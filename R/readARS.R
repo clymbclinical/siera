@@ -9,10 +9,10 @@
 #'
 readARS <- function(JSON_ARS){
 
-  library(tidyverse)
-  library(readxl)
-  library(splitstackshape)
-  library(jsonlite)
+  # library(tidyverse)
+  # library(readxl)
+  # library(splitstackshape)
+  # library(jsonlite)
 
   # load libraries ----------------------------------------------------------
 
