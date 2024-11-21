@@ -1,5 +1,5 @@
-# Siera
-Siera is an R package that ingests ARS metadata (JSON or xlsx), and produces R programs that generate ARDs.
+# siera
+siera is an R package that ingests ARS metadata (JSON or xlsx), and produces R programs that generate ARDs.
 
 ## ARS
 ARS (Analysis Results Standard) is a foundational CDISC standard that provides a framework for organising metadata as it relates to the Analysis Results for a Reporting Event.  Amongst other things, this metadata 
