@@ -8,11 +8,12 @@
 #' @examples readARS("ARS_V1_Common Safety Displays.json")
 #'
 readARS <- function(JSON_ARS){
+#
+# library(tidyverse)
+# library(readxl)
+# library(splitstackshape)
+# library(jsonlite)
 
-  # library(tidyverse)
-  # library(readxl)
-  # library(splitstackshape)
-  # library(jsonlite)
 
   # load libraries ----------------------------------------------------------
 
@@ -1635,9 +1636,9 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
     )
 
     writeLines(get(paste0("code_",Output)),
-               paste0("ARD/ARD_",Output,".R"))
+               paste0("ARD_",Output,".R"))
 
-    file.edit(paste0("ARD/ARD_",Output,".R"))
+    file.edit(paste0("ARD_",Output,".R"))
 
   } # end of outputs
 }
