@@ -2,10 +2,14 @@
 #'
 #' @param JSON_ARS A JSON file containing ARS metadata for a reporting event.
 #'
+#' @importFrom magrittr "%>%"
+#'
 #' @return R programmes generating ARDs - one for each output specificied in the ARS JSON
 #' @export
 #'
-#' @examples readARS("ARS_V1_Common Safety Displays.json")
+#' @examples
+#' json_path <- system.file("extdata", "ARS_V1_Common Safety Displays.json", package = "siera")
+#' readARS(json_path)
 #'
 readARS <- function(JSON_ARS){
 #
