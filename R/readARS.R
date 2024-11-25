@@ -2,7 +2,6 @@
 #'
 #' @param JSON_ARS A JSON file containing ARS metadata for a reporting event.
 #'
-#' @importFrom magrittr "%>%"
 #'
 #' @return R programmes generating ARDs - one for each output specificied in the ARS JSON
 #' @export
@@ -242,7 +241,7 @@ library(splitstackshape)
 
     if(!is.null(JSON_AN[["referencedAnalysisOperations"]][[h]])){
       tmp_ref <- JSON_AN[["referencedAnalysisOperations"]][[h]] %>%
-        dplyr::mutate(order = row_number()) %>%
+        dplyr::mutate(order = dplyr::row_number()) %>%
         tidyr::pivot_wider(
           names_from = order,
           values_from = c(referencedOperationRelationshipId, analysisId),
@@ -309,7 +308,7 @@ library(splitstackshape)
                            referencedOperationRole = rOF[[j]]$referencedOperationRole$controlledTerm)
 
           tmp_l3_fin <- tmp_l3 %>%
-            dplyr::mutate(order = row_number()) %>%
+            dplyr::mutate(order = dplyr::row_number()) %>%
             tidyr::pivot_wider(
               names_from = order,
               values_from = c(id, operationId, description, referencedOperationRole),
@@ -1642,7 +1641,7 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
     writeLines(get(paste0("code_",Output)),
                paste0("ARD_",Output,".R"))
 
-    file.edit(paste0("ARD_",Output,".R"))
+    #file.edit(paste0("ARD_",Output,".R"))
 
   } # end of outputs
 }
