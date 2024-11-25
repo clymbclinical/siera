@@ -16,7 +16,7 @@ R programmes generating ARDs - one for each output specificied in the ARS JSON
 readARS is a function that ingests ARS metadata, and meta-programmes R code that could be run as-is to produce Analysis Results Datasets.
 }
 \examples{
-json_path <- system.file("extdata", "ARS_V1_Common Safety Displays.json", package = "siera")
+json_path <- system.file("extdata", "ARS_V1_Common_Safety_Displays.json", package = "siera")
 readARS(json_path)
 
 }
