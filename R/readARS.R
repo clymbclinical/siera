@@ -92,7 +92,6 @@ library(splitstackshape)
                      condition_value = json_from[["dataSubsets"]][["condition"]][["value"]],
                      compoundExpression_logicalOperator = json_from[["dataSubsets"]][["compoundExpression"]][["logicalOperator"]])
 
-
   # level 2
   # loop through level 1
   whereClauses <- JSON_DataSubsets[["compoundExpression"]][["whereClauses"]]
@@ -244,7 +243,7 @@ library(splitstackshape)
         dplyr::mutate(order = dplyr::row_number()) %>%
         tidyr::pivot_wider(
           names_from = order,
-          values_from = c(referencedOperationRelationshipId, analysisId),
+          values_from = c(.data$referencedOperationRelationshipId, .data$analysisId),
           names_glue = "{'referencedAnalysisOperations_'}{.value}{order}"
         ) %>%
         dplyr::mutate(id = tmp_id)
@@ -751,7 +750,7 @@ df1_analysisidhere <- df_analysisidhere
           # combine all dplyr::filter values:
           if(exists('rFilt_2')){
 
-            rFilt_final <- paste(rFilt_1, rFilt_2, sep = ", ")
+            rFilt_final <- paste(.data$rFilt_1, .data$rFilt_2, sep = ", ")
             rm(rFilt_2) #clear it so it doesn't exist for future
           } else rFilt_final <- rFilt_1
         } # end case where there are more than one rows
@@ -1638,8 +1637,8 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
                   code_pattern)
     )
 
-    writeLines(get(paste0("code_",Output)),
-               paste0("ARD_",Output,".R"))
+    #writeLines(get(paste0("code_",Output)),
+    #           paste0("ARD_",Output,".R"))
 
     #file.edit(paste0("ARD_",Output,".R"))
 
