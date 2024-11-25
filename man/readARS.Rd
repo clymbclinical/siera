@@ -2,20 +2,20 @@
 % Please edit documentation in R/readARS.R
 \name{readARS}
 \alias{readARS}
-\title{readARS}
+\title{readARS is a function that ingests ARS metadata, and meta-programmes R code that could be run as-is to produce Analysis Results Datasets.}
 \usage{
 readARS(JSON_ARS)
 }
 \arguments{
-\item{JSON_ARS}{- A JSON file containing ARS metadata for a reporting event.}
+\item{JSON_ARS}{A JSON file containing ARS metadata for a reporting event.}
 }
 \value{
-- R programmes generating ARDs - one for each output specificied in the ARS JSON
+R programmes generating ARDs - one for each output specificied in the ARS JSON
 }
 \description{
-readARS
+readARS is a function that ingests ARS metadata, and meta-programmes R code that could be run as-is to produce Analysis Results Datasets.
 }
 \examples{
-- readARS("ARS_V1_Common Safety Displays.json")
+readARS("ARS_V1_Common Safety Displays.json")
 
 }
