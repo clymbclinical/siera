@@ -243,7 +243,7 @@ library(splitstackshape)
         dplyr::mutate(order = dplyr::row_number()) %>%
         tidyr::pivot_wider(
           names_from = order,
-          values_from = c(.data$referencedOperationRelationshipId, .data$analysisId),
+          values_from = c(referencedOperationRelationshipId, analysisId),
           names_glue = "{'referencedAnalysisOperations_'}{.value}{order}"
         ) %>%
         dplyr::mutate(id = tmp_id)
@@ -750,7 +750,7 @@ df1_analysisidhere <- df_analysisidhere
           # combine all dplyr::filter values:
           if(exists('rFilt_2')){
 
-            rFilt_final <- paste(.data$rFilt_1, .data$rFilt_2, sep = ", ")
+            rFilt_final <- paste(rFilt_1, rFilt_2, sep = ", ")
             rm(rFilt_2) #clear it so it doesn't exist for future
           } else rFilt_final <- rFilt_1
         } # end case where there are more than one rows
