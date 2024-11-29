@@ -1637,8 +1637,8 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
                   code_pattern)
     )
 
-    #writeLines(get(paste0("code_",Output)),
-    #           paste0("ARD_",Output,".R"))
+    writeLines(get(paste0("code_",Output)),
+              paste0("output/ARD_",Output,".R"))
 
     #file.edit(paste0("ARD_",Output,".R"))
 
