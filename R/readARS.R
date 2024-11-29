@@ -1,6 +1,7 @@
 #' readARS is a function that ingests ARS metadata, and meta-programmes R code that could be run as-is to produce Analysis Results Datasets.
 #'
 #' @param JSON_ARS A JSON file containing ARS metadata for a reporting event.
+#' @param output_path Path to store .R ARD scripts
 #'
 #'
 #' @return R programmes generating ARDs - one for each output specificied in the ARS JSON
@@ -8,9 +9,9 @@
 #'
 #' @examples
 #' json_path <- system.file("extdata", "ARS_V1_Common_Safety_Displays.json", package = "siera")
-#' readARS(json_path)
+#' readARS(json_path, output_path)
 #'
-readARS <- function(JSON_ARS){
+readARS <- function(JSON_ARS, output_path = Sys.getenv("USERPROFILE")){
 #
 # library(tidyverse)
 # library(readxl)
@@ -1638,7 +1639,7 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
     )
 
     writeLines(get(paste0("code_",Output)),
-              paste0("output/ARD_",Output,".R"))
+              paste0(output_path,"/ARD_",Output,".R"))
 
     #file.edit(paste0("ARD_",Output,".R"))
 

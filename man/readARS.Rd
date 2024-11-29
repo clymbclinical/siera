@@ -4,10 +4,12 @@
 \alias{readARS}
 \title{readARS is a function that ingests ARS metadata, and meta-programmes R code that could be run as-is to produce Analysis Results Datasets.}
 \usage{
-readARS(JSON_ARS)
+readARS(JSON_ARS, output_path = Sys.getenv("USERPROFILE"))
 }
 \arguments{
 \item{JSON_ARS}{A JSON file containing ARS metadata for a reporting event.}
+
+\item{output_path}{Path to store .R ARD scripts}
 }
 \value{
 R programmes generating ARDs - one for each output specificied in the ARS JSON
