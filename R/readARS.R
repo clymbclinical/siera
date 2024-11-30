@@ -9,13 +9,14 @@
 #'
 #' @examples
 #' json_path <- system.file("extdata", "ARS_V1_Common_Safety_Displays.json", package = "siera")
-#' readARS(json_path)
+#'
+#' readARS(json_path, Sys.getenv("HOME"))
 #'
 #
 # readARS <- function(JSON_ARS, output_path = Sys.getenv("HOME")){
 
-readARS <- function(JSON_ARS, output_path = file.path(tempdir())){
-
+# readARS <- function(JSON_ARS, output_path = file.path(tempdir())){
+readARS <- function(JSON_ARS, output_path = ""){
   # load libraries ----------------------------------------------------------
 
   func_libraries <- function(){
@@ -1635,9 +1636,8 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
                   code_pattern)
     )
 
-
     # Ensure the directory exists
-    dir.create(dirname(output_path), recursive = TRUE, showWarnings = FALSE)
+    # dir.create(dirname(output_path), recursive = TRUE, showWarnings = FALSE)
 
     writeLines(get(paste0("code_",Output)),
               paste0(output_path,"/ARD_",Output,".R"))
@@ -1646,4 +1646,4 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
 
   } # end of outputs
 }
-#readARS("ARS_V1_Common Safety Displays.json")
+#readARS(json_path, Sys.getenv("HOME"))

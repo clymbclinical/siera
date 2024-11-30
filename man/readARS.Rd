@@ -4,7 +4,7 @@
 \alias{readARS}
 \title{readARS is a function that ingests ARS metadata, and meta-programmes R code that could be run as-is to produce Analysis Results Datasets.}
 \usage{
-readARS(JSON_ARS, output_path = file.path(tempdir()))
+readARS(JSON_ARS, output_path = "")
 }
 \arguments{
 \item{JSON_ARS}{A JSON file containing ARS metadata for a reporting event.}
@@ -19,6 +19,7 @@ readARS is a function that ingests ARS metadata, and meta-programmes R code that
 }
 \examples{
 json_path <- system.file("extdata", "ARS_V1_Common_Safety_Displays.json", package = "siera")
-readARS(json_path)
+
+readARS(json_path, Sys.getenv("HOME"))
 
 }
