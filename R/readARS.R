@@ -11,8 +11,10 @@
 #' json_path <- system.file("extdata", "ARS_V1_Common_Safety_Displays.json", package = "siera")
 #' readARS(json_path)
 #'
+#
+# readARS <- function(JSON_ARS, output_path = Sys.getenv("HOME")){
 
-readARS <- function(JSON_ARS, output_path = Sys.getenv("HOME")){
+readARS <- function(JSON_ARS, output_path = file.path(tempdir())){
 
   # load libraries ----------------------------------------------------------
 
@@ -1632,6 +1634,10 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
                   ")\n\n #Apply pattern format:\n",
                   code_pattern)
     )
+
+
+    # Ensure the directory exists
+    dir.create(dirname(output_path), recursive = TRUE, showWarnings = FALSE)
 
     writeLines(get(paste0("code_",Output)),
               paste0(output_path,"/ARD_",Output,".R"))
