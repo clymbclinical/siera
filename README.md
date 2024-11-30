@@ -20,3 +20,6 @@ a variable for the result itself.  These results are machine-readable, and can b
 2. As an intermediate step in producing actual Outputs - the ARD only needs to be formatted/transposed to the Shell format.
 3. In AI processes that aim to summarise and report on the results in context for the CSR.
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
