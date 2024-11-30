@@ -11,7 +11,8 @@
 #' json_path <- system.file("extdata", "ARS_V1_Common_Safety_Displays.json", package = "siera")
 #' readARS(json_path)
 #'
-readARS <- function(JSON_ARS, output_path = Sys.getenv("USERPROFILE")){
+
+readARS <- function(JSON_ARS, output_path = Sys.getenv("HOME")){
 
   # load libraries ----------------------------------------------------------
 
