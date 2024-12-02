@@ -17,3 +17,7 @@ Imports:
     tidyr,
     jsonlite,
     stringr
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

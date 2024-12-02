@@ -4,13 +4,21 @@
 #' @param output_path Path to store .R ARD scripts
 #'
 #'
-#' @return R programmes generating ARDs - one for each output specificied in the ARS JSON
+#' @returns R programmes generating ARDs - one for each output specificied in the ARS JSON
 #' @export
 #'
 #' @examples
+#' # get path to json file
 #' json_path <- system.file("extdata", "ARS_V1_Common_Safety_Displays.json", package = "siera")
 #'
-#' readARS(json_path, Sys.getenv("HOME"))
+#' # output path for R programs
+#' output_dir = file.path(tempdir())
+#'
+#' # run function, write to temp directory
+#' readARS(json_path, output_dir)
+#'
+#' #remove temp directory
+#' unlink(output_dir, recursive = TRUE)
 #'
 #
 # readARS <- function(JSON_ARS, output_path = Sys.getenv("HOME")){
