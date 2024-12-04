@@ -14,7 +14,10 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Load the ARS metadata
+```{r options, include=FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
 
 ```{r setup}
 library(siera)
