@@ -351,7 +351,7 @@ library(readr)
 
   # load ADaM ---------------------------------------------------------------
 
-adam_path <- adam_path
+adam_loc <- adam_path
 
   func_ADaM <- function(adampath){
     template <- "
@@ -368,7 +368,7 @@ ADVS <- read_csv('adampathhere/ADVS.csv') %>%
     return(code)
   }
 
-  code_ADaM <- func_ADaM(adam_path)
+  code_ADaM <- func_ADaM(adam_loc)
 
   # Prework and loops ----------------------------------------------------
 
