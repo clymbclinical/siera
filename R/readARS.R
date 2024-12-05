@@ -1,7 +1,12 @@
-#' readARS is a function that ingests ARS metadata, and meta-programmes R code that could be run as-is to produce Analysis Results Datasets.
+#' Ingest ARS Metadata and meta-programme ARD code for each output
 #'
-#' @param JSON_ARS A JSON file containing ARS metadata for a reporting event.
+#' Ingest CDISC-standard JSON or xlsx ARS metadata, and meta-programme R scripts
+#' that could be run as-is to produce Analysis Results Datasets when ingesting ADaM
+#' datasets
+#'
+#' @param JSON_ARS A JSON file containing ARS metadata for a reporting event
 #' @param output_path Path to store .R ARD scripts
+#' @param adam_path Path to folder containing ADaM datasets, to be run in ARD program
 #'
 #'
 #' @returns R programmes generating ARDs - one for each output specificied in the ARS JSON
@@ -14,8 +19,11 @@
 #' # output path for R programs
 #' output_dir = file.path(tempdir())
 #'
+#' # folder containing ADaM datasets
+#' adam_folder = file.path(tempdir())
+#'
 #' # run function, write to temp directory
-#' readARS(json_path, output_dir)
+#' readARS(json_path, output_dir, adam_folder)
 #'
 #' #remove temp directory
 #' unlink(output_dir, recursive = TRUE)
@@ -24,7 +32,7 @@
 # readARS <- function(JSON_ARS, output_path = Sys.getenv("HOME")){
 
 # readARS <- function(JSON_ARS, output_path = file.path(tempdir())){
-readARS <- function(JSON_ARS, output_path = ""){
+readARS <- function(JSON_ARS, output_path = "", adam_path = ""){
   # load libraries ----------------------------------------------------------
 
   func_libraries <- function(){
@@ -343,21 +351,24 @@ library(readr)
 
   # load ADaM ---------------------------------------------------------------
 
+adam_path <- adam_path
 
-  func_ADaM <- function(){
+  func_ADaM <- function(adampath){
     template <- "
 # load ADaM ----
-ADSL <- read_csv('csv_adam/ADSL.csv')
-ADAE <- read_csv('csv_adam/ADAE.csv') %>%
-  dplyr::rename(TRT01A = TRTA)
-ADVS <- read_csv('csv_adam/ADVS.csv') %>%
-  dplyr::rename(TRT01A = TRTA)
+ADSL <- read_csv('adampathhere/ADSL.csv')
+ADAE <- read_csv('adampathhere/ADAE.csv') %>%
+  rename(TRT01A = TRTA)
+ADVS <- read_csv('adampathhere/ADVS.csv') %>%
+  rename(TRT01A = TRTA)
   "
-    code <- template
+    # code <- template
+
+    code <- gsub('adampathhere', adampath, template)
     return(code)
   }
 
-  code_ADaM <- func_ADaM()
+  code_ADaM <- func_ADaM(adam_path)
 
   # Prework and loops ----------------------------------------------------
 

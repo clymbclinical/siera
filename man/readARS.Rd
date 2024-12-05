@@ -2,20 +2,24 @@
 % Please edit documentation in R/readARS.R
 \name{readARS}
 \alias{readARS}
-\title{readARS is a function that ingests ARS metadata, and meta-programmes R code that could be run as-is to produce Analysis Results Datasets.}
+\title{Ingest ARS Metadata and meta-programme ARD code for each output}
 \usage{
-readARS(JSON_ARS, output_path = "")
+readARS(JSON_ARS, output_path = "", adam_path = "")
 }
 \arguments{
-\item{JSON_ARS}{A JSON file containing ARS metadata for a reporting event.}
+\item{JSON_ARS}{A JSON file containing ARS metadata for a reporting event}
 
 \item{output_path}{Path to store .R ARD scripts}
+
+\item{adam_path}{Path to folder containing ADaM datasets, to be run in ARD program}
 }
 \value{
 R programmes generating ARDs - one for each output specificied in the ARS JSON
 }
 \description{
-readARS is a function that ingests ARS metadata, and meta-programmes R code that could be run as-is to produce Analysis Results Datasets.
+Ingest CDISC-standard JSON or xlsx ARS metadata, and meta-programme R scripts
+that could be run as-is to produce Analysis Results Datasets when ingesting ADaM
+datasets
 }
 \examples{
 # get path to json file
@@ -24,8 +28,11 @@ json_path <- system.file("extdata", "ARS_V1_Common_Safety_Displays.json", packag
 # output path for R programs
 output_dir = file.path(tempdir())
 
+# folder containing ADaM datasets
+adam_folder = file.path(tempdir())
+
 # run function, write to temp directory
-readARS(json_path, output_dir)
+readARS(json_path, output_dir, adam_folder)
 
 #remove temp directory
 unlink(output_dir, recursive = TRUE)
