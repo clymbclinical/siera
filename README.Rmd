@@ -59,7 +59,7 @@ output_folder <- file.path(paste0(getwd(),"/inst"))
 ADaM_folder <- file.path(paste0(getwd(),"/inst/extdata")) 
 
 # run the readARS function with these 3 parameters.  This creates R scripts (1 for each output in output_folder)
-readARS(json_path, output_folder)
+readARS(json_path, output_folder, adam_path = ADaM_folder)
 ```
 
 Once the R programs are created, they can be individually run, provided that the ADaM datasets
