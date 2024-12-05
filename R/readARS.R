@@ -34,6 +34,7 @@ readARS <- function(JSON_ARS, output_path = ""){
 library(tidyverse)
 library(readxl)
 library(splitstackshape)
+library(readr)
   "
     code <- template
     return(code)
