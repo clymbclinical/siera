@@ -40,15 +40,22 @@ Using an example JSON ARS file, run readARS() function to produce the
 ARD programs.
 
 In this example, the following is used: 1. JSON ARS file: CDISC Pilot
-Study Common Safety Displays JSON ARS. 2. get
+Study Common Safety Displays JSON ARS. 2. ADaM datasets: CDISC Pilot
+Study Common Safety Displays - ADSL, ADAE, ADVS
 
 ``` r
 library(siera)
 
-json_path <- system.file("extdata", "ARS_V1_Common_Safety_Displays.json", package = "siera")
-output_folder <- file.path(paste0(getwd()))
-ADaM_folder <- file.path(paste0(getwd(),"/ADAM"))
+# the ARS JSON File:
+json_path <- system.file("extdata", "ARS_V1_Common_Safety_Displays.json", package = "siera") 
 
+# store ARD scripts in this folder:
+output_folder <- file.path(paste0(getwd(),"/inst")) 
+
+# this folder contains ADaM datasets to produce ARD:
+ADaM_folder <- file.path(paste0(getwd(),"/inst/extdata")) 
+
+# run the readARS function with these 3 parameters.  This creates R scripts (1 for each output in output_folder)
 readARS(json_path, output_folder)
 #> Warning in stri_trim_both(string): argument is not an atomic vector; coercing
 #> Warning in stri_trim_both(string): argument is not an atomic vector; coercing
@@ -69,10 +76,20 @@ corresponding R script is ARD_Out14-1-1.R.
 We also assume that there are CSV ADaMs in a folder called “adam_csv” in
 the current working directory.
 
-In this example, the ARD programs can be called as follows:
+In this example, an ARD programs can be called as follows:
 
 ``` r
+# location to one of the created R scripts:
+# ARD_program <- file.path(paste0(output_folder,"/ARD_Out14-1-1.R"))
 
-# ARD_program <- file.path(paste0(getwd(),"/ARD_Out14-1-1.R"))
+# run the program as-is.  This ingests the ADaM dataset(s) in the ADAM_folder location listed earlier.
 # source(ARD_program)
+```
+
+Once the ARD program(s) is run, the ARD is created. Among all the helper
+objects created, the ARD can be identified as the “ARD_outputname”
+object. Let’s view this object created by the previous command:
+
+``` r
+# print(ARD_Out14_1_1)
 ```
