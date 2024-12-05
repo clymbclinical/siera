@@ -33,8 +33,8 @@ The current version (0.1.0) of siera can be installed from [GitHub](https://gith
 
 ``` {r install}
 # install.packages("devtools")
-devtools::install_github("https://github.com/clymbclinical/siera", 
-                         auth_token = "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")
+Sys.unsetenv("GITHUB_PAT")
+devtools::install_github("https://github.com/clymbclinical/siera")
 ```
 
 
@@ -57,18 +57,16 @@ readARS(json_path, output_folder)
 ```
 
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+Once the R programs are created, they can be individually run, provided that the ADaM datasets
+are in the location as provided to the readARS function. In this example, one of the 5 outputs are
+Out14-1-1.  Its corresponding R script is ARD_Out14-1-1.R. 
 
-```{r cars}
-summary(cars)
+We also assume that there are CSV ADaMs in a folder called "adam_csv" in the current working directory.
+
+In this example, the ARD programs can be called as follows:
+
+```{r ARD run}
+
+# ARD_program <- file.path(paste0(getwd(),"/ARD_Out14-1-1.R"))
+# source(ARD_program)
 ```
-
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.

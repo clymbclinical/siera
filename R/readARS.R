@@ -352,22 +352,20 @@ library(readr)
   # load ADaM ---------------------------------------------------------------
 
 
-  func_ADaM <- function(adampath){
+  func_ADaM <- function(){
     template <- "
 # load ADaM ----
-ADSL <- read_csv('adampathhere/ADSL.csv')
-ADAE <- read_csv('adampathhere/ADAE.csv') %>%
-  dplyr::rename(TRT01A = TRTA)
-ADVS <- read_csv('adampathhere/ADVS.csv') %>%
-  dplyr::rename(TRT01A = TRTA)
+ADSL <- read_csv('inst/extdata/ADSL.csv')
+ADAE <- read_csv('inst/extdata/ADAE.csv') %>%
+  rename(TRT01A = TRTA)
+ADVS <- read_csv('inst/extdata/ADVS.csv') %>%
+  rename(TRT01A = TRTA)
   "
-    code <- gsub('adampathhere', adampath, template)
+    code <- template
     return(code)
   }
 
-  code_ADaM <- func_ADaM(adam_path)
-
-  return(code)
+  code_ADaM <- func_ADaM()
 
   # Prework and loops ----------------------------------------------------
 
