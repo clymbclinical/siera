@@ -1,5 +1,8 @@
 ---
 output: github_document
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -16,37 +19,48 @@ knitr::opts_chunk$set(
 # siera
 
 <!-- badges: start -->
+
+<!-- [![CRAN -->
+<!-- status](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera) -->
+
+
 <!-- badges: end -->
 
-With siera, users ingest Analysis Results Standard - ARS (a CDISC Foundational standard) metadata and auto-generate
-R scripts that, when run in with provided ADaM datasets, provide Analysis Results Datasets (ARDs).  
+With siera, users ingest Analysis Results Standard - ARS (a CDISC
+Foundational standard) metadata and auto-generate R scripts that, when
+run in with provided ADaM datasets, provide Analysis Results Datasets
+(ARDs).
 
-In order to use the readARS() function, users will need to provide the following:
+In order to use the readARS() function, users will need to provide the
+following:
 
-1. A Functional JSON file, representing ARS Metadata for a Reporting Event (to get started, see TFL Designer)
-2. An output directory where the R scripts will be placed
-3. A folder containing the related ADaM datasets for the ARDs to be generated
+1.  A Functional JSON file, representing ARS Metadata for a Reporting
+    Event (to get started, see TFL Designer)
+2.  An output directory where the R scripts will be placed
+3.  A folder containing the related ADaM datasets for the ARDs to be
+    generated
 
 ## Installation
 
-The current version (0.1.0) of siera can be installed from [GitHub](https://github.com/clymbclinical/siera) with:
+The current version (0.1.0) of siera can be installed from
+[GitHub](https://github.com/clymbclinical/siera) with:
 
-``` {r install}
+```{r install, message=FALSE}
 # install.packages("devtools")
 Sys.unsetenv("GITHUB_PAT")
 devtools::install_github("https://github.com/clymbclinical/siera")
 ```
 
-
 ## Example
 
-Using an example JSON ARS file, run readARS() function to produce the ARD programs.
+Using an example JSON ARS file, run readARS() function to produce the
+ARD programs.
 
-In this example, the following is used:
-1. JSON ARS file: CDISC Pilot Study Common Safety Displays JSON ARS.
-2. ADaM datasets: CDISC Pilot Study Common Safety Displays - ADSL, ADAE, ADVS
+In this example, the following is used: 1. JSON ARS file: CDISC Pilot
+Study Common Safety Displays JSON ARS. 2. ADaM datasets: CDISC Pilot
+Study Common Safety Displays - ADSL, ADAE, ADVS
 
-```{r example}
+```{r example, message=FALSE}
 library(siera)
 
 # the ARS JSON File:
@@ -62,26 +76,28 @@ ADaM_folder <- file.path(paste0(getwd(),"/inst/extdata"))
 readARS(json_path, output_folder, adam_path = ADaM_folder)
 ```
 
-Once the R programs are created, they can be individually run, provided that the ADaM datasets
-are in the location as provided to the readARS function. In this example, one of the 5 outputs are
-Out14-1-1.  Its corresponding R script is ARD_Out14-1-1.R. 
+Once the R programs are created, they can be individually run, provided
+that the ADaM datasets are in the location as provided to the readARS
+function. In this example, one of the 5 outputs are Out14-1-1. Its
+corresponding R script is ARD_Out14-1-1.R.
 
-We also assume that there are CSV ADaMs in a folder called "adam_csv" in the current working directory.
+We also assume that there are CSV ADaMs in a folder called "adam_csv" in
+the current working directory.
 
 In this example, an ARD programs can be called as follows:
 
-```{r ARD run}
+```{r ARD run, message=FALSE}
 # location to one of the created R scripts:
-# ARD_program <- file.path(paste0(output_folder,"/ARD_Out14-1-1.R"))
+ARD_program <- file.path(paste0(output_folder,"/ARD_Out14-1-1.R"))
 
 # run the program as-is.  This ingests the ADaM dataset(s) in the ADAM_folder location listed earlier.
-# source(ARD_program)
+source(ARD_program)
 ```
 
-Once the ARD program(s) is run, the ARD is created.  Among all the helper objects created, the ARD can be
-identified as the "ARD_outputname" object.  Let's view this object created by the previous command:
+Once the ARD program(s) is run, the ARD is created. Among all the helper
+objects created, the ARD can be identified as the "ARD_outputname"
+object. Let's view this object created by the previous command:
 
-```{r print ARD}
-# print(ARD_Out14_1_1)
+```{r print ARD, message=FALSE}
+print(ARD_Out14_1_1)
 ```
-
