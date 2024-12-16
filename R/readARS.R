@@ -343,7 +343,6 @@ library(readr)
 
   # load ADaM ---------------------------------------------------------------
 
-
   func_ADaM <- function(){
     template <- "
 # load ADaM ----
