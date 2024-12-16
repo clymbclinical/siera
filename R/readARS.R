@@ -1656,14 +1656,9 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
                   code_pattern)
     )
 
-    # Ensure the directory exists
-    # dir.create(dirname(output_path), recursive = TRUE, showWarnings = FALSE)
-
     writeLines(get(paste0("code_",Output)),
               paste0(output_path,"/ARD_",Output,".R"))
 
-    #file.edit(paste0("ARD_",Output,".R"))
 
   } # end of outputs
 }
-#readARS(json_path, Sys.getenv("HOME"))
