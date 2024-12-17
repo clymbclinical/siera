@@ -719,7 +719,8 @@ df1_analysisidhere <- df_analysisidhere
               # } else {
               #   val1 = stringr::str_trim(ord1_$condition_value)
               # }
-              val1 = stringr::str_trim(ord1_$condition_value)
+              # val1 = stringr::str_trim(ord1_$condition_value)
+              val1 = ord1_$condition_value
 
 
               # put together in R code - comment afte JSONIZATION
