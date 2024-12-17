@@ -32,7 +32,6 @@
 # readARS <- function(JSON_ARS, output_path = Sys.getenv("HOME")){
 
 # readARS <- function(JSON_ARS, output_path = file.path(tempdir())){
-NULL
 
 readARS <- function(JSON_ARS, output_path = "", adam_path = ""){
   # load libraries ----------------------------------------------------------
