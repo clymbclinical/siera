@@ -8,6 +8,8 @@
 <!-- status](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera) -->
 <!-- badges: end -->
 
+Are you looking for a way to automate TFLs?
+
 With siera, users ingest Analysis Results Standard - ARS (a CDISC
 Foundational standard) metadata and auto-generate R scripts that, when
 run in with provided ADaM datasets, provide Analysis Results Datasets
