@@ -2,7 +2,7 @@ Package: siera
 Type: Package
 Title: Generate Analysis Results Programmes Using ARS Metadata
 Version: 0.1.0
-Author: c(
+Authors@R: c(
     person("Malan", "Bosman", email = "malanbos@gmail.com", role = c("aut", "cre")),
     person("Clymb Clinical", role = c("cph", "fnd")))
 Maintainer: Malan Bosman <malanbos@gmail.com>
@@ -25,4 +25,3 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-URL: https://clymbclinical.github.io/siera/
