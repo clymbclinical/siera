@@ -6,6 +6,8 @@
 <!-- badges: start -->
 <!-- [![CRAN -->
 <!-- status](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera) -->
+
+[![R-CMD-check](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 Are you looking for a way to automate TFLs?
@@ -33,6 +35,29 @@ The current version (0.1.0) of siera can be installed from
 # install.packages("devtools")
 Sys.unsetenv("GITHUB_PAT")
 devtools::install_github("https://github.com/clymbclinical/siera")
+#> glue     (1.7.0 -> 1.8.0 ) [CRAN]
+#> pillar   (1.9.0 -> 1.10.0) [CRAN]
+#> jsonlite (1.8.8 -> 1.8.9 ) [CRAN]
+#> 
+#>   There is a binary version available but the source version is later:
+#>        binary source needs_compilation
+#> pillar  1.9.0 1.10.0             FALSE
+#> 
+#> package 'glue' successfully unpacked and MD5 sums checked
+#> package 'jsonlite' successfully unpacked and MD5 sums checked
+#> 
+#> The downloaded binary packages are in
+#>  C:\Users\mbosm\AppData\Local\Temp\Rtmpwpw92F\downloaded_packages
+#> ── R CMD build ─────────────────────────────────────────────────────────────────
+#>          checking for file 'C:\Users\mbosm\AppData\Local\Temp\Rtmpwpw92F\remotes9f28384c543c\clymbclinical-siera-d2e44f7/DESCRIPTION' ...  ✔  checking for file 'C:\Users\mbosm\AppData\Local\Temp\Rtmpwpw92F\remotes9f28384c543c\clymbclinical-siera-d2e44f7/DESCRIPTION' (408ms)
+#>       ─  preparing 'siera': (517ms)
+#>    checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
+#>       ─  checking for LF line-endings in source and make files and shell scripts (356ms)
+#>   ─  checking for empty or unneeded directories
+#>      Omitted 'LazyData' from DESCRIPTION
+#>       ─  building 'siera_0.1.0.tar.gz'
+#>      
+#> 
 ```
 
 ## Example
@@ -58,15 +83,6 @@ ADaM_folder <- file.path(paste0(getwd(),"/inst/extdata"))
 
 # run the readARS function with these 3 parameters.  This creates R scripts (1 for each output in output_folder)
 readARS(json_path, output_folder, adam_path = ADaM_folder)
-#> Warning in stri_trim_both(string): argument is not an atomic vector; coercing
-#> Warning in stri_trim_both(string): argument is not an atomic vector; coercing
-#> Warning in stri_trim_both(string): argument is not an atomic vector; coercing
-#> Warning in stri_trim_both(string): argument is not an atomic vector; coercing
-#> Warning in stri_trim_both(string): argument is not an atomic vector; coercing
-#> Warning in stri_trim_both(string): argument is not an atomic vector; coercing
-#> Warning in stri_trim_both(string): argument is not an atomic vector; coercing
-#> Warning in stri_trim_both(string): argument is not an atomic vector; coercing
-#> Warning in stri_trim_both(string): argument is not an atomic vector; coercing
 ```
 
 Once the R programs are created, they can be individually run, provided
