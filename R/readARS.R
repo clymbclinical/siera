@@ -28,11 +28,6 @@
 #' #remove temp directory
 #' unlink(output_dir, recursive = TRUE)
 #'
-#
-# readARS <- function(JSON_ARS, output_path = Sys.getenv("HOME")){
-
-# readARS <- function(JSON_ARS, output_path = file.path(tempdir())){
-
 readARS <- function(JSON_ARS, output_path = "", adam_path = ""){
   # load libraries ----------------------------------------------------------
 
@@ -353,6 +348,7 @@ library(readr)
   # load ADaM ---------------------------------------------------------------
 
 adam_loc <- adam_path
+adam_touse <-
 
   func_ADaM <- function(adampath){
     template <- "

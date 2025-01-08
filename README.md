@@ -35,29 +35,6 @@ The current version (0.1.0) of siera can be installed from
 # install.packages("devtools")
 Sys.unsetenv("GITHUB_PAT")
 devtools::install_github("https://github.com/clymbclinical/siera")
-#> glue     (1.7.0 -> 1.8.0 ) [CRAN]
-#> pillar   (1.9.0 -> 1.10.0) [CRAN]
-#> jsonlite (1.8.8 -> 1.8.9 ) [CRAN]
-#> 
-#>   There is a binary version available but the source version is later:
-#>        binary source needs_compilation
-#> pillar  1.9.0 1.10.0             FALSE
-#> 
-#> package 'glue' successfully unpacked and MD5 sums checked
-#> package 'jsonlite' successfully unpacked and MD5 sums checked
-#> 
-#> The downloaded binary packages are in
-#>  C:\Users\mbosm\AppData\Local\Temp\Rtmpwpw92F\downloaded_packages
-#> ── R CMD build ─────────────────────────────────────────────────────────────────
-#>          checking for file 'C:\Users\mbosm\AppData\Local\Temp\Rtmpwpw92F\remotes9f28384c543c\clymbclinical-siera-d2e44f7/DESCRIPTION' ...  ✔  checking for file 'C:\Users\mbosm\AppData\Local\Temp\Rtmpwpw92F\remotes9f28384c543c\clymbclinical-siera-d2e44f7/DESCRIPTION' (408ms)
-#>       ─  preparing 'siera': (517ms)
-#>    checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
-#>       ─  checking for LF line-endings in source and make files and shell scripts (356ms)
-#>   ─  checking for empty or unneeded directories
-#>      Omitted 'LazyData' from DESCRIPTION
-#>       ─  building 'siera_0.1.0.tar.gz'
-#>      
-#> 
 ```
 
 ## Example
