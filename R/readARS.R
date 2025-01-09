@@ -25,8 +25,6 @@
 #' # run function, write to temp directory
 #' readARS(json_path, output_dir, adam_folder)
 #'
-#' #remove temp directory
-#' unlink(output_dir, recursive = TRUE)
 #'
 readARS <- function(JSON_ARS, output_path = "", adam_path = ""){
   # load libraries ----------------------------------------------------------
