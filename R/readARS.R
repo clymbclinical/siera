@@ -346,7 +346,6 @@ library(readr)
   # load ADaM ---------------------------------------------------------------
 
 adam_loc <- adam_path
-adam_touse <-
 
   func_ADaM <- function(adampath){
     template <- "
