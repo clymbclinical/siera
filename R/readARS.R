@@ -522,40 +522,73 @@ df_analysisidhere <- dplyr::filter(ADaM,
 
       # Apply Grouping ----------------------------------------------------------------
 
-      AG_temp1 <- AnalysisGroupings %>%
-        dplyr::filter(id == groupid1)
 
-      AG_var1 <- AG_temp1 %>%
-        dplyr::select(groupingVariable) %>%
-        unique() %>%
-        as.character()
+      # determine maximum groupings
+      column_names <- colnames(Analyses)
 
-      AG_temp2 <- AnalysisGroupings %>%
-        dplyr::filter(id == groupid2)
+      # Filter column names that match the pattern "Group"
+      group_columns <- column_names[grep("^groupingId[0-9]+$", column_names)]
 
-      AG_var2 <- AG_temp2 %>%
-        dplyr::select(groupingVariable) %>%
-        unique() %>%
-        as.character()
+      # Extract the numeric part of the group columns and find the maximum
+      group_numbers <- as.numeric(sub("groupingId", "", group_columns))
+      max_group_number <- max(group_numbers)
 
-      AG_temp3 <- AnalysisGroupings %>%
-        dplyr::filter(id == groupid3)
 
-      AG_var3 <- AG_temp3 %>%
-        dplyr::select(groupingVariable) %>%
-        unique() %>%
-        as.character()
+      if(max_group_number >=1) {
+        AG_temp1 <- AnalysisGroupings %>%
+          dplyr::filter(id == groupid1)
 
-      #get the number of dplyr::group_by to perform in Grouping Apply
-      if(resultsByGroup1 == TRUE && !is.na(resultsByGroup1)){
-        num_grp <- 1
-        if(resultsByGroup2 == TRUE && !is.na(resultsByGroup2)) {
-          num_grp <- 2
-          if(resultsByGroup3 == TRUE && !is.na(resultsByGroup3)) {
-            num_grp <- 3
+        AG_var1 <- AG_temp1 %>%
+          dplyr::select(groupingVariable) %>%
+          unique() %>%
+          as.character()
+
+        #get the number of dplyr::group_by to perform in Grouping Apply
+        if(resultsByGroup1 == TRUE && !is.na(resultsByGroup1)){
+          num_grp <- 1
+        } else num_grp = 0
+
+        if(max_group_number >= 2){
+          AG_temp2 <- AnalysisGroupings %>%
+            dplyr::filter(id == groupid2)
+
+          AG_var2 <- AG_temp2 %>%
+            dplyr::select(groupingVariable) %>%
+            unique() %>%
+            as.character()
+
+          #get the number of dplyr::group_by to perform in Grouping Apply
+          if(resultsByGroup1 == TRUE && !is.na(resultsByGroup1)){
+            num_grp <- 1
+            if(resultsByGroup2 == TRUE && !is.na(resultsByGroup2)) {
+              num_grp <- 2
+            }
+          } else num_grp = 0
+
+          if(max_group_number >= 3){
+
+            AG_temp3 <- AnalysisGroupings %>%
+              dplyr::filter(id == groupid3)
+
+            AG_var3 <- AG_temp3 %>%
+              dplyr::select(groupingVariable) %>%
+              unique() %>%
+              as.character()
+
+            #get the number of dplyr::group_by to perform in Grouping Apply
+            if(resultsByGroup1 == TRUE && !is.na(resultsByGroup1)){
+              num_grp <- 1
+              if(resultsByGroup2 == TRUE && !is.na(resultsByGroup2)) {
+                num_grp <- 2
+                if(resultsByGroup3 == TRUE && !is.na(resultsByGroup3)) {
+                  num_grp <- 3
+                }
+              }
+            } else num_grp = 0
+
           }
         }
-      } else num_grp = 0
+      }
 
       if(num_grp == 1){
         func_AnalysisGrouping <- function(var1, ASID) {
@@ -641,136 +674,101 @@ df1_analysisidhere <- df_analysisidhere
 
       # Apply DataSubset -------------------------------------------------------------
 
-      if(!is.na(subsetid)){ # if there is a data subset for this analysis
-        subsetrule <- DataSubsets %>%
-          dplyr::filter(id == subsetid)
+      if(exists("DataSubsets")){ # if there is a data subset for the RE
+        if(!is.na(subsetid)){ # if there is a data subset for this analysis
+          subsetrule <- DataSubsets %>%
+            dplyr::filter(id == subsetid)
 
-        DSname <- subsetrule %>%
-          dplyr::select(name) %>%
-          unique() %>%
-          as.character()
+          DSname <- subsetrule %>%
+            dplyr::select(name) %>%
+            unique() %>%
+            as.character()
 
-        if(nrow(subsetrule) == 1){      # if there's only one row
+          if(nrow(subsetrule) == 1){      # if there's only one row
 
-          #dset?
-          var = subsetrule$condition_variable
-          val1 = stringr::str_trim(subsetrule$condition_value)
-          vac = subsetrule$condition_comparator
+            #dset?
+            var = subsetrule$condition_variable
+            val1 = stringr::str_trim(subsetrule$condition_value)
+            vac = subsetrule$condition_comparator
 
-          # R code
-          if(vac == "EQ") rvac = '=='
-          if(vac == "NE") rvac = '!='
-          if(vac == "GT") rvac = '>'
-          if(vac == "GE") rvac = '>='
-          if(vac == "LT") rvac = '<'
-          if(vac == "LE") rvac = '<='
-          rFilt_final <- paste0(var," ", rvac," ", "'",val1,"'")
+            # R code
+            if(vac == "EQ") rvac = '=='
+            if(vac == "NE") rvac = '!='
+            if(vac == "GT") rvac = '>'
+            if(vac == "GE") rvac = '>='
+            if(vac == "LT") rvac = '<'
+            if(vac == "LE") rvac = '<='
+            rFilt_final <- paste0(var," ", rvac," ", "'",val1,"'")
 
-        } else  {                       # if there are more than one rows
+          } else  {                       # if there are more than one rows
 
-          for (m in 1:(max(subsetrule$level) - 1)){   #loop through levels
-            # get logical operators
+            for (m in 1:(max(subsetrule$level) - 1)){   #loop through levels
+              # get logical operators
 
-            log_oper = subsetrule %>%  # identify all rows for this level
-              dplyr::filter(level == m,
-                     !is.na(compoundExpression_logicalOperator)) %>%
-              dplyr::select(compoundExpression_logicalOperator) %>%
-              as.character()
+              log_oper = subsetrule %>%  # identify all rows for this level
+                dplyr::filter(level == m,
+                              !is.na(compoundExpression_logicalOperator)) %>%
+                dplyr::select(compoundExpression_logicalOperator) %>%
+                as.character()
 
-            if(log_oper == "character(0)" ) log_oper = NA
-            assign(paste('log_oper',m, sep=''), log_oper) # assign logical operator value
-            #R code
-            if(!is.na(log_oper)){
-              if(log_oper == "AND") rlog_oper = '&'
-              else if(log_oper == "OR") rlog_oper = '|'
-              else rlog_oper = NA
-            }
-
-
-            lev = subsetrule %>%  # subset containing only first set of equations
-              dplyr::filter(level == m+1,
-                     is.na(compoundExpression_logicalOperator))
-
-            rcode <- ""
-
-            for (n in 1:nrow(lev)) {
-
-              ord1_ <- lev[n, ] # one row at a time
-
-              # assign the variables
-              var = ord1_$condition_variable
-
-              vac = ord1_$condition_comparator
-
-              # update this as we use JSON and it auto-solves "|"
-              # if (grepl('|', ord1_$condition_value, fixed = TRUE)) {     # split the condition_value
-              #   # ord1 <- cSplit(ord1_, 'condition_value', sep = "|")
-              #   ord1 <- ord1_ %>%
-              #     separate_wider_delim(condition_value, delim = "|", names_sep = "_")
-              #   val1 = stringr::str_trim(ord1$condition_value_1)
-              #   val2 = stringr::str_trim(ord1$condition_value_2)
-              # } else {
-              #   val1 = stringr::str_trim(ord1_$condition_value)
-              # }
-              # val1 = stringr::str_trim(ord1_$condition_value)
-              val1 = ord1_$condition_value
-
-
-              # put together in R code - comment afte JSONIZATION
-              # if(vac == "IN"){
-              #   f_vac = "%in%" # define operator in R code
-              #
-              # concatenate expression
-              # assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", "c('",val1, "', '",val2, "')"))
-              #
-              # if(n>1) assign('rcode', paste0(rcode, " LOGOP ",var," ", f_vac," ", "c('",val1, "', '",val2, "')"))
-              # else assign('rcode', paste0(var," ", f_vac," ", "c('",val1, "', '",val2, "')"))
-              #
-              #
-              #
-              # } else { # vac is EQ or NE
-              #   if(vac == "EQ") f_vac = "==" # define operator in R code
-              #   else if(vac == "NE") f_vac = "!="
-              #
-              #   # concatenate expression
-              #   assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", "'",val1,"'"))
-              #
-              #   if(n>1) assign('rcode', paste0(rcode, " LOGOP ",var," ", f_vac," ", "'",val1,"'"))
-              #   else assign('rcode', paste0(var," ", f_vac," ", "'",val1,"'"))
-              #
-              # }
-
-              if(vac == "IN") {
-                f_vac = "%in%"
-              }# define operator in R code
-              else { # vac is EQ or NE
-                if(vac == "EQ") f_vac = "==" # define operator in R code
-                else f_vac = "!=" #
+              if(log_oper == "character(0)" ) log_oper = NA
+              assign(paste('log_oper',m, sep=''), log_oper) # assign logical operator value
+              #R code
+              if(!is.na(log_oper)){
+                if(log_oper == "AND") rlog_oper = '&'
+                else if(log_oper == "OR") rlog_oper = '|'
+                else rlog_oper = NA
               }
-              # concatenate expression
-              assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", "'",val1,"'"))
-
-              if(n>1) assign('rcode', paste0(rcode, " LOGOP ",var," ", f_vac," ", "'",val1,"'"))
-              else assign('rcode', paste0(var," ", f_vac," ", "'",val1,"'"))
-
-            } # end loop through rows
-            # combine total dplyr::filter
 
 
-            assign(paste("rFilt", m, sep = "_"),
-                   gsub("LOGOP", rlog_oper, rcode))
-          } # end loop through levels
+              lev = subsetrule %>%  # subset containing only first set of equations
+                dplyr::filter(level == m+1,
+                              is.na(compoundExpression_logicalOperator))
 
-          # combine all dplyr::filter values:
-          if(exists('rFilt_2')){
+              rcode <- ""
 
-            rFilt_final <- paste(rFilt_1, rFilt_2, sep = ", ")
-            rm(rFilt_2) #clear it so it doesn't exist for future
-          } else rFilt_final <- rFilt_1
-        } # end case where there are more than one rows
+              for (n in 1:nrow(lev)) {
 
-        func_DataSubset <- function(filterVal, ASID, DSNAME) {
-          template <- "
+                ord1_ <- lev[n, ] # one row at a time
+
+                # assign the variables
+                var = ord1_$condition_variable
+
+                vac = ord1_$condition_comparator
+
+                val1 = ord1_$condition_value
+
+                if(vac == "IN") {
+                  f_vac = "%in%"
+                }# define operator in R code
+                else { # vac is EQ or NE
+                  if(vac == "EQ") f_vac = "==" # define operator in R code
+                  else f_vac = "!=" #
+                }
+                # concatenate expression
+                assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", "'",val1,"'"))
+
+                if(n>1) assign('rcode', paste0(rcode, " LOGOP ",var," ", f_vac," ", "'",val1,"'"))
+                else assign('rcode', paste0(var," ", f_vac," ", "'",val1,"'"))
+
+              } # end loop through rows
+              # combine total dplyr::filter
+
+
+              assign(paste("rFilt", m, sep = "_"),
+                     gsub("LOGOP", rlog_oper, rcode))
+            } # end loop through levels
+
+            # combine all dplyr::filter values:
+            if(exists('rFilt_2')){
+
+              rFilt_final <- paste(rFilt_1, rFilt_2, sep = ", ")
+              rm(rFilt_2) #clear it so it doesn't exist for future
+            } else rFilt_final <- rFilt_1
+          } # end case where there are more than one rows
+
+          func_DataSubset <- function(filterVal, ASID, DSNAME) {
+            template <- "
 
 # Apply Data Subset ---
 # Data subset: dsnamehere
@@ -778,24 +776,44 @@ df2_analysisidhere <- df1_analysisidhere %>%
         dplyr::filter(dplyr::filtertext1)
 
 "
-          code <- gsub('dplyr::filtertext1', filterVal, template)
-          code <- gsub('analysisidhere', ASID, code)
-          code <- gsub('dsnamehere', DSNAME, code)
+            code <- gsub('dplyr::filtertext1', filterVal, template)
+            code <- gsub('analysisidhere', ASID, code)
+            code <- gsub('dsnamehere', DSNAME, code)
 
-          return(code)
-        }
+            return(code)
+          }
 
-        # code_DataSubset <- func_DataSubset(rFilt_final, Anas_j)
-        assign(paste0("code_DataSubset_",Anas_j),
-               func_DataSubset(rFilt_final,
-                               Anas_j,
-                               DSname)
-        )
-        # cat(code_DataSubset)
-        # eval(parse(text=code_DataSubset))
+          # code_DataSubset <- func_DataSubset(rFilt_final, Anas_j)
+          assign(paste0("code_DataSubset_",Anas_j),
+                 func_DataSubset(rFilt_final,
+                                 Anas_j,
+                                 DSname)
+          )
+          # cat(code_DataSubset)
+          # eval(parse(text=code_DataSubset))
 
 
-      } else { # there is no data subsetting for this analysis
+        } else { # there is no data subsetting for this analysis
+
+          func_DataSubset <- function(ASID) {
+            template <- "
+
+#Apply Data Subset ---
+df2_analysisidhere <- df1_analysisidhere
+
+"
+            code <- gsub('analysisidhere', ASID, template)
+            return(code)
+          } # end function
+
+          # code_DataSubset <- func_DataSubset(rFilt_final, Anas_j)
+          assign(paste0("code_DataSubset_",Anas_j),
+                 func_DataSubset(Anas_j)
+          )
+        } # end case where no data subsetting
+      } # end case where no data subsetting for the entire RE
+
+      else { # no data subset for the RE
 
         func_DataSubset <- function(ASID) {
           template <- "
@@ -812,8 +830,7 @@ df2_analysisidhere <- df1_analysisidhere
         assign(paste0("code_DataSubset_",Anas_j),
                func_DataSubset(Anas_j)
         )
-      } # end case where no data subsetting
-
+      }
       # Apply AnalysisMethod -------------------------------------------------------------
       method <- AnalysisMethods %>%
         dplyr::filter(id == methodid)
