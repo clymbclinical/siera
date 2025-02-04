@@ -460,7 +460,7 @@ ADVS <- read_csv('adampathhere/ADVS.csv') %>%
 
       if(cond_adam == ana_adam){    # if Analysis Set ADaM and Analysis ADaM are same
 
-        func_AnalysisSet <- function(dataset, variable, oper, val, ASID, anSetName) {
+        func_AnalysisSet1 <- function(dataset, variable, oper, val, ASID, anSetName) {
           template <- "
 # Apply Analysis Set ---
 # Analysis set :  Analysissetnamehere
@@ -478,7 +478,7 @@ df_analysisidhere <- dplyr::filter(ADaM,
           return(code)
         }
 
-        assign(paste0("code_AnalysisSet_",Anas_j), func_AnalysisSet(cond_adam,
+        assign(paste0("code_AnalysisSet_",Anas_j), func_AnalysisSet1(cond_adam,
                                                                     cond_var,
                                                                     oper,
                                                                     cond_val,
@@ -488,7 +488,7 @@ df_analysisidhere <- dplyr::filter(ADaM,
       }
       else {
 
-        func_AnalysisSet <- function(dataset, variable, oper, val, ASID, anaADaM, anSetName) {
+        func_AnalysisSet2 <- function(dataset, variable, oper, val, ASID, anaADaM, anSetName) {
           template <- "
 # Apply Analysis Set ---
 # Analysis set :  Analysissetnamehere
@@ -510,7 +510,7 @@ df_analysisidhere <- dplyr::filter(ADaM,
           return(code)
         }
 
-        assign(paste0("code_AnalysisSet_",Anas_j), func_AnalysisSet(cond_adam,
+        assign(paste0("code_AnalysisSet_",Anas_j), func_AnalysisSet2(cond_adam,
                                                                     cond_var,
                                                                     oper,
                                                                     cond_val,
@@ -767,7 +767,7 @@ df1_analysisidhere <- df_analysisidhere
             } else rFilt_final <- rFilt_1
           } # end case where there are more than one rows
 
-          func_DataSubset <- function(filterVal, ASID, DSNAME) {
+          func_DataSubset1 <- function(filterVal, ASID, DSNAME) {
             template <- "
 
 # Apply Data Subset ---
@@ -785,7 +785,7 @@ df2_analysisidhere <- df1_analysisidhere %>%
 
           # code_DataSubset <- func_DataSubset(rFilt_final, Anas_j)
           assign(paste0("code_DataSubset_",Anas_j),
-                 func_DataSubset(rFilt_final,
+                 func_DataSubset1(rFilt_final,
                                  Anas_j,
                                  DSname)
           )
@@ -795,7 +795,7 @@ df2_analysisidhere <- df1_analysisidhere %>%
 
         } else { # there is no data subsetting for this analysis
 
-          func_DataSubset <- function(ASID) {
+          func_DataSubset2 <- function(ASID) {
             template <- "
 
 #Apply Data Subset ---
@@ -808,14 +808,14 @@ df2_analysisidhere <- df1_analysisidhere
 
           # code_DataSubset <- func_DataSubset(rFilt_final, Anas_j)
           assign(paste0("code_DataSubset_",Anas_j),
-                 func_DataSubset(Anas_j)
+                 func_DataSubset2(Anas_j)
           )
         } # end case where no data subsetting
       } # end case where no data subsetting for the entire RE
 
       else { # no data subset for the RE
 
-        func_DataSubset <- function(ASID) {
+        func_DataSubset3 <- function(ASID) {
           template <- "
 
 #Apply Data Subset ---
@@ -828,7 +828,7 @@ df2_analysisidhere <- df1_analysisidhere
 
         # code_DataSubset <- func_DataSubset(rFilt_final, Anas_j)
         assign(paste0("code_DataSubset_",Anas_j),
-               func_DataSubset(Anas_j)
+               func_DataSubset3(Anas_j)
         )
       }
       # Apply AnalysisMethod -------------------------------------------------------------
@@ -853,7 +853,7 @@ df2_analysisidhere <- df1_analysisidhere
 
         if(oper_id == "Mth01_CatVar_Count_ByGrp_1_n"){
 
-          func_OperationTmp <- function(operid,
+          func_OperationTmp1 <- function(operid,
                                         # operorder,
                                         opername,
                                         operdesc,
@@ -886,7 +886,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
             return(code)
           }
 
-          code_Operation_tmp = func_OperationTmp(oper_id,
+          code_Operation_tmp = func_OperationTmp1(oper_id,
                                                  oper_name,
                                                  oper_desc,
                                                  Anas_j,
@@ -898,7 +898,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
           # Mth02_ContVar_Summ_ByGrp_1_n ------------------
         } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_1_n"){
 
-          func_OperationTmp <- function(operid,
+          func_OperationTmp2 <- function(operid,
                                         # operorder,
                                         opername,
                                         operdesc,
@@ -931,7 +931,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
             return(code)
           }
 
-          code_Operation_tmp = func_OperationTmp(oper_id,
+          code_Operation_tmp = func_OperationTmp2(oper_id,
                                                  # oper_order,
                                                  oper_name,
                                                  oper_desc,
@@ -944,7 +944,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
           # Mth02_ContVar_Summ_ByGrp_2_Mean ------------------
         } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_2_Mean"){
 
-          func_OperationTmp <- function(operid,
+          func_OperationTmp3 <- function(operid,
                                         # operorder,
                                         opername,
                                         operdesc,
@@ -981,7 +981,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
             return(code)
           }
 
-          code_Operation_tmp = func_OperationTmp(oper_id,
+          code_Operation_tmp = func_OperationTmp3(oper_id,
                                                  # oper_order,
                                                  oper_name,
                                                  oper_desc,
@@ -995,7 +995,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
           # Mth02_ContVar_Summ_ByGrp_3_SD ------------------
         } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_3_SD"){
 
-          func_OperationTmp <- function(operid,
+          func_OperationTmp4 <- function(operid,
                                         # operorder,
                                         opername,
                                         operdesc,
@@ -1031,7 +1031,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
             return(code)
           }
 
-          code_Operation_tmp = func_OperationTmp(oper_id,
+          code_Operation_tmp = func_OperationTmp4(oper_id,
                                                  # oper_order,
                                                  oper_name,
                                                  oper_desc,
@@ -1045,7 +1045,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
           # Mth02_ContVar_Summ_ByGrp_4_Median ------------------
         } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_4_Median"){
 
-          func_OperationTmp <- function(operid,
+          func_OperationTmp5 <- function(operid,
                                         # operorder,
                                         opername,
                                         operdesc,
@@ -1081,7 +1081,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
             return(code)
           }
 
-          code_Operation_tmp = func_OperationTmp(oper_id,
+          code_Operation_tmp = func_OperationTmp5(oper_id,
                                                  # oper_order,
                                                  oper_name,
                                                  oper_desc,
@@ -1093,7 +1093,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
           #cat(code_Operation_tmp)
           # Mth02_ContVar_Summ_ByGrp_5_Q1 ------------------
         } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_5_Q1"){
-          func_OperationTmp <- function(operid,
+          func_OperationTmp6 <- function(operid,
                                         # operorder,
                                         opername,
                                         operdesc,
@@ -1129,7 +1129,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
             return(code)
           }
 
-          code_Operation_tmp = func_OperationTmp(oper_id,
+          code_Operation_tmp = func_OperationTmp6(oper_id,
                                                  # oper_order,
                                                  oper_name,
                                                  oper_desc,
@@ -1141,7 +1141,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
           #cat(code_Operation_tmp)
           # Mth02_ContVar_Summ_ByGrp_6_Q3 ------------------
         } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_6_Q3"){
-          func_OperationTmp <- function(operid,
+          func_OperationTmp7 <- function(operid,
                                         # operorder,
                                         opername,
                                         operdesc,
@@ -1177,7 +1177,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
             return(code)
           }
 
-          code_Operation_tmp = func_OperationTmp(oper_id,
+          code_Operation_tmp = func_OperationTmp7(oper_id,
                                                  # oper_order,
                                                  oper_name,
                                                  oper_desc,
@@ -1189,7 +1189,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
           #cat(code_Operation_tmp)
           # Mth02_ContVar_Summ_ByGrp_7_Min ------------------
         } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_7_Min"){
-          func_OperationTmp <- function(operid,
+          func_OperationTmp8 <- function(operid,
                                         # operorder,
                                         opername,
                                         operdesc,
@@ -1226,7 +1226,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
             return(code)
           }
 
-          code_Operation_tmp = func_OperationTmp(oper_id,
+          code_Operation_tmp = func_OperationTmp8(oper_id,
                                                  # oper_order,
                                                  oper_name,
                                                  oper_desc,
@@ -1239,7 +1239,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
           # Mth02_ContVar_Summ_ByGrp_8_Max ------------------
 
         } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_8_Max"){
-          func_OperationTmp <- function(operid,
+          func_OperationTmp9 <- function(operid,
                                         # operorder,
                                         opername,
                                         operdesc,
@@ -1276,7 +1276,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
             return(code)
           }
 
-          code_Operation_tmp = func_OperationTmp(oper_id,
+          code_Operation_tmp = func_OperationTmp9(oper_id,
                                                  # oper_order,
                                                  oper_name,
                                                  oper_desc,
@@ -1289,7 +1289,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
           # Mth01_CatVar_Summ_ByGrp_1_n ------------------
 
         } else if(operation$operation_id == "Mth01_CatVar_Summ_ByGrp_1_n"){
-          func_OperationTmp <- function(operid,
+          func_OperationTmp10 <- function(operid,
                                         # operorder,
                                         opername,
                                         operdesc,
@@ -1325,7 +1325,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
             return(code)
           }
 
-          code_Operation_tmp = func_OperationTmp(oper_id,
+          code_Operation_tmp = func_OperationTmp10(oper_id,
                                                  # oper_order,
                                                  oper_name,
                                                  oper_desc,
@@ -1345,7 +1345,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
           NUM_operationid = operation$operation_referencedResultRelationships1_operationId
           DEN_operationid = operation$operation_referencedResultRelationships2_operationId
 
-          func_OperationTmp <- function(operid,
+          func_OperationTmp11 <- function(operid,
                                         # operorder,
                                         opername,
                                         operdesc,
@@ -1399,7 +1399,7 @@ df3_analysisidhere_operationidhere <- merge(df3_analysisidhere_operationidhere_n
             return(code)
           }
 
-          code_Operation_tmp = func_OperationTmp(oper_id,
+          code_Operation_tmp = func_OperationTmp11(oper_id,
                                                  # oper_order,
                                                  oper_name,
                                                  oper_desc,
@@ -1417,7 +1417,7 @@ df3_analysisidhere_operationidhere <- merge(df3_analysisidhere_operationidhere_n
           # Mth04_ContVar_Comp_Anova_1_pval ----
         } else if(operation$operation_id == "Mth04_ContVar_Comp_Anova_1_pval"){
 
-          func_OperationTmp <- function(operid,
+          func_OperationTmp12 <- function(operid,
                                         # operorder,
                                         opername,
                                         operdesc,
@@ -1463,7 +1463,7 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
             return(code)
           }
 
-          code_Operation_tmp = func_OperationTmp(oper_id,
+          code_Operation_tmp = func_OperationTmp12(oper_id,
                                                  # oper_order,
                                                  oper_name,
                                                  oper_desc,
@@ -1476,7 +1476,7 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
           # Mth03_CatVar_Comp_PChiSq_1_pval ----
         } else if(operation$operation_id == "Mth03_CatVar_Comp_PChiSq_1_pval"){
 
-          func_OperationTmp <- function(operid,
+          func_OperationTmp13 <- function(operid,
                                         # operorder,
                                         opername,
                                         operdesc,
@@ -1520,7 +1520,7 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
             return(code)
           }
 
-          code_Operation_tmp = func_OperationTmp(oper_id,
+          code_Operation_tmp = func_OperationTmp13(oper_id,
                                                  # oper_order,
                                                  oper_name,
                                                  oper_desc,
