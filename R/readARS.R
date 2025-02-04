@@ -591,7 +591,7 @@ df_analysisidhere <- dplyr::filter(ADaM,
       }
 
       if(num_grp == 1){
-        func_AnalysisGrouping <- function(var1, ASID) {
+        func_AnalysisGrouping1 <- function(var1, ASID) {
 
           template <- "
 
@@ -604,10 +604,10 @@ df1_analysisidhere <- df_analysisidhere %>%
           code <- gsub('analysisidhere', ASID, code)
         }
 
-        code_AnalysisGrouping_0 <- func_AnalysisGrouping(AG_var1, Anas_j)
+        code_AnalysisGrouping_0 <- func_AnalysisGrouping1(AG_var1, Anas_j)
 
       } else if(num_grp == 2){
-        func_AnalysisGrouping <- function(var1, var2, ASID) {
+        func_AnalysisGrouping2 <- function(var1, var2, ASID) {
 
           template <- "
 
@@ -624,11 +624,11 @@ df1_analysisidhere <- df_analysisidhere %>%
           return(code)
         }
 
-        code_AnalysisGrouping_0 <- func_AnalysisGrouping(AG_var1,
+        code_AnalysisGrouping_0 <- func_AnalysisGrouping2(AG_var1,
                                                          AG_var2,
                                                          Anas_j)
       } else if(num_grp == 3){
-        func_AnalysisGrouping <- function(var1, var2, var3, ASID) {
+        func_AnalysisGrouping3 <- function(var1, var2, var3, ASID) {
 
           template <- "
 
@@ -644,13 +644,13 @@ df1_analysisidhere <- df_analysisidhere %>%
           return(code)
         }
 
-        code_AnalysisGrouping_0 <- func_AnalysisGrouping(AG_var1,
+        code_AnalysisGrouping_0 <- func_AnalysisGrouping3(AG_var1,
                                                          AG_var2,
                                                          AG_var3,
                                                          Anas_j)
       } else {
 
-        func_AnalysisGrouping <- function(ASID) {
+        func_AnalysisGrouping4 <- function(ASID) {
 
           template <- "
 
@@ -664,7 +664,7 @@ df1_analysisidhere <- df_analysisidhere
           return(code)
         }
 
-        code_AnalysisGrouping_0 <- func_AnalysisGrouping(Anas_j)
+        code_AnalysisGrouping_0 <- func_AnalysisGrouping4(Anas_j)
       }
 
       assign(paste0("code_AnalysisGrouping_",
