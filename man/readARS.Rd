@@ -2,7 +2,7 @@
 % Please edit documentation in R/readARS.R
 \name{readARS}
 \alias{readARS}
-\title{Ingest ARS (Analysis Results Standard) Metadata and meta-programme ARD (Analysis Results Standard) code for each output}
+\title{Ingest ARS (Analysis Results Standard) metadata, produce ARD (Analysis Results Dataset) code for each output}
 \usage{
 readARS(JSON_ARS, output_path = "", adam_path = "")
 }
@@ -23,7 +23,8 @@ datasets
 }
 \examples{
 # path to JSON file containing ARS metadata
-json_path <- tempdir()
+
+json_path <- ARS_example("ARS_V1_Common_Safety_Displays.json")
 
 # output path for R programs
 output_dir = tempdir()

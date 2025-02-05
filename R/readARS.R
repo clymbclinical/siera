@@ -14,7 +14,8 @@
 #'
 #' @examples
 #' # path to JSON file containing ARS metadata
-#' json_path <- tempdir()
+#'
+#' json_path <- ARS_example("ARS_V1_Common_Safety_Displays.json")
 #'
 #' # output path for R programs
 #' output_dir = tempdir()
