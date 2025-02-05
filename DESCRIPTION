@@ -6,10 +6,12 @@ Authors@R: c(
     person("Malan", "Bosman", email = "malanbos@gmail.com", role = c("aut", "cre")),
     person("Clymb Clinical", role = c("cph", "fnd")))
 Maintainer: Malan Bosman <malanbos@gmail.com>
-Description: CDISC foundational standard, Analysis Results Standard (ARS), provides
-    metadata describing all components to calculate Analysis Results.  
+Description: Analysis Results Standard (ARS), a foundational standard by CDISC
+    (Clinical Data Interchange Standards Consortium), provides a logical
+    data model for metadata describing all components to calculate Analysis Results. 
+    <https://www.cdisc.org/standards/foundational/analysis-results-standard>
     Using siera package, ARS metadata is ingested (JSON or Excel format),
-    and programmes to generate Analysis Results Datasets (ARDs) are produced.
+    producing programmes to generate Analysis Results Datasets (ARDs).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

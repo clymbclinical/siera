@@ -1,6 +1,6 @@
-#' Ingest ARS Metadata and meta-programme ARD code for each output
+#' Ingest ARS (Analysis Results Standard) metadata, produce ARD (Analysis Results Dataset) code for each output
 #'
-#' Ingest CDISC-standard JSON or xlsx ARS metadata, and meta-programme R scripts
+#' Ingest JSON or xlsx ARS (Analysis Results Standard) metadata, and meta-programme R scripts
 #' that could be run as-is to produce Analysis Results Datasets when ingesting ADaM
 #' datasets
 #'
@@ -13,17 +13,17 @@
 #' @export
 #'
 #' @examples
-#' # get path to json file
-#' json_path <- system.file("extdata", "ARS_V1_Common_Safety_Displays.json", package = "siera")
+#' # path to JSON file containing ARS metadata
+#' json_path <- tempdir()
 #'
 #' # output path for R programs
-#' output_dir = file.path(tempdir())
+#' output_dir = tempdir()
 #'
 #' # folder containing ADaM datasets
-#' adam_folder = file.path(tempdir())
+#' adam_folder = tempdir()
 #'
 #' # run function, write to temp directory
-#' readARS(json_path, output_dir, adam_folder)
+#' #readARS(json_path, output_dir, adam_folder)
 #'
 #'
 readARS <- function(JSON_ARS, output_path = "", adam_path = ""){

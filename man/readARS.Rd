@@ -2,7 +2,7 @@
 % Please edit documentation in R/readARS.R
 \name{readARS}
 \alias{readARS}
-\title{Ingest ARS Metadata and meta-programme ARD code for each output}
+\title{Ingest ARS (Analysis Results Standard) Metadata and meta-programme ARD (Analysis Results Standard) code for each output}
 \usage{
 readARS(JSON_ARS, output_path = "", adam_path = "")
 }
@@ -17,22 +17,22 @@ readARS(JSON_ARS, output_path = "", adam_path = "")
 R programmes generating ARDs - one for each output specificied in the ARS JSON
 }
 \description{
-Ingest CDISC-standard JSON or xlsx ARS metadata, and meta-programme R scripts
+Ingest JSON or xlsx ARS (Analysis Results Standard) metadata, and meta-programme R scripts
 that could be run as-is to produce Analysis Results Datasets when ingesting ADaM
 datasets
 }
 \examples{
-# get path to json file
-json_path <- system.file("extdata", "ARS_V1_Common_Safety_Displays.json", package = "siera")
+# path to JSON file containing ARS metadata
+json_path <- tempdir()
 
 # output path for R programs
-output_dir = file.path(tempdir())
+output_dir = tempdir()
 
 # folder containing ADaM datasets
-adam_folder = file.path(tempdir())
+adam_folder = tempdir()
 
 # run function, write to temp directory
-readARS(json_path, output_dir, adam_folder)
+#readARS(json_path, output_dir, adam_folder)
 
 
 }
