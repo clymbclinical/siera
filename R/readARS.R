@@ -349,7 +349,8 @@ library(readr)
 adam_loc <- adam_path
 
   func_ADaM <- function(adampath){
-    template <- "
+    template <-
+    "
 # load ADaM ----
 ADSL <- read_csv('adampathhere/ADSL.csv')
 ADAE <- read_csv('adampathhere/ADAE.csv') %>%

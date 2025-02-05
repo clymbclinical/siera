@@ -54,6 +54,22 @@ devtools::install_github("https://github.com/clymbclinical/siera")
 
 ## Example
 
+```{r library}
+library(siera)
+```
+
+siera includes several example files, which we use throughout the documentation.
+These include a JSON ARS file, as well as some csv ADaMs (ADSL and ADAE) which can 
+be run with the R scripts produced by readARS function.
+Use the helper ARS_example() with no arguments to list them or call it with an 
+example filename to get the path.
+
+```{r example files}
+ARS_example()
+
+ARS_example("ARS_V1_Common_Safety_Displays.json")
+```
+
 Using an example JSON ARS file, run readARS() function to produce the
 ARD programs.
 
@@ -61,16 +77,17 @@ In this example, the following is used:
 1. JSON ARS file from CDISC Pilot Study
 
 ```{r example, message=FALSE}
-library(siera)
-
 # the ARS JSON File. 
-json_path <- system.file("extdata", "ARS_V1_Common_Safety_Displays.json", package = "siera") 
+json_path <- ARS_example("ARS_V1_Common_Safety_Displays.json")
 
-# store ARD scripts in this folder:
-output_folder <- file.path(paste0(getwd(),"/inst")) 
+# store ARD scripts in this folder (we will use a temporary directory, 
+# but you may set to desired path):
+output_folder <- tempdir()
 
-# this folder contains ADaM datasets to produce ARD:
-ADaM_folder <- file.path(paste0(getwd(),"/inst/extdata")) 
+# this folder contains ADaM datasets to produce ARD (we will use temporary 
+# directory, but to make it workable, download the ADaMs required and use the location 
+# they are stored in):
+ADaM_folder <- tempdir()
 
 # run the readARS function with these 3 parameters.  This creates R scripts (1 for each output in output_folder)
 readARS(json_path, output_folder, adam_path = ADaM_folder)
