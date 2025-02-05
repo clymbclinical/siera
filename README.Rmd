@@ -57,14 +57,13 @@ devtools::install_github("https://github.com/clymbclinical/siera")
 Using an example JSON ARS file, run readARS() function to produce the
 ARD programs.
 
-In this example, the following is used: 1. JSON ARS file: CDISC Pilot
-Study Common Safety Displays JSON ARS. 2. ADaM datasets: CDISC Pilot
-Study Common Safety Displays - ADSL, ADAE, ADVS
+In this example, the following is used: 
+1. JSON ARS file from CDISC Pilot Study
 
 ```{r example, message=FALSE}
 library(siera)
 
-# the ARS JSON File:
+# the ARS JSON File. 
 json_path <- system.file("extdata", "ARS_V1_Common_Safety_Displays.json", package = "siera") 
 
 # store ARD scripts in this folder:
@@ -79,26 +78,4 @@ readARS(json_path, output_folder, adam_path = ADaM_folder)
 
 Once the R programs are created, they can be individually run, provided
 that the ADaM datasets are in the location as provided to the readARS
-function. In this example, one of the 5 outputs are Out14-1-1. Its
-corresponding R script is ARD_Out14-1-1.R.
-
-We also assume that there are CSV ADaMs in a folder called "adam_csv" in
-the current working directory.
-
-In this example, an ARD programs can be called as follows:
-
-```{r ARD run, message=FALSE}
-# location to one of the created R scripts:
-ARD_program <- file.path(paste0(output_folder,"/ARD_Out14-1-1.R"))
-
-# run the program as-is.  This ingests the ADaM dataset(s) in the ADAM_folder location listed earlier.
-source(ARD_program)
-```
-
-Once the ARD program(s) is run, the ARD is created. Among all the helper
-objects created, the ARD can be identified as the "ARD_outputname"
-object. Let's view this object created by the previous command:
-
-```{r print ARD, message=FALSE}
-print(ARD_Out14_1_1)
-```
+function. 

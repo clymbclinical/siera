@@ -356,7 +356,6 @@ ADAE <- read_csv('adampathhere/ADAE.csv') %>%
 ADVS <- read_csv('adampathhere/ADVS.csv') %>%
   rename(TRT01A = TRTA)
   "
-    # code <- template
 
     code <- gsub('adampathhere', adampath, template)
     return(code)
