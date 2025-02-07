@@ -33,7 +33,7 @@ output_dir = tempdir()
 adam_folder = tempdir()
 
 # run function, write to temp directory
-#readARS(json_path, output_dir, adam_folder)
+readARS(json_path, output_dir, adam_folder)
 
 
 }
