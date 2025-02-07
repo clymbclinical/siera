@@ -8,7 +8,6 @@
 #' @param output_path Path to store .R ARD scripts
 #' @param adam_path Path to folder containing ADaM datasets, to be run in ARD program
 #'
-#'
 #' @returns R programmes generating ARDs - one for each output specificied in the ARS JSON
 #' @export
 #'
