@@ -24,7 +24,7 @@
 #' adam_folder = tempdir()
 #'
 #' # run function, write to temp directory
-#' #readARS(json_path, output_dir, adam_folder)
+#' readARS(json_path, output_dir, adam_folder)
 #'
 #'
 readARS <- function(JSON_ARS, output_path = "", adam_path = ""){

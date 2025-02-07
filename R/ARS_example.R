@@ -4,6 +4,7 @@
 #' directory. This function make them easy to access.
 #'
 #' @param path Name of file. If `NULL`, the example files will be listed.
+#' @returns A list of example files (if path is NULL), or a file itself if path is used.
 #' @export
 #' @examples
 #' ARS_example()
