@@ -25,8 +25,7 @@
 #' # run function, write to temp directory
 #' readARS(json_path, output_dir, adam_folder)
 #'
-#'
-readARS <- function(JSON_ARS, output_path = "", adam_path = ""){
+readARS <- function(JSON_ARS, output_path = tempdir(), adam_path = ""){
   # load libraries ----------------------------------------------------------
 
   func_libraries <- function(){

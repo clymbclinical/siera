@@ -4,7 +4,7 @@
 \alias{readARS}
 \title{Ingest ARS (Analysis Results Standard) metadata, produce ARD (Analysis Results Dataset) code for each output}
 \usage{
-readARS(JSON_ARS, output_path = "", adam_path = "")
+readARS(JSON_ARS, output_path = tempdir(), adam_path = "")
 }
 \arguments{
 \item{JSON_ARS}{A JSON file containing ARS metadata for a reporting event}
