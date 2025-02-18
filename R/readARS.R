@@ -8,7 +8,6 @@
 #' @param output_path Path to store .R ARD scripts
 #' @param adam_path Path to folder containing ADaM datasets, to be run in ARD program
 #'
-#'
 #' @returns R programmes generating ARDs - one for each output specificied in the ARS JSON
 #' @export
 #'
@@ -24,10 +23,9 @@
 #' adam_folder = tempdir()
 #'
 #' # run function, write to temp directory
-#' #readARS(json_path, output_dir, adam_folder)
+#' readARS(json_path, output_dir, adam_folder)
 #'
-#'
-readARS <- function(JSON_ARS, output_path = "", adam_path = ""){
+readARS <- function(JSON_ARS, output_path = tempdir(), adam_path = ""){
   # load libraries ----------------------------------------------------------
 
   func_libraries <- function(){
