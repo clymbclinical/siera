@@ -43,13 +43,15 @@ following:
 
 ## Installation
 
-The current version (0.1.0) of siera can be installed from
-[GitHub](https://github.com/clymbclinical/siera) with:
+The current version (0.1.0) of siera can be installed from 
+[CRAN](https://cran.r-project.org/web/packages/siera/index.html) with:
+```{r, echo=FALSE}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+```
+
 
 ```{r install, message=FALSE}
-# install.packages("devtools")
-Sys.unsetenv("GITHUB_PAT")
-devtools::install_github("https://github.com/clymbclinical/siera")
+install.packages("siera")
 ```
 
 ## Example
@@ -65,32 +67,29 @@ Use the helper ARS_example() with no arguments to list them or call it with an
 example filename to get the path.
 
 ```{r example files}
+# To see a list of example files:
 ARS_example()
 
+# A temporary path to a specific file:
 ARS_example("ARS_V1_Common_Safety_Displays.json")
 ```
-
-Using an example JSON ARS file, run readARS() function to produce the
-ARD programs.
-
-In this example, the following is used: 
-1. JSON ARS file from CDISC Pilot Study
-
+Next, we will ingest the example json ARS file to meta-programme ready-to-run R scripts, 
+which will produce the ARDs. 
 ```{r example, message=FALSE}
-# the ARS JSON File. 
+# Path to the the ARS JSON File. 
 json_path <- ARS_example("ARS_V1_Common_Safety_Displays.json")
 
-# store ARD scripts in this folder (we will use a temporary directory, 
-# but you may set to desired path):
+# Path to a folder which will contain the meta-programmed R scripts (feel free to update 
+# to a more suitable path)
 output_folder <- tempdir()
 
 # this folder contains ADaM datasets to produce ARD (we will use temporary 
-# directory, but to make it workable, download the ADaMs required and use the location 
-# they are stored in):
+# directory tempdir(), but feel free to download the ADaMs required and use the location they are stored in.
+# This can be done with e.g. dirname(ARS_example("ADSL.csv"))
 ADaM_folder <- tempdir()
 
 # run the readARS function with these 3 parameters.  This creates R scripts (1 for each output in output_folder)
-readARS(json_path, output_folder, adam_path = ADaM_folder)
+readARS(json_path, output_folder, ADaM_folder)
 ```
 
 Once the R programs are created, they can be individually run, provided
