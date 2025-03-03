@@ -4,9 +4,8 @@
 # siera
 
 <!-- badges: start -->
-<!-- [![CRAN -->
-<!-- status](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera) -->
 
+[![CRAN](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera)
 [![R-CMD-check](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
@@ -29,21 +28,20 @@ following:
 ## Installation
 
 The current version (0.1.0) of siera can be installed from
-[CRAN](https://cran.r-project.org/web/packages/siera/index.html) with:
+[CRAN](https://CRAN.R-project.org/package=siera) with:
 
 ``` r
 install.packages("siera")
 #> package 'siera' successfully unpacked and MD5 sums checked
 #> 
 #> The downloaded binary packages are in
-#>  C:\Users\mbosm\AppData\Local\Temp\RtmpumrX0G\downloaded_packages
+#>  C:\Users\mbosm\AppData\Local\Temp\RtmpsTBaHn\downloaded_packages
 ```
 
 ## Example
 
 ``` r
 library(siera)
-#> Warning: package 'siera' was built under R version 4.4.2
 ```
 
 siera includes several example files, which we use throughout the
@@ -60,7 +58,7 @@ ARS_example()
 
 # A temporary path to a specific file:
 ARS_example("ARS_V1_Common_Safety_Displays.json")
-#> [1] "C:/Users/mbosm/AppData/Local/R/win-library/4.4/siera/extdata/ARS_V1_Common_Safety_Displays.json"
+#> [1] "C:/Users/mbosm/AppData/Local/Temp/RtmpmME8pc/temp_libpath3f08e0d63c1/siera/extdata/ARS_V1_Common_Safety_Displays.json"
 ```
 
 Next, we will ingest the example json ARS file to meta-programme
