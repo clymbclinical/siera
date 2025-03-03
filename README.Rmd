@@ -20,8 +20,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 
-<!-- [![CRAN -->
-<!-- status](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera) -->
+[![CRAN](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera)
 [![R-CMD-check](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
@@ -44,7 +43,7 @@ following:
 ## Installation
 
 The current version (0.1.0) of siera can be installed from 
-[CRAN](https://cran.r-project.org/web/packages/siera/index.html) with:
+[CRAN](https://CRAN.R-project.org/package=siera) with:
 ```{r, echo=FALSE}
 options(repos = c(CRAN = "https://cloud.r-project.org"))
 ```
