@@ -50,13 +50,13 @@ options(repos = c(CRAN = "https://cloud.r-project.org"))
 ```
 
 
-```{r install, message=FALSE}
+```{r install, message=FALSE, warning=FALSE}
 install.packages("siera")
 ```
 
 ## Example
 
-```{r library}
+```{r library, warning=FALSE}
 library(siera)
 ```
 

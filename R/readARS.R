@@ -25,7 +25,7 @@
 #' # run function, write to temp directory
 #' readARS(json_path, output_dir, adam_folder)
 #'
-readARS <- function(JSON_ARS, output_path = tempdir(), adam_path = ""){
+readARS <- function(JSON_ARS, output_path = tempdir(), adam_path = tempdir()){
   # load libraries ----------------------------------------------------------
 
   func_libraries <- function(){
@@ -342,27 +342,6 @@ library(readr)
   # AnalysisMethods <- read_excel("ARSFILE.xlsx",
   #                               sheet = 'AnalysisMethods')
 
-  # load ADaM ---------------------------------------------------------------
-
-adam_loc <- adam_path
-
-  func_ADaM <- function(adampath){
-    template <-
-    "
-# load ADaM ----
-ADSL <- read_csv('adampathhere/ADSL.csv')
-ADAE <- read_csv('adampathhere/ADAE.csv') %>%
-  rename(TRT01A = TRTA)
-ADVS <- read_csv('adampathhere/ADVS.csv') %>%
-  rename(TRT01A = TRTA)
-  "
-
-    code <- gsub('adampathhere', adampath, template)
-    return(code)
-  }
-
-  code_ADaM <- func_ADaM(adam_loc)
-
   # Prework and loops ----------------------------------------------------
 
   #Init work
@@ -375,6 +354,31 @@ ADVS <- read_csv('adampathhere/ADVS.csv') %>%
 
     Anas <- Lopa %>%    # get all analyses for current output
       dplyr::filter(outputId == Output)
+
+  # Load ADaMs ----
+    a1 <- ""
+    # Combine unique datasets from both dataframes
+    Analyses_IDs <- Analyses %>%
+      dplyr::filter(id %in% Anas$analysisId) %>%
+      dplyr::select(dataset) %>%
+      unique()
+
+    AnalysisSets_Ids <- AnalysisSets %>%
+      dplyr::filter(id %in% Anas$analysisId) %>%
+      dplyr::select(condition_dataset) %>%
+      dplyr::rename(dataset = condition_dataset) %>%
+      unique()
+
+    unique_datasets <- rbind(Analyses_IDs, AnalysisSets_Ids) %>%
+      unique()
+    # Loop through the unique dataset list once
+    for (ad in unique_datasets) {
+      ad_path <- paste0("adampathhere/", ad, ".csv")  # Construct the file path
+      a1 <- paste0(a1, ad, " <- read_csv(\'", ad_path, "\')\n")  # Append each line
+    }
+    a1 <- gsub("adampathhere", adam_path, a1, fixed = TRUE)
+    code_ADaM <- unique(paste("\n# Load ADaM -------\n", a1, sep = ""))
+
 
     run_code <- ""    # variable to contain generated code
     combine_analysis_code <- "" # variable containing code to combine analyses

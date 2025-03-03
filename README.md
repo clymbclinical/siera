@@ -36,14 +36,13 @@ install.packages("siera")
 #> package 'siera' successfully unpacked and MD5 sums checked
 #> 
 #> The downloaded binary packages are in
-#>  C:\Users\mbosm\AppData\Local\Temp\RtmpumrX0G\downloaded_packages
+#>  C:\Users\mbosm\AppData\Local\Temp\RtmpqAgqxF\downloaded_packages
 ```
 
 ## Example
 
 ``` r
 library(siera)
-#> Warning: package 'siera' was built under R version 4.4.2
 ```
 
 siera includes several example files, which we use throughout the
