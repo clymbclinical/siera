@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">siera</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,8 +49,6 @@
 <div class="page-header"><h1 id="siera">siera<a class="anchor" aria-label="anchor" href="#siera"></a>
 </h1></div>
 <!-- badges: start -->
-<!-- [![CRAN -->
-<!-- status](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera) -->
 
 <p>Are you looking for a way to automate TFLs?</p>
 <p>With siera, users ingest Analysis Results Standard - ARS (a CDISC Foundational standard) metadata and auto-generate R scripts that, when run in with provided ADaM datasets, provide Analysis Results Datasets (ARDs).</p>
@@ -63,11 +61,13 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>The current version (0.1.0) of siera can be installed from <a href="https://github.com/clymbclinical/siera" class="external-link">GitHub</a> with:</p>
+<p>The current version (0.1.0) of siera can be installed from <a href="https://CRAN.R-project.org/package=siera" class="external-link">CRAN</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.unsetenv</a></span><span class="op">(</span><span class="st">"GITHUB_PAT"</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"https://github.com/clymbclinical/siera"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"siera"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; package 'siera' successfully unpacked and MD5 sums checked</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; The downloaded binary packages are in</span></span>
+<span><span class="co">#&gt;  C:\Users\mbosm\AppData\Local\Temp\RtmpsTBaHn\downloaded_packages</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
@@ -76,29 +76,30 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">siera</span><span class="op">)</span></span></code></pre></div>
 <p>siera includes several example files, which we use throughout the documentation. These include a JSON ARS file, as well as some csv ADaMs (ADSL and ADAE) which can be run with the R scripts produced by readARS function. Use the helper ARS_example() with no arguments to list them or call it with an example filename to get the path.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># To see a list of example files:</span></span>
+<span><span class="fu"><a href="reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "ADAE.csv"                           "ADSL.csv"                          </span></span>
 <span><span class="co">#&gt; [3] "ARS_V1_Common_Safety_Displays.json"</span></span>
 <span></span>
+<span><span class="co"># A temporary path to a specific file:</span></span>
 <span><span class="fu"><a href="reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"ARS_V1_Common_Safety_Displays.json"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "C:/Users/mbosm/AppData/Local/R/win-library/4.4/siera/extdata/ARS_V1_Common_Safety_Displays.json"</span></span></code></pre></div>
-<p>Using an example JSON ARS file, run readARS() function to produce the ARD programs.</p>
-<p>In this example, the following is used: 1. JSON ARS file from CDISC Pilot Study</p>
+<span><span class="co">#&gt; [1] "C:/Users/mbosm/AppData/Local/Temp/RtmpmME8pc/temp_libpath3f08e0d63c1/siera/extdata/ARS_V1_Common_Safety_Displays.json"</span></span></code></pre></div>
+<p>Next, we will ingest the example json ARS file to meta-programme ready-to-run R scripts, which will produce the ARDs.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># the ARS JSON File. </span></span>
+<code class="sourceCode R"><span><span class="co"># Path to the the ARS JSON File. </span></span>
 <span><span class="va">json_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"ARS_V1_Common_Safety_Displays.json"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># store ARD scripts in this folder (we will use a temporary directory, </span></span>
-<span><span class="co"># but you may set to desired path):</span></span>
+<span><span class="co"># Path to a folder which will contain the meta-programmed R scripts (feel free to update </span></span>
+<span><span class="co"># to a more suitable path)</span></span>
 <span><span class="va">output_folder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># this folder contains ADaM datasets to produce ARD (we will use temporary </span></span>
-<span><span class="co"># directory, but to make it workable, download the ADaMs required and use the location </span></span>
-<span><span class="co"># they are stored in):</span></span>
+<span><span class="co"># directory tempdir(), but feel free to download the ADaMs required and use the location they are stored in.</span></span>
+<span><span class="co"># This can be done with e.g. dirname(ARS_example("ADSL.csv"))</span></span>
 <span><span class="va">ADaM_folder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># run the readARS function with these 3 parameters.  This creates R scripts (1 for each output in output_folder)</span></span>
-<span><span class="fu"><a href="reference/readARS.html">readARS</a></span><span class="op">(</span><span class="va">json_path</span>, <span class="va">output_folder</span>, adam_path <span class="op">=</span> <span class="va">ADaM_folder</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/readARS.html">readARS</a></span><span class="op">(</span><span class="va">json_path</span>, <span class="va">output_folder</span>, <span class="va">ADaM_folder</span><span class="op">)</span></span></code></pre></div>
 <p>Once the R programs are created, they can be individually run, provided that the ADaM datasets are in the location as provided to the readARS function.</p>
 </div>
 </div>
@@ -136,6 +137,7 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
+<li><a href="https://CRAN.R-project.org/package=siera" class="external-link"><img src="https://www.r-pkg.org/badges/version/siera" alt="CRAN"></a></li>
 <li><a href="https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 </ul>
 </div>
