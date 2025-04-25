@@ -43,11 +43,12 @@ library(readr)
 
   code_libraries <- func_libraries()
 
-  # Read in ARS JSON content ----------------------------------------------------
+  # Read in ARS (JSON) content ----------------------------------------------------
   json_from <- jsonlite::fromJSON(JSON_ARS)
 
   #otherListsOfContents (LOPO) --V1ized
   otherListsOfContents <- json_from$otherListsOfContents$contentsList$listItems[[1]]  # this is similar to xlsx
+  Lopo <- otherListsOfContents # list of all planned outputs to loop JSONized
 
   #listOfPlannedAnalyses --V1ized
   mainListOfContents <- json_from$mainListOfContents$contentsList$listItems
@@ -339,13 +340,8 @@ library(readr)
           by = "operation_id",
           all = TRUE)
 
-  # AnalysisMethods <- read_excel("ARSFILE.xlsx",
-  #                               sheet = 'AnalysisMethods')
-
   # Prework and loops ----------------------------------------------------
 
-  #Init work
-  Lopo <- otherListsOfContents # list of all planned outputs to loop JSONized
 
   # for (i in 1:1) {            # loop through outputs
   for (i in 1:nrow(Lopo)) {
