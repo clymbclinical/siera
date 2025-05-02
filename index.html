@@ -33,6 +33,12 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="articles/ARS_background.html">ARS_background</a></li>
+  </ul>
+</li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -48,32 +54,41 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header">
-<img src="logo.png" class="logo" alt=""><h1 id="siera">siera<a class="anchor" aria-label="anchor" href="#siera"></a>
+<img src="logo.png" class="logo" alt=""><h1 id="siera-">siera 
+<a class="anchor" aria-label="anchor" href="#siera-"></a>
 </h1>
 </div>
 <!-- badges: start -->
 
-<p>Are you looking for a way to automate TFLs?</p>
-<p>With siera, users ingest Analysis Results Standard - ARS (a CDISC Foundational standard) metadata and auto-generate R scripts that, when run in with provided ADaM datasets, provide Analysis Results Datasets (ARDs).</p>
-<p>In order to use the readARS() function, users will need to provide the following:</p>
-<ol style="list-style-type: decimal">
-<li>A Functional JSON file, representing ARS Metadata for a Reporting Event (to get started, see TFL Designer)</li>
-<li>An output directory where the R scripts will be placed</li>
-<li>A folder containing the related ADaM datasets for the ARDs to be generated</li>
-</ol>
+<!-- badges: end -->
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>With siera, users ingest Analysis Results Standard (ARS) metadata and auto-generate R scripts that, when run with provided ADaM datasets, provide Analysis Results Datasets (ARDs).</p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>The current version (0.1.0) of siera can be installed from <a href="https://CRAN.R-project.org/package=siera" class="external-link">CRAN</a> with:</p>
+<p>The current version of siera can be installed from <a href="https://CRAN.R-project.org/package=siera" class="external-link">CRAN</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"siera"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; package 'siera' successfully unpacked and MD5 sums checked</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; The downloaded binary packages are in</span></span>
-<span><span class="co">#&gt;  C:\Users\mbosm\AppData\Local\Temp\RtmpsTBaHn\downloaded_packages</span></span></code></pre></div>
+<span><span class="co">#&gt;  C:\Users\mbosm\AppData\Local\Temp\RtmpM5I1Bo\downloaded_packages</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+<h2 id="requirements">Requirements<a class="anchor" aria-label="anchor" href="#requirements"></a>
+</h2>
+<p>The main function within siera is the readARS() function. This function ingests ARS metadata, and provides R scripts (producing ARDs). In order to make use of this function, the following are required:</p>
+<ol style="list-style-type: decimal">
+<li>A functional JSON file, representing ARS Metadata for a Reporting Event</li>
+<li>An output directory where the R scripts will be placed</li>
+<li>A folder containing the related ADaM datasets for the ARDs to be generated</li>
+</ol>
+</div>
+<div class="section level2">
+<h2 id="example-to-get-started">Example to get started<a class="anchor" aria-label="anchor" href="#example-to-get-started"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">siera</span><span class="op">)</span></span></code></pre></div>
@@ -86,7 +101,7 @@
 <span></span>
 <span><span class="co"># A temporary path to a specific file:</span></span>
 <span><span class="fu"><a href="reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"ARS_V1_Common_Safety_Displays.json"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "C:/Users/mbosm/AppData/Local/Temp/RtmpmME8pc/temp_libpath3f08e0d63c1/siera/extdata/ARS_V1_Common_Safety_Displays.json"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "C:/Users/mbosm/AppData/Local/R/win-library/4.4/siera/extdata/ARS_V1_Common_Safety_Displays.json"</span></span></code></pre></div>
 <p>Next, we will ingest the example json ARS file to meta-programme ready-to-run R scripts, which will produce the ARDs.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Path to the the ARS JSON File. </span></span>
@@ -132,8 +147,8 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Malan Bosman <br><small class="roles"> Author, maintainer </small>  </li>
-<li>Clymb Clinical <br><small class="roles"> Copyright holder, funder </small>  </li>
+<li>Malan Bosman <br><small class="roles"> Author, maintainer </small>   </li>
+<li>Clymb Clinical <br><small class="roles"> Copyright holder, funder </small>   </li>
 </ul>
 </div>
 
@@ -154,7 +169,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer>
