@@ -373,7 +373,9 @@ library(readr)
       a1 <- paste0(a1, ad, " <- read_csv(\'", ad_path, "\')\n")  # Append each line
     }
     a1 <- gsub("adampathhere", adam_path, a1, fixed = TRUE)
-    code_ADaM <- unique(paste("\n# Load ADaM -------\n", a1, sep = ""))
+    code_ADaM_1 <- unique(paste(a1, sep = ""))
+    code_ADaM <- paste0("\n# Load ADaM -------\n",
+                        paste(code_ADaM_1, collapse = "\n"))
 
 
     run_code <- ""    # variable to contain generated code
