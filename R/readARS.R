@@ -487,38 +487,51 @@ df_analysisidhere <- dplyr::filter(ADaM,
                                                                     anSetName))
 
       }
-      else {
+      else
+        else { # if analysis set ADaM and Analysis ADaMs are different
 
-        func_AnalysisSet2 <- function(dataset, variable, oper, val, ASID, anaADaM, anSetName) {
-          template <- "
+          # variable used in Analysis
+
+          func_AnalysisSet2 <- function(dataset,
+                                        variable,
+                                        oper,
+                                        val,
+                                        anavar,
+                                        ASID,
+                                        anaADaM,
+                                        anSetName) {
+            template <- "
 # Apply Analysis Set ---
 # Analysis set :  Analysissetnamehere
 df_analysisidhere <- dplyr::filter(ADaM,
             var operator 'value') %>%
-            dplyr::select(USUBJID) %>%
+            #dplyr::select(anasetvrhere) %>%
             merge(analysisADAMhere,
-                  by = 'USUBJID')
-
+                  by = 'anasetvrhere',
+                  all = FALSE)
 "
-          code <- gsub('ADaM', dataset, template)
-          code <- gsub('var', variable, code)
-          code <- gsub('operator', oper, code)
-          code <- gsub('value', val, code)
-          code <- gsub('analysisidhere', ASID, code)
-          code <- gsub('analysisADAMhere', anaADaM, code)
-          code <- gsub('Analysissetnamehere', anSetName, code)
+            code <- gsub('ADaM', dataset, template)
+            code <- gsub('var', variable, code)
+            code <- gsub('operator', oper, code)
+            code <- gsub('value', val, code)
+            code <- gsub('anasetvrhere', anavar, code)
+            code <- gsub('analysisidhere', ASID, code)
+            code <- gsub('analysisADAMhere', anaADaM, code)
+            code <- gsub('Analysissetnamehere', anSetName, code)
 
-          return(code)
+            return(code)
+          }
+
+          assign(paste0("code_AnalysisSet_",Anas_j),
+                 func_AnalysisSet2(cond_adam,
+                                   cond_var,
+                                   oper,
+                                   cond_val,
+                                   ana_var,
+                                   Anas_j,
+                                   ana_adam,
+                                   anSetName))
         }
-
-        assign(paste0("code_AnalysisSet_",Anas_j), func_AnalysisSet2(cond_adam,
-                                                                    cond_var,
-                                                                    oper,
-                                                                    cond_val,
-                                                                    Anas_j,
-                                                                    ana_adam,
-                                                                    anSetName))
-      }
 
 
       # Apply Grouping ----------------------------------------------------------------
