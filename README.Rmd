@@ -16,44 +16,40 @@ knitr::opts_chunk$set(
 )
 ```
 
-# siera
-
+# siera <a href="https://clymbclinical.github.io/siera/"><img src="man/figures/logo.png" align="right" height="138" alt="siera website" /></a>
 <!-- badges: start -->
 
 [![CRAN](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera)
 [![R-CMD-check](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
-Are you looking for a way to automate TFLs?
+## Overview
 
-With siera, users ingest Analysis Results Standard - ARS (a CDISC
-Foundational standard) metadata and auto-generate R scripts that, when
-run in with provided ADaM datasets, provide Analysis Results Datasets
+With siera, users ingest Analysis Results Standard (ARS) metadata and auto-generate R scripts that, when
+run with provided ADaM datasets, provide Analysis Results Datasets
 (ARDs).
-
-In order to use the readARS() function, users will need to provide the
-following:
-
-1.  A Functional JSON file, representing ARS Metadata for a Reporting
-    Event (to get started, see TFL Designer)
-2.  An output directory where the R scripts will be placed
-3.  A folder containing the related ADaM datasets for the ARDs to be
-    generated
 
 ## Installation
 
-The current version (0.1.0) of siera can be installed from 
+The current version of siera can be installed from 
 [CRAN](https://CRAN.R-project.org/package=siera) with:
 ```{r, echo=FALSE}
 options(repos = c(CRAN = "https://cloud.r-project.org"))
 ```
 
-
 ```{r install, message=FALSE, warning=FALSE}
 install.packages("siera")
 ```
+## Requirements
 
-## Example
+The main function within siera is the readARS() function.  This function ingests ARS metadata, and provides R scripts (producing ARDs).  In order to make use of this function, the following are required:
+
+1.  A functional JSON file, representing ARS Metadata for a Reporting Event
+2.  An output directory where the R scripts will be placed
+3.  A folder containing the related ADaM datasets for the ARDs to be generated
+
+## Example to get started
 
 ```{r library, warning=FALSE}
 library(siera)

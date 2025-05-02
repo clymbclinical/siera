@@ -1,33 +1,24 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# siera
+# siera <a href="https://clymbclinical.github.io/siera/"><img src="man/figures/logo.png" align="right" height="138" alt="siera website" /></a>
 
 <!-- badges: start -->
 
 [![CRAN](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera)
 [![R-CMD-check](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
-Are you looking for a way to automate TFLs?
+## Overview
 
-With siera, users ingest Analysis Results Standard - ARS (a CDISC
-Foundational standard) metadata and auto-generate R scripts that, when
-run in with provided ADaM datasets, provide Analysis Results Datasets
-(ARDs).
-
-In order to use the readARS() function, users will need to provide the
-following:
-
-1.  A Functional JSON file, representing ARS Metadata for a Reporting
-    Event (to get started, see TFL Designer)
-2.  An output directory where the R scripts will be placed
-3.  A folder containing the related ADaM datasets for the ARDs to be
-    generated
+With siera, users ingest Analysis Results Standard (ARS) metadata and
+auto-generate R scripts that, when run with provided ADaM datasets,
+provide Analysis Results Datasets (ARDs).
 
 ## Installation
 
-The current version (0.1.0) of siera can be installed from
+The current version of siera can be installed from
 [CRAN](https://CRAN.R-project.org/package=siera) with:
 
 ``` r
@@ -35,10 +26,22 @@ install.packages("siera")
 #> package 'siera' successfully unpacked and MD5 sums checked
 #> 
 #> The downloaded binary packages are in
-#>  C:\Users\mbosm\AppData\Local\Temp\RtmpsTBaHn\downloaded_packages
+#>  C:\Users\mbosm\AppData\Local\Temp\RtmpM5I1Bo\downloaded_packages
 ```
 
-## Example
+## Requirements
+
+The main function within siera is the readARS() function. This function
+ingests ARS metadata, and provides R scripts (producing ARDs). In order
+to make use of this function, the following are required:
+
+1.  A functional JSON file, representing ARS Metadata for a Reporting
+    Event
+2.  An output directory where the R scripts will be placed
+3.  A folder containing the related ADaM datasets for the ARDs to be
+    generated
+
+## Example to get started
 
 ``` r
 library(siera)
@@ -58,7 +61,7 @@ ARS_example()
 
 # A temporary path to a specific file:
 ARS_example("ARS_V1_Common_Safety_Displays.json")
-#> [1] "C:/Users/mbosm/AppData/Local/Temp/RtmpmME8pc/temp_libpath3f08e0d63c1/siera/extdata/ARS_V1_Common_Safety_Displays.json"
+#> [1] "C:/Users/mbosm/AppData/Local/R/win-library/4.4/siera/extdata/ARS_V1_Common_Safety_Displays.json"
 ```
 
 Next, we will ingest the example json ARS file to meta-programme

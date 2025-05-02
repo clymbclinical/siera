@@ -1,0 +1,19 @@
+---
+title: "ARS_background"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ARS_background}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(siera)
+```
