@@ -495,7 +495,7 @@ df_analysisidhere <- dplyr::filter(ADaM,
                                         variable,
                                         oper,
                                         val,
-                                        anavar,
+                                       # anavar,
                                         ASID,
                                         anaADaM,
                                         anSetName) {
@@ -506,14 +506,14 @@ df_analysisidhere <- dplyr::filter(ADaM,
             var operator 'value') %>%
             #dplyr::select(anasetvrhere) %>%
             merge(analysisADAMhere,
-                  by = 'anasetvrhere',
+                  by = 'USUBJID',
                   all = FALSE)
 "
             code <- gsub('ADaM', dataset, template)
             code <- gsub('var', variable, code)
             code <- gsub('operator', oper, code)
             code <- gsub('value', val, code)
-            code <- gsub('anasetvrhere', anavar, code)
+            #code <- gsub('anasetvrhere', anavar, code)
             code <- gsub('analysisidhere', ASID, code)
             code <- gsub('analysisADAMhere', anaADaM, code)
             code <- gsub('Analysissetnamehere', anSetName, code)
@@ -526,7 +526,7 @@ df_analysisidhere <- dplyr::filter(ADaM,
                                    cond_var,
                                    oper,
                                    cond_val,
-                                   ana_var,
+                                   #ana_var,
                                    Anas_j,
                                    ana_adam,
                                    anSetName))
