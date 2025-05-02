@@ -487,8 +487,7 @@ df_analysisidhere <- dplyr::filter(ADaM,
                                                                     anSetName))
 
       }
-      else
-        else { # if analysis set ADaM and Analysis ADaMs are different
+      else { # if analysis set ADaM and Analysis ADaMs are different
 
           # variable used in Analysis
 
