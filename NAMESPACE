@@ -3,4 +3,6 @@
 export("%>%")
 export(ARS_example)
 export(readARS)
+export(readARS_xl)
 importFrom(magrittr,"%>%")
+importFrom(readxl,read_excel)

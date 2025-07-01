@@ -22,7 +22,8 @@ Imports:
     tibble,
     tidyr,
     jsonlite,
-    stringr
+    stringr,
+    readxl
 Suggests: 
     knitr,
     rmarkdown
