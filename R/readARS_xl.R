@@ -11,7 +11,6 @@
 #' @param spec_analysis The analysis ID for a specific analysis to be run from the metadata
 #'
 #' @importFrom readxl read_excel
-#' @importFrom styler style_text
 #'
 #' @returns R programmes generating ARDs - one for each output (or analysis from an output) specified in the ARS metadata
 #' @export
@@ -517,7 +516,7 @@ df_analysisidhere <- dplyr::filter(ADaM,
             dplyr::filter(id == subsetid)
 
           DSname <- subsetrule %>%
-            dplyr::select(name) %>%
+            dplyr::select(label) %>%
             unique() %>%
             as.character()
 
@@ -782,9 +781,11 @@ df2_analysisidhere <- df_analysisidhere
         # Get the replacement value using get() based on the variable name in Column B
         rep <- get(anmetparam_s$parameter_valueSource[i])
         # Replace the placeholder in VAR with the variable's value
-        anmetcode_temp <- gsub(anmetparam_s$parameter_name[i],
-                               rep,
-                               anmetcode_temp)
+        if(!is.na(rep)){
+          anmetcode_temp <- gsub(anmetparam_s$parameter_name[i],
+                                 rep,
+                                 anmetcode_temp)
+        }
       }
       anmetcode_final <- gsub('methodidhere', methodid, anmetcode_temp)
       anmetcode_final <- gsub('analysisidhere', Anas_j, anmetcode_final)
