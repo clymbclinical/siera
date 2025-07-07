@@ -11,6 +11,7 @@
 #' @param spec_analysis The analysis ID for a specific analysis to be run from the metadata
 #'
 #' @importFrom readxl read_excel
+#' @importFrom styler style_text
 #'
 #' @returns R programmes generating ARDs - one for each output (or analysis from an output) specified in the ARS metadata
 #' @export
@@ -246,7 +247,7 @@ library(tidyr)
         unlist()
 
       anSetName <- temp_AnSet %>% # condition value for this analysis set
-        dplyr::select(label)%>%
+        dplyr::select(name)%>%
         as.character()
 
       if(cond_oper == "EQ") { # convert to R code
@@ -788,6 +789,7 @@ df2_analysisidhere <- df_analysisidhere
       anmetcode_final <- gsub('methodidhere', methodid, anmetcode_temp)
       anmetcode_final <- gsub('analysisidhere', Anas_j, anmetcode_final)
 
+
       # applying transpose code
       if(transpose_yn == "Y"){
         code_method_tmp_2 = paste0(trimws(anmetcode_final %>%
@@ -807,15 +809,7 @@ if(nrow(df2_analysisidhere) != 0){
 df3_analysisidhere <- df3_analysisidhere %>%
         dplyr::mutate(AnalsysisId = 'analysisidhere',
                MethodId = 'methodidhere',
-               OutputId = 'outputidhere') %>%
-        dplyr::mutate(across(where(is.list), ~ map_chr(., ~ {
-    if (is.null(.x)) {
-      NA_character_
-    } else {
-      tryCatch(toString(.x), error = function(e) NA_character_)
-    }
-  })),
-              stat = as.numeric(stat))
+               OutputId = 'outputidhere')
 } else {
     df3_analysisidhere = data.frame(AnalsysisId = 'analysisidhere',
                MethodId = 'methodidhere',
@@ -831,6 +825,7 @@ df3_analysisidhere <- df3_analysisidhere %>%
     code_method = paste0(code_method_tmp_1, "\n",
                          code_method_tmp_2,
                          code_method_tmp_3)
+
 
     # code to combine it all --------------------------------------------------
     # dplyr::rename groups to append
@@ -948,7 +943,9 @@ df3_analysisidhere <- df3_analysisidhere %>%
                 combine_analysis_code,
                 ")\n\n #Apply pattern format:\n"#,
                 #code_pattern
-         )
+                )
+
+
   )
 
   writeLines(get(paste0("code_",Output)),

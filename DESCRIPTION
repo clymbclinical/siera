@@ -23,7 +23,8 @@ Imports:
     tidyr,
     jsonlite,
     stringr,
-    readxl
+    readxl,
+    styler
 Suggests: 
     knitr,
     rmarkdown
