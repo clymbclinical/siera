@@ -43,7 +43,6 @@ readARS_xl <- function(ARS_path,
 # load libraries ----
 library(dplyr)
 library(readxl)
-library(splitstackshape)
 library(readr)
 library(cards)
 library(cardx)
