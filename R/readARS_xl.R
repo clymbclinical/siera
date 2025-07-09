@@ -29,8 +29,6 @@
 #' # run function, write to temp directory
 #' readARS_xl(ARS_path, output_dir, adam_folder)
 #'
-#'
-#'
 
 readARS_xl <- function(ARS_path,
                        output_path = tempdir(),
@@ -62,7 +60,6 @@ library(tidyr)
   # Read in ARS xlsx content ----------------------------------------------------
 
   ARS_xlsx = ARS_path
-
   ListOfPlannedAnalyses <- read_excel(ARS_xlsx,
                                       sheet = 'MainListOfContents')
   ListOfPlannedOutputs <- read_excel(ARS_xlsx,
@@ -124,7 +121,6 @@ library(tidyr)
   # Prework and loops ----------------------------------------------------
 
   max_i = nrow(Lopo)
-  # for (i in 1:1) {            # loop through outputs
   for (i in 1:max_i) {
     Output = Lopo[i,]$listItem_outputId
     OutputName = Lopo[i,]$listItem_name
@@ -134,8 +130,8 @@ library(tidyr)
 
     # Load ADaMs ----
     a1 <- ""
-    # Combine unique datasets from both dataframes
 
+    # Combine unique datasets from both dataframes
     Analyses_IDs <- Analyses %>%
       dplyr::filter(id %in% Anas$listItem_analysisId)
 
@@ -223,9 +219,7 @@ library(tidyr)
       # Method
       methodid <- Anas_s$method_id # data subset ID (to be used in DS
 
-
       # Apply Analysis Set -----
-
       temp_AnSet <- AnalysisSets %>%  # get analysis set for this iteration
         dplyr::filter(id == ana_setId)
 
@@ -287,7 +281,6 @@ df_analysisidhere <- dplyr::filter(ADaM,
       else { # if analysis set ADaM and Analysis ADaMs are different
 
         # variable used in Analysis
-
         func_AnalysisSet2 <- function(dataset,
                                       variable,
                                       oper,
