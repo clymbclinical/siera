@@ -1,8 +1,8 @@
 ---
-title: "ARS_background"
+title: "ARS background"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{ARS_background}
+  %\VignetteIndexEntry{ARS background}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,3 +17,8 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(siera)
 ```
+
+## Introduction
+
+One aim of the _siera_ package is to act as an interface to interact with ARS metadata.  As such, 
+

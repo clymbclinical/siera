@@ -45,6 +45,4 @@ adam_folder = tempdir()
 # run function, write to temp directory
 readARS_xl(ARS_path, output_dir, adam_folder)
 
-
-
 }
