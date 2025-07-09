@@ -1,4 +1,4 @@
-#' Get path to ARS JSON example
+#' Get path to ARS example files
 #'
 #' siera comes bundled with some example files in its `inst/extdata`
 #' directory. This function make them easy to access.

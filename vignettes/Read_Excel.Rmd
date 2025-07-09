@@ -1,7 +1,5 @@
 ---
 title: "Read ARS from Excel"
-author: "Malan Bosman"
-date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Read ARS from Excel}
@@ -90,15 +88,16 @@ readARS_xl(ARS_path, output_folder, ADaM_folder)
 
 If you've followed along in the previous section example, you should now have 5 R scripts (named ARD_Out14-1-1.R, ARD_Out14-3-1-1.R, ARD_Out14-3-2-1.R, ARD_Out14-3-3-1a.R, and ARD_Out14-3-3-1b.R) in the folder specified as _output_folder_.  If this is successful, you can execute any of these 5 R scripts as-is (assuming the ADaM required for this script is available in the _ADaM_folder_), and the result will be an ARD (one result per row format) for each of the scripts.  This will look like this:
 
-```{r run ARD_xxx}
+```{r run ARD_xxx, message=FALSE}
 
 # Step 1: open ARD_xxx.R file
-# Step 2: Confirm the location of ADaM dataset(s) is correct in the code section "Load ADaMs"
-# Step 3: Run the code and enjoy automated analysis results generation
+# Step 2: Confirm the location of ADaM dataset(s) is correct in the code section "Load ADaM".  For the sake of simplicity, the only update made to the ARD_Out14-1-1.R script was to point the ADaM folder to ARS_example("ADSL.csv")
+# Step 3: Run the code and enjoy automated analysis results generation. Note: the ARD is contained in the object "df4"
 
-
-
+example_ARD_script = system.file("script", "ARD_Out14-1-1.R", package = "siera")
+source(example_ARD_script)
+df4
 ```
-
+If this was run successfully, you should
 
 Note: each output requires one or more ADaM datasets to calculate the results from.  The code to load these csv ADaMs are automatically added to the ARD_xxx.R script.  As mentioned, some ADaMs are available using the ARS_example("XXXX.csv") function. However, Output 14-3-3-1a and Output 14-3-3-1b make use of the ADVS dataset, which is not currently shipped with the _siera_ package due to size considerations.  The relevant ADVS ADaM van can be obtained from the CDISC Pilot Study.  All other outputs use either ADSL or ADAE, which is shipped with this package and can be accessed through

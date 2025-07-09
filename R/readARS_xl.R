@@ -933,7 +933,7 @@ df3_analysisidhere <- df3_analysisidhere %>%
                 code_ADaM,
                 run_code,
                 "\n\n# combine analyses to create ARD ----\n",
-                "df4 <- dplyr::bind_rows(",
+                "ARD <- dplyr::bind_rows(",
                 combine_analysis_code,
                 ")\n\n #Apply pattern format:\n"#,
                 #code_pattern
