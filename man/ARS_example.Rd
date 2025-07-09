@@ -2,7 +2,7 @@
 % Please edit documentation in R/ARS_example.R
 \name{ARS_example}
 \alias{ARS_example}
-\title{Get path to ARS JSON example}
+\title{Get path to ARS example files}
 \usage{
 ARS_example(path = NULL)
 }
