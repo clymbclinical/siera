@@ -1,9 +1,4 @@
-url: https://clymbclinical.github.io/siera
+url: https://clymbclinical.github.io/siera/
 template:
   bootstrap: 5
 
-articles:
-  - title: "Articles"
-    contents:
-      - Read_Excel
-      - ARS_background

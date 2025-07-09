@@ -88,7 +88,7 @@ readARS_xl(ARS_path, output_folder, ADaM_folder)
 
 If you've followed along in the previous section example, you should now have 5 R scripts (named ARD_Out14-1-1.R, ARD_Out14-3-1-1.R, ARD_Out14-3-2-1.R, ARD_Out14-3-3-1a.R, and ARD_Out14-3-3-1b.R) in the folder specified as _output_folder_.  If this is successful, you can execute any of these 5 R scripts as-is (assuming the ADaM required for this script is available in the _ADaM_folder_), and the result will be an ARD (one result per row format) for each of the scripts.  This will look like this:
 
-```{r run ARD_xxx, message=FALSE}
+```{r run ARD_xxx, message=FALSE, eval=FALSE}
 
 # Step 1: open ARD_xxx.R file
 # Step 2: Confirm the location of ADaM dataset(s) is correct in the code section "Load ADaM".  For the sake of simplicity, the only update made to the ARD_Out14-1-1.R script was to point the ADaM folder to ARS_example("ADSL.csv")

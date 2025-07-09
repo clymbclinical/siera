@@ -28,5 +28,5 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-URL: https://clymbclinical.github.io/siera
+URL: https://clymbclinical.github.io/siera, https://clymbclinical.github.io/siera/
 BugReports: https://github.com/clymbclinical/siera/issues
