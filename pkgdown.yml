@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   ARS_background: ARS_background.html
   Read_Excel: Read_Excel.html
-last_built: 2025-07-09T10:19Z
+last_built: 2025-07-09T10:29Z
 urls:
   reference: https://clymbclinical.github.io/siera/reference
   article: https://clymbclinical.github.io/siera/articles
