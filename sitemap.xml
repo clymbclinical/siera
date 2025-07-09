@@ -1,17 +1,17 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
-<url><loc>/404.html</loc></url>
-<url><loc>/LICENSE-text.html</loc></url>
-<url><loc>/LICENSE.html</loc></url>
-<url><loc>/articles/ARS_background.html</loc></url>
-<url><loc>/articles/Read_Excel.html</loc></url>
-<url><loc>/articles/index.html</loc></url>
-<url><loc>/authors.html</loc></url>
-<url><loc>/index.html</loc></url>
-<url><loc>/news/index.html</loc></url>
-<url><loc>/reference/ARS_example.html</loc></url>
-<url><loc>/reference/index.html</loc></url>
-<url><loc>/reference/pipe.html</loc></url>
-<url><loc>/reference/readARS.html</loc></url>
-<url><loc>/reference/readARS_xl.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/404.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/LICENSE-text.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/LICENSE.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/articles/ARS_background.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/articles/Read_Excel.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/articles/index.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/authors.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/index.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/news/index.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/ARS_example.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/index.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/pipe.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/readARS.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/readARS_xl.html</loc></url>
 </urlset>
 
