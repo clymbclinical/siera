@@ -881,7 +881,7 @@ df2_analysisidhere <- df1_analysisidhere
 
 df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
         dplyr::summarise(res = n()) %>%
-        dplyr::mutate(AnalsysisId = 'analysisidhere',
+        dplyr::mutate(AnalysisId = 'analysisidhere',
                MethodId = 'methodidhere',
                OperationId = 'operationidhere',
                OutputId = 'outputidhere',
@@ -926,7 +926,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
 
 df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
         dplyr::summarise(res = n()) %>%
-        dplyr::mutate(AnalsysisId = 'analysisidhere',
+        dplyr::mutate(AnalysisId = 'analysisidhere',
                MethodId = 'methodidhere',
                OperationId = 'operationidhere',
                OutputId = 'outputidhere',
@@ -973,7 +973,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
 
 df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
         dplyr::summarise(res = mean(ana_varhere)) %>%
-        dplyr::mutate(AnalsysisId = 'analysisidhere',
+        dplyr::mutate(AnalysisId = 'analysisidhere',
                MethodId = 'methodidhere',
                OperationId = 'operationidhere',
                OutputId = 'outputidhere',
@@ -1024,7 +1024,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
 
 df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
         dplyr::summarise(res = sd(ana_varhere)) %>%
-        dplyr::mutate(AnalsysisId = 'analysisidhere',
+        dplyr::mutate(AnalysisId = 'analysisidhere',
                MethodId = 'methodidhere',
                OperationId = 'operationidhere',
                OutputId = 'outputidhere',
@@ -1074,7 +1074,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
 
 df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
         dplyr::summarise(res = median(ana_varhere)) %>%
-        dplyr::mutate(AnalsysisId = 'analysisidhere',
+        dplyr::mutate(AnalysisId = 'analysisidhere',
                MethodId = 'methodidhere',
                OperationId = 'operationidhere',
                OutputId = 'outputidhere',
@@ -1122,7 +1122,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
 
 df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
         dplyr::summarise(res = quantile(ana_varhere, c(.25), na.rm = TRUE)) %>%
-        dplyr::mutate(AnalsysisId = 'analysisidhere',
+        dplyr::mutate(AnalysisId = 'analysisidhere',
                MethodId = 'methodidhere',
                OperationId = 'operationidhere',
                OutputId = 'outputidhere',
@@ -1170,7 +1170,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
 
 df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
         dplyr::summarise(res = quantile(ana_varhere, c(.75), na.rm = TRUE)) %>%
-        dplyr::mutate(AnalsysisId = 'analysisidhere',
+        dplyr::mutate(AnalysisId = 'analysisidhere',
                MethodId = 'methodidhere',
                OperationId = 'operationidhere',
                OutputId = 'outputidhere',
@@ -1218,7 +1218,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
 
 df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
         dplyr::summarise(res = min(ana_varhere)) %>%
-        dplyr::mutate(AnalsysisId = 'analysisidhere',
+        dplyr::mutate(AnalysisId = 'analysisidhere',
                MethodId = 'methodidhere',
                OperationId = 'operationidhere',
                OutputId = 'outputidhere',
@@ -1268,7 +1268,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
 
 df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
         dplyr::summarise(res = max(ana_varhere)) %>%
-        dplyr::mutate(AnalsysisId = 'analysisidhere',
+        dplyr::mutate(AnalysisId = 'analysisidhere',
                MethodId = 'methodidhere',
                OperationId = 'operationidhere',
                OutputId = 'outputidhere',
@@ -1318,7 +1318,7 @@ df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
 
 df3_analysisidhere_operationidhere <- df2_analysisidhere %>%
         dplyr::summarise(res = n_distinct(ana_varhere)) %>%
-        dplyr::mutate(AnalsysisId = 'analysisidhere',
+        dplyr::mutate(AnalysisId = 'analysisidhere',
                MethodId = 'methodidhere',
                OperationId = 'operationidhere',
                OutputId = 'outputidhere',
@@ -1456,7 +1456,7 @@ p <- stats::pf(f[1],f[2],f[3],lower.tail=F)
 attributes(p) <- NULL
 
 df3_analysisidhere_operationidhere <- data.frame(res = p,
-                  AnalsysisId = 'analysisidhere',
+                  AnalysisId = 'analysisidhere',
                   MethodId = 'methodidhere',
                   OperationId = 'operationidhere',
                   OutputId = 'outputidhere',
@@ -1510,7 +1510,7 @@ tab <- table(adamhere[, c('ana_groupvar1here', 'ana_groupvar2here')])
 p <- chisq.test(tab)$p.value
 
 df3_analysisidhere_operationidhere <- data.frame(res = p,
-                  AnalsysisId = 'analysisidhere',
+                  AnalysisId = 'analysisidhere',
                   MethodId = 'methodidhere',
                   OperationId = 'operationidhere',
                   OutputId = 'outputidhere',
