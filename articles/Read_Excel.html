@@ -38,8 +38,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/ARS_background.html">ARS background</a></li>
-    <li><a class="dropdown-item" href="../articles/Read_Excel.html">Read ARS from Excel</a></li>
+<li><a class="dropdown-item" href="../articles/Read_Excel.html">Read ARS from Excel</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -77,8 +76,12 @@
 allowing language-agnostic and efficient data transfer. However, there
 is an unofficial representation of ARS metadata in Excel, which has the
 benefit of being more easily human readable (and directly editable if
-needed). An example of such an Excel ARS sheet for the CDISC Pilot study
-can be found <a href="https://github.com/cdisc-org/analysis-results-standard/blob/main/workfiles/examples/ARS%20v1/Common%20Safety%20Displays.xlsx" class="external-link">here</a></p>
+needed). An example of such an Excel ARS workbook for the CDISC Pilot
+study can be found <a href="https://github.com/cdisc-org/analysis-results-standard/blob/main/workfiles/examples/ARS%20v1/Common%20Safety%20Displays.xlsx" class="external-link">here</a>.
+This example workbook has been modified (especially by adding
+<em>AnalysisMethodCodeTemplate</em> code from the <em>cards</em> package
+for performing operations - more on this later) and is the example ARS
+Excel file we’ll use for examples in this article.</p>
 </div>
 <div class="section level2">
 <h2 id="reading-in-excel-ars-metadata---what-to-expect">Reading in Excel ARS metadata - what to expect<a class="anchor" aria-label="anchor" href="#reading-in-excel-ars-metadata---what-to-expect"></a>
@@ -89,21 +92,39 @@ mapped/equivalent to the official JSON ARS representation and its
 classes (an example can be found <a href="https://github.com/cdisc-org/analysis-results-standard/blob/main/workfiles/examples/ARS%20v1/Common%20Safety%20Displays.json" class="external-link">here</a>).
 For the purpose of automating Analysis Results using <em>siera</em>, a
 subset of the multiple Excel Worksheets contain the key information.
-These include: - <em>MainListOfContents</em> (links outputs to their
-respective analyses) - <em>OtherListsOfContents</em> (contains output
-metadata) - <em>DataSubsets</em> (filters data for individual analyses)
-- <em>AnalysisSets</em> (filters data to get the Population Set for the
-output) - <em>AnalysisGroupings</em> (groups data according to analysis
-specifications) - <em>Analyses</em> (contains linking information to all
-components required for calculation of results) -
-<em>AnalysisMethods</em> (describes operations to be performed on data
-to get results) - <em>AnalysisMethodCodeTemplate</em> (contains
-dynamically written R code to perform AnalysisMethod) -
+These include:</p>
+<ul>
+<li>
+<em>MainListOfContents</em> (links outputs to their respective
+analyses)</li>
+<li>
+<em>OtherListsOfContents</em> (contains Output metadata)</li>
+<li>
+<em>DataSubsets</em> (filters data for individual analyses)</li>
+<li>
+<em>AnalysisSets</em> (filters data to get the Population Set for
+the Output)</li>
+<li>
+<em>AnalysisGroupings</em> (groups data according to analysis
+specifications)</li>
+<li>
+<em>Analyses</em> (contains linking information to all components
+required for calculation of results)</li>
+<li>
+<em>AnalysisMethods</em> (describes operations to be performed on
+data to get results)</li>
+<li>
+<em>AnalysisMethodCodeTemplate</em> (contains dynamically written R
+code to perform AnalysisMethod)</li>
+<li>
 <em>AnalysisMethodCodeParameters</em> (populates
-AnalysisMethodCodeTemplate with Analysis information)</p>
-<div class="section level3">
-<h3 id="a-note-on-example-code-used-in-analysismethodcodetemplate">A note on example code used in AnalysisMethodCodeTemplate<a class="anchor" aria-label="anchor" href="#a-note-on-example-code-used-in-analysismethodcodetemplate"></a>
-</h3>
+AnalysisMethodCodeTemplate with Analysis information)</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="a-note-on-example-code-used-in-analysismethodcodetemplate-using-cards-package">A note on example code used in AnalysisMethodCodeTemplate: using
+“cards” package<a class="anchor" aria-label="anchor" href="#a-note-on-example-code-used-in-analysismethodcodetemplate-using-cards-package"></a>
+</h2>
 <p>A powerful aspect of the ARS model, is that dynamic code can be
 supplied as part of the metadata and be evaluated on either 1. the
 Output level, 2. the Analysis level, or 3. the AnalysisMethod level (for
@@ -150,12 +171,11 @@ the ‘analysisvariable_here’ will be replaced with HEIGHT. All this is
 dynamically applied within the readARS_xl function when generating R
 scripts using <em>siera</em>.</p>
 </div>
-</div>
 <div class="section level2">
 <h2 id="reading-in-excel-ars-metadata">reading in Excel ARS metadata<a class="anchor" aria-label="anchor" href="#reading-in-excel-ars-metadata"></a>
 </h2>
 <p>The <em>readARS_xl</em> function reads in a completed ARS metadata
-Excel file, and generates R scripts for each output defined in the file.
+Excel file, and generates R scripts for each Output defined in the file.
 Below is an example of how this can be done using a ready-to-use ARS
 metadata Excel file:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -165,7 +185,7 @@ metadata Excel file:</p>
 <span><span class="co"># Path to the Excel ARS metadata file: </span></span>
 <span><span class="va">ARS_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"Common_Safety_Displays_cards.xlsx"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Path to a folder which will contain the output meta-programmed R scripts (recommended to update</span></span>
+<span><span class="co"># Path to a folder which will contain the Output meta-programmed R scripts (recommended to update</span></span>
 <span><span class="co"># to a more suitable local path)</span></span>
 <span><span class="va">output_folder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -177,11 +197,12 @@ metadata Excel file:</p>
 <span><span class="va">ADaM_folder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># run the readARS function with these 3 parameters.  This creates R scripts </span></span>
-<span><span class="co"># (1 for each output in output_folder)</span></span>
+<span><span class="co"># (1 for each Output in output_folder)</span></span>
 <span><span class="fu"><a href="../reference/readARS_xl.html">readARS_xl</a></span><span class="op">(</span><span class="va">ARS_path</span>, <span class="va">output_folder</span>, <span class="va">ADaM_folder</span><span class="op">)</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="try-it-out">Try it out!<a class="anchor" aria-label="anchor" href="#try-it-out"></a>
-</h3>
+</div>
+<div class="section level2">
+<h2 id="try-it-out">Try it out!<a class="anchor" aria-label="anchor" href="#try-it-out"></a>
+</h2>
 <p>If you’ve followed along in the previous section example, you should
 now have 5 R scripts (named ARD_Out14-1-1.R, ARD_Out14-3-1-1.R,
 ARD_Out14-3-2-1.R, ARD_Out14-3-3-1a.R, and ARD_Out14-3-3-1b.R) in the
@@ -189,27 +210,76 @@ folder specified as <em>output_folder</em>. If this is successful, you
 can execute any of these 5 R scripts as-is (assuming the ADaM required
 for this script is available in the <em>ADaM_folder</em>), and the
 result will be an ARD (one result per row format) for each of the
-scripts. This will look like this:</p>
+scripts. An example of such an auto-generated ARD script is included in
+the package, and can be used by using the <em>example_ARD_script</em>
+function. Running this script will look like this:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Step 1: open ARD_xxx.R file</span></span>
-<span><span class="co"># Step 2: Confirm the location of ADaM dataset(s) is correct in the code section "Load ADaM".  For the sake of simplicity, the only update made to the ARD_Out14-1-1.R script was to point the ADaM folder to ARS_example("ADSL.csv")</span></span>
-<span><span class="co"># Step 3: Run the code and enjoy automated analysis results generation. Note: the ARD is contained in the object "df4"</span></span>
+<span><span class="co"># Step 2: Confirm the location of ADaM dataset(s) is correct in the code section "Load ADaM".  </span></span>
+<span><span class="co"># For the sake of simplicity, the only update made to the ARD_Out14-1-1.R </span></span>
+<span><span class="co"># script was to point to the ADaM folder to ARS_example("ADSL.csv")</span></span>
+<span><span class="co"># Step 3: Run the code and enjoy automated analysis results generation. </span></span>
+<span><span class="co"># Note: the ARD is contained in the object "df4" (which contains the appended)</span></span>
+<span><span class="co"># mini-ARDs from all individual Analyses ARDs.</span></span>
 <span></span>
-<span><span class="va">example_ARD_script</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"script"</span>, <span class="st">"ARD_Out14-1-1.R"</span>, package <span class="op">=</span> <span class="st">"siera"</span><span class="op">)</span></span>
+<span><span class="va">example_ARD_script</span> <span class="op">=</span> <span class="fu"><a href="../reference/ARD_script_example.html">ARD_script_example</a></span><span class="op">(</span><span class="st">"ARD_Out14-1-1.R"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="va">example_ARD_script</span><span class="op">)</span></span>
-<span><span class="va">df4</span></span></code></pre></div>
-<p>If this was run successfully, you should</p>
-<p>Note: each output requires one or more ADaM datasets to calculate the
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df4</span><span class="op">)</span></span></code></pre></div>
+<p>If this was run successfully, you should see an ARD, with one result
+(in the <em>stat</em> column) per row. Other columns provide context for
+the result, e.g. grouping variables, as well as columns linking the
+result to the ARS metadata origin (specifically, <em>AnalysisId</em> and
+<em>OperationId</em> columns).</p>
+<p>Note: each Output requires one or more ADaM datasets to calculate the
 results from. The code to load these csv ADaMs are automatically added
 to the ARD_xxx.R script. As mentioned, some ADaMs are available using
 the ARS_example(“XXXX.csv”) function. However, Output 14-3-3-1a and
 Output 14-3-3-1b make use of the ADVS dataset, which is not currently
 shipped with the <em>siera</em> package due to size considerations. The
-relevant ADVS ADaM van can be obtained from the CDISC Pilot Study. All
-other outputs use either ADSL or ADAE, which is shipped with this
-package and can be accessed through</p>
+relevant ADVS ADaM dataset can be obtained from the CDISC Pilot Study.
+All other outputs use either ADSL or ADAE, which is shipped with this
+package and can be accessed through the ARS_example function.</p>
+<div class="section level3">
+<h3 id="how-do-i-get-ars-metadata">How do I get ARS metadata?<a class="anchor" aria-label="anchor" href="#how-do-i-get-ars-metadata"></a>
+</h3>
+<p>ARS metadata can be generated automatically by using the
+point-and-click Shell-designing software, TFL Designer (from <a href="https://clymbclinical.com/" class="external-link">Clymb Clinical</a>). There is a free
+Community Version which can be accessed <a href="https://tfldesigner.org/" class="external-link">here</a>, as well as an Enterprise
+version, with more information <a href="https://clymbclinical.com/tfl-designer/" class="external-link">here</a>.</p>
 </div>
+</div>
+<div class="section level2">
+<h2 id="whats-next">What’s next?<a class="anchor" aria-label="anchor" href="#whats-next"></a>
+</h2>
+<p>Once an ARD is created, it contains all results required for the
+final Output. This already has many benefits, like making QC easier,
+reusing results for various reporting events, etc. Of course, however,
+there might be a need to convert the ARD to an RTF or PDF Output.</p>
+<p>Although an ARD consists of results and the context for the results,
+it does not contain layout metadata (e.g. which columns there should be,
+what the indentation is, sorting order, etc.). This is outside the scope
+of the CDISC ARS. In order to convert the ARD to an Output in an R
+environment, two R packages in particular address this: 1. <a href="https://www.danieldsjoberg.com/gtsummary/" class="external-link">gtsummary</a> 2. <a href="https://gsk-biostatistics.github.io/tfrmt/" class="external-link">tfrmt</a></p>
+<p>Both these R packages take ARD objects and convert them to tables,
+adding layout metadata in the process. For some of the usage in these
+packages, the resulting ARD from running <em>siera</em> needs to be
+modified slightly, but can be achieved using functions from the
+<em>tidyverse</em> and aiming for the expected input format for the
+respective table-creating package.</p>
+</div>
+<div class="section level2">
+<h2 id="in-summary">In summary:<a class="anchor" aria-label="anchor" href="#in-summary"></a>
+</h2>
+<p>Having started with a completed ARS metadata Excel file, we were able
+to</p>
+<ol style="list-style-type: decimal">
+<li>Ingest the Excel file to produce auto-generated R scripts, and</li>
+<li>Run these R scripts to produce ARDs from ADaM datasets</li>
+</ol>
+<p>By following these steps and utilizing table-generating R packages
+(creating tables from ARDs), we have a clear roadmap for end-to-end TFL
+automation, from Shell Design to final outputs.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
