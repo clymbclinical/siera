@@ -26,22 +26,23 @@ install.packages("siera")
 #> package 'siera' successfully unpacked and MD5 sums checked
 #> 
 #> The downloaded binary packages are in
-#>  C:\Users\mbosm\AppData\Local\Temp\RtmpM5I1Bo\downloaded_packages
+#>  C:\Users\mbosm\AppData\Local\Temp\Rtmpodj5YN\downloaded_packages
 ```
 
 ## Requirements
 
-The main function within siera is the readARS() function. This function
-ingests ARS metadata, and provides R scripts (producing ARDs). In order
-to make use of this function, the following are required:
+The main functions within siera is the readARS() (for JSON ARS input)
+and readARS_xl (for Excel ARS input) functions. These functions ingests
+ARS metadata, and provide R scripts (producing ARDs). In order to make
+use of these functions, the following are required:
 
-1.  A functional JSON file, representing ARS Metadata for a Reporting
+1.  A functional ARS file, representing ARS Metadata for a Reporting
     Event
 2.  An output directory where the R scripts will be placed
 3.  A folder containing the related ADaM datasets for the ARDs to be
     generated
 
-## Example to get started
+## Example to get started using JSON ARS file
 
 ``` r
 library(siera)

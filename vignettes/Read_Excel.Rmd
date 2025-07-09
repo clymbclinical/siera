@@ -89,6 +89,11 @@ readARS_xl(ARS_path, output_folder, ADaM_folder)
 
 If you've followed along in the previous section example, you should now have 5 R scripts (named ARD_Out14-1-1.R, ARD_Out14-3-1-1.R, ARD_Out14-3-2-1.R, ARD_Out14-3-3-1a.R, and ARD_Out14-3-3-1b.R) in the folder specified as _output_folder_.  If this is successful, you can execute any of these 5 R scripts as-is (assuming the ADaM required for this script is available in the _ADaM_folder_), and the result will be an ARD (one result per row format) for each of the scripts.  An example of such an auto-generated ARD script is included in the package, and can be used by using the _example_ARD_script_ function. Running this script will look like this:
 
+```{r install, }
+
+```
+
+
 ```{r run ARD_xxx, message=FALSE, warning=FALSE, eval=FALSE}
 
 # Step 1: open ARD_xxx.R file
