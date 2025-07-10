@@ -244,6 +244,8 @@ library(tidyr)
 
       if(cond_oper == "EQ") { # convert to R code
         oper <-  '=='
+      } else if(cond_oper == "NE"){
+        oper = '!='
       }
 
       # code for conditional statement for anSet
