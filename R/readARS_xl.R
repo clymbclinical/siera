@@ -70,7 +70,8 @@ library(tidyr)
   AnalysisGroupings <- read_excel(ARS_xlsx,
                                   sheet = 'AnalysisGroupings')
   Analyses <- read_excel(ARS_xlsx,
-                         sheet = 'Analyses')
+                         sheet = 'Analyses') %>%
+    dplyr::filter(!is.na(method_id))
   AnalysisMethods <- read_excel(ARS_xlsx,
                                 sheet = 'AnalysisMethods')
   AnalysisMethods <- read_excel(ARS_xlsx,
