@@ -611,8 +611,7 @@ df_analysisidhere <- dplyr::filter(ADaM,
                   f_vac = "%in%"
 
                   f_val = paste0("'", trimws(unlist(strsplit(val1, "\\|"))), "'", collapse = ",")
-                }# define operator in R code
-                else { # vac is EQ or NE
+                } else { # vac is EQ or NE
                   if(vac == "EQ") f_vac = "==" # define operator in R code
                   else f_vac = "!=" #
                   f_val = paste0("'", val1,"'")
