@@ -250,6 +250,10 @@ library(tidyr)
         oper = '!='
       }
 
+      if(is.na(cond_val)){
+        cond_val = ""
+      }
+
       # code for conditional statement for anSet
       anset_cond_stm = paste0(cond_var, oper,"'",cond_val,"'")
 
