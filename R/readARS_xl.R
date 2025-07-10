@@ -71,7 +71,7 @@ library(tidyr)
                                   sheet = 'AnalysisGroupings')
   Analyses <- read_excel(ARS_xlsx,
                          sheet = 'Analyses') %>%
-    dplyr::filter(!is.na(method_id))
+    dplyr::filter(!is.na(method_id)) # exclude if not methodid
   AnalysisMethods <- read_excel(ARS_xlsx,
                                 sheet = 'AnalysisMethods')
   AnalysisMethods <- read_excel(ARS_xlsx,
@@ -126,7 +126,8 @@ library(tidyr)
     OutputName = Lopo[i,]$listItem_name
 
     Anas <- Lopa %>%    # get all analyses for current output
-      dplyr::filter(listItem_outputId == Output)
+      dplyr::filter(listItem_outputId == Output,
+                    listItem_analysisId %in% Analyses$id) # exclude if not methodid
 
     # Load ADaMs ----
     a1 <- ""
