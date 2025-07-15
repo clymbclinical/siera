@@ -96,4 +96,4 @@ ADaM_folder <- tempdir()
 readARS(json_path, output_folder, ADaM_folder)
 ```
 
-Once the R programs are created, they can be individually run, provided that the ADaM datasets are in the location as provided to the readARS function. 
+Once the R programs are created, they can be individually run, provided that the ADaM datasets are in the location as provided to the readARS function.  

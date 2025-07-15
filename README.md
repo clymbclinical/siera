@@ -26,7 +26,7 @@ install.packages("siera")
 #> package 'siera' successfully unpacked and MD5 sums checked
 #> 
 #> The downloaded binary packages are in
-#>  C:\Users\mbosm\AppData\Local\Temp\RtmpUT9OXa\downloaded_packages
+#>  C:\Users\mbosm\AppData\Local\Temp\Rtmpob8Yij\downloaded_packages
 ```
 
 ## Requirements
@@ -88,7 +88,7 @@ ARS_example()
 
 # A temporary path to a specific file:
 ARS_example("ARS_V1_Common_Safety_Displays.json")
-#> [1] "C:/Users/mbosm/AppData/Local/Temp/RtmpwXhtct/temp_libpath29b83f083a04/siera/extdata/ARS_V1_Common_Safety_Displays.json"
+#> [1] "C:/Users/mbosm/AppData/Local/R/win-library/4.4/siera/extdata/ARS_V1_Common_Safety_Displays.json"
 ```
 
 To get started with an example of ingesting the ARS JSON metadata,we
