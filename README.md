@@ -26,15 +26,22 @@ install.packages("siera")
 #> package 'siera' successfully unpacked and MD5 sums checked
 #> 
 #> The downloaded binary packages are in
-#>  C:\Users\mbosm\AppData\Local\Temp\Rtmpodj5YN\downloaded_packages
+#>  C:\Users\mbosm\AppData\Local\Temp\RtmpUT9OXa\downloaded_packages
 ```
 
 ## Requirements
 
-The main functions within siera is the readARS() (for JSON ARS input)
-and readARS_xl (for Excel ARS input) functions. These functions ingests
-ARS metadata, and provide R scripts (producing ARDs). In order to make
-use of these functions, the following are required:
+*siera* has two main functions used to ingest ARS metadata - one for
+JSON input - *readARS*, and another for Excel input - *readARS_xl*.
+Depending on the metadata input type, the appropriate function should be
+used.
+
+When run, these functions ingest the provided metadata, and produce R
+scripts that, when run as-is (with the applicable ADaM dataset), will
+generate an ARD for each output specified in the metadata.
+
+In order to make use of these functions, the following are required as
+arguments:
 
 1.  A functional ARS file, representing ARS Metadata for a Reporting
     Event
@@ -42,17 +49,36 @@ use of these functions, the following are required:
 3.  A folder containing the related ADaM datasets for the ARDs to be
     generated
 
-## Example to get started using JSON ARS file
+## Example to get started
 
 ``` r
 library(siera)
 ```
 
-siera includes several example files, which we use throughout the
-documentation. These include a JSON ARS file, as well as some csv ADaMs
-(ADSL and ADAE) which can be run with the R scripts produced by readARS
-function. Use the helper ARS_example() with no arguments to list them or
-call it with an example filename to get the path.
+The following example focuses on a JSON ARS metadata input file, thus
+making use of the *readARS* function. For an example of ingesting the
+ARS metadata as an Excel file, see the article [“Read ARS from
+Excel”](https://clymbclinical.github.io/siera/articles/Read_Excel.html).
+
+Note the following regarding these examples: For *readARS* (JSON
+metadata):
+
+- operations are performed within the *readARS* function, thus
+  example-driven
+
+For *readARS_xl* (Excel metadata):
+
+- operations are defined in the metadata, using
+  AnalysisMethodCodeTemplate and AnalysisMethodCodeParameters classes,
+  basing the operations on functions in the *cards* and *cardx*
+  packages.
+
+In order to facilitate the examples, *siera* includes several example
+files, which we use throughout the documentation. These include a JSON
+ARS file, as well as some csv ADaMs (ADSL and ADAE) which can be run
+with the R scripts produced by readARS function. Use the helper
+ARS_example() with no arguments to list them or call it with an example
+filename to get the path.
 
 ``` r
 # To see a list of example files:
@@ -62,11 +88,12 @@ ARS_example()
 
 # A temporary path to a specific file:
 ARS_example("ARS_V1_Common_Safety_Displays.json")
-#> [1] "C:/Users/mbosm/AppData/Local/R/win-library/4.4/siera/extdata/ARS_V1_Common_Safety_Displays.json"
+#> [1] "C:/Users/mbosm/AppData/Local/Temp/RtmpwXhtct/temp_libpath29b83f083a04/siera/extdata/ARS_V1_Common_Safety_Displays.json"
 ```
 
-Next, we will ingest the example json ARS file to meta-programme
-ready-to-run R scripts, which will produce the ARDs.
+To get started with an example of ingesting the ARS JSON metadata,we
+will ingest the example JSON ARS file to meta-programme ready-to-run R
+scripts, which will produce the ARDs.
 
 ``` r
 # Path to the the ARS JSON File. 
