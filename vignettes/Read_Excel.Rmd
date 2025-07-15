@@ -54,7 +54,14 @@ In the above example of _AnalysisMethodCodeTemplate_ code for a particular Analy
 1. 'byvariables_here', and 
 2. 'analysisvariable_here'.  
 
-These are example placeholder names, to be replaced by actual variables, depending on the context for the Analysis.  For example, 'byvariables_here' could be replaced by TRT01A, and 'analysisvariable_here' could be replaced by AGE, for an ARD with summary statistics on AGE by Treatment.  The same code, however, will be reused for summary statistics on e.g. HEIGHT for another Analysis, and the 'analysisvariable_here' will be replaced with HEIGHT.  All this is dynamically applied within the readARS_xl function when generating R scripts using _siera_.
+These are example placeholder names, to be replaced by actual variables, depending on the context for the Analysis.  For example, 'byvariables_here' could be replaced by TRT01A, and 'analysisvariable_here' could be replaced by AGE, for an ARD with summary statistics on AGE by Treatment.  The same code, however, will be reused for summary statistics on e.g. HEIGHT for another Analysis, and the 'analysisvariable_here' will be replaced with HEIGHT.  All this is dynamically applied within the readARS_xl function when generating R scripts using _siera_. 
+
+In order to facilitate the use of placeholders and their replacement with actual values from the metadata, several "constructs" have been defined in the _readARS_xl_ function, and are available to the user to call from the _AnalysisMethodCodeTemplate_ and _AnalysisMethodCodeParameters_ classes in the metadata.  These constructs are either simple variables or datasets defined in the metadata, or complex, dynamic constructs from various metadata pieces, to be inserted in specific _cards_ functions, or pre-processing steps.  A list of defined constructs and examples is shipped with this package, and can be accessed with:
+
+```{r}
+ARS_example("cards_constructs.xlsx")
+```
+
 
 ## reading in Excel ARS metadata
 
