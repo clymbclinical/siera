@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">siera</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,6 +69,8 @@
 
     
     
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://clymbclinical.github.io/siera">siera</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="ars-metadata-in-excel">ARS Metadata in Excel<a class="anchor" aria-label="anchor" href="#ars-metadata-in-excel"></a>
 </h2>
@@ -144,7 +146,7 @@ consistent ARD format. Below is a simple example of how a function
 <em>ard_continuous</em> from the <em>cards</em> package is used in the
 <em>AnalysisMethodCodeTemplate</em> class in the accompanying Excel ARS
 metadata example shipped with this package:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># example of 'cards' code in AnalysisMethodCodeTemplate, using the ard_continuous function:</span></span>
 <span></span>
 <span><span class="va">Analysis_ARD</span> <span class="op">=</span> <span class="fu">ard_continuous</span><span class="op">(</span></span>
@@ -170,6 +172,18 @@ reused for summary statistics on e.g. HEIGHT for another Analysis, and
 the ‘analysisvariable_here’ will be replaced with HEIGHT. All this is
 dynamically applied within the readARS_xl function when generating R
 scripts using <em>siera</em>.</p>
+<p>In order to facilitate the use of placeholders and their replacement
+with actual values from the metadata, several “constructs” have been
+defined in the <em>readARS_xl</em> function, and are available to the
+user to call from the <em>AnalysisMethodCodeTemplate</em> and
+<em>AnalysisMethodCodeParameters</em> classes in the metadata. These
+constructs are either simple variables or datasets defined in the
+metadata, or complex, dynamic constructs from various metadata pieces,
+to be inserted in specific <em>cards</em> functions, or pre-processing
+steps. A list of defined constructs and examples is shipped with this
+package, and can be accessed with:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"cards_constructs.xlsx"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="reading-in-excel-ars-metadata">reading in Excel ARS metadata<a class="anchor" aria-label="anchor" href="#reading-in-excel-ars-metadata"></a>
@@ -178,9 +192,7 @@ scripts using <em>siera</em>.</p>
 Excel file, and generates R scripts for each Output defined in the file.
 Below is an example of how this can be done using a ready-to-use ARS
 metadata Excel file:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://clymbclinical.github.io/siera">siera</a></span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Path to the Excel ARS metadata file: </span></span>
 <span><span class="va">ARS_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"Common_Safety_Displays_cards.xlsx"</span><span class="op">)</span></span>
@@ -213,7 +225,7 @@ result will be an ARD (one result per row format) for each of the
 scripts. An example of such an auto-generated ARD script is included in
 the package, and can be used by using the <em>example_ARD_script</em>
 function. Running this script will look like this:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Step 1: open ARD_xxx.R file</span></span>
 <span><span class="co"># Step 2: Confirm the location of ADaM dataset(s) is correct in the code section "Load ADaM".  </span></span>
