@@ -14,6 +14,11 @@ knitr::opts_chunk$set(
 )
 ```
 
+
+```{r library, warning=FALSE}
+library(siera)
+```
+
 ## ARS Metadata in Excel
 
 The official CDISC ARS metadata is represented in JSON format, allowing language-agnostic and efficient data transfer.  However, there is an unofficial representation of ARS metadata in Excel, which has the benefit of being more easily human readable (and directly editable if needed).  An example of such an Excel ARS workbook for the CDISC Pilot study can be found [here](https://github.com/cdisc-org/analysis-results-standard/blob/main/workfiles/examples/ARS%20v1/Common%20Safety%20Displays.xlsx).  This example workbook has been modified (especially by adding _AnalysisMethodCodeTemplate_ code from the _cards_ package for performing operations - more on this later) and is the example ARS Excel file we'll use for examples in this article.
@@ -58,7 +63,7 @@ These are example placeholder names, to be replaced by actual variables, dependi
 
 In order to facilitate the use of placeholders and their replacement with actual values from the metadata, several "constructs" have been defined in the _readARS_xl_ function, and are available to the user to call from the _AnalysisMethodCodeTemplate_ and _AnalysisMethodCodeParameters_ classes in the metadata.  These constructs are either simple variables or datasets defined in the metadata, or complex, dynamic constructs from various metadata pieces, to be inserted in specific _cards_ functions, or pre-processing steps.  A list of defined constructs and examples is shipped with this package, and can be accessed with:
 
-```{r}
+```{r cardsconstructs, eval=FALSE}
 ARS_example("cards_constructs.xlsx")
 ```
 
@@ -66,10 +71,6 @@ ARS_example("cards_constructs.xlsx")
 ## reading in Excel ARS metadata
 
 The _readARS_xl_ function reads in a completed ARS metadata Excel file, and generates R scripts for each Output defined in the file.  Below is an example of how this can be done using a ready-to-use ARS metadata Excel file:
-
-```{r library, warning=FALSE}
-library(siera)
-```
 
 ```{r Excel ARS metadata example, message=FALSE}
 
