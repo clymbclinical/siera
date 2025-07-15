@@ -5,8 +5,10 @@
 
 <!-- badges: start -->
 
-[![CRAN](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera)
 [![R-CMD-check](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml)
+[![Downloads](https://cranlogs.r-pkg.org/badges/siera)](https://cran.r-project.org/package=siera)
 
 <!-- badges: end -->
 
@@ -26,7 +28,7 @@ install.packages("siera")
 #> package 'siera' successfully unpacked and MD5 sums checked
 #> 
 #> The downloaded binary packages are in
-#>  C:\Users\mbosm\AppData\Local\Temp\Rtmpob8Yij\downloaded_packages
+#>  C:\Users\mbosm\AppData\Local\Temp\Rtmpaw19cU\downloaded_packages
 ```
 
 ## Requirements
