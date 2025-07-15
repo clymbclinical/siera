@@ -1,5 +1,3 @@
-# siera 0.5.0
-
 # siera 0.4.0
 
 * addition of readARS_xl function
