@@ -56,45 +56,353 @@ library(tidyr)
 
   code_libraries <- func_libraries()
 
-  # Read in ARS xlsx content ----------------------------------------------------
 
-  ARS_xlsx = ARS_path
-  ListOfPlannedAnalyses <- read_excel(ARS_xlsx,
-                                      sheet = 'MainListOfContents')
-  ListOfPlannedOutputs <- read_excel(ARS_xlsx,
-                                     sheet = 'OtherListsOfContents')
-  DataSubsets <- read_excel(ARS_xlsx,
-                            sheet = 'DataSubsets')
-  AnalysisSets <- read_excel(ARS_xlsx,
-                             sheet = 'AnalysisSets')
-  AnalysisGroupings <- read_excel(ARS_xlsx,
-                                  sheet = 'AnalysisGroupings')
-  Analyses <- read_excel(ARS_xlsx,
-                         sheet = 'Analyses') %>%
-    dplyr::filter(!is.na(method_id)) # exclude if not methodid
-  AnalysisMethods <- read_excel(ARS_xlsx,
-                                sheet = 'AnalysisMethods')
-  AnalysisMethods <- read_excel(ARS_xlsx,
-                                sheet = 'AnalysisMethods')
-  AnalysisMethodCodeTemplate <- read_excel(ARS_xlsx,
-                                           sheet = 'AnalysisMethodCodeTemplate')
-  AnalysisMethodCodeParameters <- read_excel(ARS_xlsx,
-                                             sheet = 'AnalysisMethodCodeParameters')
+# Read in ARS metadata ----------------------------------------------------
+
+  # Get file extension (case-insensitive)
+  file_ext <- tolower(tools::file_ext(ARS_path))
+
+  # Read in JSON metadata
+  if (file_ext == "json") {
+    json_from <- jsonlite::fromJSON(ARS_path)
+
+    #otherListsOfContents (LOPO) --V1ized
+    otherListsOfContents <- json_from$otherListsOfContents$contentsList$listItems[[1]]  # this is similar to xlsx
+    Lopo <- otherListsOfContents # list of all planned outputs to loop JSONized
+
+    #MainListOfContents --V1ized
+    mainListOfContents <- json_from$mainListOfContents$contentsList$listItems
+
+    # loop through outputs to construct LOPA
+    Lopa <- data.frame()
+    for(a in 1:nrow(otherListsOfContents)){
+      tmp_PO <- otherListsOfContents[a,]
+
+      tmp_json_Lopa <-  # contains list with datasets with analysisIDs
+        mainListOfContents$sublist$listItems[[a]]
+
+      # gather anaIDs from anaysisID (Level 2)
+      anaIds <- tmp_json_Lopa$analysisId %>%
+        tibble::as_tibble() %>%
+        dplyr::mutate(outputId = tmp_PO$outputId) %>%
+        dplyr::rename(analysisId = value) %>%
+        dplyr::filter(!is.na(analysisId))
+
+      # bind analysisIDs
+      Lopa <- rbind(Lopa, anaIds)
+
+      # gather level 3 AnaIDs
+      if("sublist" %in% names(tmp_json_Lopa)){ # check if there are level 3's
+
+        tmp_json_lopa_sub <- tmp_json_Lopa$sublist$listItems
+
+        forend <- length(tmp_json_lopa_sub) # amount of analyses datasets in json_lopa
+        subana_dset <- data.frame() # initialise dataframe to contain datasets
+        for(b in 2:forend){   # always(?) 1st row is empty
+          ana_ids <- tmp_json_lopa_sub[[b]]$analysisId %>%
+            tibble::as_tibble() %>%
+            dplyr::mutate(outputId = tmp_PO$outputId) %>%
+            dplyr::rename(analysisId = value)
+          subana_dset <- rbind(subana_dset, ana_ids)
+        }
+        Lopa <- rbind(Lopa, subana_dset)
+      }
+    }
+
+    #dataSubsets
+    JSON_DataSubsets <- json_from$dataSubsets
+    # level 1
+    JSONDSL1 <- tibble::tibble(id = json_from$dataSubsets[["id"]],
+                               name = json_from$dataSubsets[["name"]],
+                               order = json_from$dataSubsets[["order"]],
+                               level = json_from$dataSubsets[["level"]],
+                               condition_dataset = json_from[["dataSubsets"]][["condition"]][["dataset"]],
+                               condition_variable = json_from[["dataSubsets"]][["condition"]][["variable"]],
+                               condition_comparator = json_from[["dataSubsets"]][["condition"]][["comparator"]],
+                               condition_value = json_from[["dataSubsets"]][["condition"]][["value"]],
+                               compoundExpression_logicalOperator = json_from[["dataSubsets"]][["compoundExpression"]][["logicalOperator"]])
+
+    # level 2
+    # loop through level 1
+    whereClauses <- JSON_DataSubsets[["compoundExpression"]][["whereClauses"]]
+    JSONDSL2 <- data.frame()
+    JSONDSL3 <- data.frame()
+    for(c in 1:nrow(JSON_DataSubsets)){  # loop through level 1
+      # for(c in 5:5){
+      tmp_DSID <- JSON_DataSubsets[c, "id"]
+      tmp_DSname <- JSON_DataSubsets[c, "name"]
+      tmp_DS_c <- JSON_DataSubsets[c,]
+
+      if(!is.null(whereClauses[[c]])){ # check for level 2 existence
+
+        tmp_DS <- tibble::tibble(level =  whereClauses[[c]][["level"]],
+                                 order = whereClauses[[c]][["order"]],
+                                 condition_dataset = whereClauses[[c]][["condition"]][["dataset"]],
+                                 condition_variable = whereClauses[[c]][["condition"]][["variable"]],
+                                 condition_comparator = whereClauses[[c]][["condition"]][["comparator"]],
+                                 condition_value = whereClauses[[c]][["condition"]][["value"]],
+                                 compoundExpression_logicalOperator =  whereClauses[[c]]$compoundExpression$logicalOperator,
+                                 id = tmp_DSID,
+                                 name = tmp_DSname)
+        JSONDSL2 = dplyr::bind_rows(JSONDSL2,tmp_DS)
+
+        whereClausesL2 <- whereClauses[[c]][["compoundExpression"]][["whereClauses"]]
+        for(d in 1:nrow(tmp_DS)){ # loop through level 2
+
+          if (!is.null(whereClausesL2[[d]])) { # check for level 3 existence
+            tmp_DSL2 <- tibble::tibble(level =  whereClausesL2[[d]][["level"]],
+                                       order = whereClausesL2[[d]][["order"]],
+                                       condition_dataset = whereClausesL2[[d]][["condition"]][["dataset"]],
+                                       condition_variable = whereClausesL2[[d]][["condition"]][["variable"]],
+                                       condition_comparator = whereClausesL2[[d]][["condition"]][["comparator"]],
+                                       condition_value = whereClausesL2[[d]][["condition"]][["value"]],
+                                       id = tmp_DSID,
+                                       name = tmp_DSname)
+
+            JSONDSL3 = dplyr::bind_rows(JSONDSL3,tmp_DSL2)
+          }
+        }
+      }
+    }
+
+    DataSubsets <- dplyr::bind_rows(JSONDSL1, JSONDSL2, JSONDSL3) %>%
+      dplyr::arrange(id, level, order) # --JSONIZED! cHECK DIFFERENCE IN CONDITION_VALUE
+
+    DataSubsets$condition_value[DataSubsets$condition_value == 'NULL'] = NA
+
+    AnalysisSets <- tibble::tibble(id = json_from$analysisSets$id,
+                                   label = json_from$analysisSets$label,
+                                   name = json_from$analysisSets$name,
+                                   level = json_from$analysisSets$level,
+                                   order = json_from$analysisSets$order,
+                                   condition_dataset = json_from$analysisSets$condition[["dataset"]],
+                                   condition_variable = json_from$analysisSets$condition[["variable"]],
+                                   condition_comparator = json_from$analysisSets$condition[["comparator"]],
+                                   condition_value = json_from$analysisSets$condition[["value"]])
+
+    # AG
+    JSON_AnalysisGroupings <-  json_from$analysisGroupings
+
+    JSON_AG_1 <- tibble::tibble(id = json_from$analysisGroupings$id,
+                                name = json_from$analysisGroupings$name,
+                                groupingDataset = json_from$analysisGroupings$groupingDataset,
+                                groupingVariable = json_from$analysisGroupings$groupingVariable,
+                                dataDriven = json_from$analysisGroupings$dataDriven)
+
+    JSON_AG <- data.frame()
+    for(e in 1: nrow(JSON_AG_1)){
+
+      AG_ID <- JSON_AG_1[e, "id"] %>% as.character()
+      AG_name <- JSON_AG_1[e, "name"] %>% as.character()
+      AG_groupingVariable <- JSON_AG_1[e, "groupingVariable"] %>% as.character()
+      AG_dataDriven <- JSON_AG_1[e, "dataDriven"] %>% as.character()
+
+      tmp_AG <- tibble::tibble(group_id = JSON_AnalysisGroupings[["groups"]][[e]]$id,
+                               group_name = JSON_AnalysisGroupings[["groups"]][[e]]$name,
+                               group_level = JSON_AnalysisGroupings[["groups"]][[e]]$level,
+                               group_order = JSON_AnalysisGroupings[["groups"]][[e]]$order,
+                               group_condition_dataset = JSON_AnalysisGroupings[["groups"]][[e]]$condition[["dataset"]],
+                               group_condition_variable = JSON_AnalysisGroupings[["groups"]][[e]]$condition[["variable"]],
+                               group_condition_comparator = JSON_AnalysisGroupings[["groups"]][[e]]$condition[["comparator"]],
+                               group_condition_value = JSON_AnalysisGroupings[["groups"]][[e]]$condition[["value"]],
+                               id = AG_ID,
+                               name = AG_name,
+                               groupingVariable = AG_groupingVariable,
+                               dataDriven = AG_dataDriven)
+
+      JSON_AG <- dplyr::bind_rows(JSON_AG, tmp_AG)
+    }
+
+
+    AnalysisGroupings <- dplyr::bind_rows(JSON_AG) # JSONIZED!  (without grouping_type and Logical Operator)
+
+
+
+    # Analyses
+    JSON_AN <- json_from$analyses
+
+    JSON_AnalysesL1 <-  tibble::tibble(id = JSON_AN$id,
+                                       name = JSON_AN$name,
+                                       label = JSON_AN$label,
+                                       version = JSON_AN$version,
+                                       categoryIds = JSON_AN$categoryIds,
+                                       method_id = JSON_AN$methodId,
+                                       analysisSetId = JSON_AN$analysisSetId,
+                                       dataset = JSON_AN$dataset,
+                                       variable = JSON_AN$variable,
+                                       dataSubsetId = JSON_AN$dataSubsetId
+    )
+
+    # AN groupings
+    AN_groupings <- data.frame()
+    for(g in 1:nrow(JSON_AnalysesL1)){
+
+      tmp_id <- JSON_AN[g,]$id %>% as.character()
+
+      tmp <- JSON_AN[["orderedGroupings"]][[g]] %>%
+        tidyr::pivot_wider(
+          names_from = order,
+          values_from = c(resultsByGroup, groupingId),
+          names_glue = "{.value}{order}"
+        ) %>%
+        dplyr::mutate(id = tmp_id)
+
+      AN_groupings <- dplyr::bind_rows(AN_groupings, tmp)
+    }
+
+    # AN refs
+    AN_refs <- data.frame()
+    for(h in 1:nrow(JSON_AnalysesL1)){
+
+      tmp_id <- JSON_AN[h,]$id %>% as.character()
+
+      if(!is.null(JSON_AN[["referencedAnalysisOperations"]][[h]])){
+        tmp_ref <- JSON_AN[["referencedAnalysisOperations"]][[h]] %>%
+          dplyr::mutate(order = dplyr::row_number()) %>%
+          tidyr::pivot_wider(
+            names_from = order,
+            values_from = c(referencedOperationRelationshipId, analysisId),
+            names_glue = "{'referencedAnalysisOperations_'}{.value}{order}"
+          ) %>%
+          dplyr::mutate(id = tmp_id)
+
+        AN_refs <- dplyr::bind_rows(AN_refs, tmp_ref)
+      }
+    }
+    colnames(AN_refs) <- gsub("Relationship", "", colnames(AN_refs))
+
+    #merge Analyses
+    Analyses <- merge(JSON_AnalysesL1,  #JSONIZED
+                      AN_refs,
+                      by = "id",
+                      all.x = TRUE) %>%
+      merge(AN_groupings,
+            by = "id",
+            all.x = TRUE)
+
+    # JSON AM_L1
+    JSONAML1 <- tibble::tibble(id = json_from$methods$id,
+                               name = json_from$methods$name,
+                               description = json_from$methods$description,
+                               label = json_from$methods$label
+    )
+
+    # JSON AML2
+    JSONAML2 <- data.frame()
+    JSONAML3 <- data.frame()
+    for(i in 1:nrow(JSONAML1)){
+
+      tmp_l2 <- tibble::tibble(operation_id = json_from$methods$operations[[i]]$id, # operation info
+                               operation_name = json_from$methods$operations[[i]]$name,
+                               operation_resultPattern = json_from$methods$operations[[i]]$resultPattern,
+                               operation_label = json_from$methods$operations[[i]]$label,
+                               operation_order = json_from$methods$operations[[i]]$order,
+                               id = JSONAML1[i,]$id %>% as.character()
+      )
+      JSONAML2 <- dplyr::bind_rows(JSONAML2, tmp_l2)
+
+
+      # check for and add referenced...
+      rOF <- json_from$methods$operations[[i]]$referencedOperationRelationships
+      if(!is.null(rOF)) {
+
+        lenrOF <- length(rOF)
+
+        for(j in 1:lenrOF){
+
+          if(!is.null(rOF[[j]])){
+
+            tmp_l3 <- tibble::tibble(id =  rOF[[j]]$id,
+                                     operationId = rOF[[j]]$operationId,
+                                     description = rOF[[j]]$description,
+                                     referencedOperationRole = rOF[[j]]$referencedOperationRole$controlledTerm)
+
+            tmp_l3_fin <- tmp_l3 %>%
+              dplyr::mutate(order = dplyr::row_number()) %>%
+              tidyr::pivot_wider(
+                names_from = order,
+                values_from = c(id, operationId, description, referencedOperationRole),
+                names_glue = "{'operation_referencedResultRelationships'}{order}{'_'}{.value}"
+              ) %>%
+              dplyr::mutate(operation_id = json_from[["methods"]][["operations"]][[i]][["id"]][[j]])
+
+            JSONAML3 = dplyr::bind_rows(JSONAML3,tmp_l3_fin)
+          }
+        }
+      }
+    }
+
+    # AM
+    AnalysisMethods <- merge(JSONAML1,
+                             JSONAML2,
+                             by = "id",
+                             all = TRUE) %>%
+      merge(JSONAML3,
+            by = "operation_id",
+            all = TRUE)
+
+    #AMC
+    AnalysisMethodCodeTemplate <- tibble::tibble(method_id = json_from$methods$id,
+                                                 context = json_from$methods$codeTemplate$context,
+                                                 specifiedAs = "code",
+                                                 templatecode = json_from$methods$codeTemplate$code)
+
+
+    AnalysisMethodCodeParameters <- data.frame()
+    for(i in 1:nrow(JSONAML1)){
+      id = JSONAML1[i,]$id %>% as.character()
+      tmp_AMCP <- tibble::tibble(method_id = id,
+                                 parameter_name = json_from$methods$codeTemplate$parameters[[i]]$name,
+                                 parameter_description = json_from$methods$codeTemplate$parameters[[i]]$description,
+                                 parameter_valueSource = json_from$methods$codeTemplate$parameters[[i]]$valueSource
+      )
+
+      AnalysisMethodCodeParameters <- dplyr::bind_rows(AnalysisMethodCodeParameters,
+                                                       tmp_AMCP)
+    }
+
+  } else if (file_ext == "xlsx") {
+
+    ARS_xlsx = ARS_path
+    MainListOfContents <- read_excel(ARS_xlsx,
+                                        sheet = 'MainListOfContents')
+    OtherListsOfContents <- read_excel(ARS_xlsx,
+                                       sheet = 'OtherListsOfContents')
+    DataSubsets <- read_excel(ARS_xlsx,
+                              sheet = 'DataSubsets')
+    AnalysisSets <- read_excel(ARS_xlsx,
+                               sheet = 'AnalysisSets')
+    AnalysisGroupings <- read_excel(ARS_xlsx,
+                                    sheet = 'AnalysisGroupings')
+    Analyses <- read_excel(ARS_xlsx,
+                           sheet = 'Analyses') %>%
+      dplyr::filter(!is.na(method_id)) # exclude if not methodid
+    AnalysisMethods <- read_excel(ARS_xlsx,
+                                  sheet = 'AnalysisMethods')
+    AnalysisMethods <- read_excel(ARS_xlsx,
+                                  sheet = 'AnalysisMethods')
+    AnalysisMethodCodeTemplate <- read_excel(ARS_xlsx,
+                                             sheet = 'AnalysisMethodCodeTemplate')
+    AnalysisMethodCodeParameters <- read_excel(ARS_xlsx,
+                                               sheet = 'AnalysisMethodCodeParameters')
+  }
+
+  # Handle specific outputs or analyses -------------
 
   # specific output
   if(spec_output == ""){
-    Lopo <- ListOfPlannedOutputs # list of all planned outputs to loop
+    Lopo <- OtherListsOfContents # list of all planned outputs to loop
 
-    Lopa <- ListOfPlannedAnalyses %>%  # list of all planned analyses to loop
+    Lopa <- MainListOfContents %>%  # list of all planned analyses to loop
       tidyr::fill(listItem_outputId) %>%
       dplyr::filter(!is.na(listItem_analysisId)) %>%
       dplyr::select(listItem_analysisId, listItem_outputId)
 
   } else{
-    Lopo <- ListOfPlannedOutputs %>%
+    Lopo <- OtherListsOfContents %>%
       dplyr::filter(listItem_outputId == spec_output)
 
-    Lopa <- ListOfPlannedAnalyses %>%  # list of all planned analyses to loop
+    Lopa <- MainListOfContents %>%  # list of all planned analyses to loop
       tidyr::fill(listItem_outputId) %>%
       dplyr::filter(!is.na(listItem_analysisId)) %>%
       dplyr::select(listItem_analysisId, listItem_outputId) %>%
@@ -103,7 +411,7 @@ library(tidyr)
 
   # specific analysis
   if(spec_analysis != ""){
-    Lopa <- ListOfPlannedAnalyses %>%  # list of all planned analyses to loop
+    Lopa <- MainListOfContents %>%  # list of all planned analyses to loop
       tidyr::fill(listItem_outputId) %>%
       dplyr::filter(!is.na(listItem_analysisId)) %>%
       dplyr::select(listItem_analysisId, listItem_outputId) %>%
@@ -114,7 +422,7 @@ library(tidyr)
       unique() %>%
       as.character()
 
-    Lopo <- ListOfPlannedOutputs %>%
+    Lopo <- OtherListsOfContents %>%
       dplyr::filter(listItem_outputId == output_ded)
   }
 
