@@ -68,9 +68,13 @@ library(tidyr)
 
     #otherListsOfContents (LOPO) --V1ized
     otherListsOfContents <- json_from$otherListsOfContents$contentsList$listItems[[1]]  # this is similar to xlsx
-    Lopo <- otherListsOfContents # list of all planned outputs to loop JSONized
+    Lopo <- otherListsOfContents %>%
+      dplyr::rename(listItem_outputId = outputId,
+                    listItem_name = name,
+                    listItem_order = order,
+                    listItem_level = level)# list of all planned outputs to loop JSONized
 
-    #MainListOfContents --V1ized
+    #mainListOfContents --V1ized
     mainListOfContents <- json_from$mainListOfContents$contentsList$listItems
 
     # loop through outputs to construct LOPA
@@ -84,9 +88,9 @@ library(tidyr)
       # gather anaIDs from anaysisID (Level 2)
       anaIds <- tmp_json_Lopa$analysisId %>%
         tibble::as_tibble() %>%
-        dplyr::mutate(outputId = tmp_PO$outputId) %>%
-        dplyr::rename(analysisId = value) %>%
-        dplyr::filter(!is.na(analysisId))
+        dplyr::mutate(listItem_outputId = tmp_PO$outputId) %>%
+        dplyr::rename(listItem_analysisId = value) %>%
+        dplyr::filter(!is.na(listItem_analysisId))
 
       # bind analysisIDs
       Lopa <- rbind(Lopa, anaIds)
@@ -101,8 +105,8 @@ library(tidyr)
         for(b in 2:forend){   # always(?) 1st row is empty
           ana_ids <- tmp_json_lopa_sub[[b]]$analysisId %>%
             tibble::as_tibble() %>%
-            dplyr::mutate(outputId = tmp_PO$outputId) %>%
-            dplyr::rename(analysisId = value)
+            dplyr::mutate(listItem_outputId = tmp_PO$outputId) %>%
+            dplyr::rename(listItem_analysisId = value)
           subana_dset <- rbind(subana_dset, ana_ids)
         }
         Lopa <- rbind(Lopa, subana_dset)
@@ -114,6 +118,7 @@ library(tidyr)
     # level 1
     JSONDSL1 <- tibble::tibble(id = json_from$dataSubsets[["id"]],
                                name = json_from$dataSubsets[["name"]],
+                               label = json_from$dataSubsets[["label"]],
                                order = json_from$dataSubsets[["order"]],
                                level = json_from$dataSubsets[["level"]],
                                condition_dataset = json_from[["dataSubsets"]][["condition"]][["dataset"]],
@@ -131,6 +136,7 @@ library(tidyr)
       # for(c in 5:5){
       tmp_DSID <- JSON_DataSubsets[c, "id"]
       tmp_DSname <- JSON_DataSubsets[c, "name"]
+      tmp_DSlabel <- JSON_DataSubsets[c, "label"]
       tmp_DS_c <- JSON_DataSubsets[c,]
 
       if(!is.null(whereClauses[[c]])){ # check for level 2 existence
@@ -143,7 +149,8 @@ library(tidyr)
                                  condition_value = whereClauses[[c]][["condition"]][["value"]],
                                  compoundExpression_logicalOperator =  whereClauses[[c]]$compoundExpression$logicalOperator,
                                  id = tmp_DSID,
-                                 name = tmp_DSname)
+                                 name = tmp_DSname,
+                                 label = tmp_DSlabel)
         JSONDSL2 = dplyr::bind_rows(JSONDSL2,tmp_DS)
 
         whereClausesL2 <- whereClauses[[c]][["compoundExpression"]][["whereClauses"]]
@@ -157,7 +164,8 @@ library(tidyr)
                                        condition_comparator = whereClausesL2[[d]][["condition"]][["comparator"]],
                                        condition_value = whereClausesL2[[d]][["condition"]][["value"]],
                                        id = tmp_DSID,
-                                       name = tmp_DSname)
+                                       name = tmp_DSname,
+                                       label = tmp_DSlabel)
 
             JSONDSL3 = dplyr::bind_rows(JSONDSL3,tmp_DSL2)
           }
@@ -195,6 +203,7 @@ library(tidyr)
       AG_ID <- JSON_AG_1[e, "id"] %>% as.character()
       AG_name <- JSON_AG_1[e, "name"] %>% as.character()
       AG_groupingVariable <- JSON_AG_1[e, "groupingVariable"] %>% as.character()
+      AG_groupingDataset <- JSON_AG_1[e, "groupingDataset"] %>% as.character()
       AG_dataDriven <- JSON_AG_1[e, "dataDriven"] %>% as.character()
 
       tmp_AG <- tibble::tibble(group_id = JSON_AnalysisGroupings[["groups"]][[e]]$id,
@@ -208,6 +217,7 @@ library(tidyr)
                                id = AG_ID,
                                name = AG_name,
                                groupingVariable = AG_groupingVariable,
+                               groupingDataset = AG_groupingDataset,
                                dataDriven = AG_dataDriven)
 
       JSON_AG <- dplyr::bind_rows(JSON_AG, tmp_AG)
@@ -345,7 +355,7 @@ library(tidyr)
     AnalysisMethodCodeTemplate <- tibble::tibble(method_id = json_from$methods$id,
                                                  context = json_from$methods$codeTemplate$context,
                                                  specifiedAs = "code",
-                                                 templatecode = json_from$methods$codeTemplate$code)
+                                                 templateCode = json_from$methods$codeTemplate$code)
 
 
     AnalysisMethodCodeParameters <- data.frame()
@@ -364,9 +374,9 @@ library(tidyr)
   } else if (file_ext == "xlsx") {
 
     ARS_xlsx = ARS_path
-    MainListOfContents <- read_excel(ARS_xlsx,
+    mainListOfContents <- read_excel(ARS_xlsx,
                                         sheet = 'MainListOfContents')
-    OtherListsOfContents <- read_excel(ARS_xlsx,
+    otherListsOfContents <- read_excel(ARS_xlsx,
                                        sheet = 'OtherListsOfContents')
     DataSubsets <- read_excel(ARS_xlsx,
                               sheet = 'DataSubsets')
@@ -385,36 +395,29 @@ library(tidyr)
                                              sheet = 'AnalysisMethodCodeTemplate')
     AnalysisMethodCodeParameters <- read_excel(ARS_xlsx,
                                                sheet = 'AnalysisMethodCodeParameters')
+
+    Lopo <- otherListsOfContents # list of all planned outputs to loop
+
+    Lopa <- mainListOfContents %>%  # list of all planned analyses to loop
+      tidyr::fill(listItem_outputId) %>%
+      dplyr::filter(!is.na(listItem_analysisId)) %>%
+      dplyr::select(listItem_analysisId, listItem_outputId)
   }
 
   # Handle specific outputs or analyses -------------
 
   # specific output
-  if(spec_output == ""){
-    Lopo <- OtherListsOfContents # list of all planned outputs to loop
-
-    Lopa <- MainListOfContents %>%  # list of all planned analyses to loop
-      tidyr::fill(listItem_outputId) %>%
-      dplyr::filter(!is.na(listItem_analysisId)) %>%
-      dplyr::select(listItem_analysisId, listItem_outputId)
-
-  } else{
-    Lopo <- OtherListsOfContents %>%
+  if(spec_output != ""){
+    Lopo <- Lopo %>%
       dplyr::filter(listItem_outputId == spec_output)
 
-    Lopa <- MainListOfContents %>%  # list of all planned analyses to loop
-      tidyr::fill(listItem_outputId) %>%
-      dplyr::filter(!is.na(listItem_analysisId)) %>%
-      dplyr::select(listItem_analysisId, listItem_outputId) %>%
+    Lopa <- Lopa %>%
       dplyr::filter(listItem_outputId == spec_output)
   }
 
   # specific analysis
   if(spec_analysis != ""){
-    Lopa <- MainListOfContents %>%  # list of all planned analyses to loop
-      tidyr::fill(listItem_outputId) %>%
-      dplyr::filter(!is.na(listItem_analysisId)) %>%
-      dplyr::select(listItem_analysisId, listItem_outputId) %>%
+    Lopa <- Lopa %>%
       dplyr::filter(listItem_analysisId == spec_analysis)
 
     output_ded = Lopa %>%
@@ -422,14 +425,13 @@ library(tidyr)
       unique() %>%
       as.character()
 
-    Lopo <- OtherListsOfContents %>%
+    Lopo <- Lopo %>%
       dplyr::filter(listItem_outputId == output_ded)
   }
 
   # Prework and loops ----------------------------------------------------
 
-  max_i = nrow(Lopo)
-  for (i in 1:max_i) {
+  for (i in 1:nrow(Lopo)) {
     Output = Lopo[i,]$listItem_outputId
     OutputName = Lopo[i,]$listItem_name
 
@@ -482,7 +484,7 @@ library(tidyr)
 
     # Programme header ----
     timenow <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
-    func_header <- function(OutputId, OutputName, date){
+    func_header <- function(OutputId, Output_Name, date){
       template <- "
 # Programme:    Generate code to produce ARD for outputidhere
 # Output:       outputnamehere
@@ -490,7 +492,7 @@ library(tidyr)
 
   "
       code <- gsub('outputidhere', OutputId, template)
-      code <- gsub('outputnamehere', OutputName, code)
+      code <- gsub('outputnamehere', Output_Name, code)
       code <- gsub('datehere', date, code)
       return(code)
     }
@@ -523,10 +525,11 @@ library(tidyr)
       resultsByGroup3 <- Anas_s$resultsByGroup3
 
       # Data Subset
-      subsetid <- Anas_s$dataSubsetId # data subset ID (to be used in DS
+      subsetid <- Anas_s$dataSubsetId # data subset ID (to be used in DS)
+      if(subsetid == "") subsetid = NA
 
       # Method
-      methodid <- Anas_s$method_id # data subset ID (to be used in DS
+      methodid <- Anas_s$method_id #
 
       # Apply Analysis Set -----
       temp_AnSet <- AnalysisSets %>%  # get analysis set for this iteration
@@ -886,7 +889,12 @@ df_analysisidhere <- dplyr::filter(ADaM,
 
           } else  {                       # if there are more than one rows
 
-            for (m in 1:(max(subsetrule$level) - 1)){   #loop through levels
+            maxlev = max(subsetrule$level)
+            if(maxlev <= 1){
+              cli::cli_abort("Metadata issue in Analysis {Anas_j}: DataSubset levels not incrementing")
+            }
+
+            for (m in 1:(maxlev - 1)){   #loop through levels
               # get logical operators
 
               log_oper = subsetrule %>%  # identify all rows for this level
@@ -1044,14 +1052,14 @@ df2_analysisidhere <- df_analysisidhere
                       parameter_valueSource != "")
 
       # to be replaced with values:
-      anmetparam_v <- AnalysisMethodCodeParameters %>%
-        dplyr::filter(method_id == methodid,
-                      parameter_value != "")
+      # anmetparam_v <- AnalysisMethodCodeParameters %>%
+      #   dplyr::filter(method_id == methodid,
+      #                 parameter_value != "")
 
-      transpose_yn = anmetparam_v %>%
-        dplyr::filter(parameter_name == "transpose") %>%
-        dplyr::select(parameter_value) %>%
-        as.character()
+      # transpose_yn = anmetparam_v %>%
+      #   dplyr::filter(parameter_name == "transpose") %>%
+      #   dplyr::select(parameter_value) %>%
+      #   as.character()
 
       # operations to transpose with
       operation_list <- AnalysisMethods %>%
