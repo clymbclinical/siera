@@ -4,17 +4,16 @@
 #' that could be run as-is to produce Analysis Results Datasets when ingesting ADaM
 #' datasets
 #'
-#' @param JSON_ARS A JSON file containing ARS metadata for a reporting event
+#' @param ARS_path A file (JSON or xlsx) containing ARS metadata for a reporting event
 #' @param output_path Path to store .R ARD scripts
 #' @param adam_path Path to folder containing ADaM datasets, to be run in ARD program
 #'
-#' @returns R programmes generating ARDs - one for each output specificied in the ARS JSON
+#' @returns R programmes generating ARDs - one for each output specificied in the ARS metadata
 #' @export
 #'
 #' @examples
-#' # path to JSON file containing ARS metadata
-#'
-#' json_path <- ARS_example("ARS_V1_Common_Safety_Displays.json")
+#' # path to file containing ARS metadata
+#' ARS_file <- ARS_example("ARS_V1_Common_Safety_Displays.json")
 #'
 #' # output path for R programs
 #' output_dir = tempdir()
@@ -23,9 +22,9 @@
 #' adam_folder = tempdir()
 #'
 #' # run function, write to temp directory
-#' readARS(json_path, output_dir, adam_folder)
+#' readARS(ARS_file, output_dir, adam_folder)
 #'
-readARS <- function(JSON_ARS, output_path = tempdir(), adam_path = tempdir()){
+readARS <- function(ARS_path, output_path = tempdir(), adam_path = tempdir()){
   # load libraries ----------------------------------------------------------
 
   func_libraries <- function(){
@@ -44,7 +43,7 @@ library(readr)
   code_libraries <- func_libraries()
 
   # Read in ARS (JSON) content ----------------------------------------------------
-  json_from <- jsonlite::fromJSON(JSON_ARS)
+  json_from <- jsonlite::fromJSON(ARS_path)
 
   #otherListsOfContents (LOPO) --V1ized
   otherListsOfContents <- json_from$otherListsOfContents$contentsList$listItems[[1]]  # this is similar to xlsx

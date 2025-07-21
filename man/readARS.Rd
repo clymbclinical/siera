@@ -4,17 +4,17 @@
 \alias{readARS}
 \title{Ingest ARS (Analysis Results Standard) metadata, produce ARD (Analysis Results Dataset) code for each output}
 \usage{
-readARS(JSON_ARS, output_path = tempdir(), adam_path = tempdir())
+readARS(ARS_path, output_path = tempdir(), adam_path = tempdir())
 }
 \arguments{
-\item{JSON_ARS}{A JSON file containing ARS metadata for a reporting event}
+\item{ARS_path}{A file (JSON or xlsx) containing ARS metadata for a reporting event}
 
 \item{output_path}{Path to store .R ARD scripts}
 
 \item{adam_path}{Path to folder containing ADaM datasets, to be run in ARD program}
 }
 \value{
-R programmes generating ARDs - one for each output specificied in the ARS JSON
+R programmes generating ARDs - one for each output specificied in the ARS metadata
 }
 \description{
 Ingest JSON or xlsx ARS (Analysis Results Standard) metadata, and meta-programme R scripts
@@ -22,9 +22,8 @@ that could be run as-is to produce Analysis Results Datasets when ingesting ADaM
 datasets
 }
 \examples{
-# path to JSON file containing ARS metadata
-
-json_path <- ARS_example("ARS_V1_Common_Safety_Displays.json")
+# path to file containing ARS metadata
+ARS_file <- ARS_example("ARS_V1_Common_Safety_Displays.json")
 
 # output path for R programs
 output_dir = tempdir()
@@ -33,6 +32,6 @@ output_dir = tempdir()
 adam_folder = tempdir()
 
 # run function, write to temp directory
-readARS(json_path, output_dir, adam_folder)
+readARS(ARS_file, output_dir, adam_folder)
 
 }
