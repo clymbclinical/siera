@@ -354,7 +354,7 @@ library(tidyr)
     #AMC
     AnalysisMethodCodeTemplate <- tibble::tibble(method_id = json_from$methods$id,
                                                  context = json_from$methods$codeTemplate$context,
-                                                 specifiedAs = "code",
+                                                 specifiedAs = "Code",
                                                  templateCode = json_from$methods$codeTemplate$code)
 
 
@@ -526,7 +526,11 @@ library(tidyr)
 
       # Data Subset
       subsetid <- Anas_s$dataSubsetId # data subset ID (to be used in DS)
-      if(subsetid == "") subsetid = NA
+      if(subsetid == "") {
+        subsetid = NA
+      } else{
+        subsetid = ""
+      }
 
       # Method
       methodid <- Anas_s$method_id #
@@ -693,6 +697,7 @@ df_analysisidhere <- dplyr::filter(ADaM,
         #get the number of dplyr::group_by to perform in Grouping Apply
         if(resultsByGroup1 == TRUE && !is.na(resultsByGroup1)){
           num_grp <- 1
+          AG_max_dataDriven <- AG_1_DataDriven
         } else num_grp = 0
 
         if(max_group_number >= 2){
@@ -717,8 +722,10 @@ df_analysisidhere <- dplyr::filter(ADaM,
           #get the number of dplyr::group_by to perform in Grouping Apply
           if(resultsByGroup1 == TRUE && !is.na(resultsByGroup1)){
             num_grp <- 1
+            AG_max_dataDriven <- AG_1_DataDriven
             if(resultsByGroup2 == TRUE && !is.na(resultsByGroup2)) {
               num_grp <- 2
+              AG_max_dataDriven <- AG_2_DataDriven
             }
           } else num_grp = 0
 
@@ -891,7 +898,7 @@ df_analysisidhere <- dplyr::filter(ADaM,
 
             maxlev = max(subsetrule$level)
             if(maxlev <= 1){
-              cli::cli_abort("Metadata issue in Analysis {Anas_j}: DataSubset levels not incrementing")
+              cli::cli_abort("Metadata issue in DataSubsets {subsetid}: DataSubset levels not incrementing")
             }
 
             for (m in 1:(maxlev - 1)){   #loop through levels
@@ -1105,17 +1112,16 @@ df2_analysisidhere <- df_analysisidhere
       anmetcode_final <- gsub('methodidhere', methodid, anmetcode_temp)
       anmetcode_final <- gsub('analysisidhere', Anas_j, anmetcode_final)
 
-
       # applying transpose code
-      if(transpose_yn == "Y"){
-        code_method_tmp_2 = paste0(trimws(anmetcode_final %>%
-                                            as.character()), " %>%
-        pivot_longer(c(", operation_list_string, "),
-        names_to = 'operation_id',
-        values_to = 'res')")
-      } else {
+      # if(transpose_yn == "Y"){
+      #   code_method_tmp_2 = paste0(trimws(anmetcode_final %>%
+      #                                       as.character()), " %>%
+      #   pivot_longer(c(", operation_list_string, "),
+      #   names_to = 'operation_id',
+      #   values_to = 'res')")
+      # } else {
         code_method_tmp_2 = anmetcode_final
-      }
+      # }
 
       # mutate part
 
@@ -1255,7 +1261,7 @@ df3_analysisidhere <- df3_analysisidhere %>%
                 code_ADaM,
                 run_code,
                 "\n\n# combine analyses to create ARD ----\n",
-                "df4 <- dplyr::bind_rows(",
+                "ARD <- dplyr::bind_rows(",
                 combine_analysis_code,
                 ")\n\n #Apply pattern format:\n"#,
                 #code_pattern
