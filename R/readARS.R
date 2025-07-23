@@ -452,7 +452,7 @@ library(readr)
         unlist()
 
       anSetName <- temp_AnSet %>% # condition value for this analysis set
-        dplyr::select(label)%>%
+        dplyr::select(name)%>%
         as.character()
 
       if(cond_oper == "EQ") { # convert to R code
