@@ -35,7 +35,6 @@ readARS_xl <- function(ARS_path,
                        adam_path = tempdir(),
                        spec_output = "",
                        spec_analysis = ""){
-  # load libraries ----------------------------------------------------------
 
   func_libraries <- function(){
     template <- "
@@ -57,7 +56,7 @@ library(tidyr)
   code_libraries <- func_libraries()
 
 
-# Read in ARS metadata ----------------------------------------------------
+  # Read in ARS metadata ----------------------------------------------------
 
   # Get file extension (case-insensitive)
   file_ext <- tolower(tools::file_ext(ARS_path))
@@ -288,7 +287,9 @@ library(tidyr)
                       all.x = TRUE) %>%
       merge(AN_groupings,
             by = "id",
-            all.x = TRUE)
+            all.x = TRUE) %>%
+      dplyr::filter(!is.na(method_id),
+                    method_id != "") # exclude if not methodid
 
     # JSON AM_L1
     JSONAML1 <- tibble::tibble(id = json_from$methods$id,
@@ -375,7 +376,7 @@ library(tidyr)
 
     ARS_xlsx = ARS_path
     mainListOfContents <- read_excel(ARS_xlsx,
-                                        sheet = 'MainListOfContents')
+                                     sheet = 'MainListOfContents')
     otherListsOfContents <- read_excel(ARS_xlsx,
                                        sheet = 'OtherListsOfContents')
     DataSubsets <- read_excel(ARS_xlsx,
@@ -526,10 +527,10 @@ library(tidyr)
 
       # Data Subset
       subsetid <- Anas_s$dataSubsetId # data subset ID (to be used in DS)
-      if(subsetid == "") {
+      if(subsetid %in% c("", "NA")) {
         subsetid = NA
       } else{
-        subsetid = ""
+        subsetid = subsetid
       }
 
       # Method
@@ -674,6 +675,10 @@ df_analysisidhere <- dplyr::filter(ADaM,
         dplyr::select(groupingVariable) %>%
         unique() %>%
         as.character()
+
+      if(AG_denom_var1 %in% c(NA, "NA", "")){
+        cli::cli_alert("Metadata issue in AnalysisGroupings {groupid1}: AnalysisGrouping has missing groupingVariable")
+      }
 
       if(max_group_number >=1) {
         AG_temp1 <- AnalysisGroupings %>%
@@ -839,41 +844,41 @@ df_analysisidhere <- dplyr::filter(ADaM,
             as.character()
 
           # for Fisher's exact test to filter:
-          fishersrow = subsetrule %>%
-            dplyr::filter(condition_dataset == AG_ds1)
-
-          # assign the variables
-          fishervar = fishersrow$condition_variable
-
-          fishervac = fishersrow$condition_comparator
-
-          fisherval1 = fishersrow$condition_value
-
-
-          if(nrow(fishersrow) > 0) { # if we need a DS statement
-
-
-            if(fishervac == "IN") {
-              fisher_f_vac = "%in%"
-
-              fisher_f_val = paste0("'", trimws(unlist(strsplit(fisherval1, "\\|"))), "'", collapse = ",")
-            }# define operator in R code
-            else { # vac is EQ or NE
-              if(fishervac == "EQ") fisher_f_vac = "==" # define operator in R code
-              else fisher_f_vac = "!=" #
-              fisher_f_val = paste0("'", fisherval1,"'")
-            }
-            # concatenate expression
-            fisher_cond_stm = paste0(", ",
-                                     fishervar,
-                                     " ",
-                                     fisher_f_vac," "
-                                     , "c(",
-                                     fisher_f_val,")")
-          } else { # if the DS statement should be blank for fisher's
-            fisher_cond_stm = ""
-
-          }
+          # fishersrow = subsetrule %>%
+          #   dplyr::filter(condition_dataset == AG_ds1)
+          #
+          # # assign the variables
+          # fishervar = fishersrow$condition_variable
+          #
+          # fishervac = fishersrow$condition_comparator
+          #
+          # fisherval1 = fishersrow$condition_value
+          #
+          #
+          # if(nrow(fishersrow) > 0) { # if we need a DS statement
+          #
+          #
+          #   if(fishervac == "IN") {
+          #     fisher_f_vac = "%in%"
+          #
+          #     fisher_f_val = paste0("'", trimws(unlist(strsplit(fisherval1, "\\|"))), "'", collapse = ",")
+          #   }# define operator in R code
+          #   else { # vac is EQ or NE
+          #     if(fishervac == "EQ") fisher_f_vac = "==" # define operator in R code
+          #     else fisher_f_vac = "!=" #
+          #     fisher_f_val = paste0("'", fisherval1,"'")
+          #   }
+          #   # concatenate expression
+          #   fisher_cond_stm = paste0(", ",
+          #                            fishervar,
+          #                            " ",
+          #                            fisher_f_vac," "
+          #                            , "c(",
+          #                            fisher_f_val,")")
+          # } else { # if the DS statement should be blank for fisher's
+          #   fisher_cond_stm = ""
+          #
+          # }
 
           ### end Fisher's exact test to filter
 
@@ -1044,7 +1049,6 @@ df2_analysisidhere <- df_analysisidhere
       methodlabel = method$label
       methodid = method$id
 
-
       # Code
       anmetcode <- AnalysisMethodCodeTemplate %>%
         dplyr::filter(method_id == methodid,
@@ -1120,7 +1124,7 @@ df2_analysisidhere <- df_analysisidhere
       #   names_to = 'operation_id',
       #   values_to = 'res')")
       # } else {
-        code_method_tmp_2 = anmetcode_final
+      code_method_tmp_2 = anmetcode_final
       # }
 
       # mutate part
@@ -1265,7 +1269,7 @@ df3_analysisidhere <- df3_analysisidhere %>%
                 combine_analysis_code,
                 ")\n\n #Apply pattern format:\n"#,
                 #code_pattern
-                )
+         )
 
 
   )
