@@ -53,7 +53,8 @@ datasets</p>
 <span>  output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  adam_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  spec_output <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  spec_analysis <span class="op">=</span> <span class="st">""</span></span>
+<span>  spec_analysis <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  example <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -70,15 +71,24 @@ datasets</p>
 
 
 <dt id="arg-adam-path">adam_path<a class="anchor" aria-label="anchor" href="#arg-adam-path"></a></dt>
-<dd><p>Path to folder containing ADaM datasets, to be run in ARD program</p></dd>
+<dd><p>Path to folder containing ADaM datasets, to be run in
+ARD program</p></dd>
 
 
 <dt id="arg-spec-output">spec_output<a class="anchor" aria-label="anchor" href="#arg-spec-output"></a></dt>
-<dd><p>The output ID for a specific output to be run from the metadata</p></dd>
+<dd><p>The output ID for a specific output to be run from
+the metadata</p></dd>
 
 
 <dt id="arg-spec-analysis">spec_analysis<a class="anchor" aria-label="anchor" href="#arg-spec-analysis"></a></dt>
-<dd><p>The analysis ID for a specific analysis to be run from the metadata</p></dd>
+<dd><p>The analysis ID for a specific analysis to be run
+from the metadata</p></dd>
+
+
+<dt id="arg-example">example<a class="anchor" aria-label="anchor" href="#arg-example"></a></dt>
+<dd><p>Default is FALSE.  If TRUE, example-based operations will
+be applied to CDISC example ARS. If FALSE, AnalysisMethodCodeTemplateCode
+will be expected as source of the Method (and Operations) code</p></dd>
 
 </dl></div>
     <div class="section level2">
