@@ -9,7 +9,8 @@ readARS_xl(
   output_path = tempdir(),
   adam_path = tempdir(),
   spec_output = "",
-  spec_analysis = ""
+  spec_analysis = "",
+  example = FALSE
 )
 }
 \arguments{
@@ -17,11 +18,18 @@ readARS_xl(
 
 \item{output_path}{Path to store .R ARD scripts}
 
-\item{adam_path}{Path to folder containing ADaM datasets, to be run in ARD program}
+\item{adam_path}{Path to folder containing ADaM datasets, to be run in
+ARD program}
 
-\item{spec_output}{The output ID for a specific output to be run from the metadata}
+\item{spec_output}{The output ID for a specific output to be run from
+the metadata}
 
-\item{spec_analysis}{The analysis ID for a specific analysis to be run from the metadata}
+\item{spec_analysis}{The analysis ID for a specific analysis to be run
+from the metadata}
+
+\item{example}{Default is FALSE.  If TRUE, example-based operations will
+be applied to CDISC example ARS. If FALSE, AnalysisMethodCodeTemplateCode
+will be expected as source of the Method (and Operations) code}
 }
 \value{
 R programmes generating ARDs - one for each output (or analysis from an output) specified in the ARS metadata
