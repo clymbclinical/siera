@@ -4,27 +4,45 @@
 \alias{readARS}
 \title{Ingest ARS (Analysis Results Standard) metadata, produce ARD (Analysis Results Dataset) code for each output}
 \usage{
-readARS(JSON_ARS, output_path = tempdir(), adam_path = tempdir())
+readARS(
+  ARS_path,
+  output_path = tempdir(),
+  adam_path = tempdir(),
+  spec_output = "",
+  spec_analysis = "",
+  example = FALSE
+)
 }
 \arguments{
-\item{JSON_ARS}{A JSON file containing ARS metadata for a reporting event}
+\item{ARS_path}{A file containing ARS metadata for a reporting event}
 
 \item{output_path}{Path to store .R ARD scripts}
 
-\item{adam_path}{Path to folder containing ADaM datasets, to be run in ARD program}
+\item{adam_path}{Path to folder containing ADaM datasets, to be run in
+ARD program}
+
+\item{spec_output}{The output ID for a specific output to be run from
+the metadata}
+
+\item{spec_analysis}{The analysis ID for a specific analysis to be run
+from the metadata}
+
+\item{example}{Default is FALSE.  If TRUE, example-based operations will
+be applied to CDISC example ARS. If FALSE, AnalysisMethodCodeTemplateCode
+will be expected as source of the Method (and Operations) code}
 }
 \value{
-R programmes generating ARDs - one for each output specificied in the ARS JSON
+R programmes generating ARDs - one for each output (or analysis from an output) specified in the ARS metadata
 }
 \description{
-Ingest JSON or xlsx ARS (Analysis Results Standard) metadata, and meta-programme R scripts
+Ingest ARS (Analysis Results Standard) metadata, and meta-programme R scripts
 that could be run as-is to produce Analysis Results Datasets when ingesting ADaM
 datasets
 }
 \examples{
-# path to JSON file containing ARS metadata
+# path to file containing ARS metadata
 
-json_path <- ARS_example("ARS_V1_Common_Safety_Displays.json")
+ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
 
 # output path for R programs
 output_dir = tempdir()
@@ -33,6 +51,6 @@ output_dir = tempdir()
 adam_folder = tempdir()
 
 # run function, write to temp directory
-readARS(json_path, output_dir, adam_folder)
+readARS_xl(ARS_path, output_dir, adam_folder)
 
 }
