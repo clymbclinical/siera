@@ -36,7 +36,7 @@
 #' readARS_xl(ARS_path, output_dir, adam_folder)
 #'
 
-readARS <- function(ARS_path,
+readARS_xl <- function(ARS_path,
                        output_path = tempdir(),
                        adam_path = tempdir(),
                        spec_output = "",
@@ -1113,9 +1113,9 @@ df1_analysisidhere <- df_analysisidhere
 
 
 
-          func_DataSubset1 <- function(filterVal, ASID, DSNAME) {
-            if(example == FALSE){
-              template <- "
+            func_DataSubset1 <- function(filterVal, ASID, DSNAME) {
+              if(example == FALSE){
+                template <- "
 
 # Apply Data Subset ---
 # Data subset: dsnamehere
@@ -1123,8 +1123,8 @@ df2_analysisidhere <- df_analysisidhere %>%
         dplyr::filter(dplyr::filtertext1)
 
 "
-            } else{
-              template <- "
+              } else{
+                template <- "
 
 # Apply Data Subset ---
 # Data subset: dsnamehere
@@ -1132,61 +1132,61 @@ df2_analysisidhere <- df1_analysisidhere %>%
         dplyr::filter(dplyr::filtertext1)
 
 "
+              }
+
+              code <- gsub('dplyr::filtertext1', filterVal, template)
+              code <- gsub('analysisidhere', ASID, code)
+              code <- gsub('dsnamehere', DSNAME, code)
+
+              return(code)
             }
 
-            code <- gsub('dplyr::filtertext1', filterVal, template)
-            code <- gsub('analysisidhere', ASID, code)
-            code <- gsub('dsnamehere', DSNAME, code)
-
-            return(code)
-          }
-
-          # code_DataSubset <- func_DataSubset(rFilt_final, Anas_j)
-          assign(paste0("code_DataSubset_",Anas_j),
-                 func_DataSubset1(rFilt_final,
-                                  Anas_j,
-                                  DSname)
-          )
-          # cat(code_DataSubset)
-          # eval(parse(text=code_DataSubset))
+            # code_DataSubset <- func_DataSubset(rFilt_final, Anas_j)
+            assign(paste0("code_DataSubset_",Anas_j),
+                   func_DataSubset1(rFilt_final,
+                                    Anas_j,
+                                    DSname)
+            )
+            # cat(code_DataSubset)
+            # eval(parse(text=code_DataSubset))
 
 
-        } else { # there is no data subsetting for this analysis
+          } else { # there is no data subsetting for this analysis
 
-          func_DataSubset2 <- function(ASID) {
-            if(example == FALSE){
-              template <- "
+            func_DataSubset2 <- function(ASID) {
+              if(example == FALSE){
+                template <- "
 
 #Apply Data Subset ---
 df2_analysisidhere <- df_analysisidhere
 
 "
-            } else{
-              template <- "
+              } else{
+                template <- "
 
 #Apply Data Subset ---
 df2_analysisidhere <- df1_analysisidhere
 
 "
-            }
+              }
 
-            code <- gsub('analysisidhere', ASID, template)
-            return(code)
-          } # end function
+              code <- gsub('analysisidhere', ASID, template)
+              return(code)
+            } # end function
 
-          # code_DataSubset <- func_DataSubset(rFilt_final, Anas_j)
-          assign(paste0("code_DataSubset_",Anas_j),
-                 func_DataSubset2(Anas_j)
-          )
-        } # end case where no data subsetting
-      } # end case where no data subsetting for the entire RE
+            # code_DataSubset <- func_DataSubset(rFilt_final, Anas_j)
+            assign(paste0("code_DataSubset_",Anas_j),
+                   func_DataSubset2(Anas_j)
+            )
+          } # end case where no data subsetting
+        } # end case where no data subsetting for the entire RE
 
-      else { # no data subset for the RE
+        else { # no data subset for the RE
 
 
-        func_DataSubset3 <- function(ASID) {
+          func_DataSubset3 <- function(ASID) {
 
-          if(example == FALSE){
+            if(example == FALSE){
             template <- "
 
 #Apply Data Subset ---
@@ -1201,15 +1201,15 @@ df2_analysisidhere <- df1_analysisidhere
 "
 }
 
-          code <- gsub('analysisidhere', ASID, template)
-          return(code)
-        } # end function
+            code <- gsub('analysisidhere', ASID, template)
+            return(code)
+          } # end function
 
-        # code_DataSubset <- func_DataSubset(rFilt_final, Anas_j)
-        assign(paste0("code_DataSubset_",Anas_j),
-               func_DataSubset3(Anas_j)
-        )
-      }
+          # code_DataSubset <- func_DataSubset(rFilt_final, Anas_j)
+          assign(paste0("code_DataSubset_",Anas_j),
+                 func_DataSubset3(Anas_j)
+          )
+        }
 
       # Apply AnalysisMethod -------------------------------------------------------------
       if(example == FALSE){
