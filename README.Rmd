@@ -65,4 +65,9 @@ In order to make use of this function, the following are required as arguments:
 2.  An output directory where the R scripts will be placed
 3.  A folder containing the related ADaM datasets for the ARDs to be generated
 
-See the "Getting Started" vignette for examples and more detail on the process.
+See the [Getting Started](https://clymbclinical.github.io/siera/articles/Getting_started.html) vignette for examples and more detail on the process.
+
+### More info:
+
+- [US Connect 2025 Paper](https://www.lexjansen.com/phuse-us/2025/os/PAP_OS20.pdf)
+- [Clymb website - siera](https://clymbclinical.com/siera/)

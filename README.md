@@ -48,7 +48,7 @@ install.packages("siera")
 #> package 'siera' successfully unpacked and MD5 sums checked
 #> 
 #> The downloaded binary packages are in
-#>  C:\Users\mbosm\AppData\Local\Temp\RtmpsZfWih\downloaded_packages
+#>  C:\Users\mbosm\AppData\Local\Temp\RtmpEFtLhb\downloaded_packages
 ```
 
 The development version can be installed from
@@ -75,5 +75,12 @@ arguments:
 3.  A folder containing the related ADaM datasets for the ARDs to be
     generated
 
-See the “Getting Started” vignette for examples and more detail on the
-process.
+See the [Getting
+Started](https://clymbclinical.github.io/siera/articles/Getting_started.html)
+vignette for examples and more detail on the process.
+
+### More info:
+
+- [US Connect 2025
+  Paper](https://www.lexjansen.com/phuse-us/2025/os/PAP_OS20.pdf)
+- [Clymb website - siera](https://clymbclinical.com/siera/)
