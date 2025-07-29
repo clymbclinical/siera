@@ -15,12 +15,32 @@ status](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/
 ## Overview
 
 With siera, users ingest Analysis Results Standard (ARS) metadata and
-auto-generate R scripts that, when run with provided ADaM datasets,
+auto-generate R scripts that, when run with corresponding ADaM datasets,
 provide Analysis Results Datasets (ARDs).
+
+The [CDISC Analysis Results
+Standard](https://www.cdisc.org/standards/foundational/analysis-results-standard)
+is a foundational standard that facilitates automation, reproducibility,
+reusability and traceability of analysis results data.
+
+ARS metadata is officially represented using JSON format (though there
+is also an Excel representation for easier readability, but the JSON
+format is recommended for official ARS usage). Such a JSON file contains
+all relevant metadata to be able to calculate the Analysis Results for a
+specific Reporting Event. This metadata includes (but is not limited
+to):
+
+- Analysis Sets (e.g. SAFFL = “Y”)
+- AnalysisGroupings (e.g. group by Treatment)
+- DataSubsets (e.g. filter by Treatment-Emergent Adverse Events)
+- AnalysisMethods (e.g. calculate ‘n’, ‘Mean’, ‘Min’, ‘Max’)
+
+Applying all these concepts to ADaM input data, yields Analysis Results
+in Dataset format (ARDs).
 
 ## Installation
 
-The current version of siera can be installed from
+`siera` can be installed from
 [CRAN](https://CRAN.R-project.org/package=siera) with:
 
 ``` r
@@ -28,92 +48,32 @@ install.packages("siera")
 #> package 'siera' successfully unpacked and MD5 sums checked
 #> 
 #> The downloaded binary packages are in
-#>  C:\Users\mbosm\AppData\Local\Temp\Rtmpaw19cU\downloaded_packages
+#>  C:\Users\mbosm\AppData\Local\Temp\RtmpsZfWih\downloaded_packages
 ```
 
-## Requirements
+The development version can be installed from
+[Github](https://github.com/clymbclinical/siera) using
 
-*siera* has two main functions used to ingest ARS metadata - one for
-JSON input - *readARS*, and another for Excel input - *readARS_xl*.
-Depending on the metadata input type, the appropriate function should be
-used.
+``` r
+devtools::install_github("clymbclinical/siera")
+```
 
-When run, these functions ingest the provided metadata, and produce R
-scripts that, when run as-is (with the applicable ADaM dataset), will
-generate an ARD for each output specified in the metadata.
+## Usage
 
-In order to make use of these functions, the following are required as
+The `siera` package has one main function, called `readARS`. This
+function takes ARS metadata as input (either JSON or xlsx format), and
+makes use of the various metadata pieces to populate R scripts, which an
+be run as-is to produce ARDs. One R script is created for each output
+(table) as defined in the ARS metadata for the reportingg event.
+
+In order to make use of this function, the following are required as
 arguments:
 
 1.  A functional ARS file, representing ARS Metadata for a Reporting
-    Event
+    Event (JSON or xlsx)
 2.  An output directory where the R scripts will be placed
 3.  A folder containing the related ADaM datasets for the ARDs to be
     generated
 
-## Example to get started
-
-``` r
-library(siera)
-```
-
-The following example focuses on a JSON ARS metadata input file, thus
-making use of the *readARS* function. For an example of ingesting the
-ARS metadata as an Excel file, see the article [“Read ARS from
-Excel”](https://clymbclinical.github.io/siera/articles/Read_Excel.html).
-
-Note the following regarding these examples: For *readARS* (JSON
-metadata):
-
-- operations are performed within the *readARS* function, thus
-  example-driven
-
-For *readARS_xl* (Excel metadata):
-
-- operations are defined in the metadata, using
-  AnalysisMethodCodeTemplate and AnalysisMethodCodeParameters classes,
-  basing the operations on functions in the *cards* and *cardx*
-  packages.
-
-In order to facilitate the examples, *siera* includes several example
-files, which we use throughout the documentation. These include a JSON
-ARS file, as well as some csv ADaMs (ADSL and ADAE) which can be run
-with the R scripts produced by readARS function. Use the helper
-ARS_example() with no arguments to list them or call it with an example
-filename to get the path.
-
-``` r
-# To see a list of example files:
-ARS_example()
-#> [1] "ADAE.csv"                           "ADSL.csv"                          
-#> [3] "ARS_V1_Common_Safety_Displays.json"
-
-# A temporary path to a specific file:
-ARS_example("ARS_V1_Common_Safety_Displays.json")
-#> [1] "C:/Users/mbosm/AppData/Local/R/win-library/4.4/siera/extdata/ARS_V1_Common_Safety_Displays.json"
-```
-
-To get started with an example of ingesting the ARS JSON metadata,we
-will ingest the example JSON ARS file to meta-programme ready-to-run R
-scripts, which will produce the ARDs.
-
-``` r
-# Path to the the ARS JSON File. 
-json_path <- ARS_example("ARS_V1_Common_Safety_Displays.json")
-
-# Path to a folder which will contain the meta-programmed R scripts (feel free to update 
-# to a more suitable path)
-output_folder <- tempdir()
-
-# this folder contains ADaM datasets to produce ARD (we will use temporary 
-# directory tempdir(), but feel free to download the ADaMs required and use the location they are stored in.
-# This can be done with e.g. dirname(ARS_example("ADSL.csv"))
-ADaM_folder <- tempdir()
-
-# run the readARS function with these 3 parameters.  This creates R scripts (1 for each output in output_folder)
-readARS(json_path, output_folder, ADaM_folder)
-```
-
-Once the R programs are created, they can be individually run, provided
-that the ADaM datasets are in the location as provided to the readARS
-function.
+See the “Getting Started” vignette for examples and more detail on the
+process.
