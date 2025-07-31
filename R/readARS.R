@@ -1308,11 +1308,11 @@ df2_analysisidhere <- df1_analysisidhere
           "
 if(nrow(df2_analysisidhere) != 0){
 df3_analysisidhere <- df3_analysisidhere %>%
-        dplyr::mutate(AnalsysisId = 'analysisidhere',
+        dplyr::mutate(AnalysisId = 'analysisidhere',
                MethodId = 'methodidhere',
                OutputId = 'outputidhere')
 } else {
-    df3_analysisidhere = data.frame(AnalsysisId = 'analysisidhere',
+    df3_analysisidhere = data.frame(AnalysisId = 'analysisidhere',
                MethodId = 'methodidhere',
                OutputId = 'outputidhere')
 }
