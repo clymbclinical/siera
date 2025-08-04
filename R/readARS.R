@@ -2231,7 +2231,7 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
                   "\n\n# combine analyses to create ARD ----\n",
                   "ARD <- dplyr::bind_rows(",
                   combine_analysis_code,
-                  ")\n\n #Apply pattern format:\n"#,
+                  ") %>%\n shuffle_ard() \n #Apply pattern format:\n"#,
                   #code_pattern
            )
     )
