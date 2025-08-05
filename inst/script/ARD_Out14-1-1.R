@@ -24,8 +24,6 @@ ADSL <- read_csv(ARS_example("ADSL.csv"))
 df_An01_05_SAF_Summ_ByTrt <- dplyr::filter(ADSL,
             SAFFL == 'Y')
 
-
-
 #Apply Data Subset ---
 df2_An01_05_SAF_Summ_ByTrt <- df_An01_05_SAF_Summ_ByTrt
 
