@@ -1227,7 +1227,7 @@ df2_analysisidhere <- df1_analysisidhere
         # Code
         anmetcode <- AnalysisMethodCodeTemplate %>%
           dplyr::filter(method_id == methodid,
-                        context == "R",
+                        context %in% c("R", "R (siera)", "siera"),
                         specifiedAs == "Code") %>%
           dplyr::select(templateCode)
 
