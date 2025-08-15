@@ -54,7 +54,8 @@ datasets</p>
 <span>  adam_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  spec_output <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  spec_analysis <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  example <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  example <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  shuffle <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -89,6 +90,11 @@ from the metadata</p></dd>
 <dd><p>Default is FALSE.  If TRUE, example-based operations will
 be applied to CDISC example ARS. If FALSE, AnalysisMethodCodeTemplateCode
 will be expected as source of the Method (and Operations) code</p></dd>
+
+
+<dt id="arg-shuffle">shuffle<a class="anchor" aria-label="anchor" href="#arg-shuffle"></a></dt>
+<dd><p>Default is FALSE.  If TRUE, shuffle_ard() is applied to the
+binded final ARD, to prepare for the tfrmt use case of table generation</p></dd>
 
 </dl></div>
     <div class="section level2">
