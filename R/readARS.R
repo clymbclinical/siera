@@ -585,7 +585,16 @@ library(readr)
         oper <-  '=='
       } else if(cond_oper == "NE"){
         oper = '!='
+      } else if(cond_oper == "GE"){
+        oper = '>='
+      } else if(cond_oper == "GT"){
+        oper = '>'
+      } else if(cond_oper == "LE"){
+        oper = '<='
+      } else if(cond_oper == "LT"){
+        oper = '<'
       }
+
 
       if(is.na(cond_val)){
         cond_val = ""
