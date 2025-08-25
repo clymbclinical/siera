@@ -601,10 +601,14 @@ library(readr)
 
       if(is.na(cond_val)){
         cond_val = ""
+      } else{
+        if(!is.numeric(cond_val)){
+          cond_val = paste0("'",cond_val,"'")
+        }
       }
 
       # code for conditional statement for anSet
-      anset_cond_stm = paste0(cond_var, oper,"'",cond_val,"'")
+      anset_cond_stm = paste0(cond_var, oper,cond_val)
 
       if(cond_adam == ana_adam){    # if Analysis Set ADaM and Analysis ADaM are same
 
