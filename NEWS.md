@@ -1,3 +1,5 @@
+# siera 0.5.2
+
 # siera 0.5.1
 * Added conditional operators to cover EQ, NE, GE, GT, LE, LT
 
