@@ -48,7 +48,7 @@ install.packages("siera")
 #> package 'siera' successfully unpacked and MD5 sums checked
 #> 
 #> The downloaded binary packages are in
-#>  C:\Users\mbosm\AppData\Local\Temp\RtmpEFtLhb\downloaded_packages
+#>  C:\Users\mbosm\AppData\Local\Temp\RtmpI3Rk9T\downloaded_packages
 ```
 
 The development version can be installed from
