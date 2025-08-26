@@ -603,7 +603,7 @@ library(readr)
         cond_val = ""
       } else{
         if(!is.numeric(cond_val)){
-          cond_val = paste0("'",cond_val,"'")
+          cond_val = paste0(cond_val)
         }
       }
 
