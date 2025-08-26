@@ -2248,7 +2248,7 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
                     "\n\n# combine analyses to create ARD ----\n",
                     "ARD <- cards::bind_ard(",
                     combine_analysis_code,
-                    ") %>%\n #Apply pattern format:\n"#,
+                    ") \n #Apply pattern format:\n"#,
                     #code_pattern
              )
       )
