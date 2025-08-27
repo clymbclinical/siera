@@ -1122,15 +1122,19 @@ df1_analysisidhere <- df_analysisidhere
 
                     f_val = paste0("'", trimws(unlist(strsplit(val, "\\|"))), "'", collapse = ",")
                   } else { # vac is EQ or NE
-                    if(vac == "EQ") f_vac = "==" # define operator in R code
-                    else f_vac = "!=" #
-                    f_val = paste0("'", val1,"'")
+                    if(vac == "EQ") f_vac = '=='
+                    if(vac == "NE") f_vac = '!='
+                    if(vac == "GT") f_vac = '>'
+                    if(vac == "GE") f_vac = '>='
+                    if(vac == "LT") f_vac = '<'
+                    if(vac == "LE") f_vac = '<='
+                    f_val = val #paste0("'", val1,"'")
                   }
                   # concatenate expression
-                  assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", "'",f_val,"'"))
+                  assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", f_val))
 
-                  if(n>1) assign('rcode', paste0(rcode, " LOGOP ",var," ", f_vac," ", "c(",f_val,")"))
-                  else assign('rcode', paste0(var," ", f_vac," ", "c(",f_val,")"))
+                  if(n>1) assign('rcode', paste0(rcode, " LOGOP ",var," ", f_vac," ", f_val))
+                  else assign('rcode', paste0(var," ", f_vac," ", f_val))
 
                 }# end loop through rows
               }
