@@ -654,7 +654,7 @@ df_analysisidhere <- dplyr::filter(ADaM,
 # Analysis set :  Analysissetnamehere
 df_analysisidhere <- dplyr::filter(ADaM,
             var operator 'value') %>%
-            #dplyr::select(anasetvrhere) %>%
+            dplyr::select(USUBJID) %>%
             merge(analysisADAMhere,
                   by = 'USUBJID',
                   all = FALSE)
@@ -1010,6 +1010,12 @@ df1_analysisidhere <- df_analysisidhere
             #dset?
             var = subsetrule$condition_variable
             val1 = stringr::str_trim(subsetrule$condition_value)
+            is_num <- !is.na(suppressWarnings(as.numeric(val1)))
+            if(is_num == TRUE){
+              val = suppressWarnings(as.numeric(val1))
+            } else{
+              val =  paste0("'",val1,"'")
+            }
             vac = subsetrule$condition_comparator
 
             # R code
@@ -1019,7 +1025,7 @@ df1_analysisidhere <- df_analysisidhere
             if(vac == "GE") rvac = '>='
             if(vac == "LT") rvac = '<'
             if(vac == "LE") rvac = '<='
-            rFilt_final <- paste0(var," ", rvac," ", "'",val1,"'")
+            rFilt_final <- paste0(var," ", rvac," ",val)
 
           } else  {                       # if there are more than one rows
 
@@ -1064,19 +1070,30 @@ df1_analysisidhere <- df_analysisidhere
                   vac = ord1_$condition_comparator
 
                   val1 = ord1_$condition_value
+                  is_num <- !is.na(suppressWarnings(as.numeric(val1)))
+                  if(is_num == TRUE){
+                    val = suppressWarnings(as.numeric(val1))
+                  } else{
+                    val =  paste0("'",val1,"'")
+                  }
 
                   if(vac == "IN") {
                     f_vac = "%in%"
                   }# define operator in R code
                   else { # vac is EQ or NE
-                    if(vac == "EQ") f_vac = "==" # define operator in R code
-                    else f_vac = "!=" #
+                    if(vac == "EQ") f_vac = '=='
+                    if(vac == "NE") f_vac = '!='
+                    if(vac == "GT") f_vac = '>'
+                    if(vac == "GE") f_vac = '>='
+                    if(vac == "LT") f_vac = '<'
+                    if(vac == "LE") f_vac = '<='
                   }
-                  # concatenate expression
-                  assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", "'",val1,"'"))
 
-                  if(n>1) assign('rcode', paste0(rcode, " LOGOP ",var," ", f_vac," ", "'",val1,"'"))
-                  else assign('rcode', paste0(var," ", f_vac," ", "'",val1,"'"))
+                  # concatenate expression
+                  assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", val))
+
+                  if(n>1) assign('rcode', paste0(rcode, " LOGOP ",var," ", f_vac," ", val))
+                  else assign('rcode', paste0(var," ", f_vac," ", val))
 
                 } # end loop through rows
                 # combine total dplyr::filter
@@ -1092,12 +1109,18 @@ df1_analysisidhere <- df_analysisidhere
                   vac = ord1_$condition_comparator
 
                   val1 = ord1_$condition_value
+                  is_num <- !is.na(suppressWarnings(as.numeric(val1)))
+                  if(is_num == TRUE){
+                    val = suppressWarnings(as.numeric(val1))
+                  } else{
+                    val =  paste0("'",val1,"'")
+                  }
 
                   if(vac == "IN") {
                     f_vac = "%in%"
 
 
-                    f_val = paste0("'", trimws(unlist(strsplit(val1, "\\|"))), "'", collapse = ",")
+                    f_val = paste0("'", trimws(unlist(strsplit(val, "\\|"))), "'", collapse = ",")
                   } else { # vac is EQ or NE
                     if(vac == "EQ") f_vac = "==" # define operator in R code
                     else f_vac = "!=" #
