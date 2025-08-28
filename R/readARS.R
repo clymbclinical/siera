@@ -658,7 +658,6 @@ overlapfin <- setdiff(overlap, 'USUBJID')
 
 df_analysisidhere <- dplyr::filter(ADaM,
             var operator 'value') %>%
-            dplyr::select(USUBJID) %>%
             merge(analysisADAMhere %>% select(-all_of(overlapfin)),
                   by = 'USUBJID',
                   all = FALSE)
