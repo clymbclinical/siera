@@ -654,7 +654,7 @@ df_analysisidhere <- dplyr::filter(ADaM,
 # Analysis set :  Analysissetnamehere
 df_analysisidhere <- dplyr::filter(ADaM,
             var operator 'value') %>%
-            #dplyr::select(anasetvrhere) %>%
+            dplyr::select(USUBJID) %>%
             merge(analysisADAMhere,
                   by = 'USUBJID',
                   all = FALSE)
@@ -1007,21 +1007,43 @@ df1_analysisidhere <- df_analysisidhere
 
           if(nrow(subsetrule) == 1){      # if there's only one row
 
-            #dset?
             var = subsetrule$condition_variable
             val1 = stringr::str_trim(subsetrule$condition_value)
             vac = subsetrule$condition_comparator
 
-            # R code
-            if(vac == "EQ") rvac = '=='
-            if(vac == "NE") rvac = '!='
-            if(vac == "GT") rvac = '>'
-            if(vac == "GE") rvac = '>='
-            if(vac == "LT") rvac = '<'
-            if(vac == "LE") rvac = '<='
-            rFilt_final <- paste0(var," ", rvac," ", "'",val1,"'")
+            if(vac == "IN"){
+              rvac = "%in%"
 
-          } else  {                       # if there are more than one rows
+              # multiple values
+              vals = strsplit(val1, ",\\s*")[[1]]
+              is_num <- !is.na(suppressWarnings(as.numeric(vals)))
+
+              if(is_num[1] == TRUE){ # numeric values
+                vals_ = suppressWarnings(as.numeric(vals))
+                val =  paste0("c(", paste0( vals_, collapse = ", "), ")")
+              } else{
+                val =  paste0("c(", paste0("'", vals, "'", collapse = ", "), ")")
+              }
+
+            }else{
+              if(vac == "EQ") rvac = '=='
+              if(vac == "NE") rvac = '!='
+              if(vac == "GT") rvac = '>'
+              if(vac == "GE") rvac = '>='
+              if(vac == "LT") rvac = '<'
+              if(vac == "LE") rvac = '<='
+
+              is_num <- !is.na(suppressWarnings(as.numeric(val1)))
+              if(is_num == TRUE){
+                val = suppressWarnings(as.numeric(val1))
+              } else{
+                val =  paste0("'",val1,"'")
+              }
+            }
+
+            rFilt_final <- paste0(var," ", rvac," ",val)
+
+          } else  {# if there are more than one rows
 
             maxlev = max(subsetrule$level)
             if(maxlev <= 1){
@@ -1063,20 +1085,79 @@ df1_analysisidhere <- df_analysisidhere
 
                   vac = ord1_$condition_comparator
 
-                  val1 = ord1_$condition_value
+                  if(example == TRUE){
+                    val1 = ord1_$condition_value %>%
+                      unlist()
+                    is_num <- !is.na(suppressWarnings(as.numeric(val1)))
 
-                  if(vac == "IN") {
-                    f_vac = "%in%"
-                  }# define operator in R code
-                  else { # vac is EQ or NE
-                    if(vac == "EQ") f_vac = "==" # define operator in R code
-                    else f_vac = "!=" #
+                    if(vac == "IN") {
+                      f_vac = "%in%"
+
+                      # multiple values
+                      if(is_num[1] == TRUE){ # numeric values
+                        val1_ = suppressWarnings(as.numeric(val1))
+                        val =  paste0("c(", paste0( val1_, collapse = ", "), ")")
+                      } else{
+                        val =  paste0("c(", paste0("'", val1, "'", collapse = ", "), ")")
+                      }
+                    }
+                    else {
+                      if(vac == "EQ") f_vac = '=='
+                      if(vac == "NE") f_vac = '!='
+                      if(vac == "GT") f_vac = '>'
+                      if(vac == "GE") f_vac = '>='
+                      if(vac == "LT") f_vac = '<'
+                      if(vac == "LE") f_vac = '<='
+
+                      # single value
+                      if(is_num == TRUE){
+                        val = suppressWarnings(as.numeric(val1))
+                      } else{
+                        val =  paste0("'",val1,"'")
+                      }
+                    }
+                  } else{ # example not true
+                    val1 = ord1_$condition_value
+
+                    if(vac == "IN") {
+                      f_vac = "%in%"
+
+                      # multiple values
+                      vals = strsplit(val1, ",\\s*")[[1]]
+                      is_num <- !is.na(suppressWarnings(as.numeric(vals)))
+
+                      if(is_num[1] == TRUE){ # numeric values
+                        vals_ = suppressWarnings(as.numeric(vals))
+                        val =  paste0("c(", paste0( vals_, collapse = ", "), ")")
+                      } else{
+                        val =  paste0("c(", paste0("'", vals, "'", collapse = ", "), ")")
+                      }
+                    }
+                    else {
+                      if(vac == "EQ") f_vac = '=='
+                      if(vac == "NE") f_vac = '!='
+                      if(vac == "GT") f_vac = '>'
+                      if(vac == "GE") f_vac = '>='
+                      if(vac == "LT") f_vac = '<'
+                      if(vac == "LE") f_vac = '<='
+
+                      # single value
+                      is_num <- !is.na(suppressWarnings(as.numeric(val1)))
+                      if(is_num == TRUE){
+                        val = suppressWarnings(as.numeric(val1))
+                      } else{
+                        val =  paste0("'",val1,"'")
+                      }
+                    }
                   }
-                  # concatenate expression
-                  assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", "'",val1,"'"))
 
-                  if(n>1) assign('rcode', paste0(rcode, " LOGOP ",var," ", f_vac," ", "'",val1,"'"))
-                  else assign('rcode', paste0(var," ", f_vac," ", "'",val1,"'"))
+
+
+                  # concatenate expression
+                  assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", val))
+
+                  if(n>1) assign('rcode', paste0(rcode, " LOGOP ",var," ", f_vac," ", val))
+                  else assign('rcode', paste0(var," ", f_vac," ", val))
 
                 } # end loop through rows
                 # combine total dplyr::filter
@@ -1091,28 +1172,49 @@ df1_analysisidhere <- df_analysisidhere
 
                   vac = ord1_$condition_comparator
 
+
                   val1 = ord1_$condition_value
+                  val = gsub("\\|", ",", val1)
 
                   if(vac == "IN") {
                     f_vac = "%in%"
 
+                    #multiple values
+                    vals = strsplit(val1, ",\\s*")[[1]]
+                    is_num <- !is.na(suppressWarnings(as.numeric(vals)))
 
-                    f_val = paste0("'", trimws(unlist(strsplit(val1, "\\|"))), "'", collapse = ",")
+                    if(is_num[1] == TRUE){ # numeric values
+                      vals_ = suppressWarnings(as.numeric(vals))
+                      f_val =  paste0("c(", paste0( vals_, collapse = ", "), ")")
+                    } else{
+                      f_val =  paste0("c(", paste0("'", vals, "'", collapse = ", "), ")")
+                    }
+
                   } else { # vac is EQ or NE
-                    if(vac == "EQ") f_vac = "==" # define operator in R code
-                    else f_vac = "!=" #
-                    f_val = paste0("'", val1,"'")
+                    if(vac == "EQ") f_vac = '=='
+                    if(vac == "NE") f_vac = '!='
+                    if(vac == "GT") f_vac = '>'
+                    if(vac == "GE") f_vac = '>='
+                    if(vac == "LT") f_vac = '<'
+                    if(vac == "LE") f_vac = '<='
+
+                    # single value
+                    is_num <- !is.na(suppressWarnings(as.numeric(val1)))
+                    if(is_num == TRUE){
+                      f_val = suppressWarnings(as.numeric(val1))
+                    } else{
+                      f_val =  paste0("'",val1,"'")
+                    }
                   }
                   # concatenate expression
-                  assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", "'",f_val,"'"))
+                  assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", f_val))
 
-                  if(n>1) assign('rcode', paste0(rcode, " LOGOP ",var," ", f_vac," ", "c(",f_val,")"))
-                  else assign('rcode', paste0(var," ", f_vac," ", "c(",f_val,")"))
+                  if(n>1) assign('rcode', paste0(rcode, " LOGOP ",var," ", f_vac," ", f_val))
+                  else assign('rcode', paste0(var," ", f_vac," ", f_val))
 
                 }# end loop through rows
               }
               # combine total dplyr::filter
-
 
               assign(paste("rFilt", m, sep = "_"),
                      gsub("LOGOP", rlog_oper, rcode))
