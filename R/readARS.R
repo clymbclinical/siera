@@ -652,10 +652,14 @@ df_analysisidhere <- dplyr::filter(ADaM,
           template <- "
 # Apply Analysis Set ---
 # Analysis set :  Analysissetnamehere
+
+overlap <- intersect(names(ADaM), names(analysisADAMhere))
+overlapfin <- setdiff(overlap, 'USUBJID')
+
 df_analysisidhere <- dplyr::filter(ADaM,
             var operator 'value') %>%
             dplyr::select(USUBJID) %>%
-            merge(analysisADAMhere,
+            merge(analysisADAMhere %>% select(-all_of(overlapfin)),
                   by = 'USUBJID',
                   all = FALSE)
 "
