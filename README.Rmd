@@ -33,7 +33,7 @@ The [CDISC Analysis Results Standard](https://www.cdisc.org/standards/foundation
 
 ARS metadata is officially represented using JSON format (though there is also an Excel representation for easier readability, but the JSON format is recommended for official ARS usage).  Such a JSON file contains all relevant metadata to be able to calculate the Analysis Results for a specific Reporting Event.  This metadata includes (but is not limited to):
 
-- Analysis Sets (e.g. SAFFL = "Y")
+- Analysis Sets (e.g. SAFFL = "Y") 
 - AnalysisGroupings (e.g. group by Treatment)
 - DataSubsets (e.g. filter by Treatment-Emergent Adverse Events)
 - AnalysisMethods (e.g. calculate 'n', 'Mean', 'Min', 'Max')
