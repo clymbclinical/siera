@@ -111,9 +111,13 @@ library(readr)
       # gather anaIDs from anaysisID (Level 2)
       anaIds <- tmp_json_Lopa$analysisId %>%
         tibble::as_tibble() %>%
-        dplyr::mutate(listItem_outputId = tmp_PO$outputId) %>%
-        dplyr::rename(listItem_analysisId = value) %>%
-        dplyr::filter(!is.na(listItem_analysisId))
+        dplyr::mutate(listItem_outputId = tmp_PO$outputId)
+
+      if(nrow(anaIds) > 0){
+        anaIds = anaIds %>%
+          dplyr::rename(listItem_analysisId = value) %>%
+          dplyr::filter(!is.na(listItem_analysisId))
+      }
 
       # bind analysisIDs
       Lopa <- rbind(Lopa, anaIds)
