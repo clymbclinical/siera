@@ -501,7 +501,8 @@ library(readr)
     # Loop through the unique dataset list once
     for (ad in unique_datasets) {
       ad_path <- paste0("adampathhere/", ad, ".csv")  # Construct the file path
-      a1 <- paste0(a1, ad, " <- read_csv(\'", ad_path, "\')\n")  # Append each line
+      a1 <- paste0(a1, ad, " <- read_csv(\'", ad_path, "\') %>%
+  mutate(across(where(is.character), ~ replace_na(.x, '')))\n")  # Append each line
     }
     a1 <- gsub("adampathhere", adam_path, a1, fixed = TRUE)
     code_ADaM_1 <- unique(paste(a1, sep = ""))
@@ -2355,7 +2356,7 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
                     code_ADaM,
                     run_code,
                     "\n\n# combine analyses to create ARD ----\n",
-                    "ARD <- cards::bind_ard(",
+                    "ARD <- dplyr::bind_rows(",
                     combine_analysis_code,
                     ") \n #Apply pattern format:\n"#,
                     #code_pattern
@@ -2376,7 +2377,7 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
       )
     }
 
-  } else {
+  } else { # example = TRUE
 
     assign(paste0("code_",Output),
            paste0(code_header,
