@@ -566,129 +566,139 @@ library(readr)
       methodid <- Anas_s$method_id #
 
       # Apply Analysis Set -----
-      temp_AnSet <- AnalysisSets %>%  # get analysis set for this iteration
-        dplyr::filter(id == ana_setId)
 
-      cond_adam <- temp_AnSet %>% # ADaM for this analysis set
-        dplyr::select(condition_dataset) %>%
-        as.character()
+      if(j == 1){ # only apply AnalysisSet once per output
+        temp_AnSet <- AnalysisSets %>%  # get analysis set for this iteration
+          dplyr::filter(id == ana_setId)
 
-      cond_var <- temp_AnSet %>% # condition variable for this analysis set
-        dplyr::select(condition_variable) %>%
-        as.character()
+        cond_adam <- temp_AnSet %>% # ADaM for this analysis set
+          dplyr::select(condition_dataset) %>%
+          as.character()
 
-      cond_oper <- temp_AnSet %>% # condition operator for this analysis set
-        dplyr::select(condition_comparator) %>%
-        as.character()
+        cond_var <- temp_AnSet %>% # condition variable for this analysis set
+          dplyr::select(condition_variable) %>%
+          as.character()
 
-      cond_val <- temp_AnSet %>% # condition value for this analysis set
-        dplyr::select(condition_value) %>%
-        unlist()
+        cond_oper <- temp_AnSet %>% # condition operator for this analysis set
+          dplyr::select(condition_comparator) %>%
+          as.character()
 
-      anSetName <- temp_AnSet %>% # condition value for this analysis set
-        dplyr::select(name)%>%
-        as.character()
+        cond_val <- temp_AnSet %>% # condition value for this analysis set
+          dplyr::select(condition_value) %>%
+          unlist()
 
-      if(cond_oper == "EQ") { # convert to R code
-        oper <-  '=='
-      } else if(cond_oper == "NE"){
-        oper = '!='
-      } else if(cond_oper == "GE"){
-        oper = '>='
-      } else if(cond_oper == "GT"){
-        oper = '>'
-      } else if(cond_oper == "LE"){
-        oper = '<='
-      } else if(cond_oper == "LT"){
-        oper = '<'
-      }
+        anSetName <- temp_AnSet %>% # condition value for this analysis set
+          dplyr::select(name)%>%
+          as.character()
 
-
-      if(is.na(cond_val)){
-        cond_val = ""
-      } else{
-        if(!is.numeric(cond_val)){
-          cond_val = paste0(cond_val)
+        if(cond_oper == "EQ") { # convert to R code
+          oper <-  '=='
+        } else if(cond_oper == "NE"){
+          oper = '!='
+        } else if(cond_oper == "GE"){
+          oper = '>='
+        } else if(cond_oper == "GT"){
+          oper = '>'
+        } else if(cond_oper == "LE"){
+          oper = '<='
+        } else if(cond_oper == "LT"){
+          oper = '<'
         }
-      }
 
-      # code for conditional statement for anSet
-      anset_cond_stm = paste0(cond_var, oper,cond_val)
 
-      if(cond_adam == ana_adam){    # if Analysis Set ADaM and Analysis ADaM are same
+        if(is.na(cond_val)){
+          cond_val = ""
+        } else{
+          if(!is.numeric(cond_val)){
+            cond_val = paste0(cond_val)
+          }
+        }
 
-        func_AnalysisSet1 <- function(dataset, variable, oper, val, ASID, anSetName) {
-          template <- "
+        # code for conditional statement for anSet (Fisher's)
+        # anset_cond_stm = paste0(cond_var, oper,cond_val)
+
+        # select 2nd Analysis in Output for identifying ADaM
+        Anas_2 <- Anas[2, ]$listItem_analysisId
+        Anas_s2 <- Analyses %>% # row from AN to get other IDs
+          dplyr::filter(id == Anas_2)
+
+        ana_adam2 <- Anas_s2$dataset
+
+        if(cond_adam == ana_adam2){    # if Analysis Set ADaM and Output ADaM are same
+
+          func_AnalysisSet1 <- function(dataset, variable, oper, val, ASID, anSetName) {
+            template <- "
 # Apply Analysis Set ---
-# Analysis set :  Analysissetnamehere
-df_analysisidhere <- dplyr::filter(ADaM,
+df_pop <- dplyr::filter(ADaM,
             var operator 'value')
 
 "
-          code <- gsub('ADaM', dataset, template)
-          code <- gsub('var', variable, code)
-          code <- gsub('operator', oper, code)
-          code <- gsub('value', val, code)
-          code <- gsub('analysisidhere', ASID, code)
-          code <- gsub('Analysissetnamehere', anSetName, code)
+            code <- gsub('ADaM', dataset, template)
+            code <- gsub('var', variable, code)
+            code <- gsub('operator', oper, code)
+            code <- gsub('value', val, code)
+            code <- gsub('analysisidhere', ASID, code)
+            code <- gsub('Analysissetnamehere', anSetName, code)
 
-          return(code)
+            return(code)
+          }
+
+          assign(paste0("code_AnalysisSet_",Anas_j), func_AnalysisSet1(cond_adam,
+                                                                       cond_var,
+                                                                       oper,
+                                                                       cond_val,
+                                                                       Anas_j,
+                                                                       anSetName))
+
         }
+        else { # if analysis set ADaM and Analysis ADaMs are different
 
-        assign(paste0("code_AnalysisSet_",Anas_j), func_AnalysisSet1(cond_adam,
-                                                                     cond_var,
-                                                                     oper,
-                                                                     cond_val,
-                                                                     Anas_j,
-                                                                     anSetName))
-
-      }
-      else { # if analysis set ADaM and Analysis ADaMs are different
-
-        # variable used in Analysis
-        func_AnalysisSet2 <- function(dataset,
-                                      variable,
-                                      oper,
-                                      val,
-                                      #anavar,
-                                      ASID,
-                                      anaADaM,
-                                      anSetName) {
-          template <- "
+          # variable used in Analysis
+          func_AnalysisSet2 <- function(dataset,
+                                        variable,
+                                        oper,
+                                        val,
+                                        #anavar,
+                                        ASID,
+                                        anaADaM,
+                                        anSetName) {
+            template <- "
 # Apply Analysis Set ---
-# Analysis set :  Analysissetnamehere
-
 overlap <- intersect(names(ADaM), names(analysisADAMhere))
 overlapfin <- setdiff(overlap, 'USUBJID')
 
-df_analysisidhere <- dplyr::filter(ADaM,
+df_pop <- dplyr::filter(ADaM,
             var operator 'value') %>%
             merge(analysisADAMhere %>% select(-all_of(overlapfin)),
                   by = 'USUBJID',
                   all = FALSE)
 "
-          code <- gsub('ADaM', dataset, template)
-          code <- gsub('var', variable, code)
-          code <- gsub('operator', oper, code)
-          code <- gsub('value', val, code)
-          #code <- gsub('anasetvrhere', anavar, code)
-          code <- gsub('analysisidhere', ASID, code)
-          code <- gsub('analysisADAMhere', anaADaM, code)
-          code <- gsub('Analysissetnamehere', anSetName, code)
+            code <- gsub('ADaM', dataset, template)
+            code <- gsub('var', variable, code)
+            code <- gsub('operator', oper, code)
+            code <- gsub('value', val, code)
+            #code <- gsub('anasetvrhere', anavar, code)
+            code <- gsub('analysisidhere', ASID, code)
+            code <- gsub('analysisADAMhere', anaADaM, code)
+            code <- gsub('Analysissetnamehere', anSetName, code)
 
-          return(code)
+            return(code)
+          }
+
+          assign(paste0("code_AnalysisSet_",Anas_j),
+                 func_AnalysisSet2(cond_adam,
+                                   cond_var,
+                                   oper,
+                                   cond_val,
+                                   #ana_var,
+                                   Anas_j,
+                                   ana_adam,
+                                   anSetName))
         }
-
-        assign(paste0("code_AnalysisSet_",Anas_j),
-               func_AnalysisSet2(cond_adam,
-                                 cond_var,
-                                 oper,
-                                 cond_val,
-                                 #ana_var,
-                                 Anas_j,
-                                 ana_adam,
-                                 anSetName))
+      } else{
+        assign(paste0("code_AnalysisSet_",Anas_j),"")
       }
+
 
 
       # Apply Grouping ----------------------------
@@ -1245,7 +1255,7 @@ df1_analysisidhere <- df_analysisidhere
 
 # Apply Data Subset ---
 # Data subset: dsnamehere
-df2_analysisidhere <- df_analysisidhere %>%
+df2_analysisidhere <- df_pop %>%
         dplyr::filter(dplyr::filtertext1)
 
 "
@@ -1254,7 +1264,7 @@ df2_analysisidhere <- df_analysisidhere %>%
 
 # Apply Data Subset ---
 # Data subset: dsnamehere
-df2_analysisidhere <- df1_analysisidhere %>%
+df2_analysisidhere <- df_pop %>%
         dplyr::filter(dplyr::filtertext1)
 
 "
@@ -1284,14 +1294,14 @@ df2_analysisidhere <- df1_analysisidhere %>%
               template <- "
 
 #Apply Data Subset ---
-df2_analysisidhere <- df_analysisidhere
+df2_analysisidhere <- df_pop
 
 "
             } else{
               template <- "
 
 #Apply Data Subset ---
-df2_analysisidhere <- df1_analysisidhere
+df2_analysisidhere <- df_pop
 
 "
             }
@@ -1316,13 +1326,13 @@ df2_analysisidhere <- df1_analysisidhere
             template <- "
 
 #Apply Data Subset ---
-df2_analysisidhere <- df_analysisidhere
+df2_analysisidhere <- df_pop
 
 "} else {
   template <- "
 
 #Apply Data Subset ---
-df2_analysisidhere <- df1_analysisidhere
+df2_analysisidhere <- df_pop
 
 "
 }
@@ -2292,22 +2302,24 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
       }
 
     # Generate code for analysis ----------------------------------------------
+    # if(j == 1){  #AnalysisSet only for first analysis
+      if(example == FALSE){
+        assign(paste0("code_",Anas_j),
+               paste0("\n\n# Analysis ", Anas_j,"----",
+                      get(paste0("code_AnalysisSet_",Anas_j)),
+                      #get(paste0("code_AnalysisGrouping_",Anas_j)),
+                      get(paste0("code_DataSubset_",Anas_j)),
+                      get(paste0("code_AnalysisMethod_",Anas_j))))
+      } else {
+        assign(paste0("code_",Anas_j),
+               paste0("\n\n# Analysis ", Anas_j,"----",
+                      get(paste0("code_AnalysisSet_",Anas_j)),
+                      get(paste0("code_AnalysisGrouping_",Anas_j)),
+                      get(paste0("code_DataSubset_",Anas_j)),
+                      get(paste0("code_AnalysisMethod_",Anas_j))))
+      }
+      # }
 
-    if(example == FALSE){
-      assign(paste0("code_",Anas_j),
-             paste0("\n\n# Analysis ", Anas_j,"----",
-                    get(paste0("code_AnalysisSet_",Anas_j)),
-                    #get(paste0("code_AnalysisGrouping_",Anas_j)),
-                    get(paste0("code_DataSubset_",Anas_j)),
-                    get(paste0("code_AnalysisMethod_",Anas_j))))
-    } else {
-      assign(paste0("code_",Anas_j),
-             paste0("\n\n# Analysis ", Anas_j,"----",
-                    get(paste0("code_AnalysisSet_",Anas_j)),
-                    get(paste0("code_AnalysisGrouping_",Anas_j)),
-                    get(paste0("code_DataSubset_",Anas_j)),
-                    get(paste0("code_AnalysisMethod_",Anas_j))))
-    }
 
     run_code <- paste0(run_code,
                        get(paste0("code_",Anas_j)))
