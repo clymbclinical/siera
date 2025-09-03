@@ -48,7 +48,7 @@ install.packages("siera")
 #> package 'siera' successfully unpacked and MD5 sums checked
 #> 
 #> The downloaded binary packages are in
-#>  C:\Users\mbosm\AppData\Local\Temp\Rtmpew9bvG\downloaded_packages
+#>  C:\Users\mbosm\AppData\Local\Temp\RtmpQH7F4K\downloaded_packages
 ```
 
 The development version can be installed from
@@ -83,4 +83,3 @@ vignette for examples and more detail on the process.
 
 - [US Connect 2025
   Paper](https://www.lexjansen.com/phuse-us/2025/os/PAP_OS20.pdf)
-- [Clymb website - siera](https://clymbclinical.com/siera/)
