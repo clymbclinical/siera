@@ -1,3 +1,7 @@
+# siera 0.5.4
+
+* Convert blank columns from NA to ""
+
 # siera 0.5.3
 
 * Cover scenario of multi-value DataSubsets
