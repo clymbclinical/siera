@@ -699,8 +699,6 @@ df_pop <- dplyr::filter(ADaM,
         assign(paste0("code_AnalysisSet_",Anas_j),"")
       }
 
-
-
       # Apply Grouping ----------------------------
 
       # determine maximum groupings
