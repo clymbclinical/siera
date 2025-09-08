@@ -145,3 +145,67 @@ test_that("combined code created", {
 
   expect_true(any(grepl("ARD <- ", lines)))
 })
+
+# test_that("Generated R scripts run without error", {
+#   ARS_path   <- ARS_example("Common_Safety_Displays_cards.xlsx")
+#   output_dir <- normalizePath(tempdir(), winslash = "/", mustWork = FALSE)
+#   adam_folder <- normalizePath(tempdir(), winslash = "/", mustWork = FALSE)
+#
+#   readARS(ARS_path, output_dir, adam_folder)
+#
+#   r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+#   expect_true(length(r_files) > 0)
+#
+#   for (f in r_files) {
+#     e <- new.env()
+#     suppressWarnings(     # suppress version mismatch warning
+#       suppressPackageStartupMessages(
+#         source(f, local = e, chdir = TRUE)
+#       )
+#     )
+#     # still assert “no errors” by reaching here
+#     succeed()
+#   }
+# })
+
+test_that("Generated R scripts run without error (extdata ADaMs direct)", {
+  skip_on_cran()
+
+  # Path to ARS file (metadata driving script generation)
+  ARS_path  <- ARS_example("Common_Safety_Displays_cards.xlsx")
+
+  # Directly use extdata shipped with the package
+  adam_dir  <- system.file("extdata", package = "siera")
+  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+
+  # Temp folder for generated scripts
+  output_dir <- withr::local_tempdir()
+
+  # Generate the R scripts — note adam_dir is passed here
+  readARS(ARS_path, output_dir, adam_dir)
+
+  # Find generated R scripts
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_true(length(r_files) > 0, info = "No R scripts generated")
+
+  # Run each script and check ARD object
+  for (f in r_files) {
+    e <- new.env(parent = baseenv())
+
+    expect_error(
+      suppressWarnings(
+        suppressPackageStartupMessages(
+          source(f, local = e, chdir = TRUE)
+        )
+      ),
+      NA,
+      info = paste("Sourcing failed for", basename(f))
+    )
+
+    # Ensure ARD dataset was created
+    expect_true(exists("ARD", envir = e), info = paste("No ARD from", basename(f)))
+    ARD <- get("ARD", envir = e)
+    expect_true("stat" %in% names(ARD), info = "'stat' column missing in ARD")
+  }
+})
+
