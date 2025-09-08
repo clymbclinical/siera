@@ -2333,9 +2333,7 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
   # add pattern formatting
 
 
-  code_pattern <- paste0('ARD_',
-                         gsub('-', '_', Output),
-                         "<- df4 |>
+  code_pattern <- paste0("ARD <- df4 |>
       dplyr::mutate(dec = ifelse(grepl('X.X',
                                 df4$pattern, ),
                           stringr::str_count(substr(df4$pattern,
