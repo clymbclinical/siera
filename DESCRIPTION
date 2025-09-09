@@ -28,7 +28,14 @@ Imports:
 Suggests: 
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    withr,
+    readr,
+    cards,
+    cardx,
+    broom,
+    parameters,
+    broom.helpers
 VignetteBuilder: knitr
 URL: https://clymbclinical.github.io/siera/, https://github.com/clymbclinical/siera
 BugReports: https://github.com/clymbclinical/siera/issues
