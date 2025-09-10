@@ -146,33 +146,8 @@ test_that("combined code created", {
   expect_true(any(grepl("ARD <- ", lines)))
 })
 
-<<<<<<< HEAD
-test_that("Generated R scripts run without error - xlsx", {
-=======
-# test_that("Generated R scripts run without error", {
-#   ARS_path   <- ARS_example("Common_Safety_Displays_cards.xlsx")
-#   output_dir <- normalizePath(tempdir(), winslash = "/", mustWork = FALSE)
-#   adam_folder <- normalizePath(tempdir(), winslash = "/", mustWork = FALSE)
-#
-#   readARS(ARS_path, output_dir, adam_folder)
-#
-#   r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
-#   expect_true(length(r_files) > 0)
-#
-#   for (f in r_files) {
-#     e <- new.env()
-#     suppressWarnings(     # suppress version mismatch warning
-#       suppressPackageStartupMessages(
-#         source(f, local = e, chdir = TRUE)
-#       )
-#     )
-#     # still assert “no errors” by reaching here
-#     succeed()
-#   }
-# })
 
-test_that("Generated R scripts run without error (extdata ADaMs direct)", {
->>>>>>> 2ed8afb2efeb95d76cb18cb1dbb23c0492c5126c
+test_that("Generated R scripts run without error - xlsx", {
   skip_on_cran()
 
   # Path to ARS file (metadata driving script generation)
@@ -210,5 +185,81 @@ test_that("Generated R scripts run without error (extdata ADaMs direct)", {
     expect_true(exists("ARD", envir = e), info = paste("No ARD from", basename(f)))
     ARD <- get("ARD", envir = e)
     expect_true("stat" %in% names(ARD), info = "'stat' column missing in ARD")
+  }
+})
+
+test_that("Generated R scripts run without error - json", {
+  skip_on_cran()
+
+  # Path to ARS file (metadata driving script generation)
+  ARS_path  <- ARS_example("testARS.json")
+
+  # Directly use extdata shipped with the package
+  adam_dir  <- system.file("extdata", package = "siera")
+  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+
+  # Temp folder for generated scripts
+  output_dir <- withr::local_tempdir()
+
+  # Generate the R scripts — note adam_dir is passed here
+  readARS(ARS_path, output_dir, adam_dir)
+
+  # Find generated R scripts
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  # print(r_files)
+  expect_true(length(r_files) > 0, info = "No R scripts generated")
+
+  # Run each script and check ARD object
+  for (f in r_files) {
+    e <- new.env(parent = baseenv())
+
+    expect_error(
+      suppressWarnings(
+        suppressPackageStartupMessages(
+          source(f, local = e, chdir = TRUE)
+        )
+      ),
+      NA,
+      info = paste("Sourcing failed for", basename(f))
+    )
+
+    # Ensure ARD dataset was created
+    expect_true(exists("ARD", envir = e), info = paste("No ARD from", basename(f)))
+    ARD <- get("ARD", envir = e)
+    expect_true("stat" %in% names(ARD), info = "'stat' column missing in ARD")
+
+    # check specific values in ARD
+
+    # first Output
+    if(length(grep("Out_01", f)) > 0){
+      print(f)
+      test1 = ARD %>%
+        filter(AnalysisId == "An_01",
+               operationid == "Mth_01_01_n") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(test1[[1]], 84)
+      expect_equal(test1[[2]], 84)
+      expect_equal(test1[[3]], 86)
+    } else if(length(grep("Out_02", f)) > 0){
+      test1 = ARD %>%
+        filter(AnalysisId == "An_08",
+               operationid == "Mth_01_01_n") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(test1[[1]], 84)
+      expect_equal(test1[[2]], 84)
+      expect_equal(test1[[3]], 86)
+    } else if(length(grep("Out_03", f)) > 0){
+      test1 = ARD %>%
+        filter(AnalysisId == "An_19",
+               operationid == "Mth_01_01_n") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(test1[[1]], 84)
+      expect_equal(test1[[2]], 84)
+      expect_equal(test1[[3]], 86)
+    }
+
   }
 })
