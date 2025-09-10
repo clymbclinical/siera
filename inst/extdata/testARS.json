@@ -396,35 +396,35 @@
                             "categories": [
                                 {
                                     "id": "ANSET_01_ANINT_01",
-                                    "label": "Laboratory Test Results"
-                                },
-                                {
-                                    "id": "ANSET_01_ANINT_02",
-                                    "label": "Adverse Events"
-                                },
-                                {
-                                    "id": "ANSET_01_ANINT_03",
-                                    "label": "Disposition"
-                                },
-                                {
-                                    "id": "ANSET_01_ANINT_04",
-                                    "label": "Vital Signs"
-                                },
-                                {
-                                    "id": "ANSET_01_ANINT_05",
                                     "label": "Medical History"
                                 },
                                 {
-                                    "id": "ANSET_01_ANINT_06",
-                                    "label": "Demographics"
+                                    "id": "ANSET_01_ANINT_02",
+                                    "label": "Concomitant Medications"
                                 },
                                 {
-                                    "id": "ANSET_01_ANINT_07",
+                                    "id": "ANSET_01_ANINT_03",
+                                    "label": "Vital Signs"
+                                },
+                                {
+                                    "id": "ANSET_01_ANINT_04",
                                     "label": "Exposure"
                                 },
                                 {
+                                    "id": "ANSET_01_ANINT_05",
+                                    "label": "Disposition"
+                                },
+                                {
+                                    "id": "ANSET_01_ANINT_06",
+                                    "label": "Laboratory Test Results"
+                                },
+                                {
+                                    "id": "ANSET_01_ANINT_07",
+                                    "label": "Adverse Events"
+                                },
+                                {
                                     "id": "ANSET_01_ANINT_08",
-                                    "label": "Concomitant Medications"
+                                    "label": "Demographics"
                                 }
                             ]
                         }
@@ -574,17 +574,17 @@
             ]
         },
         {
-            "id": "AnlsGrouping_03_Usubjid",
+            "id": "AnlsGrouping_03_Ittfl",
             "dataDriven": false,
-            "name": "Unique Subject Identifier",
+            "name": "Intent-To-Treat Population Flag",
             "label": "ITT population [1]",
             "groupingDataset": "ADSL",
-            "groupingVariable": "USUBJID",
+            "groupingVariable": "ITTFL",
             "groups": [
                 {
                     "level": 1,
                     "order": 1,
-                    "id": "AnlsGrouping_03_Usubjid_01",
+                    "id": "AnlsGrouping_03_Ittfl_01",
                     "name": "ITT population [1]",
                     "label": "ITT population [1]",
                     "condition": {
@@ -599,17 +599,17 @@
             ]
         },
         {
-            "id": "AnlsGrouping_04_Usubjid",
+            "id": "AnlsGrouping_04_Saffl",
             "dataDriven": false,
-            "name": "Unique Subject Identifier",
+            "name": "Safety Population Flag",
             "label": "     Safety population [2]",
             "groupingDataset": "ADSL",
-            "groupingVariable": "USUBJID",
+            "groupingVariable": "SAFFL",
             "groups": [
                 {
                     "level": 1,
                     "order": 1,
-                    "id": "AnlsGrouping_04_Usubjid_01",
+                    "id": "AnlsGrouping_04_Saffl_01",
                     "name": "     Safety population [2]",
                     "label": "     Safety population [2]",
                     "condition": {
@@ -624,17 +624,17 @@
             ]
         },
         {
-            "id": "AnlsGrouping_05_Usubjid",
+            "id": "AnlsGrouping_05_Pprotfl",
             "dataDriven": false,
-            "name": "Unique Subject Identifier",
+            "name": "Per-Protocol Population Flag",
             "label": "     Per-protocol population [3]",
             "groupingDataset": "ADSL",
-            "groupingVariable": "USUBJID",
+            "groupingVariable": "PPROTFL",
             "groups": [
                 {
                     "level": 1,
                     "order": 1,
-                    "id": "AnlsGrouping_05_Usubjid_01",
+                    "id": "AnlsGrouping_05_Pprotfl_01",
                     "name": "     Per-protocol population [3]",
                     "label": "     Per-protocol population [3]",
                     "condition": {
@@ -2034,7 +2034,7 @@
             "description": "Descriptive summary statistics across groups for a categorical variable, based on subject occurrence",
             "codeTemplate": {
                 "context": "R (siera)",
-                "code": "method_id = 'methodidhere'\r\nif(method_id == 'Mth_01') {\r\nin_data = df2_analysisidhere |>\r\n    dplyr::select(anavarhere, groupvar1here) |>\r\n    unique()\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    bystmthere\r\n  ) |>\r\ndplyr::filter(stat_name == 'N') |>\r\n dplyr::mutate(operationid = 'Mth_01_01_n')\r\n} else {\r\ndenom_dataset = df2_denomanaidhere |>\r\n  dplyr::select(denom_anagroupvarshere)\r\nin_data = df2_analysisidhere |> \r\n    dplyr::distinct(distinctlisthere) \r\ndataDriven = isdatadrivenhere\r\nif(dataDriven == TRUE){\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    stratastmthere,\r\n    denominator = denom_dataset\r\n  ) } else {\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    bystmthere,\r\n    denominator = denom_dataset\r\n  ) }\r\ndf3_analysisidhere <- df3_analysisidhere|>\r\ndplyr::filter(stat_name %in% c('n', 'p')) |>\r\n dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth_02_01_n',\r\n                               stat_name == 'p' ~ 'Mth_02_02_%'))\r\n}",
+                "code": "method_id = 'methodidhere'\r\nif(method_id == 'Mth_01') {\r\nin_data = df2_analysisidhere |>\r\n    select(anavarhere, groupvar1here) |>\r\n    unique()\r\ndf3_analysisidhere <-\r\n  ard_categorical(\r\n    data = in_data\r\n    bystmthere\r\n  ) |>\r\nfilter(stat_name == 'N') |>\r\n mutate(operationid = 'Mth_01_01_n')\r\n} else {\r\ndenom_dataset = df2_denomanaidhere %>%\r\n  select(denom_anagroupvarshere)\r\nin_data = df2_analysisidhere %>% \r\n    distinct(distinctlisthere) \r\ndataDriven = isdatadrivenhere\r\nif(dataDriven == TRUE){\r\ndf3_analysisidhere <-\r\n  ard_categorical(\r\n    data = in_data\r\n    stratastmthere,\r\n    denominator = denom_dataset\r\n  ) } else {\r\ndf3_analysisidhere <-\r\n  ard_categorical(\r\n    data = in_data\r\n    bystmthere,\r\n    denominator = denom_dataset\r\n  ) }\r\ndf3_analysisidhere <- df3_analysisidhere|>\r\nfilter(stat_name %in% c('n', 'p')) |>\r\nmutate(operationid = case_when(stat_name == 'n' ~ 'Mth_02_01_n',\r\n                               stat_name == 'p' ~ 'Mth_02_02_%'))\r\n}",
                 "parameters": [
                     {
                         "description": "Analysis variable to be summarised",
@@ -2100,7 +2100,7 @@
                     "order": 2,
                     "name": "%",
                     "label": "%",
-                    "resultPattern": "(XX.X)",
+                    "resultPattern": "(XX.XX)",
                     "referencedOperationRelationships": [
                         {
                             "id": "Mth_03_02_%_NUM",
@@ -2125,8 +2125,13 @@
             "description": "Descriptive summary statistics across groups for a categorical variable, based on subject occurrence",
             "codeTemplate": {
                 "context": "R (siera)",
-                "code": "method_id = 'methodidhere'\r\nif(method_id == 'Mth_01') {\r\nin_data = df2_analysisidhere |>\r\n    dplyr::select(anavarhere, groupvar1here) |>\r\n    unique()\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    bystmthere\r\n  ) |>\r\ndplyr::filter(stat_name == 'n') |>\r\n dplyr::mutate(operationid = 'Mth_01_01_n')\r\n} else {\r\ndenom_dataset = df2_denomanaidhere |>\r\n  dplyr::select(denom_anagroupvarshere)\r\nin_data = df2_analysisidhere |>\r\n    dplyr::distinct(distinctlisthere) \r\ndataDriven = isdatadrivenhere\r\nif(dataDriven == TRUE){\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    stratastmthere,\r\n    denominator = denom_dataset\r\n  ) } else {\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    bystmthere,\r\n    denominator = denom_dataset\r\n  ) }\r\ndf3_analysisidhere <- df3_analysisidhere|>\r\ndplyr::filter(stat_name %in% c('n', 'p')) |>\r\ndplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth_02_01_n',\r\n                                                              stat_name == 'p' ~ 'Mth_02_02_%'))\r\n}",
+                "code": "denom_dataset = df2_denomanaidhere |>\r\n  dplyr::select(denom_anagroupvarshere)\r\nin_data = df2_analysisidhere |> \r\n    dplyr::distinct(distinctlisthere) \r\ndataDriven = isdatadrivenhere\r\nif(dataDriven == TRUE){\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    stratastmthere,\r\n    denominator = denom_dataset\r\n  ) } else {\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    bystmthere,\r\n    denominator = denom_dataset\r\n  ) }\r\ndf3_analysisidhere <- df3_analysisidhere|>\r\ndplyr::filter(stat_name %in% c('n', 'p')) |>\r\ndplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth_02_01_n',\r\n                                             stat_name == 'p' ~ 'Mth_02_02_%'))",
                 "parameters": [
+                    {
+                        "description": "Analysis variable to be summarised",
+                        "name": "anavarhere",
+                        "valueSource": "ana_var"
+                    },
                     {
                         "description": "Analysis grouping variable from Group1",
                         "name": "groupvar1here",
@@ -2166,11 +2171,6 @@
                         "description": "All Analysis Grouping Variables, with the last being added to the \"variables\" argument, and the rest to the \"strata\" argument (seperated with commas, in single quotes, and in a c() list where more than one variable in a list)",
                         "name": "stratastmthere",
                         "valueSource": "strata_vars"
-                    },
-                    {
-                        "description": "Analysis variable to be summarised",
-                        "name": "anavarhere",
-                        "valueSource": "ana_var"
                     }
                 ]
             }
@@ -2216,7 +2216,7 @@
             "description": "Descriptive summary statistics across groups for a categorical variable, based on subject occurrence",
             "codeTemplate": {
                 "context": "R (siera)",
-                "code": "method_id = 'methodidhere'\r\nif(method_id == 'Mth_01') {\r\nin_data = df2_analysisidhere |>\r\n    dplyr::select(anavarhere, groupvar1here) |>\r\n    unique()\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    bystmthere\r\n  ) |>\r\ndplyr::filter(stat_name == 'N') |>\r\n dplyr::mutate(operationid = 'Mth_01_01_n')\r\n} else {\r\ndenom_dataset = df2_denomanaidhere |>\r\n  dplyr::select(denom_anagroupvarshere)\r\nin_data = df2_analysisidhere |> \r\n    dplyr::distinct(distinctlisthere) \r\ndataDriven = isdatadrivenhere\r\nif(dataDriven == TRUE){\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    stratastmthere,\r\n    denominator = denom_dataset\r\n  ) } else {\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    bystmthere,\r\n    denominator = denom_dataset\r\n  ) }\r\ndf3_analysisidhere <- df3_analysisidhere|>\r\ndplyr::filter(stat_name %in% c('n', 'p')) |>\r\ndplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth_02_01_n',\r\n                               stat_name == 'p' ~ 'Mth_02_02_%'))\r\n}",
+                "code": "method_id = 'methodidhere'\r\nif(method_id == 'Mth_01') {\r\nin_data = df2_analysisidhere |>\r\n    select(anavarhere, groupvar1here) |>\r\n    unique()\r\ndf3_analysisidhere <-\r\n  ard_categorical(\r\n    data = in_data\r\n    bystmthere\r\n  ) |>\r\nfilter(stat_name == 'N') |>\r\n mutate(operationid = 'Mth_01_01_n')\r\n} else {\r\ndenom_dataset = df2_denomanaidhere %>%\r\n  select(denom_anagroupvarshere)\r\nin_data = df2_analysisidhere %>% \r\n    distinct(distinctlisthere) \r\ndataDriven = isdatadrivenhere\r\nif(dataDriven == TRUE){\r\ndf3_analysisidhere <-\r\n  ard_categorical(\r\n    data = in_data\r\n    stratastmthere,\r\n    denominator = denom_dataset\r\n  ) } else {\r\ndf3_analysisidhere <-\r\n  ard_categorical(\r\n    data = in_data\r\n    bystmthere,\r\n    denominator = denom_dataset\r\n  ) }\r\ndf3_analysisidhere <- df3_analysisidhere|>\r\nfilter(stat_name %in% c('n', 'p')) |>\r\nmutate(operationid = case_when(stat_name == 'n' ~ 'Mth_02_01_n',\r\n                               stat_name == 'p' ~ 'Mth_02_02_%'))\r\n}",
                 "parameters": [
                     {
                         "description": "Analysis variable to be summarised",
@@ -2282,7 +2282,7 @@
                     "order": 2,
                     "name": "%",
                     "label": "%",
-                    "resultPattern": "(XX.XX)",
+                    "resultPattern": "(XX.X)",
                     "referencedOperationRelationships": [
                         {
                             "id": "Mth_05_02_%_NUM",
@@ -2307,13 +2307,8 @@
             "description": "Descriptive summary statistics across groups for a categorical variable, based on subject occurrence",
             "codeTemplate": {
                 "context": "R (siera)",
-                "code": "method_id = 'methodidhere'\r\nif(method_id == 'Mth_01') {\r\nin_data = df2_analysisidhere |>\r\n    dplyr::select(anavarhere, groupvar1here) |>\r\n    unique()\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    bystmthere\r\n  ) |>\r\ndplyr::filter(stat_name == 'N') |>\r\n dplyr::mutate(operationid = 'Mth_01_01_n')\r\n} else {\r\ndenom_dataset = df2_denomanaidhere |>\r\n  dplyr::select(denom_anagroupvarshere)\r\nin_data = df2_analysisidhere |> \r\n    dplyr::distinct(distinctlisthere) \r\ndataDriven = isdatadrivenhere\r\nif(dataDriven == TRUE){\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    stratastmthere,\r\n    denominator = denom_dataset\r\n  ) } else {\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    bystmthere,\r\n    denominator = denom_dataset\r\n  ) }\r\ndf3_analysisidhere <- df3_analysisidhere|>\r\ndplyr::filter(stat_name %in% c('n', 'p')) |>\r\ndplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth_02_01_n',\r\n                               stat_name == 'p' ~ 'Mth_02_02_%'))\r\n}",
+                "code": "method_id = 'methodidhere'\r\nif(method_id == 'Mth_01') { #for Total N calculation\r\nin_data = df2_analysisidhere |>\r\n    dplyr::select(anavarhere, groupvar1here) |>\r\n    unique()\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    bystmthere\r\n  ) |>\r\ndplyr::filter(stat_name == 'n') |>\r\n dplyr::mutate(operationid = 'Mth_01_01_n')\r\n} else {\r\ndenom_dataset = df2_denomanaidhere |>\r\n  dplyr::select(denom_anagroupvarshere)\r\nin_data = df2_analysisidhere |>\r\n    dplyr::distinct(distinctlisthere) \r\ndataDriven = isdatadrivenhere\r\nif(dataDriven == TRUE){\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    stratastmthere,\r\n    denominator = denom_dataset\r\n  ) } else {\r\ndf3_analysisidhere <-\r\n  cards::ard_categorical(\r\n    data = in_data\r\n    bystmthere,\r\n    denominator = denom_dataset\r\n  ) }\r\ndf3_analysisidhere <- df3_analysisidhere|>\r\ndplyr::filter(stat_name %in% c('n', 'p')) |>\r\ndplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth_02_01_n',\r\n                                                              stat_name == 'p' ~ 'Mth_02_02_%'))\r\n}",
                 "parameters": [
-                    {
-                        "description": "Analysis variable to be summarised",
-                        "name": "anavarhere",
-                        "valueSource": "ana_var"
-                    },
                     {
                         "description": "Analysis grouping variable from Group1",
                         "name": "groupvar1here",
@@ -2353,6 +2348,11 @@
                         "description": "All Analysis Grouping Variables, with the last being added to the \"variables\" argument, and the rest to the \"strata\" argument (seperated with commas, in single quotes, and in a c() list where more than one variable in a list)",
                         "name": "stratastmthere",
                         "valueSource": "strata_vars"
+                    },
+                    {
+                        "description": "Analysis variable to be summarised",
+                        "name": "anavarhere",
+                        "valueSource": "ana_var"
                     }
                 ]
             }
@@ -2402,27 +2402,13 @@
                     "name": "Max",
                     "label": "Max",
                     "resultPattern": "XX.X"
-                },
-                {
-                    "id": "Mth_06_07_Q1",
-                    "order": 7,
-                    "name": "Q1",
-                    "label": "Q1",
-                    "resultPattern": "XX.X"
-                },
-                {
-                    "id": "Mth_06_08_Q3",
-                    "order": 8,
-                    "name": "Q3",
-                    "label": "Q3",
-                    "resultPattern": "XX.X"
                 }
             ],
             "label": "Grouped summary of continuous variable",
             "description": "Descriptive summary statistics across groups for a continuous variable",
             "codeTemplate": {
                 "context": "R (siera)",
-                "code": "df3_analysisidhere <-\r\n  cards::ard_continuous(\r\n    data = df2_analysisidhere,\r\n    by = c(byvarshere),\r\n    variables = anavarhere\r\n  ) |>\r\ndplyr::mutate(operationid = dplyr::case_when(stat_name == 'N' ~ 'Mth_03_01_n',\r\n                               stat_name == 'mean' ~ 'Mth_03_02_Mean',\r\n                               stat_name == 'sd' ~ 'Mth_03_03_SD',\r\n                               stat_name == 'median' ~ 'Mth_03_04_Median',\r\n                               stat_name == 'p25' ~ 'Mth_03_05_Q1',\r\n                               stat_name == 'p75' ~ 'Mth_03_06_Q3',\r\n                               stat_name == 'min' ~ 'Mth_03_07_Min',\r\n                               stat_name == 'max' ~ 'Mth_03_08_Max'))",
+                "code": "df3_analysisidhere <-\r\n  ard_continuous(\r\n    data = df2_analysisidhere,\r\n    by = c(byvarshere),\r\n    variables = anavarhere\r\n  ) |>\r\nmutate(operationid = case_when(stat_name == 'N' ~ 'Mth_03_01_n',\r\n                               stat_name == 'mean' ~ 'Mth_03_02_Mean',\r\n                               stat_name == 'sd' ~ 'Mth_03_03_SD',\r\n                               stat_name == 'median' ~ 'Mth_03_04_Median',\r\n                               stat_name == 'p25' ~ 'Mth_03_05_Q1',\r\n                               stat_name == 'p75' ~ 'Mth_03_06_Q3',\r\n                               stat_name == 'min' ~ 'Mth_03_07_Min',\r\n                               stat_name == 'max' ~ 'Mth_03_08_Max'))",
                 "parameters": [
                     {
                         "description": "string for \"by\" parameter for the ard_continuous function",
@@ -2628,13 +2614,27 @@
                     "name": "Max",
                     "label": "Max",
                     "resultPattern": "XX.X"
+                },
+                {
+                    "id": "Mth_09_07_Q1",
+                    "order": 7,
+                    "name": "Q1",
+                    "label": "Q1",
+                    "resultPattern": "XX.X"
+                },
+                {
+                    "id": "Mth_09_08_Q3",
+                    "order": 8,
+                    "name": "Q3",
+                    "label": "Q3",
+                    "resultPattern": "XX.X"
                 }
             ],
             "label": "Grouped summary of continuous variable",
             "description": "Descriptive summary statistics across groups for a continuous variable",
             "codeTemplate": {
                 "context": "R (siera)",
-                "code": "df3_analysisidhere <-\r\n  cards::ard_continuous(\r\n    data = df2_analysisidhere,\r\n    by = c(byvarshere),\r\n    variables = anavarhere\r\n  ) |>\r\ndplyr::mutate(operationid = dplyr::case_when(stat_name == 'N' ~ 'Mth_03_01_n',\r\n                               stat_name == 'mean' ~ 'Mth_03_02_Mean',\r\n                               stat_name == 'sd' ~ 'Mth_03_03_SD',\r\n                               stat_name == 'median' ~ 'Mth_03_04_Median',\r\n                               stat_name == 'p25' ~ 'Mth_03_05_Q1',\r\n                               stat_name == 'p75' ~ 'Mth_03_06_Q3',\r\n                               stat_name == 'min' ~ 'Mth_03_07_Min',\r\n                               stat_name == 'max' ~ 'Mth_03_08_Max'))",
+                "code": "df3_analysisidhere <-\r\n  ard_continuous(\r\n    data = df2_analysisidhere,\r\n    by = c(byvarshere),\r\n    variables = anavarhere\r\n  ) |>\r\nmutate(operationid = case_when(stat_name == 'N' ~ 'Mth_03_01_n',\r\n                               stat_name == 'mean' ~ 'Mth_03_02_Mean',\r\n                               stat_name == 'sd' ~ 'Mth_03_03_SD',\r\n                               stat_name == 'median' ~ 'Mth_03_04_Median',\r\n                               stat_name == 'p25' ~ 'Mth_03_05_Q1',\r\n                               stat_name == 'p75' ~ 'Mth_03_06_Q3',\r\n                               stat_name == 'min' ~ 'Mth_03_07_Min',\r\n                               stat_name == 'max' ~ 'Mth_03_08_Max'))",
                 "parameters": [
                     {
                         "description": "string for \"by\" parameter for the ard_continuous function",
@@ -2664,7 +2664,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_03"
+                "ANSET_01_ANINT_05"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -2733,7 +2733,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_03"
+                "ANSET_01_ANINT_05"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -2775,7 +2775,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_03"
+                "ANSET_01_ANINT_05"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -2795,7 +2795,7 @@
                 {
                     "order": 3,
                     "resultsByGroup": true,
-                    "groupingId": "AnlsGrouping_03_Usubjid"
+                    "groupingId": "AnlsGrouping_03_Ittfl"
                 }
             ],
             "referencedAnalysisOperations": [
@@ -2822,7 +2822,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_03"
+                "ANSET_01_ANINT_05"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -2837,7 +2837,7 @@
                 {
                     "order": 2,
                     "resultsByGroup": true,
-                    "groupingId": "AnlsGrouping_04_Usubjid"
+                    "groupingId": "AnlsGrouping_04_Saffl"
                 }
             ],
             "referencedAnalysisOperations": [
@@ -2864,7 +2864,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_03"
+                "ANSET_01_ANINT_05"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -2879,7 +2879,7 @@
                 {
                     "order": 2,
                     "resultsByGroup": true,
-                    "groupingId": "AnlsGrouping_05_Usubjid"
+                    "groupingId": "AnlsGrouping_05_Pprotfl"
                 }
             ],
             "referencedAnalysisOperations": [
@@ -2906,7 +2906,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_03"
+                "ANSET_01_ANINT_05"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -2948,7 +2948,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_03"
+                "ANSET_01_ANINT_05"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -2990,7 +2990,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_06"
+                "ANSET_01_ANINT_08"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -3079,7 +3079,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_06"
+                "ANSET_01_ANINT_08"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -3117,11 +3117,11 @@
             "purpose": {
                 "sponsorTermId": "TermEx01_01"
             },
-            "methodId": "Mth_07",
+            "methodId": "Mth_08",
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_06"
+                "ANSET_01_ANINT_08"
             ],
             "dataset": "ADSL",
             "variable": "AGE",
@@ -3148,7 +3148,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_06"
+                "ANSET_01_ANINT_08"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -3190,7 +3190,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_06"
+                "ANSET_01_ANINT_08"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -3228,11 +3228,11 @@
             "purpose": {
                 "controlledTerm": ""
             },
-            "methodId": "Mth_05",
+            "methodId": "Mth_03",
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_06"
+                "ANSET_01_ANINT_08"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -3252,11 +3252,11 @@
             ],
             "referencedAnalysisOperations": [
                 {
-                    "referencedOperationRelationshipId": "Mth_05_02_%_NUM",
+                    "referencedOperationRelationshipId": "Mth_03_02_%_NUM",
                     "analysisId": "An_13"
                 },
                 {
-                    "referencedOperationRelationshipId": "Mth_05_02_%_DEN",
+                    "referencedOperationRelationshipId": "Mth_03_02_%_DEN",
                     "analysisId": "An_08"
                 }
             ]
@@ -3274,7 +3274,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_06"
+                "ANSET_01_ANINT_08"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -3316,7 +3316,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_06"
+                "ANSET_01_ANINT_08"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -3358,7 +3358,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_06"
+                "ANSET_01_ANINT_08"
             ],
             "dataset": "ADSL",
             "variable": "WEIGHTBL",
@@ -3385,7 +3385,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_06"
+                "ANSET_01_ANINT_08"
             ],
             "dataset": "ADSL",
             "variable": "AGE",
@@ -3412,7 +3412,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_06"
+                "ANSET_01_ANINT_08"
             ],
             "dataset": "ADSL",
             "variable": "BMIBL",
@@ -3439,7 +3439,7 @@
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_07"
+                "ANSET_01_ANINT_04"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -3494,11 +3494,11 @@
             "purpose": {
                 "sponsorTermId": "TermEx01_01"
             },
-            "methodId": "Mth_06",
+            "methodId": "Mth_08",
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_07"
+                "ANSET_01_ANINT_04"
             ],
             "dataset": "ADSL",
             "variable": "TRTDURD",
@@ -3521,11 +3521,11 @@
             "purpose": {
                 "sponsorTermId": "TermEx01_01"
             },
-            "methodId": "Mth_02",
+            "methodId": "Mth_03",
             "version": 1,
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_07"
+                "ANSET_01_ANINT_04"
             ],
             "dataset": "ADSL",
             "variable": "USUBJID",
@@ -3545,11 +3545,11 @@
             ],
             "referencedAnalysisOperations": [
                 {
-                    "referencedOperationRelationshipId": "Mth_02_02_%_NUM",
+                    "referencedOperationRelationshipId": "Mth_03_02_%_NUM",
                     "analysisId": "An_21"
                 },
                 {
-                    "referencedOperationRelationshipId": "Mth_02_02_%_DEN",
+                    "referencedOperationRelationshipId": "Mth_03_02_%_DEN",
                     "analysisId": "An_19"
                 }
             ]
@@ -3661,7 +3661,7 @@
             ],
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_03"
+                "ANSET_01_ANINT_05"
             ],
             "documentRefs": [],
             "programmingCode": {}
@@ -3743,7 +3743,7 @@
             ],
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_06"
+                "ANSET_01_ANINT_08"
             ],
             "documentRefs": [],
             "programmingCode": {}
@@ -3832,7 +3832,7 @@
             ],
             "categoryIds": [
                 "ANSET_01",
-                "ANSET_01_ANINT_07"
+                "ANSET_01_ANINT_04"
             ],
             "documentRefs": [],
             "programmingCode": {}

@@ -206,7 +206,6 @@ test_that("Generated R scripts run without error - json", {
 
   # Find generated R scripts
   r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
-  # print(r_files)
   expect_true(length(r_files) > 0, info = "No R scripts generated")
 
   # Run each script and check ARD object
@@ -232,7 +231,6 @@ test_that("Generated R scripts run without error - json", {
 
     # first Output
     if(length(grep("Out_01", f)) > 0){
-      print(f)
       test1 = ARD %>%
         filter(AnalysisId == "An_01",
                operationid == "Mth_01_01_n") %>%
