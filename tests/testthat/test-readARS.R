@@ -185,6 +185,37 @@ test_that("Generated R scripts run without error - xlsx", {
     expect_true(exists("ARD", envir = e), info = paste("No ARD from", basename(f)))
     ARD <- get("ARD", envir = e)
     expect_true("stat" %in% names(ARD), info = "'stat' column missing in ARD")
+
+    # check specific values in ARD
+    if(length(grep("Out14-1-1", f)) > 0){
+      test1 = ARD %>%
+        filter(AnalysisId == "An01_05_SAF_Summ_ByTrt",
+               operationid == "Mth01_CatVar_Count_ByGrp_1_n") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(test1[[1]], 86)
+      expect_equal(test1[[2]], 84)
+      expect_equal(test1[[3]], 84)
+
+      test2 = ARD %>%
+        filter(AnalysisId == "An03_01_Age_Summ_ByTrt",
+               operationid == "Mth02_ContVar_Summ_ByGrp_4_Median") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(test2[[1]], 76)
+      expect_equal(test2[[2]], 76)
+      expect_equal(test2[[3]], 77.5)
+
+    } else if(length(grep("Out14-3-1-1", f)) > 0){
+      test1 = ARD %>%
+        filter(AnalysisId == "An07_01_TEAE_Summ_ByTrt",
+               operationid == "Mth01_CatVar_Summ_ByGrp_1_n") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(test1[[1]], 65)
+      expect_equal(test1[[2]], 76)
+      expect_equal(test1[[3]], 77)
+    }
   }
 })
 
@@ -228,8 +259,6 @@ test_that("Generated R scripts run without error - json", {
     expect_true("stat" %in% names(ARD), info = "'stat' column missing in ARD")
 
     # check specific values in ARD
-
-    # first Output
     if(length(grep("Out_01", f)) > 0){
       test1 = ARD %>%
         filter(AnalysisId == "An_01",
