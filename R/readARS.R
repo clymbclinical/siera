@@ -2366,8 +2366,7 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
                     "\n\n# combine analyses to create ARD ----\n",
                     "ARD <- dplyr::bind_rows(",
                     combine_analysis_code,
-                    ") \n #Apply pattern format:\n"#,
-                    #code_pattern
+                    ") "
              )
       )
     } else {
@@ -2379,8 +2378,7 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
                     "\n\n# combine analyses to create ARD ----\n",
                     "ARD <- cards::bind_ard(",
                     combine_analysis_code,
-                    ") %>%\n shuffle_ard() \n #Apply pattern format:\n"#,
-                    #code_pattern
+                    ") %>%\n shuffle_ard() "
              )
       )
     }
