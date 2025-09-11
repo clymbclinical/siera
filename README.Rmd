@@ -22,6 +22,8 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera)
 [![R-CMD-check](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml)
 [![Downloads](https://cranlogs.r-pkg.org/badges/siera)](https://cran.r-project.org/package=siera)
+[![codecov](https://codecov.io/gh/clymbclinical/siera/branch/main/graph/badge.svg)](https://codecov.io/gh/clymbclinical/siera)
+
 
 <!-- badges: end --> 
 
@@ -47,7 +49,7 @@ Applying all these concepts to ADaM input data, yields Analysis Results in Datas
 options(repos = c(CRAN = "https://cloud.r-project.org"))
 ```
 
-```{r install, message=FALSE, warning=FALSE}
+```{r install, message=FALSE, warning=FALSE, results='hide'}
 install.packages("siera")
 ```
 The development version can be installed from [Github](https://github.com/clymbclinical/siera) using 

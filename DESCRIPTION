@@ -35,7 +35,8 @@ Suggests:
     cardx,
     broom,
     parameters,
-    broom.helpers
+    broom.helpers,
+    covr
 VignetteBuilder: knitr
 URL: https://clymbclinical.github.io/siera/, https://github.com/clymbclinical/siera
 BugReports: https://github.com/clymbclinical/siera/issues
