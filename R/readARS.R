@@ -86,6 +86,13 @@ library(readr)
   # Get file extension (case-insensitive)
   file_ext <- tolower(tools::file_ext(ARS_path))
 
+  if (!file_ext %in% c("json", "xlsx")) {
+    cli::cli_warn(
+      "Input ARS file must be JSON or xlsx; {.path {ARS_path}} was received"
+    )
+    return(invisible(NULL))
+  }
+
   # Read in JSON metadata
   if (file_ext == "json") {
     json_from <- jsonlite::fromJSON(ARS_path)

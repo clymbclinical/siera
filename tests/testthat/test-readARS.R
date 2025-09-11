@@ -1,3 +1,15 @@
+test_that("warns when ARS file is not JSON or xlsx", {
+
+  output_dir = tempdir()
+  adam_folder = tempdir()
+  dummy_path = tempfile(fileext = ".txt")
+
+  expect_warning(
+    readARS(dummy_path, output_dir, adam_folder),
+    "Input ARS file must be JSON or xlsx; .+ was received"
+  )
+})
+
 test_that("R Scripts are created for xlsx cards version", {
 
   # path to file containing ARS metadata
