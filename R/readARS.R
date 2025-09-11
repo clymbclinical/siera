@@ -544,7 +544,7 @@ library(readr)
         dplyr::filter(id == Anas_j)
 
       ana_adam <- Anas_s$dataset # ADaM used for this analysis (esp. to be used in ChiSq)
-
+      ana_name = Anas_s$name
       # Analysis Set
       ana_setId <- Anas_s$analysisSetId # AS ID (to be used in AS)
       ana_var <- Anas_s$variable #AS variable (to be used in MT)
@@ -2301,14 +2301,16 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
     # if(j == 1){  #AnalysisSet only for first analysis
       if(example == FALSE){
         assign(paste0("code_",Anas_j),
-               paste0("\n\n# Analysis ", Anas_j,"----",
+               paste0("\n\n# Analysis ", Anas_j,"----\n#",
+                      ana_name,
                       get(paste0("code_AnalysisSet_",Anas_j)),
                       #get(paste0("code_AnalysisGrouping_",Anas_j)),
                       get(paste0("code_DataSubset_",Anas_j)),
                       get(paste0("code_AnalysisMethod_",Anas_j))))
       } else {
         assign(paste0("code_",Anas_j),
-               paste0("\n\n# Analysis ", Anas_j,"----",
+               paste0("\n\n# Analysis ", Anas_j,"----\n#",
+                      ana_name,
                       get(paste0("code_AnalysisSet_",Anas_j)),
                       get(paste0("code_AnalysisGrouping_",Anas_j)),
                       get(paste0("code_DataSubset_",Anas_j)),
