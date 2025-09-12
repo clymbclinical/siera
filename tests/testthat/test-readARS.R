@@ -248,6 +248,16 @@ test_that("Generated R scripts run without error - xlsx", {
       expect_equal(test1[[1]], 65)
       expect_equal(test1[[2]], 76)
       expect_equal(test1[[3]], 77)
+
+      # subject counts
+      test1 = ARD %>%
+        filter(AnalysisId == "An01_05_SAF_Summ_ByTrt",
+               operationid == "Mth01_CatVar_Count_ByGrp_1_n") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(test1[[1]], 86)
+      expect_equal(test1[[2]], 84)
+      expect_equal(test1[[3]], 84)
     }
   }
 })

@@ -642,6 +642,8 @@ library(readr)
 df_pop <- dplyr::filter(ADaM,
             var operator 'value')
 
+df_poptot <- df_pop
+
 "
             code <- gsub('ADaM', dataset, template)
             code <- gsub('var', variable, code)
@@ -682,6 +684,9 @@ df_pop <- dplyr::filter(ADaM,
             merge(analysisADAMhere |> dplyr::select(-dplyr::all_of(overlapfin)),
                   by = 'USUBJID',
                   all = FALSE)
+
+df_poptot = dplyr::filter(ADaM,
+            var operator 'value')
 "
             code <- gsub('ADaM', dataset, template)
             code <- gsub('var', variable, code)
@@ -705,8 +710,14 @@ df_pop <- dplyr::filter(ADaM,
                                    ana_adam2,
                                    anSetName))
         }
-      } else{
+
+        # text to be used in DataSubsets:
+        AnSetDataSubsets = "df_poptot"
+      } else{ # AnalysisSet code for > 1st Analyses
         assign(paste0("code_AnalysisSet_",Anas_j),"")
+
+        # text to be used in DataSubsets:
+        AnSetDataSubsets = "df_pop"
       }
 
       # Apply Grouping ----------------------------
@@ -1177,8 +1188,6 @@ df1_analysisidhere <- df_analysisidhere
                     }
                   }
 
-
-
                   # concatenate expression
                   assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", val))
 
@@ -1257,13 +1266,14 @@ df1_analysisidhere <- df_analysisidhere
 
 
 
-          func_DataSubset1 <- function(filterVal, ASID, DSNAME) {
+          func_DataSubset1 <- function(filterVal, ASID, DSNAME, Ansetds) {
             if(example == FALSE){
+
               template <- "
 
 # Apply Data Subset ---
 # Data subset: dsnamehere
-df2_analysisidhere <- df_pop |>
+df2_analysisidhere <- ansetdshere |>
         dplyr::filter(dplyr::filtertext1)
 
 "
@@ -1272,7 +1282,7 @@ df2_analysisidhere <- df_pop |>
 
 # Apply Data Subset ---
 # Data subset: dsnamehere
-df2_analysisidhere <- df_pop |>
+df2_analysisidhere <- ansetdshere |>
         dplyr::filter(dplyr::filtertext1)
 
 "
@@ -1281,6 +1291,7 @@ df2_analysisidhere <- df_pop |>
             code <- gsub('dplyr::filtertext1', filterVal, template)
             code <- gsub('analysisidhere', ASID, code)
             code <- gsub('dsnamehere', DSNAME, code)
+            code <- gsub('ansetdshere', Ansetds, code)
 
             return(code)
           }
@@ -1289,34 +1300,37 @@ df2_analysisidhere <- df_pop |>
           assign(paste0("code_DataSubset_",Anas_j),
                  func_DataSubset1(rFilt_final,
                                   Anas_j,
-                                  DSname)
+                                  DSname,
+                                  AnSetDataSubsets)
           )
 
         } else { # there is no data subsetting for this analysis
 
-          func_DataSubset2 <- function(ASID) {
+          func_DataSubset2 <- function(ASID, Ansetds) {
             if(example == FALSE){
               template <- "
 
 #Apply Data Subset ---
-df2_analysisidhere <- df_pop
+df2_analysisidhere <- ansetdshere
 
 "
             } else{
               template <- "
 
 #Apply Data Subset ---
-df2_analysisidhere <- df_pop
+df2_analysisidhere <- ansetdshere
 
 "
             }
 
             code <- gsub('analysisidhere', ASID, template)
+            code <- gsub('ansetdshere', Ansetds, code)
             return(code)
           } # end function
 
           assign(paste0("code_DataSubset_",Anas_j),
-                 func_DataSubset2(Anas_j)
+                 func_DataSubset2(Anas_j,
+                                  AnSetDataSubsets)
           )
         } # end case where no data subsetting
       } # end case where no data subsetting for the entire RE
@@ -1324,31 +1338,38 @@ df2_analysisidhere <- df_pop
       else { # no data subset for the RE
 
 
-        func_DataSubset3 <- function(ASID) {
+        func_DataSubset3 <- function(ASID,
+                                     Ansetds) {
 
           if(example == FALSE){
             template <- "
 
 #Apply Data Subset ---
-df2_analysisidhere <- df_pop
+df2_analysisidhere <- ansetdshere
 
 "} else {
   template <- "
 
 #Apply Data Subset ---
-df2_analysisidhere <- df_pop
+df2_analysisidhere <- ansetdshere
 
 "
 }
 
           code <- gsub('analysisidhere', ASID, template)
+          code <- gsub('ansetdshere', Ansetds, code)
           return(code)
         } # end function
 
         assign(paste0("code_DataSubset_",Anas_j),
-               func_DataSubset3(Anas_j)
+               func_DataSubset3(Anas_j,
+                                AnSetDataSubsets)
         )
       }
+      # handle
+      # if(j == 1){
+      #   gsub("df_pop", "df_poptot", get(paste0("code_DataSubset_",Anas_j)))
+      # }
 
       # Apply AnalysisMethod -------------------------------------------------------------
       if(example == FALSE){
@@ -2305,8 +2326,8 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
       }
 
     # Generate code for analysis ----------------------------------------------
-    # if(j == 1){  #AnalysisSet only for first analysis
-      if(example == FALSE){
+
+          if(example == FALSE){
         assign(paste0("code_",Anas_j),
                paste0("\n\n# Analysis ", Anas_j,"----\n#",
                       ana_name,
@@ -2323,7 +2344,6 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
                       get(paste0("code_DataSubset_",Anas_j)),
                       get(paste0("code_AnalysisMethod_",Anas_j))))
       }
-      # }
 
 
     run_code <- paste0(run_code,
