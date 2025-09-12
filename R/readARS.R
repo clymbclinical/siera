@@ -1365,10 +1365,23 @@ df2_analysisidhere <- df_pop
 
         # Code
         anmetcode <- AnalysisMethodCodeTemplate %>%
-          dplyr::filter(method_id == methodid,
-                        context %in% c("R", "R (siera)", "siera"),
-                        specifiedAs == "Code") %>%
-          dplyr::select(templateCode)
+          dplyr::filter(
+            method_id == methodid,
+            context %in% c("R", "R (siera)", "siera"),
+            specifiedAs == "Code"
+          ) %>%
+          dplyr::pull(templateCode)
+        anmetcode <- anmetcode[1]
+
+        if (length(anmetcode) == 0 || is.na(anmetcode) || anmetcode == "") {
+          warning(
+            sprintf(
+              "No template code found in AnalysisMethodCodeTemplate for method '%s' referenced by analysis '%s'",
+              methodid, Anas_j
+            )
+          )
+          anmetcode <- ""
+        }
 
         # Parameters
         # to be replaced with Source values:

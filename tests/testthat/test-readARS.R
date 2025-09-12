@@ -10,6 +10,33 @@ test_that("warns when ARS file is not JSON or xlsx", {
   )
 })
 
+test_that("warns when AnalysisMethodCodeTemplate lacks code for method", {
+
+  ARS_path <- ARS_example("test_cards.json")
+  ars_json <- jsonlite::read_json(ARS_path, simplifyVector = FALSE)
+
+  ars_json$methods <- lapply(
+    ars_json$methods,
+    function(m) {
+      if (m$id == "Mth_01") {
+        m$codeTemplate$code <- ""
+      }
+      m
+    }
+  )
+
+  tmp_json <- tempfile(fileext = ".json")
+  jsonlite::write_json(ars_json, tmp_json, auto_unbox = TRUE, pretty = TRUE)
+
+  output_dir <- tempdir()
+  adam_folder <- tempdir()
+
+  expect_warning(
+    readARS(tmp_json, output_dir, adam_folder),
+    "No template code found in AnalysisMethodCodeTemplate for method 'Mth_01'"
+  )
+})
+
 test_that("R Scripts are created for xlsx cards version", {
 
   # path to file containing ARS metadata
