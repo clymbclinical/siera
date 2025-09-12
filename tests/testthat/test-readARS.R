@@ -200,6 +200,8 @@ test_that("Generated R scripts run without error - xlsx", {
 
     # check specific values in ARD
     if(length(grep("Out14-1-1", f)) > 0){
+
+      # Categorical counts
       test1 = ARD %>%
         filter(AnalysisId == "An01_05_SAF_Summ_ByTrt",
                operationid == "Mth01_CatVar_Count_ByGrp_1_n") %>%
@@ -209,6 +211,7 @@ test_that("Generated R scripts run without error - xlsx", {
       expect_equal(test1[[2]], 84)
       expect_equal(test1[[3]], 84)
 
+      # Summary statistics
       test2 = ARD %>%
         filter(AnalysisId == "An03_01_Age_Summ_ByTrt",
                operationid == "Mth02_ContVar_Summ_ByGrp_4_Median") %>%
@@ -218,7 +221,25 @@ test_that("Generated R scripts run without error - xlsx", {
       expect_equal(test2[[2]], 76)
       expect_equal(test2[[3]], 77.5)
 
+      # ANOVA
+      test3 = ARD %>%
+        filter(AnalysisId == "An03_01_Age_Comp_ByTrt",
+               operationid == "Mth04_ContVar_Comp_Anova_1_pval") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(round(test3[[1]], digits = 7), 0.5934358)
+
+      # Chi-Square
+      test4 = ARD %>%
+        filter(AnalysisId == "An03_02_AgeGrp_Comp_ByTrt",
+               operationid == "Mth03_CatVar_Comp_PChiSq_1_pval") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(round(test4[[1]], digits = 6), 0.143917)
+
     } else if(length(grep("Out14-3-1-1", f)) > 0){
+
+      # categorical counts
       test1 = ARD %>%
         filter(AnalysisId == "An07_01_TEAE_Summ_ByTrt",
                operationid == "Mth01_CatVar_Summ_ByGrp_1_n") %>%
