@@ -27,6 +27,9 @@ jobs:
           extra-packages: any::covr, any::xml2
           needs: coverage
 
+      - name: Has CODECOV_TOKEN?
+        run: echo "CODECOV_TOKEN present? ${{ secrets.CODECOV_TOKEN != '' }}"
+
       - name: Test coverage
         run: |
           cov <- covr::package_coverage(
