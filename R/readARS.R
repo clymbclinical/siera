@@ -1003,41 +1003,41 @@ df1_analysisidhere <- df_analysisidhere
             as.character()
 
           # for Fisher's exact test to filter:
-          # fishersrow = subsetrule %>%
-          #   dplyr::filter(condition_dataset == AG_ds1)
-          #
-          # # assign the variables
-          # fishervar = fishersrow$condition_variable
-          #
-          # fishervac = fishersrow$condition_comparator
-          #
-          # fisherval1 = fishersrow$condition_value
-          #
-          #
-          # if(nrow(fishersrow) > 0) { # if we need a DS statement
-          #
-          #
-          #   if(fishervac == "IN") {
-          #     fisher_f_vac = "%in%"
-          #
-          #     fisher_f_val = paste0("'", trimws(unlist(strsplit(fisherval1, "\\|"))), "'", collapse = ",")
-          #   }# define operator in R code
-          #   else { # vac is EQ or NE
-          #     if(fishervac == "EQ") fisher_f_vac = "==" # define operator in R code
-          #     else fisher_f_vac = "!=" #
-          #     fisher_f_val = paste0("'", fisherval1,"'")
-          #   }
-          #   # concatenate expression
-          #   fisher_cond_stm = paste0(", ",
-          #                            fishervar,
-          #                            " ",
-          #                            fisher_f_vac," "
-          #                            , "c(",
-          #                            fisher_f_val,")")
-          # } else { # if the DS statement should be blank for fisher's
-          #   fisher_cond_stm = ""
-          #
-          # }
+          fishersrow = subsetrule %>%
+            dplyr::filter(condition_dataset == AG_ds1)
+
+          # assign the variables
+          fishervar = fishersrow$condition_variable
+
+          fishervac = fishersrow$condition_comparator
+
+          fisherval1 = fishersrow$condition_value
+
+
+          if(nrow(fishersrow) > 0) { # if we need a DS statement
+
+
+            if(fishervac == "IN") {
+              fisher_f_vac = "%in%"
+
+              fisher_f_val = paste0("'", trimws(unlist(strsplit(fisherval1, "\\|"))), "'", collapse = ",")
+            }# define operator in R code
+            else { # vac is EQ or NE
+              if(fishervac == "EQ") fisher_f_vac = "==" # define operator in R code
+              else fisher_f_vac = "!=" #
+              fisher_f_val = paste0("'", fisherval1,"'")
+            }
+            # concatenate expression
+            fisher_cond_stm = paste0(", ",
+                                     fishervar,
+                                     " ",
+                                     fisher_f_vac," "
+                                     , "c(",
+                                     fisher_f_val,")")
+          } else { # if the DS statement should be blank for fisher's
+            fisher_cond_stm = ""
+
+          }
 
           ### end Fisher's exact test to filter
 
@@ -1440,6 +1440,7 @@ df2_analysisidhere <- ansetdshere
 
         for (i in seq_len(nrow(anmetparam_s))) {
           # Get the replacement value using get() based on the variable name in Column B
+
           rep <- get(anmetparam_s$parameter_valueSource[i])
           # Replace the placeholder in VAR with the variable's value
           if(!is.na(rep)){
