@@ -333,3 +333,37 @@ test_that("Generated R scripts run without error - json", {
 
   }
 })
+test_that("spec_output generates only specified script", {
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+  output_dir <- tempdir()
+  adam_folder <- tempdir()
+  readARS(ARS_path, output_dir, adam_folder, spec_output = "Out14-1-1")
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_equal(length(r_files), 1)
+  expect_true(grepl("Out14-1-1", basename(r_files)))
+})
+
+test_that("spec_analysis limits analyses in generated script", {
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+  output_dir <- tempdir()
+  adam_folder <- tempdir()
+  readARS(ARS_path, output_dir, adam_folder,
+          spec_analysis = "An03_01_Age_Summ_ByTrt")
+  filepath <- file.path(output_dir, "ARD_Out14-1-1.R")
+  expect_true(file.exists(filepath))
+  lines <- readLines(filepath)
+  expect_true(any(grepl("Analysis An03_01_Age_Summ_ByTrt", lines)))
+  expect_false(any(grepl("An03_02_AgeGrp_Comp_ByTrt", lines)))
+})
+
+test_that("shuffle option adds shuffle_ard call", {
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+  output_dir <- tempdir()
+  adam_folder <- tempdir()
+  readARS(ARS_path, output_dir, adam_folder, shuffle = TRUE)
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  any_shuffle <- any(vapply(r_files, function(f) {
+    any(grepl("shuffle_ard\\(\\)", readLines(f)))
+  }, logical(1)))
+  expect_true(any_shuffle)
+})
