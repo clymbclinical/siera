@@ -9,7 +9,6 @@
 status](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera)
 [![R-CMD-check](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml)
 [![Downloads](https://cranlogs.r-pkg.org/badges/siera)](https://cran.r-project.org/package=siera)
-[![codecov](https://codecov.io/gh/clymbclinical/siera/branch/main/graph/badge.svg)](https://codecov.io/gh/clymbclinical/siera)
 
 <!-- badges: end -->
 
