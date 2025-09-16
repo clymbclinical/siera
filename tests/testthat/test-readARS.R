@@ -158,6 +158,27 @@ test_that("combined code created", {
   expect_true(any(grepl("ARD <- ", lines)))
 })
 
+test_that("shuffle option adds shuffle_ard call", {
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+  output_dir <- tempdir()
+  adam_folder <- tempdir()
+  readARS(ARS_path, output_dir, adam_folder, shuffle = TRUE)
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  any_shuffle <- any(vapply(r_files, function(f) {
+    any(grepl("shuffle_ard\\(\\)", readLines(f)))
+  }, logical(1)))
+  expect_true(any_shuffle)
+
+  ARS_path <- ARS_example("testARS.json")
+  output_dir <- tempdir()
+  adam_folder <- tempdir()
+  readARS(ARS_path, output_dir, adam_folder, shuffle = TRUE)
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  any_shuffle <- any(vapply(r_files, function(f) {
+    any(grepl("shuffle_ard\\(\\)", readLines(f)))
+  }, logical(1)))
+  expect_true(any_shuffle)
+})
 
 test_that("Generated R scripts run without error - xlsx", {
   skip_on_cran()
