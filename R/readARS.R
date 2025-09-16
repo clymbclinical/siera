@@ -1440,7 +1440,14 @@ df2_analysisidhere <- ansetdshere
 
         for (i in seq_len(nrow(anmetparam_s))) {
           # Get the replacement value using get() based on the variable name in Column B
-          rep <- get(anmetparam_s$parameter_valueSource[i])
+          value_source <- anmetparam_s$parameter_valueSource[i]
+          if (!exists(value_source)) {
+            cli::cli_warn(
+              "The valueSource item {.val {value_source}} is not an object in the environment"
+            )
+            next
+          }
+          rep <- get(value_source)
           # Replace the placeholder in VAR with the variable's value
           if(!is.na(rep)){
             anmetcode_temp <- gsub(anmetparam_s$parameter_name[i],
