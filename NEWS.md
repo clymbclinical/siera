@@ -1,5 +1,3 @@
-# siera 0.5.5
-
 # siera 0.5.4
 
 * Comprehensive testing added: checking generated ARD result values
