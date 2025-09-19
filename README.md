@@ -78,4 +78,4 @@ vignette for examples and more detail on the process.
 ### More info:
 
 - [US Connect 2025
-  Paper](https://www.lexjansen.com/phuse-us/2025/os/PAP_OS20.pdf)
+  paper](https://www.lexjansen.com/phuse-us/2025/os/PAP_OS20.pdf)

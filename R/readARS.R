@@ -10,13 +10,6 @@
 #'  ARD program
 #' @param spec_output The output ID for a specific output to be run from
 #' the metadata
-#' @param spec_analysis The analysis ID for a specific analysis to be run
-#' from the metadata
-#' @param example Default is FALSE.  If TRUE, example-based operations will
-#'  be applied to CDISC example ARS. If FALSE, AnalysisMethodCodeTemplateCode
-#'  will be expected as source of the Method (and Operations) code
-#' @param shuffle Default is FALSE.  If TRUE, shuffle_ard() is applied to the
-#'  binded final ARD, to prepare for the tfrmt use case of table generation
 #'
 #' @importFrom readxl read_excel
 #'
@@ -41,14 +34,9 @@
 readARS <- function(ARS_path,
                      output_path = tempdir(),
                      adam_path = tempdir(),
-                     spec_output = "",
-                     spec_analysis = "",
-                     example = FALSE,
-                     shuffle = FALSE){
+                     spec_output = ""){
 
   func_libraries <- function(){
-
-    if(example == FALSE){
 
       template <- "
 
@@ -63,17 +51,6 @@ library(parameters)
 library(tidyr)
 library(magrittr)
   "
-    } else {
-
-      template <- "
-
-# load libraries ----
-library(tidyverse)
-library(readxl)
-library(splitstackshape)
-library(readr)
-  "
-    }
     code <- template
     return(code)
   }
@@ -450,20 +427,6 @@ library(readr)
 
     Lopa <- Lopa %>%
       dplyr::filter(listItem_outputId == spec_output)
-  }
-
-  # specific analysis
-  if(spec_analysis != ""){
-    Lopa <- Lopa %>%
-      dplyr::filter(listItem_analysisId == spec_analysis)
-
-    output_ded = Lopa %>%
-      dplyr::select(listItem_outputId) %>%
-      unique() %>%
-      as.character()
-
-    Lopo <- Lopo %>%
-      dplyr::filter(listItem_outputId == output_ded)
   }
 
   # Prework and loops ----------------------------------------------------
@@ -857,8 +820,6 @@ df_poptot = dplyr::filter(ADaM,
         }
       }
 
-      if(example == FALSE){
-
         if(num_grp == 1){
           #cards part
           distinct_list <- paste0(AG_var1,", ",ana_var)
@@ -907,89 +868,6 @@ df_poptot = dplyr::filter(ADaM,
         } else { # no grouping being done
         }
 
-      } else if(example == TRUE){
-
-        if(num_grp == 1){
-          func_AnalysisGrouping1 <- function(var1, ASID) {
-
-            template <- "
-
-#Apply Analysis Grouping ---
-df1_analysisidhere <- df_analysisidhere |>
-          dplyr::group_by(var)
-
-"
-            code <- gsub('var', var1, template)
-            code <- gsub('analysisidhere', ASID, code)
-          }
-
-          code_AnalysisGrouping_0 <- func_AnalysisGrouping1(AG_var1, Anas_j)
-
-        } else if(num_grp == 2){
-          func_AnalysisGrouping2 <- function(var1, var2, ASID) {
-
-            template <- "
-
-#Apply Analysis Grouping ---
-df1_analysisidhere <- df_analysisidhere |>
-          dplyr::group_by(var1, var2)
-
-"
-
-            code <- gsub('var1', var1, template)
-            code <- gsub('var2', var2, code)
-            code <- gsub('analysisidhere', ASID, code)
-
-            return(code)
-          }
-
-          code_AnalysisGrouping_0 <- func_AnalysisGrouping2(AG_var1,
-                                                            AG_var2,
-                                                            Anas_j)
-        } else if(num_grp == 3){
-          func_AnalysisGrouping3 <- function(var1, var2, var3, ASID) {
-
-            template <- "
-
-#Apply Analysis Grouping ---
-df1_analysisidhere <- df_analysisidhere |>
-          dplyr::group_by(var1, var2, var3)
-
-"
-            code <- gsub('var1', var1, template)
-            code <- gsub('var2', var2, code)
-            code <- gsub('var3', var3, code)
-            code <- gsub('analysisidhere', ASID, code)
-            return(code)
-          }
-
-          code_AnalysisGrouping_0 <- func_AnalysisGrouping3(AG_var1,
-                                                            AG_var2,
-                                                            AG_var3,
-                                                            Anas_j)
-        } else {
-
-          func_AnalysisGrouping4 <- function(ASID) {
-
-            template <- "
-
-#Apply Analysis Grouping ---
-
-# (No grouping applicable for this analysis)
-df1_analysisidhere <- df_analysisidhere
-"
-
-            code <- gsub('analysisidhere', ASID, template)
-            return(code)
-          }
-
-          code_AnalysisGrouping_0 <- func_AnalysisGrouping4(Anas_j)
-        }
-
-        assign(paste0("code_AnalysisGrouping_",
-                      Anas_j),
-               code_AnalysisGrouping_0)
-      }
       # Apply DataSubset -------------------------------------------------------------
 
       if(exists("DataSubsets")){ # if there is a data subset for the RE
@@ -1142,7 +1020,6 @@ df1_analysisidhere <- df_analysisidhere
 
                   vac = ord1_$condition_comparator
 
-                  if(example == TRUE){
                     val1 = ord1_$condition_value %>%
                       unlist()
                     is_num <- !is.na(suppressWarnings(as.numeric(val1)))
@@ -1173,7 +1050,6 @@ df1_analysisidhere <- df_analysisidhere
                         val =  paste0("'",val1,"'")
                       }
                     }
-                  } else{ # example not true
                     val1 = ord1_$condition_value
 
                     if(vac == "IN") {
@@ -1206,7 +1082,6 @@ df1_analysisidhere <- df_analysisidhere
                         val =  paste0("'",val1,"'")
                       }
                     }
-                  }
 
                   # concatenate expression
                   assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", val))
@@ -1287,7 +1162,6 @@ df1_analysisidhere <- df_analysisidhere
 
 
           func_DataSubset1 <- function(filterVal, ASID, DSNAME, Ansetds) {
-            if(example == FALSE){
 
               template <- "
 
@@ -1297,16 +1171,6 @@ df2_analysisidhere <- ansetdshere |>
         dplyr::filter(dplyr::filtertext1)
 
 "
-            } else{
-              template <- "
-
-# Apply Data Subset ---
-# Data subset: dsnamehere
-df2_analysisidhere <- ansetdshere |>
-        dplyr::filter(dplyr::filtertext1)
-
-"
-            }
 
             code <- gsub('dplyr::filtertext1', filterVal, template)
             code <- gsub('analysisidhere', ASID, code)
@@ -1408,39 +1272,7 @@ df2_analysisidhere <- ansetdshere |>
           #         var = ord1_$condition_variable
           #
           #         vac = ord1_$condition_comparator
-          #
-          #         if(example == TRUE){
-          #           val1 = ord1_$condition_value %>%
-          #             unlist()
-          #           is_num <- !is.na(suppressWarnings(as.numeric(val1)))
-          #
-          #           if(vac == "IN") {
-          #             f_vac = "%in%"
-          #
-          #             # multiple values
-          #             if(is_num[1] == TRUE){ # numeric values
-          #               val1_ = suppressWarnings(as.numeric(val1))
-          #               val =  paste0("c(", paste0( val1_, collapse = ", "), ")")
-          #             } else{
-          #               val =  paste0("c(", paste0("'", val1, "'", collapse = ", "), ")")
-          #             }
-          #           }
-          #           else {
-          #             if(vac == "EQ") f_vac = '=='
-          #             if(vac == "NE") f_vac = '!='
-          #             if(vac == "GT") f_vac = '>'
-          #             if(vac == "GE") f_vac = '>='
-          #             if(vac == "LT") f_vac = '<'
-          #             if(vac == "LE") f_vac = '<='
-          #
-          #             # single value
-          #             if(is_num == TRUE){
-          #               val = suppressWarnings(as.numeric(val1))
-          #             } else{
-          #               val =  paste0("'",val1,"'")
-          #             }
-          #           }
-          #         } else{ # example not true
+
           #           val1 = ord1_$condition_value
           #
           #           if(vac == "IN") {
@@ -1473,7 +1305,6 @@ df2_analysisidhere <- ansetdshere |>
           #               val =  paste0("'",val1,"'")
           #             }
           #           }
-          #         }
           #
           #         # concatenate expression
           #         assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", val))
@@ -1554,21 +1385,12 @@ df2_analysisidhere <- ansetdshere |>
         } else { # there is no data subsetting for this analysis
 
           func_DataSubset2 <- function(ASID, Ansetds) {
-            if(example == FALSE){
               template <- "
 
 #Apply Data Subset ---
 df2_analysisidhere <- ansetdshere
 
 "
-            } else{
-              template <- "
-
-#Apply Data Subset ---
-df2_analysisidhere <- ansetdshere
-
-"
-            }
 
             code <- gsub('analysisidhere', ASID, template)
             code <- gsub('ansetdshere', Ansetds, code)
@@ -1587,21 +1409,12 @@ df2_analysisidhere <- ansetdshere
 
         func_DataSubset3 <- function(ASID,
                                      Ansetds) {
-
-          if(example == FALSE){
             template <- "
 
 #Apply Data Subset ---
 df2_analysisidhere <- ansetdshere
 
-"} else {
-  template <- "
-
-#Apply Data Subset ---
-df2_analysisidhere <- ansetdshere
-
 "
-}
 
           code <- gsub('analysisidhere', ASID, template)
           code <- gsub('ansetdshere', Ansetds, code)
@@ -1615,7 +1428,6 @@ df2_analysisidhere <- ansetdshere
       }
 
       # Apply AnalysisMethod -------------------------------------------------------------
-      if(example == FALSE){
 
         method <- AnalysisMethods %>%
           dplyr::filter(id == methodid) %>% # refnew
@@ -1790,788 +1602,9 @@ df3_analysisidhere <- df3_analysisidhere |>
                     code_method#,
                     #code_rename
              ))
-      } else {
-        method <- AnalysisMethods %>%
-          dplyr::filter(id == methodid)
-
-        code_Operation_0 = ""  # initialise code (to be appended)
-        code_combine = "" #initialise code to combine datasets
-
-        for(k in 1:nrow(method)){
-          # for(k in 1:1){
-
-          operation = method[k,] # one operation at a time
-          oper_id <- operation$operation_id #current operation ID
-          # oper_order <- operation$operation_order #current operation order
-          oper_name <- operation$name #current operation name
-          oper_desc <- operation$description #current operation description
-          oper_pattern <- operation$operation_resultPattern # pattern
-
-
-          # Mth01_CatVar_Count_ByGrp_1_n ------------------------
-
-          if(oper_id == "Mth01_CatVar_Count_ByGrp_1_n"){
-
-            func_OperationTmp1 <- function(operid,
-                                           # operorder,
-                                           opername,
-                                           operdesc,
-                                           analysisid,
-                                           methodid,
-                                           outputid,
-                                           pattern) {
-              template <- "
-# Operation ID:           operationidhere
-# Operation name:         operationnamehere
-# Operation description:  operationdeschere
-
-df3_analysisidhere_operationidhere <- df2_analysisidhere |>
-        dplyr::summarise(res = n()) |>
-        dplyr::mutate(AnalysisId = 'analysisidhere',
-               MethodId = 'methodidhere',
-               OperationId = 'operationidhere',
-               OutputId = 'outputidhere',
-               pattern = 'patternhere')
-
-"
-              code <- gsub('operationidhere', operid, template)
-              code <- gsub('operationnamehere', opername, code)
-              code <- gsub('operationdeschere', operdesc, code)
-              code <- gsub('analysisidhere', analysisid, code)
-              code <- gsub('methodidhere', methodid, code)
-              code <- gsub('outputidhere', outputid, code)
-              code <- gsub('patternhere', pattern, code)
-
-              return(code)
-            }
-
-            code_Operation_tmp = func_OperationTmp1(oper_id,
-                                                    oper_name,
-                                                    oper_desc,
-                                                    Anas_j,
-                                                    methodid,
-                                                    Output,
-                                                    oper_pattern)
-
-            #cat(code_Operation_tmp)
-            # Mth02_ContVar_Summ_ByGrp_1_n ------------------
-          } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_1_n"){
-
-            func_OperationTmp2 <- function(operid,
-                                           # operorder,
-                                           opername,
-                                           operdesc,
-                                           analysisid,
-                                           methodid,
-                                           outputid,
-                                           pattern) {
-              template <- "
-# Operation ID:           operationidhere
-# Operation name:         operationnamehere
-# Operation description:  operationdeschere
-
-df3_analysisidhere_operationidhere <- df2_analysisidhere |>
-        dplyr::summarise(res = n()) |>
-        dplyr::mutate(AnalysisId = 'analysisidhere',
-               MethodId = 'methodidhere',
-               OperationId = 'operationidhere',
-               OutputId = 'outputidhere',
-               pattern = 'patternhere')
-
-"
-              code <- gsub('operationidhere', operid, template)
-              code <- gsub('operationnamehere', opername, code)
-              code <- gsub('operationdeschere', operdesc, code)
-              code <- gsub('analysisidhere', analysisid, code)
-              code <- gsub('methodidhere', methodid, code)
-              code <- gsub('outputidhere', outputid, code)
-              code <- gsub('patternhere', pattern, code)
-
-              return(code)
-            }
-
-            code_Operation_tmp = func_OperationTmp2(oper_id,
-                                                    # oper_order,
-                                                    oper_name,
-                                                    oper_desc,
-                                                    Anas_j,
-                                                    methodid,
-                                                    Output,
-                                                    oper_pattern)
-
-            #cat(code_Operation_tmp)
-            # Mth02_ContVar_Summ_ByGrp_2_Mean ------------------
-          } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_2_Mean"){
-
-            func_OperationTmp3 <- function(operid,
-                                           # operorder,
-                                           opername,
-                                           operdesc,
-                                           analysisid,
-                                           methodid,
-                                           outputid,
-                                           analysisvar,
-                                           pattern) {
-              template <- "
-# Operation ID:           operationidhere
-# Operation name:         operationnamehere
-# Operation description:  operationdeschere
-
-df3_analysisidhere_operationidhere <- df2_analysisidhere |>
-        dplyr::summarise(res = mean(ana_varhere)) |>
-        dplyr::mutate(AnalysisId = 'analysisidhere',
-               MethodId = 'methodidhere',
-               OperationId = 'operationidhere',
-               OutputId = 'outputidhere',
-               pattern = 'patternhere')
-
-"
-              code <- gsub('operationidhere', operid, template)
-              code <- gsub('operationnamehere', opername, code)
-              code <- gsub('operationdeschere', operdesc, code)
-              # code <- gsub('operorderhere', operorder, code)
-              code <- gsub('analysisidhere', analysisid, code)
-              code <- gsub('methodidhere', methodid, code)
-              code <- gsub('outputidhere', outputid, code)
-              code <- gsub('ana_varhere', analysisvar, code)
-              code <- gsub('patternhere', pattern, code)
-
-
-              return(code)
-            }
-
-            code_Operation_tmp = func_OperationTmp3(oper_id,
-                                                    # oper_order,
-                                                    oper_name,
-                                                    oper_desc,
-                                                    Anas_j,
-                                                    methodid,
-                                                    Output,
-                                                    ana_var,
-                                                    oper_pattern)
-
-            #cat(code_Operation_tmp)
-            # Mth02_ContVar_Summ_ByGrp_3_SD ------------------
-          } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_3_SD"){
-
-            func_OperationTmp4 <- function(operid,
-                                           # operorder,
-                                           opername,
-                                           operdesc,
-                                           analysisid,
-                                           methodid,
-                                           outputid,
-                                           analysisvar,
-                                           pattern) {
-              template <- "
-# Operation ID:           operationidhere
-# Operation name:         operationnamehere
-# Operation description:  operationdeschere
-
-df3_analysisidhere_operationidhere <- df2_analysisidhere |>
-        dplyr::summarise(res = sd(ana_varhere)) |>
-        dplyr::mutate(AnalysisId = 'analysisidhere',
-               MethodId = 'methodidhere',
-               OperationId = 'operationidhere',
-               OutputId = 'outputidhere',
-               pattern = 'patternhere')
-
-"
-              code <- gsub('operationidhere', operid, template)
-              code <- gsub('operationnamehere', opername, code)
-              code <- gsub('operationdeschere', operdesc, code)
-              # code <- gsub('operorderhere', operorder, code)
-              code <- gsub('analysisidhere', analysisid, code)
-              code <- gsub('methodidhere', methodid, code)
-              code <- gsub('outputidhere', outputid, code)
-              code <- gsub('ana_varhere', analysisvar, code)
-              code <- gsub('patternhere', pattern, code)
-
-              return(code)
-            }
-
-            code_Operation_tmp = func_OperationTmp4(oper_id,
-                                                    # oper_order,
-                                                    oper_name,
-                                                    oper_desc,
-                                                    Anas_j,
-                                                    methodid,
-                                                    Output,
-                                                    ana_var,
-                                                    oper_pattern)
-
-            #cat(code_Operation_tmp)
-            # Mth02_ContVar_Summ_ByGrp_4_Median ------------------
-          } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_4_Median"){
-
-            func_OperationTmp5 <- function(operid,
-                                           # operorder,
-                                           opername,
-                                           operdesc,
-                                           analysisid,
-                                           methodid,
-                                           outputid,
-                                           analysisvar,
-                                           pattern) {
-              template <- "
-# Operation ID:           operationidhere
-# Operation name:         operationnamehere
-# Operation description:  operationdeschere
-
-df3_analysisidhere_operationidhere <- df2_analysisidhere |>
-        dplyr::summarise(res = median(ana_varhere)) |>
-        dplyr::mutate(AnalysisId = 'analysisidhere',
-               MethodId = 'methodidhere',
-               OperationId = 'operationidhere',
-               OutputId = 'outputidhere',
-               pattern = 'patternhere')
-
-"
-              code <- gsub('operationidhere', operid, template)
-              code <- gsub('operationnamehere', opername, code)
-              code <- gsub('operationdeschere', operdesc, code)
-              # code <- gsub('operorderhere', operorder, code)
-              code <- gsub('analysisidhere', analysisid, code)
-              code <- gsub('methodidhere', methodid, code)
-              code <- gsub('outputidhere', outputid, code)
-              code <- gsub('ana_varhere', analysisvar, code)
-              code <- gsub('patternhere', pattern, code)
-
-              return(code)
-            }
-
-            code_Operation_tmp = func_OperationTmp5(oper_id,
-                                                    # oper_order,
-                                                    oper_name,
-                                                    oper_desc,
-                                                    Anas_j,
-                                                    methodid,
-                                                    Output,
-                                                    ana_var,
-                                                    oper_pattern)
-            #cat(code_Operation_tmp)
-            # Mth02_ContVar_Summ_ByGrp_5_Q1 ------------------
-          } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_5_Q1"){
-            func_OperationTmp6 <- function(operid,
-                                           # operorder,
-                                           opername,
-                                           operdesc,
-                                           analysisid,
-                                           methodid,
-                                           outputid,
-                                           analysisvar,
-                                           pattern) {
-              template <- "
-# Operation ID:           operationidhere
-# Operation name:         operationnamehere
-# Operation description:  operationdeschere
-
-df3_analysisidhere_operationidhere <- df2_analysisidhere |>
-        dplyr::summarise(res = quantile(ana_varhere, c(.25), na.rm = TRUE)) |>
-        dplyr::mutate(AnalysisId = 'analysisidhere',
-               MethodId = 'methodidhere',
-               OperationId = 'operationidhere',
-               OutputId = 'outputidhere',
-               pattern = 'patternhere')
-
-"
-              code <- gsub('operationidhere', operid, template)
-              code <- gsub('operationnamehere', opername, code)
-              code <- gsub('operationdeschere', operdesc, code)
-              # code <- gsub('operorderhere', operorder, code)
-              code <- gsub('analysisidhere', analysisid, code)
-              code <- gsub('methodidhere', methodid, code)
-              code <- gsub('outputidhere', outputid, code)
-              code <- gsub('ana_varhere', analysisvar, code)
-              code <- gsub('patternhere', pattern, code)
-
-              return(code)
-            }
-
-            code_Operation_tmp = func_OperationTmp6(oper_id,
-                                                    # oper_order,
-                                                    oper_name,
-                                                    oper_desc,
-                                                    Anas_j,
-                                                    methodid,
-                                                    Output,
-                                                    ana_var,
-                                                    oper_pattern)
-            #cat(code_Operation_tmp)
-            # Mth02_ContVar_Summ_ByGrp_6_Q3 ------------------
-          } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_6_Q3"){
-            func_OperationTmp7 <- function(operid,
-                                           # operorder,
-                                           opername,
-                                           operdesc,
-                                           analysisid,
-                                           methodid,
-                                           outputid,
-                                           analysisvar,
-                                           pattern) {
-              template <- "
-# Operation ID:           operationidhere
-# Operation name:         operationnamehere
-# Operation description:  operationdeschere
-
-df3_analysisidhere_operationidhere <- df2_analysisidhere |>
-        dplyr::summarise(res = quantile(ana_varhere, c(.75), na.rm = TRUE)) |>
-        dplyr::mutate(AnalysisId = 'analysisidhere',
-               MethodId = 'methodidhere',
-               OperationId = 'operationidhere',
-               OutputId = 'outputidhere',
-               pattern = 'patternhere')
-
-"
-              code <- gsub('operationidhere', operid, template)
-              code <- gsub('operationnamehere', opername, code)
-              code <- gsub('operationdeschere', operdesc, code)
-              # code <- gsub('operorderhere', operorder, code)
-              code <- gsub('analysisidhere', analysisid, code)
-              code <- gsub('methodidhere', methodid, code)
-              code <- gsub('outputidhere', outputid, code)
-              code <- gsub('ana_varhere', analysisvar, code)
-              code <- gsub('patternhere', pattern, code)
-
-              return(code)
-            }
-
-            code_Operation_tmp = func_OperationTmp7(oper_id,
-                                                    # oper_order,
-                                                    oper_name,
-                                                    oper_desc,
-                                                    Anas_j,
-                                                    methodid,
-                                                    Output,
-                                                    ana_var,
-                                                    oper_pattern)
-            #cat(code_Operation_tmp)
-            # Mth02_ContVar_Summ_ByGrp_7_Min ------------------
-          } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_7_Min"){
-            func_OperationTmp8 <- function(operid,
-                                           # operorder,
-                                           opername,
-                                           operdesc,
-                                           analysisid,
-                                           methodid,
-                                           outputid,
-                                           analysisvar,
-                                           pattern) {
-              template <- "
-# Operation ID:           operationidhere
-# Operation name:         operationnamehere
-# Operation description:  operationdeschere
-
-df3_analysisidhere_operationidhere <- df2_analysisidhere |>
-        dplyr::summarise(res = min(ana_varhere)) |>
-        dplyr::mutate(AnalysisId = 'analysisidhere',
-               MethodId = 'methodidhere',
-               OperationId = 'operationidhere',
-               OutputId = 'outputidhere',
-               pattern = 'patternhere')
-
-"
-              code <- gsub('operationidhere', operid, template)
-              code <- gsub('operationnamehere', opername, code)
-              code <- gsub('operationdeschere', operdesc, code)
-              # code <- gsub('operorderhere', operorder, code)
-              code <- gsub('analysisidhere', analysisid, code)
-              code <- gsub('methodidhere', methodid, code)
-              code <- gsub('outputidhere', outputid, code)
-              code <- gsub('ana_varhere', analysisvar, code)
-              code <- gsub('patternhere', pattern, code)
-
-
-              return(code)
-            }
-
-            code_Operation_tmp = func_OperationTmp8(oper_id,
-                                                    # oper_order,
-                                                    oper_name,
-                                                    oper_desc,
-                                                    Anas_j,
-                                                    methodid,
-                                                    Output,
-                                                    ana_var,
-                                                    oper_pattern)
-            # #cat(code_Operation_tmp)
-            # Mth02_ContVar_Summ_ByGrp_8_Max ------------------
-
-          } else if(operation$operation_id == "Mth02_ContVar_Summ_ByGrp_8_Max"){
-            func_OperationTmp9 <- function(operid,
-                                           # operorder,
-                                           opername,
-                                           operdesc,
-                                           analysisid,
-                                           methodid,
-                                           outputid,
-                                           analysisvar,
-                                           pattern) {
-              template <- "
-# Operation ID:           operationidhere
-# Operation name:         operationnamehere
-# Operation description:  operationdeschere
-
-df3_analysisidhere_operationidhere <- df2_analysisidhere |>
-        dplyr::summarise(res = max(ana_varhere)) |>
-        dplyr::mutate(AnalysisId = 'analysisidhere',
-               MethodId = 'methodidhere',
-               OperationId = 'operationidhere',
-               OutputId = 'outputidhere',
-               pattern = 'patternhere')
-
-"
-              code <- gsub('operationidhere', operid, template)
-              code <- gsub('operationnamehere', opername, code)
-              code <- gsub('operationdeschere', operdesc, code)
-              # code <- gsub('operorderhere', operorder, code)
-              code <- gsub('analysisidhere', analysisid, code)
-              code <- gsub('methodidhere', methodid, code)
-              code <- gsub('outputidhere', outputid, code)
-              code <- gsub('ana_varhere', analysisvar, code)
-              code <- gsub('patternhere', pattern, code)
-
-
-              return(code)
-            }
-
-            code_Operation_tmp = func_OperationTmp9(oper_id,
-                                                    # oper_order,
-                                                    oper_name,
-                                                    oper_desc,
-                                                    Anas_j,
-                                                    methodid,
-                                                    Output,
-                                                    ana_var,
-                                                    oper_pattern)
-            # #cat(code_Operation_tmp)
-            # Mth01_CatVar_Summ_ByGrp_1_n ------------------
-
-          } else if(operation$operation_id == "Mth01_CatVar_Summ_ByGrp_1_n"){
-            func_OperationTmp10 <- function(operid,
-                                            # operorder,
-                                            opername,
-                                            operdesc,
-                                            analysisid,
-                                            methodid,
-                                            outputid,
-                                            analysisvar,
-                                            pattern) {
-              template <- "
-# Operation ID:           operationidhere
-# Operation name:         operationnamehere
-# Operation description:  operationdeschere
-
-df3_analysisidhere_operationidhere <- df2_analysisidhere |>
-        dplyr::summarise(res = n_distinct(ana_varhere)) |>
-        dplyr::mutate(AnalysisId = 'analysisidhere',
-               MethodId = 'methodidhere',
-               OperationId = 'operationidhere',
-               OutputId = 'outputidhere',
-               pattern = 'patternhere')
-
-"
-              code <- gsub('operationidhere', operid, template)
-              code <- gsub('operationnamehere', opername, code)
-              code <- gsub('operationdeschere', operdesc, code)
-              # code <- gsub('operorderhere', operorder, code)
-              code <- gsub('analysisidhere', analysisid, code)
-              code <- gsub('methodidhere', methodid, code)
-              code <- gsub('outputidhere', outputid, code)
-              code <- gsub('ana_varhere', analysisvar, code)
-              code <- gsub('patternhere', pattern, code)
-
-              return(code)
-            }
-
-            code_Operation_tmp = func_OperationTmp10(oper_id,
-                                                     # oper_order,
-                                                     oper_name,
-                                                     oper_desc,
-                                                     Anas_j,
-                                                     methodid,
-                                                     Output,
-                                                     ana_var,
-                                                     oper_pattern)
-            # Mth01_CatVar_Summ_ByGrp_2_pct ------------------
-
-          } else if(operation$operation_id == "Mth01_CatVar_Summ_ByGrp_2_pct"){
-
-
-            NUM_analysisid = Anas_s$referencedAnalysisOperations_analysisId1
-            DEN_analysisid = Anas_s$referencedAnalysisOperations_analysisId2
-
-            NUM_operationid = operation$operation_referencedResultRelationships1_operationId
-            DEN_operationid = operation$operation_referencedResultRelationships2_operationId
-
-            func_OperationTmp11 <- function(operid,
-                                            # operorder,
-                                            opername,
-                                            operdesc,
-                                            analysisid,
-                                            methodid,
-                                            outputid,
-                                            analysisvar,
-                                            num_analysisid,
-                                            den_analysisid,
-                                            num_operationid,
-                                            den_operationid,
-                                            pattern,
-                                            groupvar1) {
-              template <- "
-# Operation ID:           operationidhere
-# Operation name:         operationnamehere
-# Operation description:  operationdeschere
-
-
-
-df3_analysisidhere_operationidhere_num <- df3_num_analysisIDhere_num_operationIDhere |>
-          dplyr::rename(NUM = res)
-
-df3_analysisidhere_operationidhere_den <- df3_den_analysisIDhere_den_operationIDhere |>
-          dplyr::rename(DEN = res)
-
-df3_analysisidhere_operationidhere <- merge(df3_analysisidhere_operationidhere_num,
-                                            df3_analysisidhere_operationidhere_den |>
-                                                  dplyr::select(group1varhere, DEN),
-                                            by = c('group1varhere')) |>
-                                            dplyr::mutate(res = NUM / DEN * 100,
-                                                   OperationId = 'operationidhere',
-                                                   pattern = 'patternhere') |>
-                                            dplyr::select(-NUM, -DEN)
-
-"
-              code <- gsub('operationidhere', operid, template)
-              code <- gsub('operationnamehere', opername, code)
-              code <- gsub('operationdeschere', operdesc, code)
-              # code <- gsub('operorderhere', operorder, code)
-              code <- gsub('analysisidhere', analysisid, code)
-              code <- gsub('methodidhere', methodid, code)
-              code <- gsub('outputidhere', outputid, code)
-              code <- gsub('num_analysisIDhere', num_analysisid, code)
-              code <- gsub('den_analysisIDhere', den_analysisid, code)
-              code <- gsub('num_operationIDhere', num_operationid, code)
-              code <- gsub('den_operationIDhere', den_operationid, code)
-              code <- gsub('patternhere', pattern, code)
-              code <- gsub('group1varhere', groupvar1, code)
-
-              return(code)
-            }
-
-            code_Operation_tmp = func_OperationTmp11(oper_id,
-                                                     # oper_order,
-                                                     oper_name,
-                                                     oper_desc,
-                                                     Anas_j,
-                                                     methodid,
-                                                     Output,
-                                                     ana_var,
-                                                     NUM_analysisid,
-                                                     DEN_analysisid,
-                                                     NUM_operationid,
-                                                     DEN_operationid,
-                                                     oper_pattern,
-                                                     AG_var1)
-
-            # Mth04_ContVar_Comp_Anova_1_pval ----
-          } else if(operation$operation_id == "Mth04_ContVar_Comp_Anova_1_pval"){
-
-            func_OperationTmp12 <- function(operid,
-                                            # operorder,
-                                            opername,
-                                            operdesc,
-                                            analysisid,
-                                            methodid,
-                                            outputid,
-                                            analysisvar,
-                                            AGvar,
-                                            pattern) {
-              template <- "
-# Operation ID:           operationidhere
-# Operation name:         operationnamehere
-# Operation description:  operationdeschere
-
-
-fm <- stats::as.formula(paste('ana_varhere', '~', 'ana_groupvarhere'))
-  model <- stats::lm(fm, data = df2_analysisidhere
-  )
-
-if (class(model) != 'lm') stop('Not an object of class lm ')
-f <- summary(model)$fstatistic
-p <- stats::pf(f[1],f[2],f[3],lower.tail=F)
-attributes(p) <- NULL
-
-df3_analysisidhere_operationidhere <- data.frame(res = p,
-                  AnalysisId = 'analysisidhere',
-                  MethodId = 'methodidhere',
-                  OperationId = 'operationidhere',
-                  OutputId = 'outputidhere',
-                  pattern = 'patternhere')
-"
-              code <- gsub('operationidhere', operid, template)
-              code <- gsub('operationnamehere', opername, code)
-              code <- gsub('operationdeschere', operdesc, code)
-              # code <- gsub('operorderhere', operorder, code)
-              code <- gsub('analysisidhere', analysisid, code)
-              code <- gsub('methodidhere', methodid, code)
-              code <- gsub('outputidhere', outputid, code)
-              code <- gsub('ana_varhere', analysisvar, code)
-              code <- gsub('ana_groupvarhere', AGvar, code)
-              code <- gsub('patternhere', pattern, code)
-
-              return(code)
-            }
-
-            code_Operation_tmp = func_OperationTmp12(oper_id,
-                                                     # oper_order,
-                                                     oper_name,
-                                                     oper_desc,
-                                                     Anas_j,
-                                                     methodid,
-                                                     Output,
-                                                     ana_var,
-                                                     AG_var1,
-                                                     oper_pattern)
-            # Mth03_CatVar_Comp_PChiSq_1_pval ----
-          } else if(operation$operation_id == "Mth03_CatVar_Comp_PChiSq_1_pval"){
-
-            func_OperationTmp13 <- function(operid,
-                                            # operorder,
-                                            opername,
-                                            operdesc,
-                                            analysisid,
-                                            methodid,
-                                            outputid,
-                                            analysisvar,
-                                            AGvar1,
-                                            AGvar2,
-                                            ana_adam,
-                                            pattern) {
-              template <- "
-# Operation ID:           operationidhere
-# Operation name:         operationnamehere
-# Operation description:  operationdeschere
-
-tab <- table(adamhere[, c('ana_groupvar1here', 'ana_groupvar2here')])
-p <- chisq.test(tab)$p.value
-
-df3_analysisidhere_operationidhere <- data.frame(res = p,
-                  AnalysisId = 'analysisidhere',
-                  MethodId = 'methodidhere',
-                  OperationId = 'operationidhere',
-                  OutputId = 'outputidhere',
-                  pattern = 'patternhere')
-
-"
-              code <- gsub('operationidhere', operid, template)
-              code <- gsub('operationnamehere', opername, code)
-              code <- gsub('operationdeschere', operdesc, code)
-              # code <- gsub('operorderhere', operorder, code)
-              code <- gsub('analysisidhere', analysisid, code)
-              code <- gsub('methodidhere', methodid, code)
-              code <- gsub('outputidhere', outputid, code)
-              code <- gsub('ana_varhere', analysisvar, code)
-              code <- gsub('ana_groupvar1here', AGvar1, code)
-              code <- gsub('ana_groupvar2here', AGvar2, code)
-              code <- gsub('adamhere', ana_adam, code)
-              code <- gsub('patternhere', pattern, code)
-
-              return(code)
-            }
-
-            code_Operation_tmp = func_OperationTmp13(oper_id,
-                                                     # oper_order,
-                                                     oper_name,
-                                                     oper_desc,
-                                                     Anas_j,
-                                                     methodid,
-                                                     Output,
-                                                     ana_var,
-                                                     AG_var1,
-                                                     AG_var2,
-                                                     ana_adam,
-                                                     oper_pattern)
-
-          } # operation loop ends
-
-          code_Operation_0 = paste(code_Operation_0, # code contai
-                                   code_Operation_tmp)
-
-          if(k<nrow(method)) {
-            code_combine = paste0(code_combine,
-                                  "df3_",Anas_j, "_",oper_id, ", \n")
-          } else {
-            code_combine = paste0(code_combine,
-                                  "df3_",Anas_j, "_",oper_id)
-          }
-        } # all operations end
-
-        # code to combine it all --------------------------------------------------
-        # dplyr::rename groups to append
-        if(num_grp == 1){ # if 1 analysis grouping
-          func_rename1 <- function(groupvar1) {
-            template <- " |>
-      dplyr::rename(Group1 = groupvar1here)
-"
-            code <- gsub('groupvar1here', groupvar1, template)
-
-            return(code)
-          }
-
-          code_rename = func_rename1(AG_var1)
-
-        }
-        else if(num_grp == 2){ # if 2 analysis groupings
-          func_rename2 <- function(groupvar1,
-                                   groupvar2) {
-            template <- " |>
-      dplyr::rename(Group1 = groupvar1here,
-             Group2 = groupvar2here)
-"
-            code <- gsub('groupvar1here', groupvar1, template)
-            code <- gsub('groupvar2here', groupvar2, code)
-
-            return(code)
-          }
-          code_rename = func_rename2(AG_var1,
-                                     AG_var2)
-
-        }
-        else if(num_grp == 3){ # if 3 analysis groupings
-          func_rename3 <- function(groupvar1,
-                                   groupvar2,
-                                   groupvar3) {
-            template <- " |>
-      dplyr::rename(Group1 = groupvar1here,
-             Group2 = groupvar2here,
-             Group3 = groupvar3here)
-"
-            code <- gsub('groupvar1here', groupvar1, template)
-            code <- gsub('groupvar2here', groupvar2, code)
-            code <- gsub('groupvar3here', groupvar3, code)
-
-            return(code)
-          }
-
-          code_rename = func_rename3(AG_var1,
-                                     AG_var2,
-                                     AG_var3)
-        } else code_rename = "" # if no analysis grouping
-
-
-        assign(paste0("code_AnalysisMethod_", Anas_j),
-               paste0("#Apply Operations within Method --- \n",
-                      code_Operation_0,
-                      "#Combine operation datasets: \n",
-                      "df3_",Anas_j," <- dplyr::bind_rows(",
-                      code_combine,
-                      ")",
-                      code_rename))
-      }
 
     # Generate code for analysis ----------------------------------------------
 
-          if(example == FALSE){
         assign(paste0("code_",Anas_j),
                paste0("\n\n# Analysis ", Anas_j,"----\n#",
                       ana_name,
@@ -2579,16 +1612,6 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
                       #get(paste0("code_AnalysisGrouping_",Anas_j)),
                       get(paste0("code_DataSubset_",Anas_j)),
                       get(paste0("code_AnalysisMethod_",Anas_j))))
-      } else {
-        assign(paste0("code_",Anas_j),
-               paste0("\n\n# Analysis ", Anas_j,"----\n#",
-                      ana_name,
-                      get(paste0("code_AnalysisSet_",Anas_j)),
-                      get(paste0("code_AnalysisGrouping_",Anas_j)),
-                      get(paste0("code_DataSubset_",Anas_j)),
-                      get(paste0("code_AnalysisMethod_",Anas_j))))
-      }
-
 
     run_code <- paste0(run_code,
                        get(paste0("code_",Anas_j)))
@@ -2626,9 +1649,6 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
 
 
   # add all code, combine analyses ARDs and apply pattern
-  if(example == FALSE){
-
-    if(shuffle == FALSE){
       assign(paste0("code_",Output),
              paste0(code_header,
                     code_libraries,
@@ -2640,35 +1660,6 @@ df3_analysisidhere_operationidhere <- data.frame(res = p,
                     ") "
              )
       )
-    } else {
-      assign(paste0("code_",Output),
-             paste0(code_header,
-                    code_libraries,
-                    code_ADaM,
-                    run_code,
-                    "\n\n# combine analyses to create ARD ----\n",
-                    "ARD <- cards::bind_ard(",
-                    combine_analysis_code,
-                    ") %>%\n shuffle_ard() "
-             )
-      )
-    }
-
-  } else { # example = TRUE
-
-    assign(paste0("code_",Output),
-           paste0(code_header,
-                  code_libraries,
-                  code_ADaM,
-                  run_code,
-                  "\n\n# combine analyses to create ARD ----\n",
-                  "df4 <- dplyr::bind_rows(",
-                  combine_analysis_code,
-                  ")\n\n #Apply pattern format:\n",
-                  code_pattern
-           )
-    )
-  }
   writeLines(get(paste0("code_",Output)),
              paste0(output_path,"/ARD_",Output,".R"))
   } # end of outputs

@@ -8,10 +8,7 @@ readARS(
   ARS_path,
   output_path = tempdir(),
   adam_path = tempdir(),
-  spec_output = "",
-  spec_analysis = "",
-  example = FALSE,
-  shuffle = FALSE
+  spec_output = ""
 )
 }
 \arguments{
@@ -24,16 +21,6 @@ ARD program}
 
 \item{spec_output}{The output ID for a specific output to be run from
 the metadata}
-
-\item{spec_analysis}{The analysis ID for a specific analysis to be run
-from the metadata}
-
-\item{example}{Default is FALSE.  If TRUE, example-based operations will
-be applied to CDISC example ARS. If FALSE, AnalysisMethodCodeTemplateCode
-will be expected as source of the Method (and Operations) code}
-
-\item{shuffle}{Default is FALSE.  If TRUE, shuffle_ard() is applied to the
-binded final ARD, to prepare for the tfrmt use case of table generation}
 }
 \value{
 R programmes generating ARDs - one for each output (or analysis from an output) specified in the ARS metadata
