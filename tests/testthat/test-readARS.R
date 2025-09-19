@@ -10,6 +10,16 @@ test_that("warns when ARS file is not JSON or xlsx", {
   )
 })
 
+test_that("spec_output generates only specified script", {
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+  output_dir <- tempdir()
+  adam_folder <- tempdir()
+  readARS(ARS_path, output_dir, adam_folder, spec_output = "Out14-1-1")
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_equal(length(r_files), 1)
+  expect_true(grepl("Out14-1-1", basename(r_files)))
+})
+
 test_that("R Scripts are created for xlsx cards version", {
 
   # path to file containing ARS metadata
