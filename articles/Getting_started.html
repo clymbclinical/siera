@@ -71,33 +71,28 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://clymbclinical.github.io/siera/">siera</a></span><span class="op">)</span></span></code></pre></div>
-<p>We will use two examples to get started:</p>
-<ol style="list-style-type: decimal">
-<li>Using the original <em>CDISC Common Safety Displays</em> ARS
-metadata (JSON format, with example operations handled in the
-<code>readARS</code> function)</li>
-<li>Using a modified <em>CDISC Common Safety Displays</em> ARS metadata
-(xlsx format, with example dynamic AnalysisMethodCodeTemplate R code
-handling operations, based on functions from the <code>cards</code>
-package)</li>
-</ol>
-<p>In order to facilitate the examples, <em>siera</em> includes several
+<p>We will use the following example to get started:</p>
+<p>A modified <em>CDISC Common Safety Displays</em> ARS metadata (xlsx
+format, with example dynamic AnalysisMethodCodeTemplate R code handling
+operations, based on functions from the <code>cards</code> package)</p>
+<p>In order to facilitate the example, <em>siera</em> includes several
 example files, which we use throughout the documentation. These include
-a JSON ARS file, as well as some csv ADaMs (ADSL and ADAE) which can be
-run with the R scripts produced by readARS function. Use the helper
+several ARS files (json and xlsx), as well as csv-format ADaMs which can
+be run with the R scripts produced by readARS function. Use the helper
 ARS_example() with no arguments to list them or call it with an example
 filename to get the path.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># To see a list of example files:</span></span>
 <span><span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "ADAE.csv"                           "ADSL.csv"                          </span></span>
-<span><span class="co">#&gt; [3] "ADVS.csv"                           "ARS_V1_Common_Safety_Displays.json"</span></span>
-<span><span class="co">#&gt; [5] "cards_constructs.xlsx"              "Common_Safety_Displays_cards.xlsx" </span></span>
-<span><span class="co">#&gt; [7] "test_cards.json"                    "testARS.json"</span></span>
+<span><span class="co">#&gt;  [1] "ADAE.csv"                          "ADSL.csv"                         </span></span>
+<span><span class="co">#&gt;  [3] "ADVS.csv"                          "ADZSDER.csv"                      </span></span>
+<span><span class="co">#&gt;  [5] "cards_constructs.xlsx"             "Common_Safety_Displays_cards.xlsx"</span></span>
+<span><span class="co">#&gt;  [7] "exampleARS_1.json"                 "exampleARS_2.json"                </span></span>
+<span><span class="co">#&gt;  [9] "exampleARS_2.xlsx"                 "test_cards.json"</span></span>
 <span></span>
 <span><span class="co"># A temporary path to a specific file:</span></span>
-<span><span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"ARS_V1_Common_Safety_Displays.json"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/home/runner/work/_temp/Library/siera/extdata/ARS_V1_Common_Safety_Displays.json"</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"exampleARS_1.json"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "/home/runner/work/_temp/Library/siera/extdata/exampleARS_1.json"</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="cdisc-example-json-format">CDISC example: JSON format<a class="anchor" aria-label="anchor" href="#cdisc-example-json-format"></a>
 </h2>
@@ -106,7 +101,7 @@ will ingest the example JSON ARS file to meta-programme ready-to-run R
 scripts, which will produce the ARDs.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Path to the the ARS JSON File. </span></span>
-<span><span class="va">json_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"ARS_V1_Common_Safety_Displays.json"</span><span class="op">)</span></span>
+<span><span class="va">json_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"exampleARS_1.json"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Path to a folder which will contain the meta-programmed R scripts (feel free to update </span></span>
 <span><span class="co"># to a more suitable path)</span></span>
@@ -118,7 +113,7 @@ scripts, which will produce the ARDs.</p>
 <span><span class="va">ADaM_folder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># run the readARS function with these 3 parameters.  This creates R scripts (1 for each output in output_folder)</span></span>
-<span><span class="fu"><a href="../reference/readARS.html">readARS</a></span><span class="op">(</span><span class="va">json_path</span>, <span class="va">output_folder</span>, <span class="va">ADaM_folder</span>, example <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/readARS.html">readARS</a></span><span class="op">(</span><span class="va">json_path</span>, <span class="va">output_folder</span>, <span class="va">ADaM_folder</span><span class="op">)</span></span></code></pre></div>
 <p>Once the R programs are created, they can be individually run,
 provided that the ADaM datasets are in the location as provided to the
 readARS function.</p>
