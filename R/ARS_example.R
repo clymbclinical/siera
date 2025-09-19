@@ -8,7 +8,7 @@
 #' @export
 #' @examples
 #' ARS_example()
-#' ARS_example("ARS_V1_Common_Safety_Displays.json")
+#' ARS_example("Common_Safety_Displays_cards.xlsx")
 ARS_example <- function(path = NULL) {
   if (is.null(path)) {
     dir(system.file("extdata", package = "siera"))

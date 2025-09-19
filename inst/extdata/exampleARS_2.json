@@ -1,0 +1,3571 @@
+{
+    "about": {
+        "generatedUsing": "TFL Designer Jazz",
+        "version": "1.5.3",
+        "note": "The metadata provided herein has been generated using the TFL Designer Jazz version 1.5.3. The representation of metadata fields available in this worksheet adheres to the CDISC Analysis Results Standard example available on the ARS GitHub repository."
+    },
+    "studyInfo": {
+        "studyId": "Example_Malan_copy",
+        "studyTitle": "Example 2",
+        "phase": [
+            "Phase III"
+        ],
+        "compoundUnderStudy": "Example Compound",
+        "description": "",
+        "diseaseArea": "Neurology",
+        "therapeuticArea": "Seizure"
+    },
+    "name": "Clinical Study Report",
+    "id": "CSR",
+    "mainListOfContents": {
+        "name": "List of Planned Analyses",
+        "label": "LOPA",
+        "contentsList": {
+            "listItems": [
+                {
+                    "name": "Summary of Indication-associated Seizure Frequency",
+                    "level": 1,
+                    "order": 1,
+                    "outputId": "Out_01",
+                    "sublist": {
+                        "listItems": [
+                            {
+                                "name": "Summary of Subjects by Treatment",
+                                "level": 2,
+                                "order": 1,
+                                "analysisId": "An_01"
+                            },
+                            {
+                                "name": "Baseline period (Average per 28 days)",
+                                "level": 2,
+                                "order": 2,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Baseline period (Average per 28 days)",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_02"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Treatment period (Weeks 1 to 12) (Average per 28 days)",
+                                "level": 2,
+                                "order": 3,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Treatment period (Weeks 1 to 12) (Average per 28 days)",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_03"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Treatment period (Weeks 13 to 24) (Average per 28 days)",
+                                "level": 2,
+                                "order": 4,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Treatment period (Weeks 13 to 24) (Average per 28 days)",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_04"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Treatment period (Weeks 25 to 36) (Average per 28 days)",
+                                "level": 2,
+                                "order": 5,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Treatment period (Weeks 25 to 36) (Average per 28 days)",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_05"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Treatment period (Weeks 37 to 48) (Average per 28 days)",
+                                "level": 2,
+                                "order": 6,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Treatment period (Weeks 37 to 48) (Average per 28 days)",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_06"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Treatment period (Average per 28 days)",
+                                "level": 2,
+                                "order": 7,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Treatment period (Average per 28 days)",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_07"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Percentage change from baseline period - Treatment period",
+                                "level": 2,
+                                "order": 8,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Percentage change from baseline period - Treatment period",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_08"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Summary of Demographic Data",
+                    "level": 1,
+                    "order": 2,
+                    "outputId": "Out_02",
+                    "sublist": {
+                        "listItems": [
+                            {
+                                "name": "Summary of Subjects by Treatment",
+                                "level": 2,
+                                "order": 1,
+                                "analysisId": "An_09"
+                            },
+                            {
+                                "name": "Overall Age (years)",
+                                "level": 2,
+                                "order": 2,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Overall Age (years)",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_10"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Age group, n (%)",
+                                "level": 2,
+                                "order": 3,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Age group, n (%)",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_11"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Race, n (%)",
+                                "level": 2,
+                                "order": 4,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Race, n (%)",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_12"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Sex, n (%)",
+                                "level": 2,
+                                "order": 5,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Sex, n (%)",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_13"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Height at Baseline (cm)",
+                                "level": 2,
+                                "order": 6,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Height at Baseline (cm)",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_14"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Weight at Baseline (kg)",
+                                "level": 2,
+                                "order": 7,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Weight at Baseline (kg)",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_15"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "BMI at Baseline (kg/m^2)",
+                                "level": 2,
+                                "order": 8,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and BMI at Baseline (kg/m^2)",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_16"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "SCN1A Genetic Testing Result",
+                                "level": 2,
+                                "order": 9,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and SCN1A Genetic Testing Result",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_17"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "TSC1 Genetic Testing Result",
+                                "level": 2,
+                                "order": 10,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and TSC1 Genetic Testing Result",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_18"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "TSC2 Genetic Testing Result",
+                                "level": 2,
+                                "order": 11,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and TSC2 Genetic Testing Result",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_19"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "CYP2C19 Phenotype Category",
+                                "level": 2,
+                                "order": 12,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and CYP2C19 Phenotype Category",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_20"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Summary of Analysis Populations",
+                    "level": 1,
+                    "order": 3,
+                    "outputId": "Out_03",
+                    "sublist": {
+                        "listItems": [
+                            {
+                                "name": "Summary of Subjects by Treatment",
+                                "level": 2,
+                                "order": 1,
+                                "analysisId": "An_21"
+                            },
+                            {
+                                "name": "Evaluable Analysis Set",
+                                "level": 2,
+                                "order": 2,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Evaluable Analysis Set",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_22"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Modified Evaluable Pediatrics (MEP) Analysis Set",
+                                "level": 2,
+                                "order": 3,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Modified Evaluable Pediatrics (MEP) Analysis Set",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_23"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Modified Evaluable Adults (MEA) Analysis Set",
+                                "level": 2,
+                                "order": 4,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Modified Evaluable Adults (MEA) Analysis Set",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_24"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Part B Evaluable Analysis Set",
+                                "level": 2,
+                                "order": 5,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Part B Evaluable Analysis Set",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_25"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "name": "Part B MEP Analysis Set",
+                                "level": 2,
+                                "order": 6,
+                                "sublist": {
+                                    "listItems": [
+                                        {
+                                            "name": "Summary of Subjects by Treatment and Part B MEP Analysis Set",
+                                            "level": 3,
+                                            "order": 1,
+                                            "analysisId": "An_26"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "otherListsOfContents": [
+        {
+            "name": "List of Planned Outputs",
+            "label": "LOPO",
+            "contentsList": {
+                "listItems": [
+                    {
+                        "name": "Summary of Indication-associated Seizure Frequency",
+                        "level": 1,
+                        "order": 1,
+                        "outputId": "Out_01"
+                    },
+                    {
+                        "name": "Summary of Demographic Data",
+                        "level": 1,
+                        "order": 2,
+                        "outputId": "Out_02"
+                    },
+                    {
+                        "name": "Summary of Analysis Populations",
+                        "level": 1,
+                        "order": 3,
+                        "outputId": "Out_03"
+                    }
+                ]
+            }
+        }
+    ],
+    "referenceDocuments": [],
+    "terminologyExtensions": [],
+    "analysisOutputCategorizations": [
+        {
+            "id": "ANSET",
+            "categories": [
+                {
+                    "id": "ANSET_01",
+                    "subCategorizations": [
+                        {
+                            "id": "ANSET_01_ANINT",
+                            "label": "Analysis Of Interest",
+                            "categories": [
+                                {
+                                    "id": "ANSET_01_ANINT_01",
+                                    "label": "Others"
+                                },
+                                {
+                                    "id": "ANSET_01_ANINT_02",
+                                    "label": "Demographics"
+                                },
+                                {
+                                    "id": "ANSET_01_ANINT_03",
+                                    "label": "Disposition"
+                                }
+                            ]
+                        }
+                    ],
+                    "label": "Safety"
+                }
+            ],
+            "label": "Analysis Sets"
+        }
+    ],
+    "analysisSets": [
+        {
+            "level": 1,
+            "order": 1,
+            "id": "AnalysisSet_01",
+            "name": "Part B Flag",
+            "description": "",
+            "condition": {
+                "dataset": "ADSL",
+                "variable": "BMEPFFL",
+                "comparator": "EQ",
+                "value": [
+                    "Y"
+                ]
+            }
+        },
+        {
+            "level": 1,
+            "order": 1,
+            "id": "AnalysisSet_02",
+            "name": "Safety",
+            "description": "",
+            "condition": {
+                "dataset": "ADSL",
+                "variable": "SAFFL",
+                "comparator": "EQ",
+                "value": [
+                    "Y"
+                ]
+            }
+        },
+        {
+            "level": 1,
+            "order": 1,
+            "id": "AnalysisSet_03",
+            "name": "All Subjects",
+            "description": "",
+            "condition": {
+                "dataset": "ADSL",
+                "variable": "USUBJID",
+                "comparator": "NE",
+                "value": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "analysisGroupings": [
+        {
+            "name": "Treatment",
+            "id": "AnlsGrouping_01_Trt01An",
+            "dataDriven": false,
+            "groupingDataset": "ADSL",
+            "groupingVariable": "TRT01AN",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_01_Trt01An_01",
+                    "name": "A\n(N=XX)",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "TRT01AN",
+                        "comparator": "EQ",
+                        "value": [
+                            "1"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 2,
+                    "id": "AnlsGrouping_01_Trt01An_02",
+                    "name": "B\n(N=XX)",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "TRT01AN",
+                        "comparator": "EQ",
+                        "value": [
+                            "2"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 3,
+                    "id": "AnlsGrouping_01_Trt01An_03",
+                    "name": "C\n(N=XX)",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "TRT01AN",
+                        "comparator": "EQ",
+                        "value": [
+                            "3"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 4,
+                    "id": "AnlsGrouping_01_Trt01An_04",
+                    "name": "Overall\n(N=XX)",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "TRT01AN",
+                        "comparator": "NE",
+                        "value": [
+                            ""
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Treatment",
+            "id": "AnlsGrouping_02_Trt01An",
+            "dataDriven": false,
+            "groupingDataset": "ADSL",
+            "groupingVariable": "TRT01AN",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_02_Trt01An_01",
+                    "name": "A\n(N=XX)",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "TRT01AN",
+                        "comparator": "EQ",
+                        "value": [
+                            "1"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 2,
+                    "id": "AnlsGrouping_02_Trt01An_02",
+                    "name": "B\n(N=XX)",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "TRT01AN",
+                        "comparator": "EQ",
+                        "value": [
+                            "2"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 3,
+                    "id": "AnlsGrouping_02_Trt01An_03",
+                    "name": "C\n(N=XX)",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "TRT01AN",
+                        "comparator": "EQ",
+                        "value": [
+                            "3"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 4,
+                    "id": "AnlsGrouping_02_Trt01An_04",
+                    "name": "Overall\n(N=XX)",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "TRT01AN",
+                        "comparator": "NE",
+                        "value": [
+                            ""
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "AnlsGrouping_03_Agegr1",
+            "dataDriven": false,
+            "name": "Pooled Age Group 1",
+            "label": "Age group, n (%)",
+            "groupingDataset": "ADSL",
+            "groupingVariable": "AGEGR1",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_03_Agegr1_01",
+                    "name": "1-6 years",
+                    "label": "1-6 years",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "AGEGR1",
+                        "comparator": "EQ",
+                        "value": [
+                            "1-6 years"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 2,
+                    "id": "AnlsGrouping_03_Agegr1_02",
+                    "name": "7-11 years",
+                    "label": "7-11 years",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "AGEGR1",
+                        "comparator": "EQ",
+                        "value": [
+                            "7-11 years"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 3,
+                    "id": "AnlsGrouping_03_Agegr1_03",
+                    "name": "12-18 years",
+                    "label": "12-18 years",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "AGEGR1",
+                        "comparator": "EQ",
+                        "value": [
+                            "12-18 years"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 4,
+                    "id": "AnlsGrouping_03_Agegr1_04",
+                    "name": "19-65 years",
+                    "label": "19-65 years",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "AGEGR1",
+                        "comparator": "EQ",
+                        "value": [
+                            "19-65 years"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "AnlsGrouping_04_Race",
+            "dataDriven": false,
+            "name": "Race, n (%)",
+            "label": "Race, n (%)",
+            "groupingDataset": "ADSL",
+            "groupingVariable": "RACE",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_04_Race_01",
+                    "name": "American Indian or Alaska Native Asian",
+                    "label": "American Indian or Alaska Native Asian",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "RACE",
+                        "comparator": "EQ",
+                        "value": [
+                            "AMERICAN INDIAN OR ALASKA NATIVE"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 2,
+                    "id": "AnlsGrouping_04_Race_02",
+                    "name": "Black or African American",
+                    "label": "Black or African American",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "RACE",
+                        "comparator": "EQ",
+                        "value": [
+                            "BLACK OR AFRICAN AMERICAN"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 3,
+                    "id": "AnlsGrouping_04_Race_03",
+                    "name": "Native Hawaiian or Other Pacific Islander",
+                    "label": "Native Hawaiian or Other Pacific Islander",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "RACE",
+                        "comparator": "EQ",
+                        "value": [
+                            "NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 4,
+                    "id": "AnlsGrouping_04_Race_04",
+                    "name": "White",
+                    "label": "White",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "RACE",
+                        "comparator": "EQ",
+                        "value": [
+                            "WHITE"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 5,
+                    "id": "AnlsGrouping_04_Race_05",
+                    "name": "Other",
+                    "label": "Other",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "RACE",
+                        "comparator": "EQ",
+                        "value": [
+                            "OTHER"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "AnlsGrouping_05_Sex",
+            "dataDriven": false,
+            "name": "Sex, n (%)",
+            "label": "Sex, n (%)",
+            "groupingDataset": "ADSL",
+            "groupingVariable": "SEX",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_05_Sex_01",
+                    "name": "Male",
+                    "label": "Male",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "SEX",
+                        "comparator": "EQ",
+                        "value": [
+                            "M"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 2,
+                    "id": "AnlsGrouping_05_Sex_02",
+                    "name": "Female",
+                    "label": "Female",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "SEX",
+                        "comparator": "EQ",
+                        "value": [
+                            "F"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "AnlsGrouping_06_Dhscniar",
+            "dataDriven": false,
+            "name": "SCN1A Genetic Testing Result",
+            "label": "SCN1A Genetic Testing Result",
+            "groupingDataset": "ADSL",
+            "groupingVariable": "DHSCNIAR",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_06_Dhscniar_01",
+                    "name": "NEGATIVE",
+                    "label": "NEGATIVE",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "DHSCNIAR",
+                        "comparator": "EQ",
+                        "value": [
+                            "NEGATIVE"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 2,
+                    "id": "AnlsGrouping_06_Dhscniar_02",
+                    "name": "POSITIVE",
+                    "label": "POSITIVE",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "DHSCNIAR",
+                        "comparator": "EQ",
+                        "value": [
+                            "POSITIVE"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 3,
+                    "id": "AnlsGrouping_06_Dhscniar_03",
+                    "name": "VUS",
+                    "label": "VUS",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "DHSCNIAR",
+                        "comparator": "EQ",
+                        "value": [
+                            "VUS"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "AnlsGrouping_07_Dhtsc1R",
+            "dataDriven": false,
+            "name": "TSC1 Genetic Testing Result",
+            "label": "TSC1 Genetic Testing Result",
+            "groupingDataset": "ADSL",
+            "groupingVariable": "DHTSC1R",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_07_Dhtsc1R_01",
+                    "name": "NEGATIVE",
+                    "label": "NEGATIVE",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "DHTSC1R",
+                        "comparator": "EQ",
+                        "value": [
+                            "NEGATIVE"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 2,
+                    "id": "AnlsGrouping_07_Dhtsc1R_02",
+                    "name": "POSITIVE",
+                    "label": "POSITIVE",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "DHTSC1R",
+                        "comparator": "EQ",
+                        "value": [
+                            "POSITIVE"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "AnlsGrouping_08_Dhtsc2R",
+            "dataDriven": false,
+            "name": "TSC2 Genetic Testing Result",
+            "label": "TSC2 Genetic Testing Result",
+            "groupingDataset": "ADSL",
+            "groupingVariable": "DHTSC2R",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_08_Dhtsc2R_01",
+                    "name": "NEGATIVE",
+                    "label": "NEGATIVE",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "DHTSC2R",
+                        "comparator": "EQ",
+                        "value": [
+                            "NEGATIVE"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 2,
+                    "id": "AnlsGrouping_08_Dhtsc2R_02",
+                    "name": "POSITIVE",
+                    "label": "POSITIVE",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "DHTSC2R",
+                        "comparator": "EQ",
+                        "value": [
+                            "POSITIVE"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 3,
+                    "id": "AnlsGrouping_08_Dhtsc2R_03",
+                    "name": "VUS",
+                    "label": "VUS",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "DHTSC2R",
+                        "comparator": "EQ",
+                        "value": [
+                            "VUS"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "AnlsGrouping_09_Cyp2Catp",
+            "dataDriven": false,
+            "name": "CYP2C19 Phenotype Category",
+            "label": "CYP2C19 Phenotype Category",
+            "groupingDataset": "ADSL",
+            "groupingVariable": "CYP2CATP",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_09_Cyp2Catp_01",
+                    "name": "Intermediate",
+                    "label": "Intermediate",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "CYP2CATP",
+                        "comparator": "EQ",
+                        "value": [
+                            "Intermediate"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 2,
+                    "id": "AnlsGrouping_09_Cyp2Catp_02",
+                    "name": "Missing",
+                    "label": "Missing",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "CYP2CATP",
+                        "comparator": "EQ",
+                        "value": [
+                            "Missing"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 3,
+                    "id": "AnlsGrouping_09_Cyp2Catp_03",
+                    "name": "Normal",
+                    "label": "Normal",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "CYP2CATP",
+                        "comparator": "EQ",
+                        "value": [
+                            "Normal"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 4,
+                    "id": "AnlsGrouping_09_Cyp2Catp_04",
+                    "name": "Poor",
+                    "label": "Poor",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "CYP2CATP",
+                        "comparator": "EQ",
+                        "value": [
+                            "Poor"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Treatment",
+            "id": "AnlsGrouping_10_Trt01An",
+            "dataDriven": false,
+            "groupingDataset": "ADSL",
+            "groupingVariable": "TRT01AN",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_10_Trt01An_01",
+                    "name": "A\n(N=XX)",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "TRT01AN",
+                        "comparator": "EQ",
+                        "value": [
+                            "1"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 2,
+                    "id": "AnlsGrouping_10_Trt01An_02",
+                    "name": "B\n(N=XX)",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "TRT01AN",
+                        "comparator": "EQ",
+                        "value": [
+                            "2"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 3,
+                    "id": "AnlsGrouping_10_Trt01An_03",
+                    "name": "C\n(N=XX)",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "TRT01AN",
+                        "comparator": "EQ",
+                        "value": [
+                            "3"
+                        ]
+                    }
+                },
+                {
+                    "level": 1,
+                    "order": 4,
+                    "id": "AnlsGrouping_10_Trt01An_04",
+                    "name": "Overall\n(N=XX)",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "TRT01AN",
+                        "comparator": "NE",
+                        "value": [
+                            ""
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "AnlsGrouping_11_Evlfl",
+            "dataDriven": false,
+            "name": "Evaluable Population Flag",
+            "label": "Evaluable Analysis Set",
+            "groupingDataset": "ADSL",
+            "groupingVariable": "EVLFL",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_11_Evlfl_01",
+                    "name": "Evaluable Analysis Set",
+                    "label": "Evaluable Analysis Set",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "EVLFL",
+                        "comparator": "EQ",
+                        "value": [
+                            "Y"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "AnlsGrouping_12_Mepffl",
+            "dataDriven": false,
+            "name": "Modified Evaluable Pediatrics Pop Flag",
+            "label": "Modified Evaluable Pediatrics (MEP) Analysis Set",
+            "groupingDataset": "ADSL",
+            "groupingVariable": "MEPFFL",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_12_Mepffl_01",
+                    "name": "Modified Evaluable Pediatrics (MEP) Analysis Set",
+                    "label": "Modified Evaluable Pediatrics (MEP) Analysis Set",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "MEPFFL",
+                        "comparator": "EQ",
+                        "value": [
+                            "Y"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "AnlsGrouping_13_Meafl",
+            "dataDriven": false,
+            "name": "Modified Evaluable Adults Pop Flag",
+            "label": "Modified Evaluable Adults (MEA) Analysis Set",
+            "groupingDataset": "ADSL",
+            "groupingVariable": "MEAFL",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_13_Meafl_01",
+                    "name": "Modified Evaluable Adults (MEA) Analysis Set",
+                    "label": "Modified Evaluable Adults (MEA) Analysis Set",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "MEAFL",
+                        "comparator": "EQ",
+                        "value": [
+                            "Y"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "AnlsGrouping_14_Bevlfl",
+            "dataDriven": false,
+            "name": "Part B Evaluable Population Flag",
+            "label": "Part B Evaluable Analysis Set",
+            "groupingDataset": "ADSL",
+            "groupingVariable": "BEVLFL",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_14_Bevlfl_01",
+                    "name": "Part B Evaluable Analysis Set",
+                    "label": "Part B Evaluable Analysis Set",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "BEVLFL",
+                        "comparator": "EQ",
+                        "value": [
+                            "Y"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "AnlsGrouping_15_Bmepffl",
+            "dataDriven": false,
+            "name": "Part B Modified Evaluable Ped. Pop Flag",
+            "label": "Part B MEP Analysis Set",
+            "groupingDataset": "ADSL",
+            "groupingVariable": "BMEPFFL",
+            "groups": [
+                {
+                    "level": 1,
+                    "order": 1,
+                    "id": "AnlsGrouping_15_Bmepffl_01",
+                    "name": "Part B MEP Analysis Set",
+                    "label": "Part B MEP Analysis Set",
+                    "condition": {
+                        "dataset": "ADSL",
+                        "variable": "BMEPFFL",
+                        "comparator": "EQ",
+                        "value": [
+                            "Y"
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "dataSubsets": [
+        {
+            "level": 1,
+            "order": 1,
+            "id": "Dss_01",
+            "name": "Baseline period (Average per 28 days)",
+            "label": "Baseline period (Average per 28 days)",
+            "compoundExpression": {
+                "logicalOperator": "AND",
+                "whereClauses": [
+                    {
+                        "level": 2,
+                        "order": 1,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "PARAMCD",
+                            "comparator": "EQ",
+                            "value": [
+                                "INDASPW"
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 2,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "DTYPE",
+                            "comparator": "EQ",
+                            "value": [
+                                ""
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 3,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "DHIND",
+                            "comparator": "NE",
+                            "value": [
+                                ""
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 4,
+                        "compoundExpression": {
+                            "logicalOperator": "AND",
+                            "whereClauses": [
+                                {
+                                    "level": 3,
+                                    "order": 1,
+                                    "condition": {
+                                        "dataset": "ADZSDER",
+                                        "variable": "AVISITN",
+                                        "comparator": "GE",
+                                        "value": [
+                                            "20"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "level": 3,
+                                    "order": 2,
+                                    "condition": {
+                                        "dataset": "ADZSDER",
+                                        "variable": "AVISITN",
+                                        "comparator": "NE",
+                                        "value": [
+                                            "25"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "description": ""
+        },
+        {
+            "level": 1,
+            "order": 1,
+            "id": "Dss_02",
+            "name": "Treatment period (Weeks 1 to 12) (Average per 28 days)",
+            "label": "Treatment period (Weeks 1 to 12) (Average per 28 days)",
+            "compoundExpression": {
+                "logicalOperator": "AND",
+                "whereClauses": [
+                    {
+                        "level": 2,
+                        "order": 1,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "PARAMCD",
+                            "comparator": "EQ",
+                            "value": [
+                                "INDASPW"
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 2,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "DTYPE",
+                            "comparator": "EQ",
+                            "value": [
+                                ""
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 3,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "DHIND",
+                            "comparator": "NE",
+                            "value": [
+                                ""
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 4,
+                        "compoundExpression": {
+                            "logicalOperator": "AND",
+                            "whereClauses": [
+                                {
+                                    "level": 3,
+                                    "order": 1,
+                                    "condition": {
+                                        "dataset": "ADZSDER",
+                                        "variable": "AVISITN",
+                                        "comparator": "GE",
+                                        "value": [
+                                            "20"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "level": 3,
+                                    "order": 2,
+                                    "condition": {
+                                        "dataset": "ADZSDER",
+                                        "variable": "AVISITN",
+                                        "comparator": "NE",
+                                        "value": [
+                                            "25"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "description": ""
+        },
+        {
+            "level": 1,
+            "order": 1,
+            "id": "Dss_03",
+            "name": "Treatment period (Weeks 13 to 24) (Average per 28 days)",
+            "label": "Treatment period (Weeks 13 to 24) (Average per 28 days)",
+            "compoundExpression": {
+                "logicalOperator": "AND",
+                "whereClauses": [
+                    {
+                        "level": 2,
+                        "order": 1,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "PARAMCD",
+                            "comparator": "EQ",
+                            "value": [
+                                "INDASPW"
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 2,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "DTYPE",
+                            "comparator": "EQ",
+                            "value": [
+                                ""
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 3,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "DHIND",
+                            "comparator": "NE",
+                            "value": [
+                                ""
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 4,
+                        "compoundExpression": {
+                            "logicalOperator": "AND",
+                            "whereClauses": [
+                                {
+                                    "level": 3,
+                                    "order": 1,
+                                    "condition": {
+                                        "dataset": "ADZSDER",
+                                        "variable": "AVISITN",
+                                        "comparator": "GE",
+                                        "value": [
+                                            "20"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "level": 3,
+                                    "order": 2,
+                                    "condition": {
+                                        "dataset": "ADZSDER",
+                                        "variable": "AVISITN",
+                                        "comparator": "NE",
+                                        "value": [
+                                            "25"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "description": ""
+        },
+        {
+            "level": 1,
+            "order": 1,
+            "id": "Dss_04",
+            "name": "Treatment period (Weeks 25 to 36) (Average per 28 days)",
+            "label": "Treatment period (Weeks 25 to 36) (Average per 28 days)",
+            "compoundExpression": {
+                "logicalOperator": "AND",
+                "whereClauses": [
+                    {
+                        "level": 2,
+                        "order": 1,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "PARAMCD",
+                            "comparator": "EQ",
+                            "value": [
+                                "INDASPW"
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 2,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "DTYPE",
+                            "comparator": "EQ",
+                            "value": [
+                                ""
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 3,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "DHIND",
+                            "comparator": "NE",
+                            "value": [
+                                ""
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 4,
+                        "compoundExpression": {
+                            "logicalOperator": "AND",
+                            "whereClauses": [
+                                {
+                                    "level": 3,
+                                    "order": 1,
+                                    "condition": {
+                                        "dataset": "ADZSDER",
+                                        "variable": "AVISITN",
+                                        "comparator": "GE",
+                                        "value": [
+                                            "20"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "level": 3,
+                                    "order": 2,
+                                    "condition": {
+                                        "dataset": "ADZSDER",
+                                        "variable": "AVISITN",
+                                        "comparator": "NE",
+                                        "value": [
+                                            "25"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "description": ""
+        },
+        {
+            "level": 1,
+            "order": 1,
+            "id": "Dss_05",
+            "name": "Treatment period (Weeks 37 to 48) (Average per 28 days)",
+            "label": "Treatment period (Weeks 37 to 48) (Average per 28 days)",
+            "compoundExpression": {
+                "logicalOperator": "AND",
+                "whereClauses": [
+                    {
+                        "level": 2,
+                        "order": 1,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "PARAMCD",
+                            "comparator": "EQ",
+                            "value": [
+                                "INDASPW"
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 2,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "DTYPE",
+                            "comparator": "EQ",
+                            "value": [
+                                ""
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 3,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "DHIND",
+                            "comparator": "NE",
+                            "value": [
+                                ""
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 4,
+                        "compoundExpression": {
+                            "logicalOperator": "AND",
+                            "whereClauses": [
+                                {
+                                    "level": 3,
+                                    "order": 1,
+                                    "condition": {
+                                        "dataset": "ADZSDER",
+                                        "variable": "AVISITN",
+                                        "comparator": "GE",
+                                        "value": [
+                                            "20"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "level": 3,
+                                    "order": 2,
+                                    "condition": {
+                                        "dataset": "ADZSDER",
+                                        "variable": "AVISITN",
+                                        "comparator": "NE",
+                                        "value": [
+                                            "25"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "description": ""
+        },
+        {
+            "level": 1,
+            "order": 1,
+            "id": "Dss_06",
+            "name": "Treatment period (Average per 28 days)",
+            "label": "Treatment period (Average per 28 days)",
+            "compoundExpression": {
+                "logicalOperator": "AND",
+                "whereClauses": [
+                    {
+                        "level": 2,
+                        "order": 1,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "PARAMCD",
+                            "comparator": "EQ",
+                            "value": [
+                                "INDASPW"
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 2,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "DTYPE",
+                            "comparator": "EQ",
+                            "value": [
+                                ""
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 3,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "DHIND",
+                            "comparator": "NE",
+                            "value": [
+                                ""
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 4,
+                        "compoundExpression": {
+                            "logicalOperator": "AND",
+                            "whereClauses": [
+                                {
+                                    "level": 3,
+                                    "order": 1,
+                                    "condition": {
+                                        "dataset": "ADZSDER",
+                                        "variable": "AVISITN",
+                                        "comparator": "GE",
+                                        "value": [
+                                            "20"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "level": 3,
+                                    "order": 2,
+                                    "condition": {
+                                        "dataset": "ADZSDER",
+                                        "variable": "AVISITN",
+                                        "comparator": "NE",
+                                        "value": [
+                                            "25"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "description": ""
+        },
+        {
+            "level": 1,
+            "order": 1,
+            "id": "Dss_07",
+            "name": "Percentage change from baseline period - Treatment period",
+            "label": "Percentage change from baseline period - Treatment period",
+            "compoundExpression": {
+                "logicalOperator": "AND",
+                "whereClauses": [
+                    {
+                        "level": 2,
+                        "order": 1,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "PARAMCD",
+                            "comparator": "EQ",
+                            "value": [
+                                "INDASPW"
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 2,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "DTYPE",
+                            "comparator": "EQ",
+                            "value": [
+                                ""
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 3,
+                        "condition": {
+                            "dataset": "ADZSDER",
+                            "variable": "DHIND",
+                            "comparator": "NE",
+                            "value": [
+                                ""
+                            ]
+                        }
+                    },
+                    {
+                        "level": 2,
+                        "order": 4,
+                        "compoundExpression": {
+                            "logicalOperator": "AND",
+                            "whereClauses": [
+                                {
+                                    "level": 3,
+                                    "order": 1,
+                                    "condition": {
+                                        "dataset": "ADZSDER",
+                                        "variable": "AVISITN",
+                                        "comparator": "GE",
+                                        "value": [
+                                            "20"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "level": 3,
+                                    "order": 2,
+                                    "condition": {
+                                        "dataset": "ADZSDER",
+                                        "variable": "AVISITN",
+                                        "comparator": "NE",
+                                        "value": [
+                                            "25"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "description": ""
+        },
+        {
+            "level": 1,
+            "order": 1,
+            "id": "Dss_08",
+            "name": "Evaluable Analysis Set",
+            "label": "Evaluable Analysis Set",
+            "condition": {
+                "dataset": "ADSL",
+                "variable": "EVLFL",
+                "comparator": "EQ",
+                "value": [
+                    "Y"
+                ]
+            },
+            "description": ""
+        },
+        {
+            "level": 1,
+            "order": 1,
+            "id": "Dss_09",
+            "name": "Modified Evaluable Pediatrics (MEP) Analysis Set",
+            "label": "Modified Evaluable Pediatrics (MEP) Analysis Set",
+            "condition": {
+                "dataset": "ADSL",
+                "variable": "MEPFFL",
+                "comparator": "EQ",
+                "value": [
+                    "Y"
+                ]
+            },
+            "description": ""
+        },
+        {
+            "level": 1,
+            "order": 1,
+            "id": "Dss_10",
+            "name": "Modified Evaluable Adults (MEA) Analysis Set",
+            "label": "Modified Evaluable Adults (MEA) Analysis Set",
+            "condition": {
+                "dataset": "ADSL",
+                "variable": "MEAFL",
+                "comparator": "EQ",
+                "value": [
+                    "Y"
+                ]
+            },
+            "description": ""
+        },
+        {
+            "level": 1,
+            "order": 1,
+            "id": "Dss_11",
+            "name": "Part B Evaluable Analysis Set",
+            "label": "Part B Evaluable Analysis Set",
+            "condition": {
+                "dataset": "ADSL",
+                "variable": "BEVLFL",
+                "comparator": "EQ",
+                "value": [
+                    "Y"
+                ]
+            },
+            "description": ""
+        },
+        {
+            "level": 1,
+            "order": 1,
+            "id": "Dss_12",
+            "name": "Part B MEP Analysis Set",
+            "label": "Part B MEP Analysis Set",
+            "condition": {
+                "dataset": "ADSL",
+                "variable": "BMEPFFL",
+                "comparator": "EQ",
+                "value": [
+                    "Y"
+                ]
+            },
+            "description": ""
+        }
+    ],
+    "methods": [
+        {
+            "name": "Count by group for a categorical variable",
+            "description": "Count across groups for a categorical variable, based on subject occurrence",
+            "label": "Grouped count for categorical variable",
+            "id": "Mth_01",
+            "operations": [
+                {
+                    "name": "Count of subjects",
+                    "label": "n",
+                    "id": "Mth_01_01_n",
+                    "order": 1,
+                    "resultPattern": "(N=)"
+                }
+            ],
+            "codeTemplate": {
+                "context": "R (siera)",
+                "code": "in_data = df2_analysisidhere |>\n    dplyr::select(anavarhere, groupvar1here) |>\n    unique()\ndf3_analysisidhere <-\n  cards::ard_categorical(\n    data = in_data\n    bystmthere\n  ) |>\ndplyr::filter(stat_name == 'n') |>\n dplyr::mutate(operationid = 'Mth_01_01_n')",
+                "parameters": [
+                    {
+                        "name": "anavarhere",
+                        "valueSource": "ana_var",
+                        "description": "Analysis variable to be summarised"
+                    },
+                    {
+                        "name": "groupvar1here",
+                        "valueSource": "AG_var1",
+                        "description": "Analysis grouping variable from Group1"
+                    },
+                    {
+                        "name": "bystmthere",
+                        "valueSource": "by_vars",
+                        "description": "Combined statement for \"variables\" and \"by\" statement in ard_categorical"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Summary by group of a categorical variable",
+            "id": "Mth_02",
+            "operations": [
+                {
+                    "id": "Mth_02_01_n",
+                    "order": 1,
+                    "name": "n",
+                    "label": "n",
+                    "resultPattern": "XX"
+                },
+                {
+                    "id": "Mth_02_02_%",
+                    "order": 2,
+                    "name": "%",
+                    "label": "%",
+                    "resultPattern": "(XX.XX)",
+                    "referencedOperationRelationships": [
+                        {
+                            "id": "Mth_02_02_%_NUM",
+                            "referencedOperationRole": {
+                                "controlledTerm": "NUMERATOR"
+                            },
+                            "operationId": "Mth_02_01_n",
+                            "description": "The count operation whose result provides the numerator for calculation of the percentage. The referenced analysis should be the analysis that contains this percent operation."
+                        },
+                        {
+                            "id": "Mth_02_02_%_DEN",
+                            "referencedOperationRole": {
+                                "controlledTerm": "DENOMINATOR"
+                            },
+                            "operationId": "Mth_01_01_n",
+                            "description": "The count operation whose result provides the denominator for calculation of the percentage. The referenced analysis should have the same analysis set and subject grouping(s) as the analysis containing this percent operation."
+                        }
+                    ]
+                }
+            ],
+            "label": "Grouped summary of categorical variable",
+            "description": "Descriptive summary statistics across groups for a categorical variable, based on subject occurrence",
+            "codeTemplate": {
+                "context": "R (siera)",
+                "code": "denom_dataset = df2_denomanaidhere |>\n  dplyr::select(denom_anagroupvarshere)\n\nin_data = df2_analysisidhere |>\n    dplyr::distinct(distinctlisthere) |>\n    dplyr::mutate(dummy = 'dummyvar')\n\ndataDriven = isdatadrivenhere\nif(dataDriven == TRUE){\ndf3_analysisidhere <-\n  cards::ard_categorical(\n    data = in_data,\n    strata = c(byvarshere),\n    variables = 'dummy',\n    denominator = denom_dataset\n  ) } else {\ndf3_analysisidhere <-\n cards::ard_categorical(\n    data = in_data,\n    by = c(byvarshere),\n    variables = 'dummy',\n    denominator = denom_dataset\n  ) }\ndf3_analysisidhere <- df3_analysisidhere|>\ndplyr::filter(stat_name %in% c('n', 'p')) |>\ndplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth_02_01_n',\n                                      stat_name == 'p' ~ 'Mth_02_02_%'))",
+                "parameters": [
+                    {
+                        "name": "distinctlisthere",
+                        "valueSource": "distinct_list",
+                        "description": "list of variables by which to apply the \"distinct\" function from dplyr"
+                    },
+                    {
+                        "name": "denomanaidhere",
+                        "valueSource": "DEN_analysisid",
+                        "description": "Analysis ID for Denominator Analysis"
+                    },
+                    {
+                        "name": "denom_anagroupvarshere",
+                        "valueSource": "AG_denom_var1",
+                        "description": "Analysis Grouping variables for denominator dataset"
+                    },
+                    {
+                        "name": "isdatadrivenhere",
+                        "valueSource": "AG_max_dataDriven",
+                        "description": "dataDriven boolean value for highest Analysisgrouping factor"
+                    },
+                    {
+                        "description": "variables to be used in \"by\" statement",
+                        "name": "byvarshere",
+                        "valueSource": "by_listc"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Summary by group of a continuous variable",
+            "id": "Mth_03",
+            "operations": [
+                {
+                    "id": "Mth_03_01_n",
+                    "order": 1,
+                    "name": "n",
+                    "label": "n",
+                    "resultPattern": "XX"
+                },
+                {
+                    "id": "Mth_03_02_Mean",
+                    "order": 2,
+                    "name": "Mean",
+                    "label": "Mean",
+                    "resultPattern": "XX.X"
+                },
+                {
+                    "id": "Mth_03_03_SD",
+                    "order": 3,
+                    "name": "SD",
+                    "label": "SD",
+                    "resultPattern": "(XX.XX)"
+                },
+                {
+                    "id": "Mth_03_04_Median",
+                    "order": 4,
+                    "name": "Median",
+                    "label": "Median",
+                    "resultPattern": "XX.X"
+                },
+                {
+                    "id": "Mth_03_05_Q1",
+                    "order": 5,
+                    "name": "Q1",
+                    "label": "Q1",
+                    "resultPattern": "XX.X"
+                },
+                {
+                    "id": "Mth_03_06_Q3",
+                    "order": 6,
+                    "name": "Q3",
+                    "label": "Q3",
+                    "resultPattern": "XX.X"
+                },
+                {
+                    "id": "Mth_03_07_Min",
+                    "order": 7,
+                    "name": "Min",
+                    "label": "Min",
+                    "resultPattern": "XX.X"
+                },
+                {
+                    "id": "Mth_03_08_Max",
+                    "order": 8,
+                    "name": "Max",
+                    "label": "Max",
+                    "resultPattern": "XX.X"
+                }
+            ],
+            "label": "Grouped summary of continuous variable",
+            "description": "Descriptive summary statistics across groups for a continuous variable",
+            "codeTemplate": {
+                "context": "R (siera)",
+                "code": "df3_analysisidhere <-\n  cards::ard_continuous(\n    data = df2_analysisidhere,\n    by = c(byvarshere),\n    variables = anavarhere\n  ) |>\ndplyr::mutate(operationid = dplyr::case_when(stat_name == 'N' ~ 'Mth_03_01_n',\n                               stat_name == 'mean' ~ 'Mth_03_02_Mean',\n                               stat_name == 'sd' ~ 'Mth_03_03_SD',\n                               stat_name == 'median' ~ 'Mth_03_04_Median',\n                               stat_name == 'p25' ~ 'Mth_03_05_Q1',\n                               stat_name == 'p75' ~ 'Mth_03_06_Q3',\n                               stat_name == 'min' ~ 'Mth_03_07_Min',\n                               stat_name == 'max' ~ 'Mth_03_08_Max'))",
+                "parameters": [
+                    {
+                        "name": "byvarshere",
+                        "valueSource": "by_listc",
+                        "description": "string for \"by\" parameter for the ard_continuous function"
+                    },
+                    {
+                        "name": "anavarhere",
+                        "valueSource": "ana_var",
+                        "description": "Analysis variable to be summarised"
+                    }
+                ]
+            }
+        }
+    ],
+    "analyses": [
+        {
+            "name": "Summary of Subjects by Treatment",
+            "id": "An_01",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_01",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_01"
+            ],
+            "dataset": "ADZSDER",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": "",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_01_Trt01An"
+                }
+            ],
+            "results": [
+                {
+                    "resultGroups": [
+                        {
+                            "groupingId": "AnlsGrouping_01_Trt01An",
+                            "groupId": "AnlsGrouping_01_Trt01An_01"
+                        }
+                    ],
+                    "rawValue": "",
+                    "formattedValue": "(N=)"
+                },
+                {
+                    "resultGroups": [
+                        {
+                            "groupingId": "AnlsGrouping_01_Trt01An",
+                            "groupId": "AnlsGrouping_01_Trt01An_02"
+                        }
+                    ],
+                    "rawValue": "",
+                    "formattedValue": "(N=)"
+                },
+                {
+                    "resultGroups": [
+                        {
+                            "groupingId": "AnlsGrouping_01_Trt01An",
+                            "groupId": "AnlsGrouping_01_Trt01An_03"
+                        }
+                    ],
+                    "rawValue": "",
+                    "formattedValue": "(N=)"
+                },
+                {
+                    "resultGroups": [
+                        {
+                            "groupingId": "AnlsGrouping_01_Trt01An",
+                            "groupId": "AnlsGrouping_01_Trt01An_04"
+                        }
+                    ],
+                    "rawValue": "",
+                    "formattedValue": "(N=)"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Baseline period (Average per 28 days)",
+            "id": "An_02",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_03",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_01"
+            ],
+            "dataset": "ADZSDER",
+            "variable": "AVAL",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": "Dss_01",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_01_Trt01An"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Treatment period (Weeks 1 to 12) (Average per 28 days)",
+            "id": "An_03",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_03",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_01"
+            ],
+            "dataset": "ADZSDER",
+            "variable": "AVAL",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": "Dss_02",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_01_Trt01An"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Treatment period (Weeks 13 to 24) (Average per 28 days)",
+            "id": "An_04",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_03",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_01"
+            ],
+            "dataset": "ADZSDER",
+            "variable": "AVAL",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": "Dss_03",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_01_Trt01An"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Treatment period (Weeks 25 to 36) (Average per 28 days)",
+            "id": "An_05",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_03",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_01"
+            ],
+            "dataset": "ADZSDER",
+            "variable": "AVAL",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": "Dss_04",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_01_Trt01An"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Treatment period (Weeks 37 to 48) (Average per 28 days)",
+            "id": "An_06",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_03",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_01"
+            ],
+            "dataset": "ADZSDER",
+            "variable": "AVAL",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": "Dss_05",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_01_Trt01An"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Treatment period (Average per 28 days)",
+            "id": "An_07",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_03",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_01"
+            ],
+            "dataset": "ADZSDER",
+            "variable": "AVAL",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": "Dss_06",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_01_Trt01An"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Percentage change from baseline period - Treatment period",
+            "id": "An_08",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_03",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_01"
+            ],
+            "dataset": "ADZSDER",
+            "variable": "AVAL",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": "Dss_07",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_01_Trt01An"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment",
+            "id": "An_09",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_01",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_02"
+            ],
+            "dataset": "ADSL",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": "",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_02_Trt01An"
+                }
+            ],
+            "results": [
+                {
+                    "resultGroups": [
+                        {
+                            "groupingId": "AnlsGrouping_02_Trt01An",
+                            "groupId": "AnlsGrouping_02_Trt01An_01"
+                        }
+                    ],
+                    "rawValue": "",
+                    "formattedValue": "(N=)"
+                },
+                {
+                    "resultGroups": [
+                        {
+                            "groupingId": "AnlsGrouping_02_Trt01An",
+                            "groupId": "AnlsGrouping_02_Trt01An_02"
+                        }
+                    ],
+                    "rawValue": "",
+                    "formattedValue": "(N=)"
+                },
+                {
+                    "resultGroups": [
+                        {
+                            "groupingId": "AnlsGrouping_02_Trt01An",
+                            "groupId": "AnlsGrouping_02_Trt01An_03"
+                        }
+                    ],
+                    "rawValue": "",
+                    "formattedValue": "(N=)"
+                },
+                {
+                    "resultGroups": [
+                        {
+                            "groupingId": "AnlsGrouping_02_Trt01An",
+                            "groupId": "AnlsGrouping_02_Trt01An_04"
+                        }
+                    ],
+                    "rawValue": "",
+                    "formattedValue": "(N=)"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Overall Age (years)",
+            "id": "An_10",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_03",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_02"
+            ],
+            "dataset": "ADSL",
+            "variable": "AGE",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": null,
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_02_Trt01An"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Age group, n (%)",
+            "id": "An_11",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_02",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_02"
+            ],
+            "dataset": "ADSL",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": null,
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_02_Trt01An"
+                },
+                {
+                    "order": 2,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_03_Agegr1"
+                }
+            ],
+            "referencedAnalysisOperations": [
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_NUM",
+                    "analysisId": "An_11"
+                },
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_DEN",
+                    "analysisId": "An_09"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Race, n (%)",
+            "id": "An_12",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_02",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_02"
+            ],
+            "dataset": "ADSL",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": null,
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_02_Trt01An"
+                },
+                {
+                    "order": 2,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_04_Race"
+                }
+            ],
+            "referencedAnalysisOperations": [
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_NUM",
+                    "analysisId": "An_12"
+                },
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_DEN",
+                    "analysisId": "An_09"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Sex, n (%)",
+            "id": "An_13",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_02",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_02"
+            ],
+            "dataset": "ADSL",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": null,
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_02_Trt01An"
+                },
+                {
+                    "order": 2,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_05_Sex"
+                }
+            ],
+            "referencedAnalysisOperations": [
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_NUM",
+                    "analysisId": "An_13"
+                },
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_DEN",
+                    "analysisId": "An_09"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Height at Baseline (cm)",
+            "id": "An_14",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_03",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_02"
+            ],
+            "dataset": "ADSL",
+            "variable": "HEIGHTBL",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": null,
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_02_Trt01An"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Weight at Baseline (kg)",
+            "id": "An_15",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_03",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_02"
+            ],
+            "dataset": "ADSL",
+            "variable": "WEIGHTBL",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": null,
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_02_Trt01An"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and BMI at Baseline (kg/m^2)",
+            "id": "An_16",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_03",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_02"
+            ],
+            "dataset": "ADSL",
+            "variable": "BMIBL",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": null,
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_02_Trt01An"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and SCN1A Genetic Testing Result",
+            "id": "An_17",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_02",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_02"
+            ],
+            "dataset": "ADSL",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": null,
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_02_Trt01An"
+                },
+                {
+                    "order": 2,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_06_Dhscniar"
+                }
+            ],
+            "referencedAnalysisOperations": [
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_NUM",
+                    "analysisId": "An_17"
+                },
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_DEN",
+                    "analysisId": "An_09"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and TSC1 Genetic Testing Result",
+            "id": "An_18",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_02",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_02"
+            ],
+            "dataset": "ADSL",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": null,
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_02_Trt01An"
+                },
+                {
+                    "order": 2,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_07_Dhtsc1R"
+                }
+            ],
+            "referencedAnalysisOperations": [
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_NUM",
+                    "analysisId": "An_18"
+                },
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_DEN",
+                    "analysisId": "An_09"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and TSC2 Genetic Testing Result",
+            "id": "An_19",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_02",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_02"
+            ],
+            "dataset": "ADSL",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": null,
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_02_Trt01An"
+                },
+                {
+                    "order": 2,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_08_Dhtsc2R"
+                }
+            ],
+            "referencedAnalysisOperations": [
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_NUM",
+                    "analysisId": "An_19"
+                },
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_DEN",
+                    "analysisId": "An_09"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and CYP2C19 Phenotype Category",
+            "id": "An_20",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_02",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_02"
+            ],
+            "dataset": "ADSL",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_01",
+            "dataSubsetId": null,
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_02_Trt01An"
+                },
+                {
+                    "order": 2,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_09_Cyp2Catp"
+                }
+            ],
+            "referencedAnalysisOperations": [
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_NUM",
+                    "analysisId": "An_20"
+                },
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_DEN",
+                    "analysisId": "An_09"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment",
+            "id": "An_21",
+            "reason": {
+                "controlledTerm": ""
+            },
+            "purpose": {
+                "controlledTerm": ""
+            },
+            "methodId": "Mth_01",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_03"
+            ],
+            "dataset": "ADSL",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_03",
+            "dataSubsetId": "",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_10_Trt01An"
+                }
+            ],
+            "results": [
+                {
+                    "resultGroups": [
+                        {
+                            "groupingId": "AnlsGrouping_10_Trt01An",
+                            "groupId": "AnlsGrouping_10_Trt01An_01"
+                        }
+                    ],
+                    "rawValue": "",
+                    "formattedValue": "(N=)"
+                },
+                {
+                    "resultGroups": [
+                        {
+                            "groupingId": "AnlsGrouping_10_Trt01An",
+                            "groupId": "AnlsGrouping_10_Trt01An_02"
+                        }
+                    ],
+                    "rawValue": "",
+                    "formattedValue": "(N=)"
+                },
+                {
+                    "resultGroups": [
+                        {
+                            "groupingId": "AnlsGrouping_10_Trt01An",
+                            "groupId": "AnlsGrouping_10_Trt01An_03"
+                        }
+                    ],
+                    "rawValue": "",
+                    "formattedValue": "(N=)"
+                },
+                {
+                    "resultGroups": [
+                        {
+                            "groupingId": "AnlsGrouping_10_Trt01An",
+                            "groupId": "AnlsGrouping_10_Trt01An_04"
+                        }
+                    ],
+                    "rawValue": "",
+                    "formattedValue": "(N=)"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Evaluable Analysis Set",
+            "id": "An_22",
+            "reason": {
+                "controlledTerm": "SPECIFIED IN SAP"
+            },
+            "purpose": {
+                "controlledTerm": "Study Population"
+            },
+            "methodId": "Mth_02",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_03"
+            ],
+            "dataset": "ADSL",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_03",
+            "dataSubsetId": "Dss_08",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_10_Trt01An"
+                },
+                {
+                    "order": 2,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_11_Evlfl"
+                }
+            ],
+            "referencedAnalysisOperations": [
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_NUM",
+                    "analysisId": "An_22"
+                },
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_DEN",
+                    "analysisId": "An_21"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Modified Evaluable Pediatrics (MEP) Analysis Set",
+            "id": "An_23",
+            "reason": {
+                "controlledTerm": "SPECIFIED IN SAP"
+            },
+            "purpose": {
+                "controlledTerm": "Study Population"
+            },
+            "methodId": "Mth_02",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_03"
+            ],
+            "dataset": "ADSL",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_03",
+            "dataSubsetId": "Dss_09",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_10_Trt01An"
+                },
+                {
+                    "order": 2,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_12_Mepffl"
+                }
+            ],
+            "referencedAnalysisOperations": [
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_NUM",
+                    "analysisId": "An_23"
+                },
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_DEN",
+                    "analysisId": "An_21"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Modified Evaluable Adults (MEA) Analysis Set",
+            "id": "An_24",
+            "reason": {
+                "controlledTerm": "SPECIFIED IN SAP"
+            },
+            "purpose": {
+                "controlledTerm": "Study Population"
+            },
+            "methodId": "Mth_02",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_03"
+            ],
+            "dataset": "ADSL",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_03",
+            "dataSubsetId": "Dss_10",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_10_Trt01An"
+                },
+                {
+                    "order": 2,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_13_Meafl"
+                }
+            ],
+            "referencedAnalysisOperations": [
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_NUM",
+                    "analysisId": "An_24"
+                },
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_DEN",
+                    "analysisId": "An_21"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Part B Evaluable Analysis Set",
+            "id": "An_25",
+            "reason": {
+                "controlledTerm": "SPECIFIED IN SAP"
+            },
+            "purpose": {
+                "controlledTerm": "Study Population"
+            },
+            "methodId": "Mth_02",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_03"
+            ],
+            "dataset": "ADSL",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_03",
+            "dataSubsetId": "Dss_11",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_10_Trt01An"
+                },
+                {
+                    "order": 2,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_14_Bevlfl"
+                }
+            ],
+            "referencedAnalysisOperations": [
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_NUM",
+                    "analysisId": "An_25"
+                },
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_DEN",
+                    "analysisId": "An_21"
+                }
+            ]
+        },
+        {
+            "name": "Summary of Subjects by Treatment and Part B MEP Analysis Set",
+            "id": "An_26",
+            "reason": {
+                "controlledTerm": "SPECIFIED IN SAP"
+            },
+            "purpose": {
+                "controlledTerm": "Study Population"
+            },
+            "methodId": "Mth_02",
+            "version": 1,
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_03"
+            ],
+            "dataset": "ADSL",
+            "variable": "USUBJID",
+            "analysisSetId": "AnalysisSet_03",
+            "dataSubsetId": "Dss_12",
+            "orderedGroupings": [
+                {
+                    "order": 1,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_10_Trt01An"
+                },
+                {
+                    "order": 2,
+                    "resultsByGroup": true,
+                    "groupingId": "AnlsGrouping_15_Bmepffl"
+                }
+            ],
+            "referencedAnalysisOperations": [
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_NUM",
+                    "analysisId": "An_26"
+                },
+                {
+                    "referencedOperationRelationshipId": "Mth_02_02_%_DEN",
+                    "analysisId": "An_21"
+                }
+            ]
+        }
+    ],
+    "globalDisplaySections": [
+        {
+            "sectionType": "Title",
+            "subSections": [
+                {
+                    "id": "GlobalDisp_Header_01",
+                    "text": "GWEP19186"
+                }
+            ],
+            "shellType": "Table"
+        },
+        {
+            "sectionType": "Abbreviation",
+            "subSections": [
+                {
+                    "id": "GlobalDisp_Abbreviation_01",
+                    "text": "LGS= Lennox-Gastaut syndrome; DS= Dravet syndrome; TSC= Tuberous sclerosis complex."
+                }
+            ],
+            "shellType": "Table"
+        },
+        {
+            "sectionType": "Footnote",
+            "subSections": [
+                {
+                    "id": "GlobalDisp_Footnote_01",
+                    "text": "Evaluable Analysis Set includes all participants >= 1 to <= 65 years of age who are enrolled in the study and received at least 1 dose of study intervention."
+                },
+                {
+                    "id": "GlobalDisp_Footnote_02",
+                    "text": "MEP Analysis Set includes all participants >= 1 to <= 18 years of age who are enrolled in the study and received at least 1 dose of study intervention."
+                },
+                {
+                    "id": "GlobalDisp_Footnote_03",
+                    "text": "MEA Analysis Set includes all participants >= 19 years of age or older who are enrolled in the study and received at least 1 dose of study intervention. Part B Evaluable Analysis Set includes all participants >= 1 to <= 65 years of age who are enrolled in the study and received at least 1 dose of study intervention in Part B."
+                },
+                {
+                    "id": "GlobalDisp_Footnote_04",
+                    "text": "Part B MEP Analysis Set includes all participants >= 1 to <= 18 years of age who are enrolled in the study and received at least 1 dose of study   intervention in Part B."
+                },
+                {
+                    "id": "GlobalDisp_Footnote_05",
+                    "text": "Part B MEA Analysis Set includes all participants >= 19 years of age or older who are enrolled in the study and received at least 1 dose of study intervention in Part B."
+                },
+                {
+                    "id": "GlobalDisp_Footnote_06",
+                    "text": "One participant was a screen failure and did not have indication collected."
+                }
+            ],
+            "shellType": "Table"
+        }
+    ],
+    "outputs": [
+        {
+            "name": "Summary of Indication-associated Seizure Frequency",
+            "id": "Out_01",
+            "version": 1,
+            "fileSpecifications": [],
+            "displays": [
+                {
+                    "order": 1,
+                    "display": {
+                        "name": "Summary of Indication-associated Seizure Frequency",
+                        "id": "Disp_01",
+                        "version": 1,
+                        "displayTitle": "Summary of Indication-associated Seizure Frequency",
+                        "displaySections": [
+                            {
+                                "sectionType": "Title",
+                                "orderedSubSections": [
+                                    {
+                                        "order": 1,
+                                        "subSection": {
+                                            "id": "Disp_01_Title_01",
+                                            "text": "Table 9.2.1.1.1"
+                                        }
+                                    },
+                                    {
+                                        "order": 2,
+                                        "subSection": {
+                                            "id": "Disp_01_Title_02",
+                                            "text": "Summary of Indication-associated Seizure Frequency"
+                                        }
+                                    },
+                                    {
+                                        "order": 3,
+                                        "subSection": {
+                                            "id": "Disp_01_Title_03",
+                                            "text": "Part B Flag"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "sectionType": "Abbreviations",
+                                "orderedSubSections": [
+                                    {
+                                        "order": 1,
+                                        "subSection": {
+                                            "id": "Disp_01_Abbreviations_01",
+                                            "text": "LGS= Lennox-Gastaut syndrome; DS= Dravet syndrome; TSC= Tuberous sclerosis complex."
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "sectionType": "Footnote",
+                                "orderedSubSections": [
+                                    {
+                                        "order": 1,
+                                        "subSection": {
+                                            "id": "Disp_01_Footnote_01",
+                                            "text": "Evaluable Analysis Set includes all participants >= 1 to <= 65 years of age who are enrolled in the study and received at least 1 dose of study intervention."
+                                        }
+                                    },
+                                    {
+                                        "order": 2,
+                                        "subSection": {
+                                            "id": "Disp_01_Footnote_02",
+                                            "text": "MEP Analysis Set includes all participants >= 1 to <= 18 years of age who are enrolled in the study and received at least 1 dose of study intervention."
+                                        }
+                                    },
+                                    {
+                                        "order": 3,
+                                        "subSection": {
+                                            "id": "Disp_01_Footnote_03",
+                                            "text": "MEA Analysis Set includes all participants >= 19 years of age or older who are enrolled in the study and received at least 1 dose of study intervention. Part B Evaluable Analysis Set includes all participants >= 1 to <= 65 years of age who are enrolled in the study and received at least 1 dose of study intervention in Part B."
+                                        }
+                                    },
+                                    {
+                                        "order": 4,
+                                        "subSection": {
+                                            "id": "Disp_01_Footnote_04",
+                                            "text": "Part B MEP Analysis Set includes all participants >= 1 to <= 18 years of age who are enrolled in the study and received at least 1 dose of study   intervention in Part B."
+                                        }
+                                    },
+                                    {
+                                        "order": 5,
+                                        "subSection": {
+                                            "id": "Disp_01_Footnote_05",
+                                            "text": "Part B MEA Analysis Set includes all participants >= 19 years of age or older who are enrolled in the study and received at least 1 dose of study intervention in Part B."
+                                        }
+                                    },
+                                    {
+                                        "order": 6,
+                                        "subSection": {
+                                            "id": "Disp_01_Footnote_06",
+                                            "text": "One participant was a screen failure and did not have indication collected."
+                                        }
+                                    },
+                                    {
+                                        "order": 7,
+                                        "subSection": {
+                                            "id": "Disp_01_Footnote_07",
+                                            "text": "Abbreviations: MEP= Modified Evaluable Pediatrics; LGS= Lennox Gastaut syndrome; DS= Dravet syndrome; TSC= Tuberous sclerosis complex.\nLGS-associated seizures include: drop seizure, which is defined as an attack or spell (atonic, tonic, or tonic-clonic) involving the entire body, trunk, or head that led or could have led to a participant’s fall, injury, slumping in a chair, or hitting their head on a surface. DS-associated seizures include: convulsive seizures, which are defined as tonic clonic, tonic, clonic, or atonic. TSC-associated seizures include: focal motor seizures without impairment of consciousness or awareness; focal seizures with impairment of consciousness or awareness; focal seizures evolving to bilateral generalized convulsive seizures and generalized seizures (tonic clonic, tonic, clonic, or atonic) that are countable.\nBaseline period includes all data from date of Part A Visit 2 to prior to Part A Day 1. Treatment period is defined as Part B Day 1 to earliest of Part B End of Treatment or 26 week cut-off."
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "sectionType": "Rowlabel Header",
+                                "orderedSubSections": [
+                                    {
+                                        "order": 1,
+                                        "subSection": {
+                                            "id": "Disp_01_RowlabelHeader_01",
+                                            "text": "Characteristics"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_01"
+            ],
+            "documentRefs": [],
+            "programmingCode": {}
+        },
+        {
+            "name": "Summary of Demographic Data",
+            "id": "Out_02",
+            "version": 1,
+            "fileSpecifications": [],
+            "displays": [
+                {
+                    "order": 1,
+                    "display": {
+                        "name": "Summary of Demographic Data",
+                        "id": "Disp_02",
+                        "version": 1,
+                        "displayTitle": "Summary of Demographic Data",
+                        "displaySections": [
+                            {
+                                "sectionType": "Title",
+                                "orderedSubSections": [
+                                    {
+                                        "order": 1,
+                                        "subSection": {
+                                            "id": "Disp_02_Title_01",
+                                            "text": "Table 9.1.3.1.1"
+                                        }
+                                    },
+                                    {
+                                        "order": 2,
+                                        "subSection": {
+                                            "id": "Disp_02_Title_02",
+                                            "text": "Summary of Demographic Data"
+                                        }
+                                    },
+                                    {
+                                        "order": 3,
+                                        "subSection": {
+                                            "id": "Disp_02_Title_03",
+                                            "text": "Part B Flag"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "sectionType": "Abbreviations",
+                                "orderedSubSections": [
+                                    {
+                                        "order": 1,
+                                        "subSection": {
+                                            "id": "Disp_02_Abbreviations_01",
+                                            "text": "LGS= Lennox-Gastaut syndrome; DS= Dravet syndrome; TSC= Tuberous sclerosis complex."
+                                        }
+                                    },
+                                    {
+                                        "order": 2,
+                                        "subSection": {
+                                            "id": "Disp_02_Abbreviations_02",
+                                            "text": "AMEP= Modified Evaluable Pediatrics; LGS= lennox gastaut syndrome; DS= dravet syndrome; TSC= tuberous sclerosis complex; SD = standard deviation; Min = minimum; Max = maximum; SCN1A = sodium channel alpha subunit 1; TSC1 = tuberous sclerosis complex mutation 1; TSC2 = tuberous sclerosis complex mutation 2."
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "sectionType": "Footnote",
+                                "orderedSubSections": [
+                                    {
+                                        "order": 1,
+                                        "subSection": {
+                                            "id": "Disp_02_Footnote_01",
+                                            "text": "Evaluable Analysis Set includes all participants >= 1 to <= 65 years of age who are enrolled in the study and received at least 1 dose of study intervention."
+                                        }
+                                    },
+                                    {
+                                        "order": 2,
+                                        "subSection": {
+                                            "id": "Disp_02_Footnote_02",
+                                            "text": "MEP Analysis Set includes all participants >= 1 to <= 18 years of age who are enrolled in the study and received at least 1 dose of study intervention."
+                                        }
+                                    },
+                                    {
+                                        "order": 3,
+                                        "subSection": {
+                                            "id": "Disp_02_Footnote_03",
+                                            "text": "MEA Analysis Set includes all participants >= 19 years of age or older who are enrolled in the study and received at least 1 dose of study intervention. Part B Evaluable Analysis Set includes all participants >= 1 to <= 65 years of age who are enrolled in the study and received at least 1 dose of study intervention in Part B."
+                                        }
+                                    },
+                                    {
+                                        "order": 4,
+                                        "subSection": {
+                                            "id": "Disp_02_Footnote_04",
+                                            "text": "Part B MEP Analysis Set includes all participants >= 1 to <= 18 years of age who are enrolled in the study and received at least 1 dose of study   intervention in Part B."
+                                        }
+                                    },
+                                    {
+                                        "order": 5,
+                                        "subSection": {
+                                            "id": "Disp_02_Footnote_05",
+                                            "text": "Part B MEA Analysis Set includes all participants >= 19 years of age or older who are enrolled in the study and received at least 1 dose of study intervention in Part B."
+                                        }
+                                    },
+                                    {
+                                        "order": 6,
+                                        "subSection": {
+                                            "id": "Disp_02_Footnote_06",
+                                            "text": "One participant was a screen failure and did not have indication collected."
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "sectionType": "Rowlabel Header",
+                                "orderedSubSections": [
+                                    {
+                                        "order": 1,
+                                        "subSection": {
+                                            "id": "Disp_02_RowlabelHeader_01",
+                                            "text": "Characteristics"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_02"
+            ],
+            "documentRefs": [],
+            "programmingCode": {}
+        },
+        {
+            "name": "Summary of Analysis Populations",
+            "id": "Out_03",
+            "version": 1,
+            "fileSpecifications": [],
+            "displays": [
+                {
+                    "order": 1,
+                    "display": {
+                        "name": "Summary of Analysis Populations",
+                        "id": "Disp_03",
+                        "version": 1,
+                        "displayTitle": "Summary of Analysis Populations",
+                        "displaySections": [
+                            {
+                                "sectionType": "Title",
+                                "orderedSubSections": [
+                                    {
+                                        "order": 1,
+                                        "subSection": {
+                                            "id": "Disp_03_Title_01",
+                                            "text": "Table 9.1.2.2"
+                                        }
+                                    },
+                                    {
+                                        "order": 2,
+                                        "subSection": {
+                                            "id": "Disp_03_Title_02",
+                                            "text": "Summary of Analysis Populations"
+                                        }
+                                    },
+                                    {
+                                        "order": 3,
+                                        "subSection": {
+                                            "id": "Disp_03_Title_03",
+                                            "text": "All Subjects"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "sectionType": "Abbreviations",
+                                "orderedSubSections": [
+                                    {
+                                        "order": 1,
+                                        "subSection": {
+                                            "id": "Disp_03_Abbreviations_01",
+                                            "text": "LGS= Lennox-Gastaut syndrome; DS= Dravet syndrome; TSC= Tuberous sclerosis complex."
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "sectionType": "Footnote",
+                                "orderedSubSections": [
+                                    {
+                                        "order": 1,
+                                        "subSection": {
+                                            "id": "Disp_03_Footnote_01",
+                                            "text": "Evaluable Analysis Set includes all participants >= 1 to <= 65 years of age who are enrolled in the study and received at least 1 dose of study intervention."
+                                        }
+                                    },
+                                    {
+                                        "order": 2,
+                                        "subSection": {
+                                            "id": "Disp_03_Footnote_02",
+                                            "text": "MEP Analysis Set includes all participants >= 1 to <= 18 years of age who are enrolled in the study and received at least 1 dose of study intervention."
+                                        }
+                                    },
+                                    {
+                                        "order": 3,
+                                        "subSection": {
+                                            "id": "Disp_03_Footnote_03",
+                                            "text": "MEA Analysis Set includes all participants >= 19 years of age or older who are enrolled in the study and received at least 1 dose of study intervention. Part B Evaluable Analysis Set includes all participants >= 1 to <= 65 years of age who are enrolled in the study and received at least 1 dose of study intervention in Part B."
+                                        }
+                                    },
+                                    {
+                                        "order": 4,
+                                        "subSection": {
+                                            "id": "Disp_03_Footnote_04",
+                                            "text": "Part B MEP Analysis Set includes all participants >= 1 to <= 18 years of age who are enrolled in the study and received at least 1 dose of study   intervention in Part B."
+                                        }
+                                    },
+                                    {
+                                        "order": 5,
+                                        "subSection": {
+                                            "id": "Disp_03_Footnote_05",
+                                            "text": "Part B MEA Analysis Set includes all participants >= 19 years of age or older who are enrolled in the study and received at least 1 dose of study intervention in Part B."
+                                        }
+                                    },
+                                    {
+                                        "order": 6,
+                                        "subSection": {
+                                            "id": "Disp_03_Footnote_06",
+                                            "text": "One participant was a screen failure and did not have indication collected."
+                                        }
+                                    },
+                                    {
+                                        "order": 7,
+                                        "subSection": {
+                                            "id": "Disp_03_Footnote_07",
+                                            "text": "NOTE: N in column headers represents number of subjects entered in study (i.e., signed informed consent). The ITT population includes all subjects randomized. The Safety population includes all randomized subjects known to have taken at least one dose of randomized study drug. The Full Analysis Set population includes all subjects in the safety population who also have at least one post-baseline ADAS-Cog and CIBIC+assessment."
+                                        }
+                                    },
+                                    {
+                                        "order": 8,
+                                        "subSection": {
+                                            "id": "Disp_03_Footnote_08",
+                                            "text": "Source: adxx; Program name; Program run date/time"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "sectionType": "Rowlabel Header",
+                                "orderedSubSections": [
+                                    {
+                                        "order": 1,
+                                        "subSection": {
+                                            "id": "Disp_03_RowlabelHeader_01",
+                                            "text": "Total Number, n (%)"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "categoryIds": [
+                "ANSET_01",
+                "ANSET_01_ANINT_03"
+            ],
+            "documentRefs": [],
+            "programmingCode": {}
+        }
+    ],
+    "@type": "ReportingEvent"
+}

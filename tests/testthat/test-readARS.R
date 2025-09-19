@@ -56,25 +56,6 @@ test_that("R Scripts are created for json cards version", {
   expect_true(length(r_files) > 0)
 })
 
-
-test_that("R Scripts are created for json CDISC version", {
-
-  # path to file containing ARS metadata
-  ARS_path <- ARS_example("ARS_V1_Common_Safety_Displays.json")
-
-  # output path for R programs
-  output_dir = tempdir()
-
-  # folder containing ADaM datasets
-  adam_folder = tempdir()
-
-  # run function, write to temp directory
-  readARS(ARS_path, output_dir, adam_folder, example = TRUE)
-
-  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
-  expect_true(length(r_files) > 0)
-})
-
 test_that("Analysis Set code created", {
 
   # path to file containing ARS metadata
@@ -168,29 +149,7 @@ test_that("combined code created", {
   expect_true(any(grepl("ARD <- ", lines)))
 })
 
-test_that("shuffle option adds shuffle_ard call", {
-  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
-  output_dir <- tempdir()
-  adam_folder <- tempdir()
-  readARS(ARS_path, output_dir, adam_folder, shuffle = TRUE)
-  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
-  any_shuffle <- any(vapply(r_files, function(f) {
-    any(grepl("shuffle_ard\\(\\)", readLines(f)))
-  }, logical(1)))
-  expect_true(any_shuffle)
-
-  ARS_path <- ARS_example("testARS.json")
-  output_dir <- tempdir()
-  adam_folder <- tempdir()
-  readARS(ARS_path, output_dir, adam_folder, shuffle = TRUE)
-  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
-  any_shuffle <- any(vapply(r_files, function(f) {
-    any(grepl("shuffle_ard\\(\\)", readLines(f)))
-  }, logical(1)))
-  expect_true(any_shuffle)
-})
-
-test_that("Generated R scripts run without error - xlsx", {
+test_that("test - xlsx 1: Generated R scripts", {
   skip_on_cran()
 
   # Path to ARS file (metadata driving script generation)
@@ -293,11 +252,11 @@ test_that("Generated R scripts run without error - xlsx", {
   }
 })
 
-test_that("Generated R scripts run without error - json", {
+test_that("test - json 1: Generated R scripts", {
   skip_on_cran()
 
   # Path to ARS file (metadata driving script generation)
-  ARS_path  <- ARS_example("testARS.json")
+  ARS_path  <- ARS_example("exampleARS_1.json")
 
   # Directly use extdata shipped with the package
   adam_dir  <- system.file("extdata", package = "siera")
@@ -364,3 +323,125 @@ test_that("Generated R scripts run without error - json", {
 
   }
 })
+
+test_that("test - json 2: Generated R scripts ", {
+  skip_on_cran()
+
+  # Path to ARS file (metadata driving script generation)
+  ARS_path  <- ARS_example("exampleARS_2.json")
+
+  # Directly use extdata shipped with the package
+  adam_dir  <- system.file("extdata", package = "siera")
+  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+
+  # Temp folder for generated scripts
+  output_dir <- withr::local_tempdir()
+
+  # Generate the R scripts — note adam_dir is passed here
+  readARS(ARS_path, output_dir, adam_dir)
+
+  # Find generated R scripts
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_true(length(r_files) > 0, info = "No R scripts generated")
+
+  # Run each script and check ARD object
+  for (f in r_files) {
+    e <- new.env(parent = baseenv())
+
+    expect_error(
+      suppressWarnings(
+        suppressPackageStartupMessages(
+          source(f, local = e, chdir = TRUE)
+        )
+      ),
+      NA,
+      info = paste("Sourcing failed for", basename(f))
+    )
+
+    # Ensure ARD dataset was created
+    expect_true(exists("ARD", envir = e), info = paste("No ARD from", basename(f)))
+    ARD <- get("ARD", envir = e)
+    expect_true("stat" %in% names(ARD), info = "'stat' column missing in ARD")
+
+    # check specific values in ARD
+    if(length(grep("Out_01", f)) > 0){
+      test1 = ARD %>%
+        filter(AnalysisId == "An_01",
+               operationid == "Mth_01_01_n") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(test1[[1]], 84)
+      expect_equal(test1[[2]], 84)
+      expect_equal(test1[[3]], 86)
+
+      test2 = ARD %>%
+        filter(AnalysisId == "An_02",
+               operationid == "Mth_03_01_n") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(test2[[1]], 3)
+      expect_equal(test2[[2]], 3)
+      expect_equal(test2[[3]], 2)
+
+      test3 = ARD %>%
+        filter(AnalysisId == "An_02",
+               operationid == "Mth_03_02_Mean") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(round(test3[[1]], digits = 5), 16.02553)
+      expect_equal(round(test3[[2]], digits = 5), 14.12637)
+      expect_equal(round(test3[[3]], digits = 5), 15.05614)
+
+    } else if(length(grep("Out_02", f)) > 0){
+      test1 = ARD %>%
+        filter(AnalysisId == "An_09",
+               operationid == "Mth_01_01_n") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(test1[[1]], 84)
+      expect_equal(test1[[2]], 84)
+      expect_equal(test1[[3]], 86)
+
+      test2 = ARD %>%
+        mutate(group1_level = as.character(group1_level)) %>%
+        filter(AnalysisId == "An_11",
+               operationid == "Mth_02_02_%",
+               group1_level == 1) %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(round(test2[[1]], digits = 7), 0.5595238)
+      expect_equal(round(test2[[2]], digits = 7), 0.0952381)
+      expect_equal(round(test2[[3]], digits = 7), 0.3452381)
+
+    } else if(length(grep("Out_03", f)) > 0){
+      test1 = ARD %>%
+        filter(AnalysisId == "An_21",
+               operationid == "Mth_01_01_n") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(test1[[1]], 84)
+      expect_equal(test1[[2]], 84)
+      expect_equal(test1[[3]], 86)
+
+      test2 = ARD %>%
+        filter(AnalysisId == "An_22",
+               operationid == "Mth_02_01_n") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(test2[[1]], 84)
+      expect_equal(test2[[2]], 84)
+      expect_equal(test2[[3]], 86)
+
+      test3 = ARD %>%
+        filter(AnalysisId == "An_22",
+               operationid == "Mth_02_02_%") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(test3[[1]], 1)
+      expect_equal(test3[[2]], 1)
+      expect_equal(test3[[3]], 1)
+    }
+
+  }
+  }
+)

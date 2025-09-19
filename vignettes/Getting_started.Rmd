@@ -18,19 +18,18 @@ knitr::opts_chunk$set(
 library(siera)
 ```
 
-We will use two examples to get started:
+We will use the following example to get started:
 
-1. Using the original *CDISC Common Safety Displays* ARS metadata (JSON format, with example operations handled in the `readARS` function)
-2. Using a modified *CDISC Common Safety Displays* ARS metadata (xlsx format, with example dynamic AnalysisMethodCodeTemplate R code handling operations, based on functions from the `cards` package)
+A modified *CDISC Common Safety Displays* ARS metadata (xlsx format, with example dynamic AnalysisMethodCodeTemplate R code handling operations, based on functions from the `cards` package)
 
-In order to facilitate the examples, _siera_ includes several example files, which we use throughout the documentation.  These include a JSON ARS file, as well as some csv ADaMs (ADSL and ADAE) which can be run with the R scripts produced by readARS function. Use the helper ARS_example() with no arguments to list them or call it with an example filename to get the path.
+In order to facilitate the example, _siera_ includes several example files, which we use throughout the documentation.  These include several ARS files (json and xlsx), as well as csv-format ADaMs which can be run with the R scripts produced by readARS function. Use the helper ARS_example() with no arguments to list them or call it with an example filename to get the path.
 
 ```{r example files}
 # To see a list of example files:
 ARS_example()
 
 # A temporary path to a specific file:
-ARS_example("ARS_V1_Common_Safety_Displays.json")
+ARS_example("exampleARS_1.json")
 ```
 
 
@@ -40,7 +39,7 @@ To get started with an example of ingesting the ARS JSON metadata,we will ingest
 which will produce the ARDs. 
 ```{r example, message=FALSE}
 # Path to the the ARS JSON File. 
-json_path <- ARS_example("ARS_V1_Common_Safety_Displays.json")
+json_path <- ARS_example("exampleARS_1.json")
 
 # Path to a folder which will contain the meta-programmed R scripts (feel free to update 
 # to a more suitable path)
@@ -52,7 +51,7 @@ output_folder <- tempdir()
 ADaM_folder <- tempdir()
 
 # run the readARS function with these 3 parameters.  This creates R scripts (1 for each output in output_folder)
-readARS(json_path, output_folder, ADaM_folder, example = TRUE)
+readARS(json_path, output_folder, ADaM_folder)
 ```
 
 Once the R programs are created, they can be individually run, provided that the ADaM datasets are in the location as provided to the readARS function.  

@@ -18,5 +18,5 @@ directory. This function make them easy to access.
 }
 \examples{
 ARS_example()
-ARS_example("ARS_V1_Common_Safety_Displays.json")
+ARS_example("Common_Safety_Displays_cards.xlsx")
 }
