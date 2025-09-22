@@ -239,6 +239,16 @@ test_that("test - xlsx 1: Generated R scripts", {
       expect_equal(test1[[2]], 76)
       expect_equal(test1[[3]], 77)
 
+      # categorical %
+      test2 = ARD %>%
+        filter(AnalysisId == "An07_01_TEAE_Summ_ByTrt",
+               operationid == "Mth01_CatVar_Summ_ByGrp_2_pct") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(round(test2[[1]], digits = 5), 0.75581)
+      expect_equal(round(test2[[2]], digits = 5), 0.90476)
+      expect_equal(round(test2[[3]], digits = 5), 0.91667)
+
       # subject counts
       test1 = ARD %>%
         filter(AnalysisId == "An01_05_SAF_Summ_ByTrt",
