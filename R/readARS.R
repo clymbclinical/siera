@@ -1434,6 +1434,17 @@ df2_analysisidhere <- ansetdshere
           dplyr::select(name, description, label, id) %>%
           unique()
 
+      operations = AnalysisMethods %>%
+        dplyr::filter(id == methodid) %>%
+        dplyr::select(operation_id)
+
+      operation = operations$operation_id
+      for(i in seq_len(nrow(operations))){
+        assign(paste0("operation_", i),
+               operation[i],
+               envir = .GlobalEnv)
+      }
+
         methodname = method$name
         methoddesc = method$description
         methodlabel = method$label
@@ -1451,16 +1462,6 @@ df2_analysisidhere <- ansetdshere
         anmetparam_s <- AnalysisMethodCodeParameters %>%
           dplyr::filter(method_id == methodid,
                         parameter_valueSource != "")
-
-        # to be replaced with values:
-        # anmetparam_v <- AnalysisMethodCodeParameters %>%
-        #   dplyr::filter(method_id == methodid,
-        #                 parameter_value != "")
-
-        # transpose_yn = anmetparam_v %>%
-        #   dplyr::filter(parameter_name == "transpose") %>%
-        #   dplyr::select(parameter_value) %>%
-        #   as.character()
 
         # operations to transpose with
         operation_list <- AnalysisMethods %>%
@@ -1507,19 +1508,9 @@ df2_analysisidhere <- ansetdshere
         anmetcode_final <- gsub('methodidhere', methodid, anmetcode_temp)
         anmetcode_final <- gsub('analysisidhere', Anas_j, anmetcode_final)
 
-        # applying transpose code
-        # if(transpose_yn == "Y"){
-        #   code_method_tmp_2 = paste0(trimws(anmetcode_final %>%
-        #                                       as.character()), " %>%
-        #   pivot_longer(c(", operation_list_string, "),
-        #   names_to = 'operation_id',
-        #   values_to = 'res')")
-        # } else {
         code_method_tmp_2 = anmetcode_final
-        # }
 
         # mutate part
-
         template <-
           "
 if(nrow(df2_analysisidhere) != 0){
