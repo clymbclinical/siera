@@ -149,7 +149,7 @@ test_that("combined code created", {
   expect_true(any(grepl("ARD <- ", lines)))
 })
 
-test_that("test - xlsx 1: Generated R scripts", {
+test_that("ARD values - xlsx 1", {
   skip_on_cran()
 
   # Path to ARS file (metadata driving script generation)
@@ -262,7 +262,7 @@ test_that("test - xlsx 1: Generated R scripts", {
   }
 })
 
-test_that("test - json 1: Generated R scripts", {
+test_that("ARD values - json 1", {
   skip_on_cran()
 
   # Path to ARS file (metadata driving script generation)
@@ -334,7 +334,7 @@ test_that("test - json 1: Generated R scripts", {
   }
 })
 
-test_that("test - json 2: Generated R scripts ", {
+test_that("ARD values - json 2", {
   skip_on_cran()
 
   # Path to ARS file (metadata driving script generation)
@@ -454,4 +454,80 @@ test_that("test - json 2: Generated R scripts ", {
 
   }
   }
+)
+
+
+test_that("Dynamic Operation Ids", {
+  skip_on_cran()
+
+  # Path to ARS file (metadata driving script generation)
+  ARS_path  <- ARS_example("exampleARS_3.json")
+
+  # Directly use extdata shipped with the package
+  adam_dir  <- system.file("extdata", package = "siera")
+  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+
+  # Temp folder for generated scripts
+  output_dir <- withr::local_tempdir()
+
+  # Generate the R scripts — note adam_dir is passed here
+  readARS(ARS_path, output_dir, adam_dir)
+
+  # Find generated R scripts
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_true(length(r_files) > 0, info = "No R scripts generated")
+
+  # Run each script and check ARD object
+  for (f in r_files) {
+    e <- new.env(parent = baseenv())
+
+    expect_error(
+      suppressWarnings(
+        suppressPackageStartupMessages(
+          source(f, local = e, chdir = TRUE)
+        )
+      ),
+      NA,
+      info = paste("Sourcing failed for", basename(f))
+    )
+
+    # Ensure ARD dataset was created
+    expect_true(exists("ARD", envir = e), info = paste("No ARD from", basename(f)))
+    ARD <- get("ARD", envir = e)
+    expect_true("stat" %in% names(ARD), info = "'stat' column missing in ARD")
+
+    # check specific values in ARD
+    if(length(grep("Out_01", f)) > 0){
+      test1 = ARD %>%
+        mutate(group1_level = as.character(group1_level),
+               group2_level = as.character(group2_level)) %>%
+        filter(AnalysisId == "An_02",
+               group2_level == "F") %>%
+        select(operationid) %>%
+        unique() %>%
+        unlist()
+
+      expect_equal(test1[[1]], "Mth_03_01_n")
+      expect_equal(test1[[2]], "Mth_03_02_%")
+
+      test2 = ARD %>%
+        mutate(group1_level = as.character(group1_level),
+               group2_level = as.character(group2_level)) %>%
+        filter(AnalysisId == "An_03") %>%
+        select(operationid) %>%
+        unique() %>%
+        unlist()
+
+      expect_equal(test2[[1]], "Mth_08_01_n")
+      expect_equal(test2[[2]], "Mth_08_02_Mean")
+      expect_equal(test2[[3]], "Mth_08_03_SD")
+      expect_equal(test2[[4]], "Mth_08_04_Median")
+      expect_equal(test2[[5]], "Mth_08_05_Q1")
+      expect_equal(test2[[6]], "Mth_08_06_Q3")
+      expect_equal(test2[[7]], "Mth_08_07_Min")
+      expect_equal(test2[[8]], "Mth_08_08_Max")
+
+  }
+  }
+}
 )
