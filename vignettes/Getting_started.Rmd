@@ -76,7 +76,7 @@ You should now have 5 R scripts (named ARD_Out14-1-1.R, ARD_Out14-3-1-1.R, ARD_O
 #### Running a auto-generated ARD script
 An example of such an auto-generated ARD script is included in the package, and can be used by using the `ARD_script_example` function. Running this script will look like this:
 
-```{r run ARD_xxx, message=FALSE, warning=FALSE, eval=TRUE}
+```{r run ARD_xxx, message=FALSE, warning=FALSE, eval=FALSE}
 
 # Step 1: open ARD_xxx.R file
 # Step 2: Confirm the location of ADaM dataset(s) is correct in the code section "Load ADaM".  
@@ -96,4 +96,3 @@ The `ARD` object is the result of appending all analysis-level ARD (created from
 ### A note on example code used in AnalysisMethodCodeTemplate: using `cards` package
 
 A powerful aspect of the ARS model, is that dynamic code can be supplied as part of the metadata and be evaluated on either 1. the Output level, 2. the Analysis level, or 3. the AnalysisMethod level (for more information on this, see [this](https://www.lexjansen.com/phuse-us/2025/ds/PAP_DS09.pdf) PHUSE paper).  The latter case is implemented by making use of the _AnalysisMethodCodeTemplate_ and _AnalysisMethodCodeParameters_ classes in the metadata.  The user supplies dynamic R code (with the option of making use of parameters referring to metadata pieces), which will be executed to perform the relevant AnalysisMethod operations.  As was the case in this example, the `cards` and `cardx` R packages were used. See more information on this in the vignette on [using `cards` and `cardx`](using-cards.html).
-
