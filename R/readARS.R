@@ -74,6 +74,24 @@ library(magrittr)
   if (file_ext == "json") {
     json_from <- jsonlite::fromJSON(ARS_path)
 
+    required_json_sections <- c(
+      "otherListsOfContents",
+      "mainListOfContents",
+      "dataSubsets",
+      "analysisGroupings",
+      "analyses",
+      "methods"
+    )
+
+    missing_sections <- setdiff(required_json_sections, names(json_from))
+
+    if (length(missing_sections) > 0) {
+      cli::cli_warn(
+        "Input ARS file is missing required metadata sections: {paste(missing_sections, collapse = ", ")}"
+      )
+      return(invisible(NULL))
+    }
+
     #otherListsOfContents (LOPO) --V1ized
     otherListsOfContents <- json_from$otherListsOfContents$contentsList$listItems[[1]]  # this is similar to xlsx
     Lopo <- otherListsOfContents |>

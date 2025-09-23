@@ -10,6 +10,21 @@ test_that("warns when ARS file is not JSON or xlsx", {
   )
 })
 
+test_that("warns when JSON metadata is missing required sections", {
+
+  output_dir <- tempdir()
+  adam_folder <- tempdir()
+  json_path <- tempfile(fileext = ".json")
+
+  minimal_json <- list(mainListOfContents = list())
+  jsonlite::write_json(minimal_json, json_path, auto_unbox = TRUE)
+
+  expect_warning(
+    readARS(json_path, output_dir, adam_folder),
+    "Input ARS file is missing required metadata sections: otherListsOfContents, dataSubsets, analysisGroupings, analyses, methods"
+  )
+})
+
 test_that("spec_output generates only specified script", {
   ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
   output_dir <- tempdir()
