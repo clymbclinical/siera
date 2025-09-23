@@ -1,3 +1,19 @@
+test_that("warns when JSON metadata is missing required sections", {
+  skip_on_cran()
+
+  ARS_path  <- ARS_example("exampleARS_1a.json")
+  adam_dir  <- system.file("extdata", package = "siera")
+  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+
+  output_dir <- withr::local_tempdir()
+
+  # Only call inside expect_warning so the warning is captured
+  expect_warning(
+    readARS(ARS_path, output_dir, adam_dir),
+    "Input ARS file is missing required metadata sections: .*otherListsOfContents"
+  )
+})
+
 test_that("warns when ARS file is not JSON or xlsx", {
 
   output_dir = tempdir()
@@ -531,3 +547,5 @@ test_that("Dynamic Operation Ids", {
   }
 }
 )
+
+
