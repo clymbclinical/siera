@@ -32,56 +32,23 @@ ARS_example()
 ARS_example("exampleARS_1.json")
 ```
 
+### Reading in ARS metadata - what to expect
 
-## Example: JSON format
+The ARS metadata contains all ARS information for the Reporting Event. This information includes:
 
-To get started with an example of ingesting the ARS JSON metadata,we will ingest the example JSON ARS file to meta-programme ready-to-run R scripts, 
-which will produce the ARDs. 
-```{r example, message=FALSE}
-# Path to the the ARS JSON File. 
-json_path <- ARS_example("exampleARS_1.json")
-
-# Path to a folder which will contain the meta-programmed R scripts (feel free to update 
-# to a more suitable path)
-output_folder <- tempdir()
-
-# this folder contains ADaM datasets to produce ARD (we will use temporary 
-# directory tempdir(), but feel free to download the ADaMs required and use the location they are stored in.
-# This can be done with e.g. dirname(ARS_example("ADSL.csv"))
-ADaM_folder <- tempdir()
-
-# run the readARS function with these 3 parameters.  This creates R scripts (1 for each output in output_folder)
-readARS(json_path, output_folder, ADaM_folder)
-```
-
-Once the R programs are created, they can be individually run, provided that the ADaM datasets are in the location as provided to the readARS function.  
-
-## Example: xlsx format
-
-Before starting out with this example, it would be helpful to first have a discussion on the composition of the ARS metadata, and the use of `cards` functions.  
-
-### Reading in Excel ARS metadata - what to expect
-
-The ARS metadata represented in Excel contains all ARS information for the Reporting Event.  It is divided into Excel Worksheets, roughly mapped/equivalent to the official JSON ARS representation and its classes (an example can be found [here](https://github.com/cdisc-org/analysis-results-standard/blob/main/workfiles/examples/ARS%20v1/Common%20Safety%20Displays.json)).  For the purpose of automating Analysis Results using 
-_siera_, a subset of the multiple Excel Worksheets contain the key information.  These include:
-
-- _MainListOfContents_ (links outputs to their respective analyses)
-- _OtherListsOfContents_ (contains Output metadata)
-- _DataSubsets_ (filters data for individual analyses)
-- _AnalysisSets_ (filters data to get the Population Set for the Output)
-- _AnalysisGroupings_ (groups data according to analysis specifications)
-- _Analyses_ (contains linking information to all components required for calculation of results)
-- _AnalysisMethods_ (describes operations to be performed on data to get results)
-- _AnalysisMethodCodeTemplate_ (contains dynamically written R code to perform AnalysisMethod)
-- _AnalysisMethodCodeParameters_ (populates AnalysisMethodCodeTemplate with Analysis information)
-
-### A note on example code used in AnalysisMethodCodeTemplate: using `cards` package
-
-A powerful aspect of the ARS model, is that dynamic code can be supplied as part of the metadata and be evaluated on either 1. the Output level, 2. the Analysis level, or 3. the AnalysisMethod level (for more information on this, see [this](https://www.lexjansen.com/phuse-us/2025/ds/PAP_DS09.pdf) PHUSE paper).  The latter case is implemented by making use of the _AnalysisMethodCodeTemplate_ and _AnalysisMethodCodeParameters_ classes in the metadata.  The user supplies dynamic R code (with the option of making use of parameters referring to metadata pieces), which will be executed to perform the relevant AnalysisMethod operations.  See more information on this in the vignette on [using `cards` and `cardx`](using-cards.html).
+- _mainListOfContents_ (links outputs to their respective analyses)
+- _otherListsOfContents_ (contains Output metadata)
+- _dataSubsets_ (filters data for individual analyses)
+- _analysisSets_ (filters data to get the Population Set for the Output)
+- _analysisGroupings_ (groups data according to analysis specifications)
+- _analyses_ (contains linking information to all components required for calculation of results)
+- _methods_ (describes operations to be performed on data to get results)
 
 
 
-The _readARS_ function reads in a completed ARS metadata file, and generates R scripts for each Output defined in the file.  Below is an example of how this can be done using a ready-to-use ARS metadata Excel file:
+### Example 
+
+The _readARS_ function reads in a completed ARS metadata file, and generates R scripts for each Output defined in the file.  Below is an example of how this can be done using a ready-to-use ARS metadata Excel file (note that this is meant as an example.  Official ARS metadata is in json format, which can also be passed to the _readARS_ function):
 
 ```{r Excel ARS metadata example, message=FALSE}
 
@@ -104,9 +71,12 @@ ADaM_folder <- tempdir()
 readARS(ARS_path, output_folder, ADaM_folder)
 ```
 
-If you've followed along so far, you should now have 5 R scripts (named ARD_Out14-1-1.R, ARD_Out14-3-1-1.R, ARD_Out14-3-2-1.R, ARD_Out14-3-3-1a.R, and ARD_Out14-3-3-1b.R) in the folder specified as _output_folder_.  If this is successful, you can execute any of these 5 R scripts as-is (assuming the ADaM required for this script is available in the _ADaM_folder_), and the result will be an ARD (one result per row format) for each of the scripts.  An example of such an auto-generated ARD script is included in the package, and can be used by using the `ARD_script_exampe` function. Running this script will look like this:
+You should now have 5 R scripts (named ARD_Out14-1-1.R, ARD_Out14-3-1-1.R, ARD_Out14-3-2-1.R, ARD_Out14-3-3-1a.R, and ARD_Out14-3-3-1b.R) in the folder specified as _output_folder_.  You can execute any of these 5 R scripts as-is (assuming the ADaM required for this script is available in the _ADaM_folder_), and the result will be an ARD (one result per row format) for each of the scripts.  
 
-```{r run ARD_xxx, message=FALSE, warning=FALSE, eval=FALSE}
+#### Running a auto-generated ARD script
+An example of such an auto-generated ARD script is included in the package, and can be used by using the `ARD_script_example` function. Running this script will look like this:
+
+```{r run ARD_xxx, message=FALSE, warning=FALSE, eval=TRUE}
 
 # Step 1: open ARD_xxx.R file
 # Step 2: Confirm the location of ADaM dataset(s) is correct in the code section "Load ADaM".  
@@ -118,5 +88,12 @@ If you've followed along so far, you should now have 5 R scripts (named ARD_Out1
 
 example_ARD_script = ARD_script_example("ARD_Out14-1-1.R")
 source(example_ARD_script)
-head(df4)
+head(ARD)
 ```
+
+The `ARD` object is the result of appending all analysis-level ARD (created from the `cards` and `cardx` functions) for the output.  It can be used (and re-used) downstream for various applications.  See [this vignette](apply-ARD.html) for next step in utilising the ARD - like creating Tables, or using it for QC.
+
+### A note on example code used in AnalysisMethodCodeTemplate: using `cards` package
+
+A powerful aspect of the ARS model, is that dynamic code can be supplied as part of the metadata and be evaluated on either 1. the Output level, 2. the Analysis level, or 3. the AnalysisMethod level (for more information on this, see [this](https://www.lexjansen.com/phuse-us/2025/ds/PAP_DS09.pdf) PHUSE paper).  The latter case is implemented by making use of the _AnalysisMethodCodeTemplate_ and _AnalysisMethodCodeParameters_ classes in the metadata.  The user supplies dynamic R code (with the option of making use of parameters referring to metadata pieces), which will be executed to perform the relevant AnalysisMethod operations.  As was the case in this example, the `cards` and `cardx` R packages were used. See more information on this in the vignette on [using `cards` and `cardx`](using-cards.html).
+

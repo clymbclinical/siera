@@ -1479,8 +1479,10 @@ df2_analysisidhere <- ansetdshere
       operation = operations$operation_id
       for(i in seq_len(nrow(operations))){
         assign(paste0("operation_", i),
-               operation[i],
-               envir = .GlobalEnv)
+               operation[i]
+               # ,
+               # envir = .GlobalEnv
+               )
       }
 
         methodname = method$name
