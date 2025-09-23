@@ -405,6 +405,26 @@ library(magrittr)
 
   } else if (file_ext == "xlsx") {
 
+    ws <- readxl::excel_sheets(ARS_path)
+
+    required_sheets <- c(
+      "OtherListsOfContents",
+      "MainListOfContents",
+      "DataSubsets",
+      "AnalysisGroupings",
+      "Analyses",
+      "AnalysisMethods"
+    )
+
+    missing_sheets <- setdiff(required_sheets, ws)
+
+    if (length(missing_sheets) > 0) {
+      cli::cli_warn(
+        "Input ARS workbook is missing required sheets: {paste(missing_sheets, collapse = ', ')}"
+      )
+      return(invisible(NULL))
+    }
+
     ARS_xlsx = ARS_path
     mainListOfContents <- read_excel(ARS_xlsx,
                                      sheet = 'MainListOfContents')

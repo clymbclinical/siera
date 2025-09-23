@@ -14,6 +14,27 @@ test_that("warns when JSON metadata is missing required sections", {
   )
 })
 
+test_that("warns when xlsx workbook is missing required sheets", {
+  skip_on_cran()
+  skip_if_not_installed("readxl")
+
+  # Path to an XLSX example that is intentionally missing 'otherListsOfContents'
+  ARS_path  <- ARS_example("exampleARS_2a.xlsx")
+
+  # ADaM directory (as in your JSON test, if needed by downstream logic)
+  adam_dir  <- system.file("extdata", package = "siera")
+  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+
+  # Temp folder for any outputs
+  output_dir <- withr::local_tempdir()
+
+  # Expect the warning message about the missing sheet
+  expect_warning(
+    readARS(ARS_path, output_dir, adam_dir),
+    "Input ARS workbook is missing required sheets: DataSubsets, AnalysisMethods"
+  )
+})
+
 test_that("warns when ARS file is not JSON or xlsx", {
 
   output_dir = tempdir()

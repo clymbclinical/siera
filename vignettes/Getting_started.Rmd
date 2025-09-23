@@ -33,7 +33,7 @@ ARS_example("exampleARS_1.json")
 ```
 
 
-## CDISC example: JSON format
+## Example: JSON format
 
 To get started with an example of ingesting the ARS JSON metadata,we will ingest the example JSON ARS file to meta-programme ready-to-run R scripts, 
 which will produce the ARDs. 
@@ -56,9 +56,9 @@ readARS(json_path, output_folder, ADaM_folder)
 
 Once the R programs are created, they can be individually run, provided that the ADaM datasets are in the location as provided to the readARS function.  
 
-## CDISC example: xlsx format, with `cards` functions to handle operations
+## Example: xlsx format
 
-Before starting out with this example, it would be helpful to first have a discussion on the composition of the ARS metadata (the xlsx representation, in particular), and the use of `cards` functions.  
+Before starting out with this example, it would be helpful to first have a discussion on the composition of the ARS metadata, and the use of `cards` functions.  
 
 ### Reading in Excel ARS metadata - what to expect
 
@@ -75,37 +75,13 @@ _siera_, a subset of the multiple Excel Worksheets contain the key information. 
 - _AnalysisMethodCodeTemplate_ (contains dynamically written R code to perform AnalysisMethod)
 - _AnalysisMethodCodeParameters_ (populates AnalysisMethodCodeTemplate with Analysis information)
 
-### A note on example code used in AnalysisMethodCodeTemplate: using "cards" package
+### A note on example code used in AnalysisMethodCodeTemplate: using `cards` package
 
-A powerful aspect of the ARS model, is that dynamic code can be supplied as part of the metadata and be evaluated on either 1. the Output level, 2. the Analysis level, or 3. the AnalysisMethod level (for more information on this, see [this](https://www.lexjansen.com/phuse-us/2025/ds/PAP_DS09.pdf) PHUSE paper).  The latter case is implemented by making use of the _AnalysisMethodCodeTemplate_ and _AnalysisMethodCodeParameters_ classes in the metadata.  The user supplies dynamic R code (with the option of making use of parameters referring to metadata pieces), which will be executed to perform the relevant AnalysisMethod operations.  
-
-For the example ARS metadata in Excel shipped with this package, the R code used in the _AnalysisMethodCodeTemplate_ is aligned with the _cards_ R package (more information [here](https://insightsengineering.github.io/cards/latest-tag/)).  The _cards_ package is a reputable R package consisting of wrappers for various statistical functions, and producing results in a consistent ARD format. Below is a simple example of how a function _ard_continuous_ from the _cards_ package is used in the _AnalysisMethodCodeTemplate_ class in the accompanying Excel ARS metadata example shipped with this package:
-
-```{r cards example, eval=FALSE}
-# example of 'cards' code in AnalysisMethodCodeTemplate, using the ard_continuous function:
-
-Analysis_ARD = ard_continuous(
-  data = filtered_ADSL,
-  by = c(byvariables_here),
-  variables = analysisvariable_here
-)
-```
-
-In the above example of _AnalysisMethodCodeTemplate_ code for a particular AnalysisMethod (summary statistics for a continuous variable), the _ard_continuous_ function from the _cards_ package is used.  Notice, however, that two parameters are used in the code: 
-
-1. 'byvariables_here', and 
-2. 'analysisvariable_here'.  
-
-These are example placeholder names, to be replaced by actual variables, depending on the context for the Analysis.  For example, 'byvariables_here' could be replaced by TRT01A, and 'analysisvariable_here' could be replaced by AGE, for an ARD with summary statistics on AGE by Treatment.  The same code, however, will be reused for summary statistics on e.g. HEIGHT for another Analysis, and the 'analysisvariable_here' will be replaced with HEIGHT.  All this is dynamically applied within the readARS_xl function when generating R scripts using _siera_. 
-
-In order to facilitate the use of placeholders and their replacement with actual values from the metadata, several "constructs" have been defined in the _readARS_xl_ function, and are available to the user to call from the _AnalysisMethodCodeTemplate_ and _AnalysisMethodCodeParameters_ classes in the metadata.  These constructs are either simple variables or datasets defined in the metadata, or complex, dynamic constructs from various metadata pieces, to be inserted in specific _cards_ functions, or pre-processing steps.  A list of defined constructs and examples is shipped with this package, and can be accessed with:
-
-```{r cardsconstructs, eval=FALSE}
-ARS_example("cards_constructs.xlsx")
-```
+A powerful aspect of the ARS model, is that dynamic code can be supplied as part of the metadata and be evaluated on either 1. the Output level, 2. the Analysis level, or 3. the AnalysisMethod level (for more information on this, see [this](https://www.lexjansen.com/phuse-us/2025/ds/PAP_DS09.pdf) PHUSE paper).  The latter case is implemented by making use of the _AnalysisMethodCodeTemplate_ and _AnalysisMethodCodeParameters_ classes in the metadata.  The user supplies dynamic R code (with the option of making use of parameters referring to metadata pieces), which will be executed to perform the relevant AnalysisMethod operations.  See more information on this in the vignette on [using `cards` and `cardx`](using-cards.html).
 
 
-The _readARS_ function reads in a completed ARS metadata Excel file, and generates R scripts for each Output defined in the file.  Below is an example of how this can be done using a ready-to-use ARS metadata Excel file:
+
+The _readARS_ function reads in a completed ARS metadata file, and generates R scripts for each Output defined in the file.  Below is an example of how this can be done using a ready-to-use ARS metadata Excel file:
 
 ```{r Excel ARS metadata example, message=FALSE}
 
