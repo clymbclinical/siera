@@ -11,7 +11,7 @@ library(readxl)
 library(readr)
 library(cards)
 library(cardx)
-library(broom)
+library(siera)
 library(parameters)
 library(tidyr)
 library(magrittr)
@@ -22,7 +22,7 @@ library(magrittr)
 #                                       progress = FALSE) |>
 #   dplyr::mutate(dplyr::across(dplyr::where(is.character), ~ tidyr::replace_na(.x, '')))
 
-ADSL <- readr::read_csv(ARS_example("ADSL.csv"),
+ADSL <- readr::read_csv(siera::ARS_example("ADSL.csv"),
                         show_col_types = FALSE,
                         progress = FALSE) |>
   dplyr::mutate(dplyr::across(dplyr::where(is.character), ~ tidyr::replace_na(.x, '')))
