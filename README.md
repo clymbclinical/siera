@@ -60,7 +60,7 @@ The `siera` package has one main function, called `readARS`. This
 function takes ARS metadata as input (either JSON or xlsx format), and
 makes use of the various metadata pieces to populate R scripts, which an
 be run as-is to produce ARDs. One R script is created for each output
-(table) as defined in the ARS metadata for the reportingg event.
+(table) as defined in the ARS metadata for the reporting event.
 
 In order to make use of this function, the following are required as
 arguments:
