@@ -1,0 +1,156 @@
+---
+title: "ARD program structure"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ARD_script_structure}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(siera)
+```
+
+## My ARD program has been auto-generated: What can I expect?
+
+Each auto-generated ARD program (one generated for each output) follows a logical structure linked to the ARS model.  Each script contains code for all the analyses related to the output, and follows the same code pattern for each analysis (except the first analysis, which handles the "big N" calculation by convention).  An analysis-level ARD is generated for each analysis, and at the end of the program, all these analysis-level ARDs are appended to create one output-level ARD.  Keep in mind that each of these code sections are auto-populated with ARS metadata.  This can be visualized as follows:
+
+```{r high-level program overview}
+# Section 1: Program header
+
+# Section 2: Load libraries
+
+# Section 3: Load ADaM datasets
+
+# Section 4a (first Analysis): Code to calculate results as an ARD
+
+# Section 4b (subsequent Analyses): Code to calculate results as an ARD
+
+# Section 5: Append Analysis-level ARDs
+```
+
+
+### Analysis-level code to calculate ARDs
+
+Each analysis related to the output follows a logical structure based on the ARS model to create an analysis-level ARD.  This structure is as follows:
+
+#### Step 1: Apply "Analysis Set" to ADaM(s) 
+
+This step applies the Analysis Set assigned to the output (e.g. Safety Population) to the ADaM dataset(s). In the case where the "big N" count is based on another dataset (like ADSL) than the main ADaM (e.g. ADAE), two separate datasets are created for downstream use in subsequent analyses. Example: 
+
+```{r Analysis Sets, message=FALSE, eval=FALSE}
+overlap <- intersect(names(ADSL), names(ADAE))
+overlapfin <- setdiff(overlap, 'USUBJID') 
+
+df_pop <- dplyr::filter(ADSL,
+            SAFFL == 'Y') |>
+            merge(ADAE |> dplyr::select(-dplyr::all_of(overlapfin)),
+                  by = 'USUBJID',
+                  all = FALSE)
+
+df_poptot = dplyr::filter(ADSL,
+            SAFFL == 'Y')
+```
+
+Note: this is only done once for the first Analysis, and assigned by subsequent analyses, since the dataset(s) remain the same for the remainder of the program's analyses.
+
+#### Step 2: Apply "Data Subset"
+
+Based on the resulting dataset from step 1, further data subsetting is applied which is relevant to the current analysis (e.g. filtering for serious, treatment-related Adverse Events).  If no data subsetting is required for the analysis, a simple assignment of the previous dataset is done with no 'filter' statement. This step has a convention of starting the dataframe name with "df2", followed by the AnalysisId.
+
+```{r Data Subsets, message=FALSE, eval=FALSE}
+df2_An07_03_SerTEAE_Summ_ByTrt <- df_pop |>
+        dplyr::filter(TRTEMFL == 'Y' & AESER == 'Y')
+```
+
+#### Step 3: Apply "Method"
+
+This step takes the subsetted dataset, and applies the required AnalysisMethod (e.g. counting subjects by treatment and a group, like RACE).  As explained in the vignette for [using `cards` and `cardx`](using-cards.html), functions from these packages are applied to handle the statistical operations for the analysis.  Typically, there would be some pre-work done on the dataset before passing it to a `cards` or `cardx` function.  When the function is applied, the result is an analysis-level ARD.  At the end of this step, record-level metadata from the ARS model is also merged to the ARD, to ensure the ability to trace each result back to ARS metadata.  See example below:
+
+```{r MethodExample, eval=FALSE}
+
+# intermediate step: Prepare Denominator Dataset for `cards` function
+denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
+  dplyr::select(TRT01A)
+
+# intermediate step: Prepare input dataset for `cards` function
+in_data = df2_An03_05_Race_Summ_ByTrt |>
+  dplyr::distinct(TRT01A, RACE, USUBJID) |>
+  dplyr::mutate(dummy = 'dummyvar')
+
+# pass calculate subjects counts and % (based on big N) grouped by treatment and race
+cards::ard_categorical(
+  data = in_data,
+  by = c('TRT01A', 'RACE'),
+  variables = 'dummy',
+  denominator = denom_dataset)
+    
+# select relevant statistics as defined by the Method, and assign operation Ids
+df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt|>
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_1_n',
+                                               stat_name == 'p' ~ 'Mth01_2_pct'))
+
+# add ARS metadata IDs to the dataset to enable tracing each result back to ARS metadata
+df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt |>
+  dplyr::mutate(AnalysisId = 'An03_05_Race_Summ_ByTrt',
+                MethodId = 'Mth01',
+                OutputId = 'Out14-1-1')
+```
+
+### Final steps
+
+The above process repeats for each Analysis, although the code for each step would of course vary (as defined in the specific ARS metadata for each Analysis). Once each Analysis ARD has been created, these ARDs are all appened to create output-level ARD.  See example below:
+
+```{r append, message=FALSE, eval=FALSE}
+# combine analyses to create ARD ----
+ARD <- dplyr::bind_rows(df3_An01_05_SAF_Summ_ByTrt, 
+df3_An03_01_Age_Summ_ByTrt, 
+df3_An03_01_Age_Comp_ByTrt, 
+df3_An03_02_AgeGrp_Summ_ByTrt, 
+df3_An03_02_AgeGrp_Comp_ByTrt, 
+df3_An03_03_Sex_Summ_ByTrt, 
+df3_An03_03_Sex_Comp_ByTrt, 
+df3_An03_04_Ethnic_Summ_ByTrt, 
+df3_An03_04_Ethnic_Comp_ByTrt, 
+df3_An03_05_Race_Summ_ByTrt, 
+df3_An03_05_Race_Comp_ByTrt, 
+df3_An03_06_Height_Summ_ByTrt, 
+df3_An03_06_Height_Comp_ByTrt) 
+```
+
+### Example
+
+Examples of such an ARD script has been shipped with this package.  Below are such examples, for 
+
+- Summary of Demographics: ARD_Out14-1-1.R
+- Overall Summary of Treatment-Emergent Adverse Events: ARD_Out14-3-1-1.R
+
+Access these with the below functions:
+
+```{r example ARD script, message=FALSE, warning=FALSE, eval=FALSE}
+# see location of script:
+ARD_script_example("ARD_Out14-1-1.R")
+ARD_script_example("ARD_Out14-3-1-1.R")
+```
+
+```{r open ARD script, message=FALSE, warning=FALSE, eval=FALSE}
+# open script to inspect:
+file.edit(ARD_script_example("ARD_Out14-1-1.R"))
+file.edit(ARD_script_example("ARD_Out14-3-1-1.R"))
+```
+
+```{r run ARD script, message=FALSE, warning=FALSE, eval=FALSE}
+# run script locally:
+source(ARD_script_example("ARD_Out14-1-1.R"))
+source(ARD_script_example("ARD_Out14-3-1-1.R"))
+```
+
+This ARD can be used in various ways downstream.  Read more about this in the vignette on [utilising ARDs](apply-ARD.html).
