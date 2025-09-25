@@ -172,12 +172,25 @@ function. Running this script will look like this:</p>
 <span><span class="co"># For the sake of simplicity, the only update made to the ARD_Out14-1-1.R </span></span>
 <span><span class="co"># script was to point to the ADaM folder to ARS_example("ADSL.csv")</span></span>
 <span><span class="co"># Step 3: Run the code and enjoy automated analysis results generation. </span></span>
-<span><span class="co"># Note: the ARD is contained in the object "df4" (which contains the appended)</span></span>
-<span><span class="co"># mini-ARDs from all individual Analyses ARDs.</span></span>
+<span><span class="co"># Note: the ARD is contained in the object "ARD" (which contains the appended) mini-ARDs from all individual Analyses ARDs.</span></span>
 <span></span>
 <span><span class="va">example_ARD_script</span> <span class="op">=</span> <span class="fu"><a href="../reference/ARD_script_example.html">ARD_script_example</a></span><span class="op">(</span><span class="st">"ARD_Out14-1-1.R"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="va">example_ARD_script</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ARD</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ARD</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   group1 group1_level group2 group2_level variable variable_level stat_name</span></span>
+<span><span class="co">#&gt; 1   &lt;NA&gt;                &lt;NA&gt;                TRT01A        Placebo         n</span></span>
+<span><span class="co">#&gt; 2   &lt;NA&gt;                &lt;NA&gt;                TRT01A      Xanomeli…         n</span></span>
+<span><span class="co">#&gt; 3   &lt;NA&gt;                &lt;NA&gt;                TRT01A      Xanomeli…         n</span></span>
+<span><span class="co">#&gt; 4 TRT01A      Placebo   &lt;NA&gt;                   AGE                        N</span></span>
+<span><span class="co">#&gt; 5 TRT01A      Placebo   &lt;NA&gt;                   AGE                     mean</span></span>
+<span><span class="co">#&gt; 6 TRT01A      Placebo   &lt;NA&gt;                   AGE                       sd</span></span>
+<span><span class="co">#&gt;   stat_label   stat</span></span>
+<span><span class="co">#&gt; 1          n     86</span></span>
+<span><span class="co">#&gt; 2          n     84</span></span>
+<span><span class="co">#&gt; 3          n     84</span></span>
+<span><span class="co">#&gt; 4          N     86</span></span>
+<span><span class="co">#&gt; 5       Mean 75.209</span></span>
+<span><span class="co">#&gt; 6         SD   8.59</span></span></code></pre></div>
 <p>The <code>ARD</code> object is the result of appending all
 analysis-level ARD (created from the <code>cards</code> and
 <code>cardx</code> functions) for the output. It can be used (and
