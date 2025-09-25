@@ -76,15 +76,14 @@ You should now have 5 R scripts (named ARD_Out14-1-1.R, ARD_Out14-3-1-1.R, ARD_O
 #### Running a auto-generated ARD script
 An example of such an auto-generated ARD script is included in the package, and can be used by using the `ARD_script_example` function. Running this script will look like this:
 
-```{r run ARD_xxx, message=FALSE, warning=FALSE, eval=FALSE}
+```{r run ARD_xxx, message=FALSE, warning=FALSE, eval=TRUE}
 
 # Step 1: open ARD_xxx.R file
 # Step 2: Confirm the location of ADaM dataset(s) is correct in the code section "Load ADaM".  
 # For the sake of simplicity, the only update made to the ARD_Out14-1-1.R 
 # script was to point to the ADaM folder to ARS_example("ADSL.csv")
 # Step 3: Run the code and enjoy automated analysis results generation. 
-# Note: the ARD is contained in the object "df4" (which contains the appended)
-# mini-ARDs from all individual Analyses ARDs.
+# Note: the ARD is contained in the object "ARD" (which contains the appended) mini-ARDs from all individual Analyses ARDs.
 
 example_ARD_script = ARD_script_example("ARD_Out14-1-1.R")
 source(example_ARD_script)
