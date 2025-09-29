@@ -46,6 +46,8 @@ library(readxl)
 library(readr)
 library(cards)
 library(cardx)
+library(broom)
+library(parameters)
 library(tidyr)
 library(magrittr)
   "
