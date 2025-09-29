@@ -11,7 +11,7 @@ datasets"><meta property="og:image" content="https://clymbclinical.github.io/sie
 
     <a class="navbar-brand me-2" href="../index.html">siera</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,10 +22,7 @@ datasets"><meta property="og:image" content="https://clymbclinical.github.io/sie
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/apply-ARD.html">What do I do with my ARD?</a></li>
-    <li><a class="dropdown-item" href="../articles/ARD_script_structure.html">ARD program structure</a></li>
-    <li><a class="dropdown-item" href="../articles/Getting_started.html">Getting Started</a></li>
-    <li><a class="dropdown-item" href="../articles/using-cards.html">Making use of `cards` and `cardx`</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/Getting_started.html">Getting Started</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -39,7 +36,7 @@ datasets"><meta property="og:image" content="https://clymbclinical.github.io/sie
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Ingest ARS (Analysis Results Standard) metadata, produce ARD (Analysis Results Dataset) code for each output</h1>
-      <small class="dont-index">Source: <a href="https://github.com/clymbclinical/siera/blob/main/R/readARS.R" class="external-link"><code>R/readARS.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/clymbclinical/siera/blob/v0.5.4/R/readARS.R" class="external-link"><code>R/readARS.R</code></a></small>
       <div class="d-none name"><code>readARS.Rd</code></div>
     </div>
 
@@ -55,7 +52,10 @@ datasets</p>
 <span>  <span class="va">ARS_path</span>,</span>
 <span>  output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  adam_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  spec_output <span class="op">=</span> <span class="st">""</span></span>
+<span>  spec_output <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  spec_analysis <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  example <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  shuffle <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -79,6 +79,22 @@ ARD program</p></dd>
 <dt id="arg-spec-output">spec_output<a class="anchor" aria-label="anchor" href="#arg-spec-output"></a></dt>
 <dd><p>The output ID for a specific output to be run from
 the metadata</p></dd>
+
+
+<dt id="arg-spec-analysis">spec_analysis<a class="anchor" aria-label="anchor" href="#arg-spec-analysis"></a></dt>
+<dd><p>The analysis ID for a specific analysis to be run
+from the metadata</p></dd>
+
+
+<dt id="arg-example">example<a class="anchor" aria-label="anchor" href="#arg-example"></a></dt>
+<dd><p>Default is FALSE.  If TRUE, example-based operations will
+be applied to CDISC example ARS. If FALSE, AnalysisMethodCodeTemplateCode
+will be expected as source of the Method (and Operations) code</p></dd>
+
+
+<dt id="arg-shuffle">shuffle<a class="anchor" aria-label="anchor" href="#arg-shuffle"></a></dt>
+<dd><p>Default is FALSE.  If TRUE, shuffle_ard() is applied to the
+binded final ARD, to prepare for the tfrmt use case of table generation</p></dd>
 
 </dl></div>
     <div class="section level2">

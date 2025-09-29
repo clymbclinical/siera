@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">siera</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,10 +38,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/apply-ARD.html">What do I do with my ARD?</a></li>
-    <li><a class="dropdown-item" href="../articles/ARD_script_structure.html">ARD program structure</a></li>
-    <li><a class="dropdown-item" href="../articles/Getting_started.html">Getting Started</a></li>
-    <li><a class="dropdown-item" href="../articles/using-cards.html">Making use of `cards` and `cardx`</a></li>
+<li><a class="dropdown-item" href="../articles/Getting_started.html">Getting Started</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -66,7 +63,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Getting Started</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/clymbclinical/siera/blob/main/vignettes/Getting_started.Rmd" class="external-link"><code>vignettes/Getting_started.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/clymbclinical/siera/blob/v0.5.4/vignettes/Getting_started.Rmd" class="external-link"><code>vignettes/Getting_started.Rmd</code></a></small>
       <div class="d-none name"><code>Getting_started.Rmd</code></div>
     </div>
 
@@ -74,67 +71,170 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://clymbclinical.github.io/siera/">siera</a></span><span class="op">)</span></span></code></pre></div>
-<p>We will use the following example to get started:</p>
-<p>A modified <em>CDISC Common Safety Displays</em> ARS metadata (xlsx
-format, with example dynamic AnalysisMethodCodeTemplate R code handling
-operations, based on functions from the <code>cards</code> package)</p>
-<p>In order to facilitate the example, <em>siera</em> includes several
+<p>We will use two examples to get started:</p>
+<ol style="list-style-type: decimal">
+<li>Using the original <em>CDISC Common Safety Displays</em> ARS
+metadata (JSON format, with example operations handled in the
+<code>readARS</code> function)</li>
+<li>Using a modified <em>CDISC Common Safety Displays</em> ARS metadata
+(xlsx format, with example dynamic AnalysisMethodCodeTemplate R code
+handling operations, based on functions from the <code>cards</code>
+package)</li>
+</ol>
+<p>In order to facilitate the examples, <em>siera</em> includes several
 example files, which we use throughout the documentation. These include
-several ARS files (json and xlsx), as well as csv-format ADaMs which can
-be run with the R scripts produced by readARS function. Use the helper
+a JSON ARS file, as well as some csv ADaMs (ADSL and ADAE) which can be
+run with the R scripts produced by readARS function. Use the helper
 ARS_example() with no arguments to list them or call it with an example
 filename to get the path.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># To see a list of example files:</span></span>
 <span><span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "ADAE.csv"                          "ADSL.csv"                         </span></span>
-<span><span class="co">#&gt;  [3] "ADVS.csv"                          "ADZSDER.csv"                      </span></span>
-<span><span class="co">#&gt;  [5] "cards_constructs.xlsx"             "Common_Safety_Displays_cards.xlsx"</span></span>
-<span><span class="co">#&gt;  [7] "exampleARS_1.json"                 "exampleARS_1a.json"               </span></span>
-<span><span class="co">#&gt;  [9] "exampleARS_2.json"                 "exampleARS_2.xlsx"                </span></span>
-<span><span class="co">#&gt; [11] "exampleARS_2a.xlsx"                "exampleARS_3.json"                </span></span>
-<span><span class="co">#&gt; [13] "test_cards.json"</span></span>
+<span><span class="co">#&gt; [1] "ADAE.csv"                           "ADSL.csv"                          </span></span>
+<span><span class="co">#&gt; [3] "ADVS.csv"                           "ARS_V1_Common_Safety_Displays.json"</span></span>
+<span><span class="co">#&gt; [5] "cards_constructs.xlsx"              "Common_Safety_Displays_cards.xlsx" </span></span>
+<span><span class="co">#&gt; [7] "test_cards.json"                    "testARS.json"</span></span>
 <span></span>
 <span><span class="co"># A temporary path to a specific file:</span></span>
-<span><span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"exampleARS_1.json"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/home/runner/work/_temp/Library/siera/extdata/exampleARS_1.json"</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"ARS_V1_Common_Safety_Displays.json"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "/home/runner/work/_temp/Library/siera/extdata/ARS_V1_Common_Safety_Displays.json"</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="cdisc-example-json-format">CDISC example: JSON format<a class="anchor" aria-label="anchor" href="#cdisc-example-json-format"></a>
+</h2>
+<p>To get started with an example of ingesting the ARS JSON metadata,we
+will ingest the example JSON ARS file to meta-programme ready-to-run R
+scripts, which will produce the ARDs.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Path to the the ARS JSON File. </span></span>
+<span><span class="va">json_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"ARS_V1_Common_Safety_Displays.json"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Path to a folder which will contain the meta-programmed R scripts (feel free to update </span></span>
+<span><span class="co"># to a more suitable path)</span></span>
+<span><span class="va">output_folder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># this folder contains ADaM datasets to produce ARD (we will use temporary </span></span>
+<span><span class="co"># directory tempdir(), but feel free to download the ADaMs required and use the location they are stored in.</span></span>
+<span><span class="co"># This can be done with e.g. dirname(ARS_example("ADSL.csv"))</span></span>
+<span><span class="va">ADaM_folder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># run the readARS function with these 3 parameters.  This creates R scripts (1 for each output in output_folder)</span></span>
+<span><span class="fu"><a href="../reference/readARS.html">readARS</a></span><span class="op">(</span><span class="va">json_path</span>, <span class="va">output_folder</span>, <span class="va">ADaM_folder</span>, example <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>Once the R programs are created, they can be individually run,
+provided that the ADaM datasets are in the location as provided to the
+readARS function.</p>
+</div>
+<div class="section level2">
+<h2 id="cdisc-example-xlsx-format-with-cards-functions-to-handle-operations">CDISC example: xlsx format, with <code>cards</code> functions to
+handle operations<a class="anchor" aria-label="anchor" href="#cdisc-example-xlsx-format-with-cards-functions-to-handle-operations"></a>
+</h2>
+<p>Before starting out with this example, it would be helpful to first
+have a discussion on the composition of the ARS metadata (the xlsx
+representation, in particular), and the use of <code>cards</code>
+functions.</p>
 <div class="section level3">
-<h3 id="reading-in-ars-metadata---what-to-expect">Reading in ARS metadata - what to expect<a class="anchor" aria-label="anchor" href="#reading-in-ars-metadata---what-to-expect"></a>
+<h3 id="reading-in-excel-ars-metadata---what-to-expect">Reading in Excel ARS metadata - what to expect<a class="anchor" aria-label="anchor" href="#reading-in-excel-ars-metadata---what-to-expect"></a>
 </h3>
-<p>The ARS metadata contains all ARS information for the Reporting
-Event. This information includes:</p>
+<p>The ARS metadata represented in Excel contains all ARS information
+for the Reporting Event. It is divided into Excel Worksheets, roughly
+mapped/equivalent to the official JSON ARS representation and its
+classes (an example can be found <a href="https://github.com/cdisc-org/analysis-results-standard/blob/main/workfiles/examples/ARS%20v1/Common%20Safety%20Displays.json" class="external-link">here</a>).
+For the purpose of automating Analysis Results using <em>siera</em>, a
+subset of the multiple Excel Worksheets contain the key information.
+These include:</p>
 <ul>
 <li>
-<em>mainListOfContents</em> (links outputs to their respective
+<em>MainListOfContents</em> (links outputs to their respective
 analyses)</li>
 <li>
-<em>otherListsOfContents</em> (contains Output metadata)</li>
+<em>OtherListsOfContents</em> (contains Output metadata)</li>
 <li>
-<em>dataSubsets</em> (filters data for individual analyses)</li>
+<em>DataSubsets</em> (filters data for individual analyses)</li>
 <li>
-<em>analysisSets</em> (filters data to get the Population Set for
+<em>AnalysisSets</em> (filters data to get the Population Set for
 the Output)</li>
 <li>
-<em>analysisGroupings</em> (groups data according to analysis
+<em>AnalysisGroupings</em> (groups data according to analysis
 specifications)</li>
 <li>
-<em>analyses</em> (contains linking information to all components
+<em>Analyses</em> (contains linking information to all components
 required for calculation of results)</li>
 <li>
-<em>methods</em> (describes operations to be performed on data to
-get results)</li>
+<em>AnalysisMethods</em> (describes operations to be performed on
+data to get results)</li>
+<li>
+<em>AnalysisMethodCodeTemplate</em> (contains dynamically written R
+code to perform AnalysisMethod)</li>
+<li>
+<em>AnalysisMethodCodeParameters</em> (populates
+AnalysisMethodCodeTemplate with Analysis information)</li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+<h3 id="a-note-on-example-code-used-in-analysismethodcodetemplate-using-cards-package">A note on example code used in AnalysisMethodCodeTemplate: using
+“cards” package<a class="anchor" aria-label="anchor" href="#a-note-on-example-code-used-in-analysismethodcodetemplate-using-cards-package"></a>
 </h3>
-<p>The <em>readARS</em> function reads in a completed ARS metadata file,
-and generates R scripts for each Output defined in the file. Below is an
-example of how this can be done using a ready-to-use ARS metadata Excel
-file (note that this is meant as an example. Official ARS metadata is in
-json format, which can also be passed to the <em>readARS</em>
-function):</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<p>A powerful aspect of the ARS model, is that dynamic code can be
+supplied as part of the metadata and be evaluated on either 1. the
+Output level, 2. the Analysis level, or 3. the AnalysisMethod level (for
+more information on this, see <a href="https://www.lexjansen.com/phuse-us/2025/ds/PAP_DS09.pdf" class="external-link">this</a>
+PHUSE paper). The latter case is implemented by making use of the
+<em>AnalysisMethodCodeTemplate</em> and
+<em>AnalysisMethodCodeParameters</em> classes in the metadata. The user
+supplies dynamic R code (with the option of making use of parameters
+referring to metadata pieces), which will be executed to perform the
+relevant AnalysisMethod operations.</p>
+<p>For the example ARS metadata in Excel shipped with this package, the
+R code used in the <em>AnalysisMethodCodeTemplate</em> is aligned with
+the <em>cards</em> R package (more information <a href="https://insightsengineering.github.io/cards/latest-tag/" class="external-link">here</a>).
+The <em>cards</em> package is a reputable R package consisting of
+wrappers for various statistical functions, and producing results in a
+consistent ARD format. Below is a simple example of how a function
+<em>ard_continuous</em> from the <em>cards</em> package is used in the
+<em>AnalysisMethodCodeTemplate</em> class in the accompanying Excel ARS
+metadata example shipped with this package:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># example of 'cards' code in AnalysisMethodCodeTemplate, using the ard_continuous function:</span></span>
+<span></span>
+<span><span class="va">Analysis_ARD</span> <span class="op">=</span> <span class="fu">ard_continuous</span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">filtered_ADSL</span>,</span>
+<span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">byvariables_here</span><span class="op">)</span>,</span>
+<span>  variables <span class="op">=</span> <span class="va">analysisvariable_here</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>In the above example of <em>AnalysisMethodCodeTemplate</em> code for
+a particular AnalysisMethod (summary statistics for a continuous
+variable), the <em>ard_continuous</em> function from the <em>cards</em>
+package is used. Notice, however, that two parameters are used in the
+code:</p>
+<ol style="list-style-type: decimal">
+<li>‘byvariables_here’, and</li>
+<li>‘analysisvariable_here’.</li>
+</ol>
+<p>These are example placeholder names, to be replaced by actual
+variables, depending on the context for the Analysis. For example,
+‘byvariables_here’ could be replaced by TRT01A, and
+‘analysisvariable_here’ could be replaced by AGE, for an ARD with
+summary statistics on AGE by Treatment. The same code, however, will be
+reused for summary statistics on e.g. HEIGHT for another Analysis, and
+the ‘analysisvariable_here’ will be replaced with HEIGHT. All this is
+dynamically applied within the readARS_xl function when generating R
+scripts using <em>siera</em>.</p>
+<p>In order to facilitate the use of placeholders and their replacement
+with actual values from the metadata, several “constructs” have been
+defined in the <em>readARS_xl</em> function, and are available to the
+user to call from the <em>AnalysisMethodCodeTemplate</em> and
+<em>AnalysisMethodCodeParameters</em> classes in the metadata. These
+constructs are either simple variables or datasets defined in the
+metadata, or complex, dynamic constructs from various metadata pieces,
+to be inserted in specific <em>cards</em> functions, or pre-processing
+steps. A list of defined constructs and examples is shipped with this
+package, and can be accessed with:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"cards_constructs.xlsx"</span><span class="op">)</span></span></code></pre></div>
+<p>The <em>readARS</em> function reads in a completed ARS metadata Excel
+file, and generates R scripts for each Output defined in the file. Below
+is an example of how this can be done using a ready-to-use ARS metadata
+Excel file:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Path to the Excel ARS metadata file: </span></span>
 <span><span class="va">ARS_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"Common_Safety_Displays_cards.xlsx"</span><span class="op">)</span></span>
@@ -153,70 +253,30 @@ function):</p>
 <span><span class="co"># run the readARS function with these 3 parameters.  This creates R scripts </span></span>
 <span><span class="co"># (1 for each Output in output_folder)</span></span>
 <span><span class="fu"><a href="../reference/readARS.html">readARS</a></span><span class="op">(</span><span class="va">ARS_path</span>, <span class="va">output_folder</span>, <span class="va">ADaM_folder</span><span class="op">)</span></span></code></pre></div>
-<p>You should now have 5 R scripts (named ARD_Out14-1-1.R,
-ARD_Out14-3-1-1.R, ARD_Out14-3-2-1.R, ARD_Out14-3-3-1a.R, and
-ARD_Out14-3-3-1b.R) in the folder specified as <em>output_folder</em>.
-You can execute any of these 5 R scripts as-is (assuming the ADaM
-required for this script is available in the <em>ADaM_folder</em>), and
-the result will be an ARD (one result per row format) for each of the
-scripts.</p>
-<div class="section level4">
-<h4 id="running-a-auto-generated-ard-script">Running a auto-generated ARD script<a class="anchor" aria-label="anchor" href="#running-a-auto-generated-ard-script"></a>
-</h4>
-<p>The structure of the auto-generated ARD script is discussed the the
-<a href="ARD_script_structure.html">ARD structure</a> vignette. Examples
-of such an auto-generated ARD scripts are included in the package, and
-can be used by using the <code>ARD_script_example</code> function.
-Running this script will look like this:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p>If you’ve followed along so far, you should now have 5 R scripts
+(named ARD_Out14-1-1.R, ARD_Out14-3-1-1.R, ARD_Out14-3-2-1.R,
+ARD_Out14-3-3-1a.R, and ARD_Out14-3-3-1b.R) in the folder specified as
+<em>output_folder</em>. If this is successful, you can execute any of
+these 5 R scripts as-is (assuming the ADaM required for this script is
+available in the <em>ADaM_folder</em>), and the result will be an ARD
+(one result per row format) for each of the scripts. An example of such
+an auto-generated ARD script is included in the package, and can be used
+by using the <code>ARD_script_exampe</code> function. Running this
+script will look like this:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Step 1: open ARD_xxx.R file</span></span>
 <span><span class="co"># Step 2: Confirm the location of ADaM dataset(s) is correct in the code section "Load ADaM".  </span></span>
-<span><span class="co"># For the sake of simplicity, the only update made to the ARD_Out14-1-1.R script was to point to the ADaM folder to ARS_example("ADSL.csv")</span></span>
+<span><span class="co"># For the sake of simplicity, the only update made to the ARD_Out14-1-1.R </span></span>
+<span><span class="co"># script was to point to the ADaM folder to ARS_example("ADSL.csv")</span></span>
 <span><span class="co"># Step 3: Run the code and enjoy automated analysis results generation. </span></span>
-<span><span class="co"># Note: the ARD is contained in the object "ARD" (which contains the appended) mini-ARDs from all individual Analyses ARDs.</span></span>
+<span><span class="co"># Note: the ARD is contained in the object "df4" (which contains the appended)</span></span>
+<span><span class="co"># mini-ARDs from all individual Analyses ARDs.</span></span>
 <span></span>
 <span><span class="va">example_ARD_script</span> <span class="op">=</span> <span class="fu"><a href="../reference/ARD_script_example.html">ARD_script_example</a></span><span class="op">(</span><span class="st">"ARD_Out14-1-1.R"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="va">example_ARD_script</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ARD</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   group1 group1_level group2 group2_level variable variable_level stat_name</span></span>
-<span><span class="co">#&gt; 1   &lt;NA&gt;                &lt;NA&gt;                TRT01A        Placebo         n</span></span>
-<span><span class="co">#&gt; 2   &lt;NA&gt;                &lt;NA&gt;                TRT01A      Xanomeli…         n</span></span>
-<span><span class="co">#&gt; 3   &lt;NA&gt;                &lt;NA&gt;                TRT01A      Xanomeli…         n</span></span>
-<span><span class="co">#&gt; 4 TRT01A      Placebo   &lt;NA&gt;                   AGE                        N</span></span>
-<span><span class="co">#&gt; 5 TRT01A      Placebo   &lt;NA&gt;                   AGE                     mean</span></span>
-<span><span class="co">#&gt; 6 TRT01A      Placebo   &lt;NA&gt;                   AGE                       sd</span></span>
-<span><span class="co">#&gt;   stat_label   stat</span></span>
-<span><span class="co">#&gt; 1          n     86</span></span>
-<span><span class="co">#&gt; 2          n     84</span></span>
-<span><span class="co">#&gt; 3          n     84</span></span>
-<span><span class="co">#&gt; 4          N     86</span></span>
-<span><span class="co">#&gt; 5       Mean 75.209</span></span>
-<span><span class="co">#&gt; 6         SD   8.59</span></span></code></pre></div>
-<p>The <code>ARD</code> object is the result of appending all
-analysis-level ARD (created from the <code>cards</code> and
-<code>cardx</code> functions) for the output. It can be used (and
-re-used) downstream for various applications. See <a href="apply-ARD.html">this vignette</a> for next step in utilising the
-ARD - like creating Tables, or using it for QC.</p>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df4</span><span class="op">)</span></span></code></pre></div>
 </div>
-</div>
-<div class="section level3">
-<h3 id="a-note-on-example-code-used-in-analysismethodcodetemplate-using-cards-package">A note on example code used in AnalysisMethodCodeTemplate: using
-<code>cards</code> package<a class="anchor" aria-label="anchor" href="#a-note-on-example-code-used-in-analysismethodcodetemplate-using-cards-package"></a>
-</h3>
-<p>A powerful aspect of the ARS model, is that dynamic code can be
-supplied as part of the metadata and be evaluated on either 1. the
-Output level, 2. the Analysis level, or 3. the AnalysisMethod level (for
-more information on this, see <a href="https://www.lexjansen.com/phuse-us/2025/ds/PAP_DS09.pdf" class="external-link">this</a>
-PHUSE paper). The latter case is implemented by making use of the
-<em>AnalysisMethodCodeTemplate</em> and
-<em>AnalysisMethodCodeParameters</em> classes in the metadata. The user
-supplies dynamic R code (with the option of making use of parameters
-referring to metadata pieces), which will be executed to perform the
-relevant AnalysisMethod operations. As was the case in this example, the
-<code>cards</code> and <code>cardx</code> R packages were used. See more
-information on this in the vignette on <a href="using-cards.html">using
-<code>cards</code> and <code>cardx</code></a>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
