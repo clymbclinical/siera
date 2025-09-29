@@ -57,7 +57,6 @@ library(magrittr)
 
   code_libraries <- func_libraries()
 
-
   # Read in ARS metadata ----------------------------------------------------
 
   # Get file extension (case-insensitive)
