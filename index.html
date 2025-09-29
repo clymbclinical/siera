@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">siera</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,7 +41,10 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/Getting_started.html">Getting Started</a></li>
+<li><a class="dropdown-item" href="articles/apply-ARD.html">What do I do with my ARD?</a></li>
+    <li><a class="dropdown-item" href="articles/ARD_script_structure.html">ARD program structure</a></li>
+    <li><a class="dropdown-item" href="articles/Getting_started.html">Getting Started</a></li>
+    <li><a class="dropdown-item" href="articles/using-cards.html">Making use of `cards` and `cardx`</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -94,7 +97,7 @@
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>The <code>siera</code> package has one main function, called <code>readARS</code>. This function takes ARS metadata as input (either JSON or xlsx format), and makes use of the various metadata pieces to populate R scripts, which an be run as-is to produce ARDs. One R script is created for each output (table) as defined in the ARS metadata for the reportingg event.</p>
+<p>The <code>siera</code> package has one main function, called <code>readARS</code>. This function takes ARS metadata as input (either JSON or xlsx format), and makes use of the various metadata pieces to populate R scripts, which an be run as-is to produce ARDs. One R script is created for each output (table) as defined in the ARS metadata for the reporting event.</p>
 <p>In order to make use of this function, the following are required as arguments:</p>
 <ol style="list-style-type: decimal">
 <li>A functional ARS file, representing ARS Metadata for a Reporting Event (JSON or xlsx)</li>
@@ -106,7 +109,7 @@
 <h3 id="more-info">More info:<a class="anchor" aria-label="anchor" href="#more-info"></a>
 </h3>
 <ul>
-<li><a href="https://www.lexjansen.com/phuse-us/2025/os/PAP_OS20.pdf" class="external-link">US Connect 2025 Paper</a></li>
+<li><a href="https://www.lexjansen.com/phuse-us/2025/os/PAP_OS20.pdf" class="external-link">US Connect 2025 paper</a></li>
 </ul>
 </div>
 </div>
