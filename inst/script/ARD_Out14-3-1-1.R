@@ -12,7 +12,6 @@ library(readr)
 library(cards)
 library(cardx)
 library(siera)
-library(parameters)
 library(tidyr)
 library(magrittr)
 
