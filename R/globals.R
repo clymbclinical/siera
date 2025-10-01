@@ -5,4 +5,4 @@ utils::globalVariables(c('value','analysisId','id','level','resultsByGroup','gro
                          'compoundExpression_logicalOperator','rFilt_1','rFilt_2', 'dataset', 'ADaM_folder',
                          'method_id','listItem_outputId','listItem_analysisId','groupingId1',
                          'groupingDataset','dataDriven','context','specifiedAs','templateCode',
-                         'parameter_valueSource','parameter_value','parameter_name','operation_id'))
+                         'parameter_valueSource','parameter_value','parameter_name','operation_id','.'))

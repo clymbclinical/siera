@@ -862,6 +862,8 @@ df_poptot = dplyr::filter(ADaM,
           distinct_list <- paste0(AG_var1,", ",ana_var)
           by_listc <- paste0("'",AG_var1,"'")
           by_list <- paste0(AG_var1)
+          by_stmt = paste0(", by = ",AG_var1)
+
 
           by_vars =  paste0(", variables = '",AG_var1,"'")
           strata_vars =  paste0(", variables = '",AG_var1,"'")
@@ -903,6 +905,8 @@ df_poptot = dplyr::filter(ADaM,
                                 ,AG_var3,"'")
 
         } else { # no grouping being done
+          distinct_list <- ana_var
+          by_stmt = ""
         }
 
       # Apply DataSubset -------------------------------------------------------------
@@ -915,7 +919,8 @@ df_poptot = dplyr::filter(ADaM,
           DSname <- subsetrule %>%
             dplyr::select(name) %>%
             unique() %>%
-            as.character()
+            as.character() %>%
+            gsub("[\r\n]", " ", .)
 
           # for Fisher's exact test to filter:
           # fishersrow = subsetrule %>%
