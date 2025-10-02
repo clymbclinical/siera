@@ -1123,7 +1123,7 @@ df_poptot = dplyr::filter(ADaM,
                     }
                     if(val1 == "" & vac == "NE"){ # value is not blank
                       NEblankval = TRUE
-                    } else{
+                    } else {
                       NEblankval = FALSE
                     }
                   }
@@ -1140,7 +1140,7 @@ df_poptot = dplyr::filter(ADaM,
               if(exists('NEblankval')){
                 if(NEblankval == TRUE){
                 rcode = paste0("!is.na(", var, ") & ",var, "!= ''")
-                }
+                } else rcode = rcode
               }
 
               assign(paste("rFilt", m, sep = "_"),
