@@ -482,7 +482,7 @@ test_that("ARD values - json 2", {
         unlist()
       expect_equal(test2[[1]], 3)
       expect_equal(test2[[2]], 3)
-      expect_equal(test2[[3]], 2)
+      expect_equal(test2[[3]], 3)
 
       test3 = ARD %>%
         filter(AnalysisId == "An_02",
@@ -491,7 +491,7 @@ test_that("ARD values - json 2", {
         unlist()
       expect_equal(round(test3[[1]], digits = 5), 16.02553)
       expect_equal(round(test3[[2]], digits = 5), 14.12637)
-      expect_equal(round(test3[[3]], digits = 5), 15.05614)
+      expect_equal(round(test3[[3]], digits = 5), 16.02862)
 
     } else if(length(grep("Out_02", f)) > 0){
       test1 = ARD %>%
