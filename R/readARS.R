@@ -922,66 +922,6 @@ df_poptot = dplyr::filter(ADaM,
             as.character() %>%
             gsub("[\r\n]", " ", .)
 
-          # for Fisher's exact test to filter:
-          # fishersrow = subsetrule %>%
-          #   dplyr::filter(condition_dataset == AG_ds1)
-          #
-          # # assign the variables
-          # fishervar = fishersrow$condition_variable
-          #
-          # fishervac = fishersrow$condition_comparator
-          #
-          # fisherval1 = stringr::str_trim(fishersrow$condition_value)
-          #
-          # if(nrow(fishersrow) > 0) { # if we need a DS statement
-          #
-          #   #new
-          #
-          #   if(fishervac == "IN"){
-          #     fisher_f_vac = "%in%"
-          #
-          #     # multiple values
-          #     vals = strsplit(fisherval1, ",\\s*")[[1]]
-          #     is_num <- !is.na(suppressWarnings(as.numeric(vals)))
-          #
-          #     if(is_num[1] == TRUE){ # numeric values
-          #       vals_ = suppressWarnings(as.numeric(vals))
-          #       fisher_f_val =  paste0("c(", paste0( vals_, collapse = ", "), ")")
-          #     } else{
-          #       fisher_f_val =  paste0("c(", paste0("'", vals, "'", collapse = ", "), ")")
-          #     }
-          #
-          #   }else{
-          #     if(fishervac == "EQ") fisher_f_vac = '=='
-          #     if(fishervac == "NE") fisher_f_vac = '!='
-          #     if(fishervac == "GT") fisher_f_vac = '>'
-          #     if(fishervac == "GE") fisher_f_vac = '>='
-          #     if(fishervac == "LT") fisher_f_vac = '<'
-          #     if(fishervac == "LE") fisher_f_vac = '<='
-          #
-          #     is_num <- !is.na(suppressWarnings(as.numeric(fisherval1)))
-          #     if(is_num == TRUE){
-          #       fisher_f_val = suppressWarnings(as.numeric(fisherval1))
-          #     } else{
-          #       fisher_f_val =  paste0("'",fisherval1,"'")
-          #     }
-          #   }
-          #
-          #   # concatenate expression
-          #   fisher_cond_stm = paste0(", ",
-          #                            fishervar,
-          #                            " ",
-          #                            fisher_f_vac," "
-          #                            , "c(",
-          #                            fisher_f_val,")")
-          # } else { # if the DS statement should be blank for fisher's
-          #   fisher_cond_stm = ""
-          #
-          # }
-
-          ### end Fisher's exact test to filter
-
-
           if(nrow(subsetrule) == 1){      # if there's only one row
 
             var = subsetrule$condition_variable
@@ -1118,13 +1058,17 @@ df_poptot = dplyr::filter(ADaM,
 
                       # single value
                       is_num <- !is.na(suppressWarnings(as.numeric(val1)))
-                      if(is_num == TRUE){
+                      if(is_num == TRUE){  # value is numeric
                         val = suppressWarnings(as.numeric(val1))
-                      } else{
-                        val =  paste0("'",val1,"'")
+                      } else{ # value is character
+                          val =  paste0("'",val1,"'")
                       }
+                      if(val1 == "" & vac == "NE"){ # value is not blank
+                        NEblankval = TRUE
+                      } else{
+                      NEblankval = FALSE
                     }
-
+                }
                   # concatenate expression
                   assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", val))
 
@@ -1177,6 +1121,11 @@ df_poptot = dplyr::filter(ADaM,
                     } else{
                       f_val =  paste0("'",val1,"'")
                     }
+                    if(val1 == "" & vac == "NE"){ # value is not blank
+                      NEblankval = TRUE
+                    } else {
+                      NEblankval = FALSE
+                    }
                   }
                   # concatenate expression
                   assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", f_val))
@@ -1185,8 +1134,14 @@ df_poptot = dplyr::filter(ADaM,
                   else assign('rcode', paste0(var," ", f_vac," ", f_val))
 
                 }# end loop through rows
+              } # end xlsx case
+
+              # handle blank value scenario:
+              if(exists('NEblankval')){
+                if(NEblankval == TRUE){
+                rcode = paste0("!is.na(", var, ") & ",var, "!= ''")
+                } else rcode = rcode
               }
-              # combine total dplyr::filter
 
               assign(paste("rFilt", m, sep = "_"),
                      gsub("LOGOP", rlog_oper, rcode))
@@ -1201,19 +1156,14 @@ df_poptot = dplyr::filter(ADaM,
 
           } # end case where there are more than one rows
 
-
-
           func_DataSubset1 <- function(filterVal, ASID, DSNAME, Ansetds) {
 
               template <- "
-
 # Apply Data Subset ---
 # Data subset: dsnamehere
 df2_analysisidhere <- ansetdshere |>
         dplyr::filter(dplyr::filtertext1)
-
 "
-
             code <- gsub('dplyr::filtertext1', filterVal, template)
             code <- gsub('analysisidhere', ASID, code)
             code <- gsub('dsnamehere', DSNAME, code)
@@ -1229,200 +1179,6 @@ df2_analysisidhere <- ansetdshere |>
                                   DSname,
                                   AnSetDataSubsets)
           )
-
-
-          # comparative statistics filterval ----
-          # compfiltersubset = subsetrule %>%
-          #   dplyr::filter(condition_dataset == AG_ds1)
-          #
-          # if(nrow(compfiltersubset) == 1){      # if there's only one row
-          #
-          #   var = compfiltersubset$condition_variable
-          #   val1 = stringr::str_trim(compfiltersubset$condition_value)
-          #   vac = compfiltersubset$condition_comparator
-          #
-          #   if(vac == "IN"){
-          #     rvac = "%in%"
-          #
-          #     # multiple values
-          #     vals = strsplit(val1, ",\\s*")[[1]]
-          #     is_num <- !is.na(suppressWarnings(as.numeric(vals)))
-          #
-          #     if(is_num[1] == TRUE){ # numeric values
-          #       vals_ = suppressWarnings(as.numeric(vals))
-          #       val =  paste0("c(", paste0( vals_, collapse = ", "), ")")
-          #     } else{
-          #       val =  paste0("c(", paste0("'", vals, "'", collapse = ", "), ")")
-          #     }
-          #
-          #   }else{
-          #     if(vac == "EQ") rvac = '=='
-          #     if(vac == "NE") rvac = '!='
-          #     if(vac == "GT") rvac = '>'
-          #     if(vac == "GE") rvac = '>='
-          #     if(vac == "LT") rvac = '<'
-          #     if(vac == "LE") rvac = '<='
-          #
-          #     is_num <- !is.na(suppressWarnings(as.numeric(val1)))
-          #     if(is_num == TRUE){
-          #       val = suppressWarnings(as.numeric(val1))
-          #     } else{
-          #       val =  paste0("'",val1,"'")
-          #     }
-          #   }
-          #
-          #   compfilterval <- paste0(var," ", rvac," ",val)
-          #
-          # } else if(nrow(compfiltersubset) > 1) {# if there are more than one rows
-          #
-          #   maxlev = max(compfiltersubset$level)
-          #   # if(maxlev <= 1){
-          #   #   cli::cli_abort("Metadata issue in DataSubsets {subsetid}: DataSubset levels not incrementing")
-          #   # }
-          #
-          #   for (m in 1:(maxlev - 1)){   #loop through levels
-          #     # get logical operators
-          #
-          #     log_oper = compfiltersubset %>%  # identify all rows for this level
-          #       dplyr::filter(level == m,
-          #                     !is.na(compoundExpression_logicalOperator)) %>%
-          #       dplyr::select(compoundExpression_logicalOperator) %>%
-          #       as.character()
-          #
-          #     if(log_oper == "character(0)" ) log_oper = NA
-          #     assign(paste('log_oper',m, sep=''), log_oper) # assign logical operator value
-          #     #R code
-          #     if(!is.na(log_oper)){
-          #       if(log_oper == "AND") rlog_oper = '&'
-          #       else if(log_oper == "OR") rlog_oper = '|'
-          #       else rlog_oper = NA
-          #     }
-          #
-          #     lev = compfiltersubset %>%  # subset containing only first set of equations
-          #       dplyr::filter(level == m+1,
-          #                     is.na(compoundExpression_logicalOperator))
-          #
-          #     rcode <- ""
-          #
-          #     if(file_ext == "json"){
-          #
-          #       for (n in 1:nrow(lev)) {
-          #
-          #         ord1_ <- lev[n, ] # one row at a time
-          #
-          #         # assign the variables
-          #         var = ord1_$condition_variable
-          #
-          #         vac = ord1_$condition_comparator
-
-          #           val1 = ord1_$condition_value
-          #
-          #           if(vac == "IN") {
-          #             f_vac = "%in%"
-          #
-          #             # multiple values
-          #             vals = strsplit(val1, ",\\s*")[[1]]
-          #             is_num <- !is.na(suppressWarnings(as.numeric(vals)))
-          #
-          #             if(is_num[1] == TRUE){ # numeric values
-          #               vals_ = suppressWarnings(as.numeric(vals))
-          #               val =  paste0("c(", paste0( vals_, collapse = ", "), ")")
-          #             } else{
-          #               val =  paste0("c(", paste0("'", vals, "'", collapse = ", "), ")")
-          #             }
-          #           }
-          #           else {
-          #             if(vac == "EQ") f_vac = '=='
-          #             if(vac == "NE") f_vac = '!='
-          #             if(vac == "GT") f_vac = '>'
-          #             if(vac == "GE") f_vac = '>='
-          #             if(vac == "LT") f_vac = '<'
-          #             if(vac == "LE") f_vac = '<='
-          #
-          #             # single value
-          #             is_num <- !is.na(suppressWarnings(as.numeric(val1)))
-          #             if(is_num == TRUE){
-          #               val = suppressWarnings(as.numeric(val1))
-          #             } else{
-          #               val =  paste0("'",val1,"'")
-          #             }
-          #           }
-          #
-          #         # concatenate expression
-          #         assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", val))
-          #
-          #         if(n>1) assign('rcode', paste0(rcode, " LOGOP ",var," ", f_vac," ", val))
-          #         else assign('rcode', paste0(var," ", f_vac," ", val))
-          #
-          #       } # end loop through rows
-          #       # combine total dplyr::filter
-          #     } else if(file_ext == "xlsx"){
-          #
-          #       for (n in 1:nrow(lev)) {
-          #
-          #         ord1_ <- lev[n, ] # one row at a time
-          #
-          #         # assign the variables
-          #         var = ord1_$condition_variable
-          #
-          #         vac = ord1_$condition_comparator
-          #
-          #
-          #         val1 = ord1_$condition_value
-          #         val = gsub("\\|", ",", val1)
-          #
-          #         if(vac == "IN") {
-          #           f_vac = "%in%"
-          #
-          #           #multiple values
-          #           vals = strsplit(val1, ",\\s*")[[1]]
-          #           is_num <- !is.na(suppressWarnings(as.numeric(vals)))
-          #
-          #           if(is_num[1] == TRUE){ # numeric values
-          #             vals_ = suppressWarnings(as.numeric(vals))
-          #             f_val =  paste0("c(", paste0( vals_, collapse = ", "), ")")
-          #           } else{
-          #             f_val =  paste0("c(", paste0("'", vals, "'", collapse = ", "), ")")
-          #           }
-          #
-          #         } else { # vac is EQ or NE
-          #           if(vac == "EQ") f_vac = '=='
-          #           if(vac == "NE") f_vac = '!='
-          #           if(vac == "GT") f_vac = '>'
-          #           if(vac == "GE") f_vac = '>='
-          #           if(vac == "LT") f_vac = '<'
-          #           if(vac == "LE") f_vac = '<='
-          #
-          #           # single value
-          #           is_num <- !is.na(suppressWarnings(as.numeric(val1)))
-          #           if(is_num == TRUE){
-          #             f_val = suppressWarnings(as.numeric(val1))
-          #           } else{
-          #             f_val =  paste0("'",val1,"'")
-          #           }
-          #         }
-          #         # concatenate expression
-          #         assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", f_val))
-          #
-          #         if(n>1) assign('rcode', paste0(rcode, " LOGOP ",var," ", f_vac," ", f_val))
-          #         else assign('rcode', paste0(var," ", f_vac," ", f_val))
-          #
-          #       }# end loop through rows
-          #     }
-          #     # combine total dplyr::filter
-          #
-          #     assign(paste("rFilt", m, sep = "_"),
-          #            gsub("LOGOP", rlog_oper, rcode))
-          #   } # end loop through levels
-          #
-          #   # combine all dplyr::filter values:
-          #   if(exists('rFilt_2')){
-          #
-          #     compfilterval <- paste(rFilt_1, rFilt_2, sep = ", ")
-          #     rm(rFilt_2) #clear it so it doesn't exist for future
-          #   } else compfilterval <- rFilt_1
-          #
-          # } # end comparative statistics filterval
 
         } else { # there is no data subsetting for this analysis
 
@@ -1695,6 +1451,7 @@ df3_analysisidhere <- df3_analysisidhere |>
                     ") "
              )
       )
+
   writeLines(get(paste0("code_",Output)),
              paste0(output_path,"/ARD_",Output,".R"))
   } # end of outputs
