@@ -636,15 +636,15 @@ library(magrittr)
           }
         }
 
-        # code for conditional statement for anSet (Fisher's)
-        # anset_cond_stm = paste0(cond_var, oper,cond_val)
-
         # select 2nd Analysis in Output for identifying ADaM
         Anas_2 <- Anas[2, ]$listItem_analysisId
         Anas_s2 <- Analyses %>% # row from AN to get other IDs
           dplyr::filter(id == Anas_2)
 
         ana_adam2 <- Anas_s2$dataset
+
+        # Anas_s2 <- Analyses %>% # row from AN to get other IDs
+        #   dplyr::filter(id %in% Analyses_IDs)
 
         if(cond_adam == ana_adam2){    # if Analysis Set ADaM and Output ADaM are same
 
