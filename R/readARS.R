@@ -956,6 +956,19 @@ df_poptot = dplyr::filter(ADaM,
               } else{
                 val =  paste0("'",val1,"'")
               }
+              # if(val1 == "" & vac == "NE"){ # value is not blank
+              #   NEblankval = TRUE
+              # } else{
+              #   NEblankval = FALSE
+              # }
+              NEblankval <- FALSE
+              # normalize to length-1 character if possible
+              val1_chr <- suppressWarnings(as.character(val1))[1]
+
+              if (!is.null(vac) && !is.na(vac) && vac == "NE" &&
+                  !is.null(val1_chr) && !is.na(val1_chr) && identical(val1_chr, "")) {
+                NEblankval <- TRUE
+              }
             }
 
             rFilt_final <- paste0(var," ", rvac," ",val)
@@ -1063,11 +1076,19 @@ df_poptot = dplyr::filter(ADaM,
                       } else{ # value is character
                           val =  paste0("'",val1,"'")
                       }
-                      if(val1 == "" & vac == "NE"){ # value is not blank
-                        NEblankval = TRUE
-                      } else{
-                      NEblankval = FALSE
-                    }
+                    #   if(val1 == "" & vac == "NE"){ # value is not blank
+                    #     NEblankval = TRUE
+                    #   } else{
+                    #   NEblankval = FALSE
+                    # }
+                      NEblankval <- FALSE
+                      # normalize to length-1 character if possible
+                      val1_chr <- suppressWarnings(as.character(val1))[1]
+
+                      if (!is.null(vac) && !is.na(vac) && vac == "NE" &&
+                          !is.null(val1_chr) && !is.na(val1_chr) && identical(val1_chr, "")) {
+                        NEblankval <- TRUE
+                      }
                 }
                   # concatenate expression
                   assign(paste("fexp", m,n, sep = "_"), paste0(var," ", f_vac," ", val))
@@ -1121,10 +1142,18 @@ df_poptot = dplyr::filter(ADaM,
                     } else{
                       f_val =  paste0("'",val1,"'")
                     }
-                    if(val1 == "" & vac == "NE"){ # value is not blank
-                      NEblankval = TRUE
-                    } else {
-                      NEblankval = FALSE
+                    # if(val1 == "" & vac == "NE"){ # value is not blank
+                    #   NEblankval = TRUE
+                    # } else {
+                    #   NEblankval = FALSE
+                    # }
+                    NEblankval <- FALSE
+                    # normalize to length-1 character if possible
+                    val1_chr <- suppressWarnings(as.character(val1))[1]
+
+                    if (!is.null(vac) && !is.na(vac) && vac == "NE" &&
+                        !is.null(val1_chr) && !is.na(val1_chr) && identical(val1_chr, "")) {
+                      NEblankval <- TRUE
                     }
                   }
                   # concatenate expression
