@@ -1,4 +1,4 @@
-test_that("NE blank (single) handled - json", {
+test_that("NE blank (multiple) handled - json", {
 
   # path to file containing ARS metadata
   ARS_path <- ARS_example("exampleARS_2.json")
