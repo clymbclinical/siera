@@ -637,7 +637,7 @@ library(magrittr)
         }
 
         # select 2nd Analysis in Output for identifying ADaM
-        Anas_2 <- Anas[2, ]$listItem_analysisId
+        Anas_2 <- Anas[3, ]$listItem_analysisId
         Anas_s2 <- Analyses %>% # row from AN to get other IDs
           dplyr::filter(id == Anas_2)
 
