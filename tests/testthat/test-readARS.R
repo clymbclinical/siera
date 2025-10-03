@@ -1,3 +1,272 @@
+test_that("create script with no groupings in metadata", {
+  ARS_path <- ARS_example("exampleARS_4.json")
+  output_dir <- withr::local_tempdir()
+  adam_folder <- withr::local_tempdir()
+  readARS(ARS_path, output_dir, adam_folder, spec_output = "Out_01")
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_equal(length(r_files), 1)
+  expect_true(grepl("Out_01", basename(r_files)))
+})
+
+test_that("ARD values - Total column with no grouping", {
+  skip_on_cran()
+
+  # Path to ARS file (metadata driving script generation)
+  ARS_path  <- ARS_example("exampleARS_4.json")
+
+  # Directly use extdata shipped with the package
+  adam_dir  <- system.file("extdata", package = "siera")
+  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+
+  # Temp folder for generated scripts
+  output_dir <- withr::local_tempdir()
+
+  # Generate the R scripts — note adam_dir is passed here
+  readARS(ARS_path, output_dir, adam_dir, spec_output = "Out_01")
+
+  # Find generated R scripts
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_true(length(r_files) > 0, info = "No R scripts generated")
+
+  # Run each script and check ARD object
+  for (f in r_files) {
+    e <- new.env(parent = baseenv())
+
+    expect_error(
+      suppressWarnings(
+        suppressPackageStartupMessages(
+          source(f, local = e, chdir = TRUE)
+        )
+      ),
+      NA,
+      info = paste("Sourcing failed for", basename(f))
+    )
+
+    # Ensure ARD dataset was created
+    expect_true(exists("ARD", envir = e), info = paste("No ARD from", basename(f)))
+    ARD <- get("ARD", envir = e)
+    expect_true("stat" %in% names(ARD), info = "'stat' column missing in ARD")
+
+    # check specific values in ARD
+    if(length(grep("Out_01", f)) > 0){
+
+      # Categorical counts
+      test1 = ARD %>%
+        filter(AnalysisId == "An_04",
+               operationid == "Mth_02_02_%") %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(round(test1[[1]], digits = 3), 0.563)
+      expect_equal(round(test1[[2]], digits = 3), 0.437)
+    }
+
+  }
+}
+)
+
+test_that("Analysis created with OrderedGroupings row 1", {
+  # path to file containing ARS metadata
+  ARS_path <- ARS_example("exampleARS_4.json")
+  # output path for R programs
+  output_dir = withr::local_tempdir()
+  # folder containing ADaM datasets
+  adam_folder = withr::local_tempdir()
+  # run function, write to temp directory
+  readARS(ARS_path, output_dir, adam_folder)
+  filepath = file.path(output_dir, "ARD_Out_01.R")
+  expect_true(file.exists(filepath))
+  lines = readLines(filepath)
+  expect_true(any(grepl("Analysis An_02----", lines)))
+})
+
+test_that("warns when JSON metadata is missing required sections", {
+  skip_on_cran()
+
+  ARS_path  <- ARS_example("exampleARS_1a.json")
+  adam_dir  <- system.file("extdata", package = "siera")
+  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+
+  output_dir <- withr::local_tempdir()
+
+  # Only call inside expect_warning so the warning is captured
+  expect_warning(
+    readARS(ARS_path, output_dir, adam_dir),
+    "Input ARS file is missing required metadata sections: .*otherListsOfContents"
+  )
+})
+
+test_that("warns when xlsx workbook is missing required sheets", {
+  skip_on_cran()
+  skip_if_not_installed("readxl")
+
+  # Path to an XLSX example that is intentionally missing 'otherListsOfContents'
+  ARS_path  <- ARS_example("exampleARS_2a.xlsx")
+
+  # ADaM directory (as in your JSON test, if needed by downstream logic)
+  adam_dir  <- system.file("extdata", package = "siera")
+  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+
+  # Temp folder for any outputs
+  output_dir <- withr::local_tempdir()
+
+  # Expect the warning message about the missing sheet
+  expect_warning(
+    readARS(ARS_path, output_dir, adam_dir),
+    "Input ARS workbook is missing required sheets: DataSubsets, AnalysisMethods"
+  )
+})
+
+test_that("warns when ARS file is not JSON or xlsx", {
+
+  output_dir = withr::local_tempdir()
+  adam_folder = withr::local_tempdir()
+  dummy_path = tempfile(fileext = ".txt")
+
+  expect_warning(
+    readARS(dummy_path, output_dir, adam_folder),
+    "Input ARS file must be JSON or xlsx; .+ was received"
+  )
+})
+
+test_that("spec_output generates only specified script", {
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+  output_dir <- withr::local_tempdir()
+  adam_folder <- withr::local_tempdir()
+  readARS(ARS_path, output_dir, adam_folder, spec_output = "Out14-1-1")
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_equal(length(r_files), 1)
+  expect_true(grepl("Out14-1-1", basename(r_files)))
+})
+
+test_that("R Scripts are created for xlsx cards version", {
+
+  # path to file containing ARS metadata
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+
+  # output path for R programs
+  output_dir = withr::local_tempdir()
+
+  # folder containing ADaM datasets
+  adam_folder = withr::local_tempdir()
+
+  # run function, write to temp directory
+  readARS(ARS_path, output_dir, adam_folder)
+
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_true(length(r_files) > 0)
+})
+
+test_that("R Scripts are created for json cards version", {
+
+  # path to file containing ARS metadata
+  ARS_path <- ARS_example("test_cards.json")
+
+  # output path for R programs
+  output_dir = withr::local_tempdir()
+
+  # folder containing ADaM datasets
+  adam_folder = withr::local_tempdir()
+
+  # run function, write to temp directory
+  readARS(ARS_path, output_dir, adam_folder)
+
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_true(length(r_files) > 0)
+})
+
+test_that("Analysis Set code created", {
+
+  # path to file containing ARS metadata
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+
+  # output path for R programs
+  output_dir = withr::local_tempdir()
+
+  # folder containing ADaM datasets
+  adam_folder = withr::local_tempdir()
+
+  # run function, write to temp directory
+  readARS(ARS_path, output_dir, adam_folder)
+
+  filepath = file.path(output_dir, "ARD_Out14-1-1.R")
+
+  expect_true(file.exists(filepath))
+
+  lines = readLines(filepath)
+
+  expect_true(any(grepl("Apply Analysis Set", lines)))
+})
+
+
+test_that("Data Subset code created", {
+
+  # path to file containing ARS metadata
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+
+  # output path for R programs
+  output_dir = withr::local_tempdir()
+
+  # folder containing ADaM datasets
+  adam_folder = withr::local_tempdir()
+
+  # run function, write to temp directory
+  readARS(ARS_path, output_dir, adam_folder)
+
+  filepath = file.path(output_dir, "ARD_Out14-1-1.R")
+
+  expect_true(file.exists(filepath))
+
+  lines = readLines(filepath)
+
+  expect_true(any(grepl("Apply Data Subset", lines)))
+})
+
+test_that("Method code created", {
+
+  # path to file containing ARS metadata
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+
+  # output path for R programs
+  output_dir =withr::local_tempdir()
+
+  # folder containing ADaM datasets
+  adam_folder = withr::local_tempdir()
+
+  # run function, write to temp directory
+  readARS(ARS_path, output_dir, adam_folder)
+
+  filepath = file.path(output_dir, "ARD_Out14-1-1.R")
+
+  expect_true(file.exists(filepath))
+
+  lines = readLines(filepath)
+
+  expect_true(any(grepl("Apply Method", lines)))
+})
+
+test_that("combined code created", {
+
+  # path to file containing ARS metadata
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+
+  # output path for R programs
+  output_dir = withr::local_tempdir()
+
+  # folder containing ADaM datasets
+  adam_folder = withr::local_tempdir()
+
+  # run function, write to temp directory
+  readARS(ARS_path, output_dir, adam_folder)
+
+  filepath = file.path(output_dir, "ARD_Out14-1-1.R")
+
+  expect_true(file.exists(filepath))
+
+  lines = readLines(filepath)
+
+  expect_true(any(grepl("ARD <- ", lines)))
+})
+
 test_that("ARD values - xlsx 1", {
   skip_on_cran()
 

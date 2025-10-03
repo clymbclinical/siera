@@ -131,12 +131,17 @@ library(magrittr)
 
         forend <- length(tmp_json_lopa_sub) # amount of analyses datasets in json_lopa
         subana_dset <- data.frame() # initialise dataframe to contain datasets
-        for(b in 2:forend){   # always(?) 1st row is empty
-          ana_ids <- tmp_json_lopa_sub[[b]]$analysisId |>
-            tibble::as_tibble() |>
-            dplyr::mutate(listItem_outputId = tmp_PO$outputId) |>
-            dplyr::rename(listItem_analysisId = value)
-          subana_dset <- rbind(subana_dset, ana_ids)
+        for(b in 1:forend){
+
+          if(!is.null(tmp_json_lopa_sub[[b]])){
+            ana_ids <- tmp_json_lopa_sub[[b]]$analysisId |>
+              tibble::as_tibble() |>
+              dplyr::mutate(listItem_outputId = tmp_PO$outputId) |>
+              dplyr::rename(listItem_analysisId = value)
+
+            subana_dset <- rbind(subana_dset, ana_ids)
+          }
+
         }
         Lopa <- rbind(Lopa, subana_dset)
       }
@@ -278,13 +283,20 @@ library(magrittr)
 
       tmp_id <- JSON_AN[g,]$id %>% as.character()
 
-      tmp <- JSON_AN[["orderedGroupings"]][[g]] %>%
-        tidyr::pivot_wider(
-          names_from = order,
-          values_from = c(resultsByGroup, groupingId),
-          names_glue = "{.value}{order}"
-        ) %>%
-        dplyr::mutate(id = tmp_id)
+      if(nrow(JSON_AN[["orderedGroupings"]][[g]]) > 0){
+        tmp <- JSON_AN[["orderedGroupings"]][[g]] %>%
+          tidyr::pivot_wider(
+            names_from = order,
+            values_from = c(resultsByGroup, groupingId),
+            names_glue = "{.value}{order}"
+          ) %>%
+          dplyr::mutate(id = tmp_id)
+      } else {
+        tmp = tibble::tibble(resultByGroup = NA,
+                             groupingId1 = NA,
+                             id = tmp_id)
+      }
+
 
       AN_groupings <- dplyr::bind_rows(AN_groupings, tmp)
     }
