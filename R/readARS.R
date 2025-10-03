@@ -968,22 +968,25 @@ df_poptot = dplyr::filter(ADaM,
               } else{
                 val =  paste0("'",val1,"'")
               }
-              # if(val1 == "" & vac == "NE"){ # value is not blank
-              #   NEblankval = TRUE
-              # } else{
-              #   NEblankval = FALSE
-              # }
+              # handle blank value
               NEblankval <- FALSE
-              # normalize to length-1 character if possible
               val1_chr <- suppressWarnings(as.character(val1))[1]
 
               if (!is.null(vac) && !is.na(vac) && vac == "NE" &&
-                  !is.null(val1_chr) && !is.na(val1_chr) && identical(val1_chr, "")) {
+                  !is.null(val1_chr) && (identical(val1_chr, "") ||
+                                         identical(val1_chr, "NA") ||
+                                         is.na(val1_chr))) {
                 NEblankval <- TRUE
               }
             }
 
             rFilt_final <- paste0(var," ", rvac," ",val)
+            # handle blank value scenario:
+            if(exists('NEblankval')){
+              if(NEblankval == TRUE){
+                rFilt_final = paste0("!is.na(", var, ") & ",var, "!= ''")
+              } else rFilt_final = rFilt_final
+            }
 
           } else  {# if there are more than one rows
 
@@ -1088,17 +1091,15 @@ df_poptot = dplyr::filter(ADaM,
                       } else{ # value is character
                           val =  paste0("'",val1,"'")
                       }
-                    #   if(val1 == "" & vac == "NE"){ # value is not blank
-                    #     NEblankval = TRUE
-                    #   } else{
-                    #   NEblankval = FALSE
-                    # }
+                      # handle blank value
                       NEblankval <- FALSE
                       # normalize to length-1 character if possible
                       val1_chr <- suppressWarnings(as.character(val1))[1]
 
                       if (!is.null(vac) && !is.na(vac) && vac == "NE" &&
-                          !is.null(val1_chr) && !is.na(val1_chr) && identical(val1_chr, "")) {
+                          !is.null(val1_chr) && (identical(val1_chr, "") ||
+                                                 identical(val1_chr, "NA") ||
+                                                 is.na(val1_chr))) {
                         NEblankval <- TRUE
                       }
                 }
@@ -1154,17 +1155,15 @@ df_poptot = dplyr::filter(ADaM,
                     } else{
                       f_val =  paste0("'",val1,"'")
                     }
-                    # if(val1 == "" & vac == "NE"){ # value is not blank
-                    #   NEblankval = TRUE
-                    # } else {
-                    #   NEblankval = FALSE
-                    # }
+                    # handle blank value
                     NEblankval <- FALSE
                     # normalize to length-1 character if possible
                     val1_chr <- suppressWarnings(as.character(val1))[1]
 
                     if (!is.null(vac) && !is.na(vac) && vac == "NE" &&
-                        !is.null(val1_chr) && !is.na(val1_chr) && identical(val1_chr, "")) {
+                        !is.null(val1_chr) && (identical(val1_chr, "") ||
+                                               identical(val1_chr, "NA") ||
+                                               is.na(val1_chr))) {
                       NEblankval <- TRUE
                     }
                   }

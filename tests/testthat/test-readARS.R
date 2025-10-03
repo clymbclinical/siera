@@ -1,3 +1,44 @@
+test_that("NE blank (single) handled - json", {
+
+  # path to file containing ARS metadata
+  ARS_path <- ARS_example("exampleARS_2.json")
+
+  # output path for R programs
+  output_dir = withr::local_tempdir()
+
+  # folder containing ADaM datasets
+  adam_folder = withr::local_tempdir()
+
+  # run function, write to temp directory
+  readARS(ARS_path, output_dir, adam_folder)
+
+  filepath = file.path(output_dir, "ARD_Out_01.R")
+  expect_true(file.exists(filepath))
+  lines = readLines(filepath)
+  expect_true(any(grepl("!is.na\\(DHIND\\)\\s*&\\s*DHIND\\s*!=\\s*''", lines)))
+})
+
+test_that("NE blank (single) handled - xlsx", {
+
+  # path to file containing ARS metadata
+  ARS_path <- ARS_example("exampleARS_3.xlsx")
+
+  # output path for R programs
+  output_dir = withr::local_tempdir()
+
+  # folder containing ADaM datasets
+  adam_folder = withr::local_tempdir()
+
+  # run function, write to temp directory
+  readARS(ARS_path, output_dir, adam_folder)
+
+  filepath = file.path(output_dir, "ARD_Out_01.R")
+  expect_true(file.exists(filepath))
+  lines = readLines(filepath)
+  expect_true(any(grepl("!is.na\\(TRT01AN\\)\\s*&\\s*TRT01AN\\s*!=\\s*''", lines)))
+})
+
+
 test_that("create script with no groupings in metadata", {
   ARS_path <- ARS_example("exampleARS_4.json")
   output_dir <- withr::local_tempdir()
@@ -892,5 +933,4 @@ test_that("combined code created", {
 
   expect_true(any(grepl("ARD <- ", lines)))
 })
-
 
