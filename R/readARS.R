@@ -358,124 +358,23 @@ readARS <- function(ARS_path,
 
       # Apply AnalysisMethod -------------------------------------------------------------
 
-      method <- AnalysisMethods %>%
-        dplyr::filter(id == methodid) %>% # refnew
-        dplyr::select(name, description, label, id) %>%
-        unique()
+      analysis_method_result <- .generate_analysis_method_section(
+        analysis_methods = AnalysisMethods,
+        analysis_method_code_template = AnalysisMethodCodeTemplate,
+        analysis_method_code_parameters = AnalysisMethodCodeParameters,
+        method_id = methodid,
+        analysis_id = Anas_j,
+        output_id = Output,
+        envir = environment()
+      )
 
-      operations <- AnalysisMethods %>%
-        dplyr::filter(id == methodid) %>%
-        dplyr::select(operation_id)
+      code_method <- analysis_method_result$code
 
-      operation <- operations$operation_id
-      for (i in seq_len(nrow(operations))) {
-        assign(
-          paste0("operation_", i),
-          operation[i]
-          # ,
-          # envir = .GlobalEnv
-        )
-      }
-
+      method <- analysis_method_result$method
       methodname <- method$name
       methoddesc <- method$description
       methodlabel <- method$label
       methodid <- method$id
-
-      # Code
-      anmetcode <- AnalysisMethodCodeTemplate %>%
-        dplyr::filter(
-          method_id == methodid,
-          context %in% c("R", "R (siera)", "siera"),
-          specifiedAs == "Code"
-        ) %>%
-        dplyr::select(templateCode)
-
-      # Parameters
-      # to be replaced with Source values:
-      anmetparam_s <- AnalysisMethodCodeParameters %>%
-        dplyr::filter(
-          method_id == methodid,
-          parameter_valueSource != ""
-        )
-
-      # operations to transpose with
-      operation_list <- AnalysisMethods %>%
-        dplyr::filter(id == methodid) %>% # refnew
-        dplyr::select(operation_id)
-
-      operation_list_string <- paste(operation_list$operation_id,
-        collapse = ", "
-      )
-
-
-      # refnew
-      # intro part
-
-      template <- "
-# Method ID:              methodidhere
-# Method name:            methodnamehere
-# Method description:     methoddeschere
-"
-
-      code <- gsub("methodidhere", methodid, template)
-      code <- gsub("methodnamehere", methodname, code)
-      code_method_tmp_1 <- gsub("methoddeschere", methoddesc, code)
-
-      # code part
-
-      ## using for loop
-      anmetcode_temp <- paste0(
-        "if(nrow(df2_analysisidhere) != 0) {
-                              ",
-        anmetcode,
-        "}"
-      )
-
-      for (i in seq_len(nrow(anmetparam_s))) {
-        # Get the replacement value using get() based on the variable name in Column B
-
-        rep <- get(anmetparam_s$parameter_valueSource[i])
-        # Replace the placeholder in VAR with the variable's value
-        if (!is.na(rep)) {
-          anmetcode_temp <- gsub(
-            anmetparam_s$parameter_name[i],
-            rep,
-            anmetcode_temp
-          )
-        }
-      }
-      anmetcode_final <- gsub("methodidhere", methodid, anmetcode_temp)
-      anmetcode_final <- gsub("analysisidhere", Anas_j, anmetcode_final)
-
-      code_method_tmp_2 <- anmetcode_final
-
-      # mutate part
-      template <-
-        "
-if(nrow(df2_analysisidhere) != 0){
-df3_analysisidhere <- df3_analysisidhere |>
-        dplyr::mutate(AnalysisId = 'analysisidhere',
-               MethodId = 'methodidhere',
-               OutputId = 'outputidhere')
-} else {
-    df3_analysisidhere = data.frame(AnalysisId = 'analysisidhere',
-               MethodId = 'methodidhere',
-               OutputId = 'outputidhere')
-}
-    "
-
-      code <- gsub("methodidhere", methodid, template)
-      code <- gsub("analysisidhere", Anas_j, code)
-      code_method_tmp_3 <- gsub("outputidhere", Output, code)
-
-
-      code_method <- paste0(
-        code_method_tmp_1, "\n",
-        code_method_tmp_2,
-        code_method_tmp_3
-      )
-
 
       # code to combine it all --------------------------------------------------
       # dplyr::rename groups to append

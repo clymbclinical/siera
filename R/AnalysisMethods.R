@@ -1,0 +1,100 @@
+.generate_analysis_method_section <- function(analysis_methods,
+                                              analysis_method_code_template,
+                                              analysis_method_code_parameters,
+                                              method_id,
+                                              analysis_id,
+                                              output_id,
+                                              envir = parent.frame()) {
+  method <- analysis_methods %>%
+    dplyr::filter(id == method_id) %>%
+    dplyr::select(name, description, label, id) %>%
+    unique()
+
+  operations <- analysis_methods %>%
+    dplyr::filter(id == method_id) %>%
+    dplyr::select(operation_id)
+
+  operation_values <- operations$operation_id
+
+  operations_named <- stats::setNames(
+    as.list(operation_values),
+    paste0("operation_", seq_along(operation_values))
+  )
+
+  for (op_name in names(operations_named)) {
+    assign(op_name, operations_named[[op_name]], envir = envir)
+  }
+
+  methodname <- method$name
+  methoddesc <- method$description
+  methodlabel <- method$label
+  methodid <- method$id
+
+  anmetcode <- analysis_method_code_template %>%
+    dplyr::filter(
+      method_id == methodid,
+      context %in% c("R", "R (siera)", "siera"),
+      specifiedAs == "Code"
+    ) %>%
+    dplyr::select(templateCode)
+
+  anmetparam_s <- analysis_method_code_parameters %>%
+    dplyr::filter(
+      method_id == methodid,
+      parameter_valueSource != ""
+    )
+
+  anmetcode_temp <- paste0(
+    "if(nrow(df2_analysisidhere) != 0) {\n                              ",
+    anmetcode,
+    "}"
+  )
+
+  for (i in seq_len(nrow(anmetparam_s))) {
+    rep <- get(anmetparam_s$parameter_valueSource[i], envir = envir)
+    if (!is.na(rep)) {
+      anmetcode_temp <- gsub(
+        anmetparam_s$parameter_name[i],
+        rep,
+        anmetcode_temp
+      )
+    }
+  }
+
+  anmetcode_final <- gsub("methodidhere", methodid, anmetcode_temp)
+  anmetcode_final <- gsub("analysisidhere", analysis_id, anmetcode_final)
+
+  template_intro <- "
+# Method ID:              methodidhere
+# Method name:            methodnamehere
+# Method description:     methoddeschere
+"
+
+  code_method_tmp_1 <- gsub("methodidhere", methodid, template_intro)
+  code_method_tmp_1 <- gsub("methodnamehere", methodname, code_method_tmp_1)
+  code_method_tmp_1 <- gsub("methoddeschere", methoddesc, code_method_tmp_1)
+
+  template <-
+    "\nif(nrow(df2_analysisidhere) != 0){\ndf3_analysisidhere <- df3_analysisidhere |>
+        dplyr::mutate(AnalysisId = 'analysisidhere',
+               MethodId = 'methodidhere',
+               OutputId = 'outputidhere')\n} else {\n    df3_analysisidhere = data.frame(AnalysisId = 'analysisidhere',
+               MethodId = 'methodidhere',
+               OutputId = 'outputidhere')\n}\n    "
+
+  code <- gsub("methodidhere", methodid, template)
+  code <- gsub("analysisidhere", analysis_id, code)
+  code_method_tmp_3 <- gsub("outputidhere", output_id, code)
+
+  code_method <- paste0(
+    code_method_tmp_1, "\n",
+    anmetcode_final,
+    code_method_tmp_3
+  )
+
+  list(
+    code = paste0("#Apply Method --- \n", code_method),
+    operations = operations_named,
+    method = method
+  )
+}
