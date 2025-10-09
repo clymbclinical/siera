@@ -21,7 +21,6 @@
   c(list(file_ext = file_ext), metadata)
 }
 
-
 .read_ars_json_metadata <- function(ARS_path) {
   json_from <- jsonlite::fromJSON(ARS_path)
 
