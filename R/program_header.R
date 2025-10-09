@@ -4,4 +4,3 @@
   code <- gsub("outputnamehere", Output_Name, code, fixed = TRUE)
   gsub("datehere", date, code, fixed = TRUE)
 }
-
