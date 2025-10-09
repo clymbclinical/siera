@@ -132,148 +132,18 @@ readARS <- function(ARS_path,
 
       # Apply Analysis Set -----
 
-      if(j == 1){ # only apply AnalysisSet once per output
-        temp_AnSet <- AnalysisSets |>  # get analysis set for this iteration
-          dplyr::filter(id == ana_setId)
+      analysis_set_result <- .generate_analysis_set_code(
+        j = j,
+        analysis_sets = AnalysisSets,
+        analyses = Analyses,
+        anas = Anas,
+        analysis_set_id = ana_setId,
+        analysis_id = Anas_j
+      )
 
-        cond_adam <- temp_AnSet |> # ADaM for this analysis set
-          dplyr::select(condition_dataset) |>
-          as.character()
+      assign(paste0("code_AnalysisSet_", Anas_j), analysis_set_result$code)
 
-        cond_var <- temp_AnSet |> # condition variable for this analysis set
-          dplyr::select(condition_variable) |>
-          as.character()
-
-        cond_oper <- temp_AnSet |> # condition operator for this analysis set
-          dplyr::select(condition_comparator) |>
-          as.character()
-
-        cond_val <- temp_AnSet |> # condition value for this analysis set
-          dplyr::select(condition_value) |>
-          unlist()
-
-        anSetName <- temp_AnSet |> # condition value for this analysis set
-          dplyr::select(name)|>
-          as.character()
-
-        if(cond_oper == "EQ") { # convert to R code
-          oper <-  '=='
-        } else if(cond_oper == "NE"){
-          oper = '!='
-        } else if(cond_oper == "GE"){
-          oper = '>='
-        } else if(cond_oper == "GT"){
-          oper = '>'
-        } else if(cond_oper == "LE"){
-          oper = '<='
-        } else if(cond_oper == "LT"){
-          oper = '<'
-        }
-
-
-        if(is.na(cond_val)){
-          cond_val = ""
-        } else{
-          if(!is.numeric(cond_val)){
-            cond_val = paste0(cond_val)
-          }
-        }
-
-        # select 2nd Analysis in Output for identifying ADaM
-        Anas_2 <- Anas[3, ]$listItem_analysisId
-        Anas_s2 <- Analyses %>% # row from AN to get other IDs
-          dplyr::filter(id == Anas_2)
-
-        ana_adam2 <- Anas_s2$dataset
-
-        # Anas_s2 <- Analyses %>% # row from AN to get other IDs
-        #   dplyr::filter(id %in% Analyses_IDs)
-
-        if(cond_adam == ana_adam2){    # if Analysis Set ADaM and Output ADaM are same
-
-          func_AnalysisSet1 <- function(dataset, variable, oper, val, ASID, anSetName) {
-            template <- "
-# Apply Analysis Set ---
-df_pop <- dplyr::filter(ADaM,
-            var operator 'value')
-
-df_poptot <- df_pop
-
-"
-            code <- gsub('ADaM', dataset, template)
-            code <- gsub('var', variable, code)
-            code <- gsub('operator', oper, code)
-            code <- gsub('value', val, code)
-            code <- gsub('analysisidhere', ASID, code)
-            code <- gsub('Analysissetnamehere', anSetName, code)
-
-            return(code)
-          }
-
-          assign(paste0("code_AnalysisSet_",Anas_j), func_AnalysisSet1(cond_adam,
-                                                                       cond_var,
-                                                                       oper,
-                                                                       cond_val,
-                                                                       Anas_j,
-                                                                       anSetName))
-
-        }
-        else { # if analysis set ADaM and Analysis ADaMs are different
-
-          # variable used in Analysis
-          func_AnalysisSet2 <- function(dataset,
-                                        variable,
-                                        oper,
-                                        val,
-                                        #anavar,
-                                        ASID,
-                                        anaADaM,
-                                        anSetName) {
-            template <- "
-# Apply Analysis Set ---
-overlap <- intersect(names(ADaM), names(analysisADAMhere))
-overlapfin <- setdiff(overlap, 'USUBJID')
-
-df_pop <- dplyr::filter(ADaM,
-            var operator 'value') |>
-            merge(analysisADAMhere |> dplyr::select(-dplyr::all_of(overlapfin)),
-                  by = 'USUBJID',
-                  all = FALSE)
-
-df_poptot = dplyr::filter(ADaM,
-            var operator 'value')
-"
-            code <- gsub('ADaM', dataset, template)
-            code <- gsub('var', variable, code)
-            code <- gsub('operator', oper, code)
-            code <- gsub('value', val, code)
-            #code <- gsub('anasetvrhere', anavar, code)
-            code <- gsub('analysisidhere', ASID, code)
-            code <- gsub('analysisADAMhere', anaADaM, code)
-            code <- gsub('Analysissetnamehere', anSetName, code)
-
-            return(code)
-          }
-
-          assign(paste0("code_AnalysisSet_",Anas_j),
-                 func_AnalysisSet2(cond_adam,
-                                   cond_var,
-                                   oper,
-                                   cond_val,
-                                   #ana_var,
-                                   Anas_j,
-                                   ana_adam2,
-                                   anSetName))
-        }
-
-        # text to be used in DataSubsets:
-        AnSetDataSubsets = "df_poptot"
-      } else{ # AnalysisSet code for > 1st Analyses
-        assign(paste0("code_AnalysisSet_",Anas_j),"")
-
-        # text to be used in DataSubsets:
-        AnSetDataSubsets = "df_pop"
-      }
+      AnSetDataSubsets <- analysis_set_result$data_subset
 
       # Apply Grouping ----------------------------
 
@@ -1038,4 +908,116 @@ df3_analysisidhere <- df3_analysisidhere |>
   writeLines(get(paste0("code_",Output)),
              paste0(output_path,"/ARD_",Output,".R"))
   } # end of outputs
+}
+
+.generate_analysis_set_code <- function(j,
+                                        analysis_sets,
+                                        analyses,
+                                        anas,
+                                        analysis_set_id,
+                                        analysis_id) {
+
+  if (j != 1) {
+    return(list(
+      code = "",
+      data_subset = "df_pop"
+    ))
+  }
+
+  temp_AnSet <- analysis_sets |>
+    dplyr::filter(id == analysis_set_id)
+
+  cond_adam <- temp_AnSet |>
+    dplyr::select(condition_dataset) |>
+    as.character()
+  cond_adam <- cond_adam[1]
+
+  cond_var <- temp_AnSet |>
+    dplyr::select(condition_variable) |>
+    as.character()
+  cond_var <- cond_var[1]
+
+  cond_oper <- temp_AnSet |>
+    dplyr::select(condition_comparator) |>
+    as.character()
+  cond_oper <- cond_oper[1]
+
+  cond_val <- temp_AnSet |>
+    dplyr::select(condition_value) |>
+    unlist()
+
+  cond_val <- cond_val[1]
+
+  anSetName <- temp_AnSet |>
+    dplyr::select(name) |>
+    as.character()
+  anSetName <- anSetName[1]
+
+  oper <- dplyr::case_when(
+    cond_oper == "EQ" ~ "==",
+    cond_oper == "NE" ~ "!=",
+    cond_oper == "GE" ~ ">=",
+    cond_oper == "GT" ~ ">",
+    cond_oper == "LE" ~ "<=",
+    cond_oper == "LT" ~ "<",
+    TRUE ~ cond_oper
+  )
+
+  if (is.na(cond_val)) {
+    cond_val <- ""
+  } else if (!is.numeric(cond_val)) {
+    cond_val <- paste0(cond_val)
+  }
+
+  Anas_2 <- anas[3, ]$listItem_analysisId
+  Anas_s2 <- analyses %>%
+    dplyr::filter(id == Anas_2)
+
+  ana_adam2 <- Anas_s2$dataset
+
+  if (isTRUE(cond_adam == ana_adam2)) {
+    template <- "
+# Apply Analysis Set ---
+df_pop <- dplyr::filter(ADaM,
+            var operator 'value')
+
+df_poptot <- df_pop
+
+"
+
+    code <- gsub("ADaM", cond_adam, template)
+    code <- gsub("var", cond_var, code)
+    code <- gsub("operator", oper, code)
+    code <- gsub("value", cond_val, code)
+    code <- gsub("analysisidhere", analysis_id, code)
+    code <- gsub("Analysissetnamehere", anSetName, code)
+  } else {
+    template <- "
+# Apply Analysis Set ---
+overlap <- intersect(names(ADaM), names(analysisADAMhere))
+overlapfin <- setdiff(overlap, 'USUBJID')
+
+df_pop <- dplyr::filter(ADaM,
+            var operator 'value') |>
+            merge(analysisADAMhere |> dplyr::select(-dplyr::all_of(overlapfin)),
+                  by = 'USUBJID',
+                  all = FALSE)
+
+df_poptot = dplyr::filter(ADaM,
+            var operator 'value')
+"
+
+    code <- gsub("ADaM", cond_adam, template)
+    code <- gsub("var", cond_var, code)
+    code <- gsub("operator", oper, code)
+    code <- gsub("value", cond_val, code)
+    code <- gsub("analysisidhere", analysis_id, code)
+    code <- gsub("analysisADAMhere", ana_adam2, code)
+    code <- gsub("Analysissetnamehere", anSetName, code)
+  }
+
+  list(
+    code = code,
+    data_subset = "df_poptot"
+  )
 }
