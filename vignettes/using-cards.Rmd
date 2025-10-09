@@ -36,7 +36,7 @@ For the `siera` package,  the R code used in _AnalysisMethodCodeTemplate_ is ali
 ```{r cards example, eval=FALSE}
 # example of 'cards' code in AnalysisMethodCodeTemplate, using the ard_continuous function:
 
-Analysis_ARD = ard_continuous(
+Analysis_ARD <- ard_continuous(
   data = filtered_ADSL,
   by = c(byvariables_here),
   variables = analysisvariable_here
@@ -53,7 +53,7 @@ These are example placeholder names, to be replaced by actual variables, dependi
 ```{r cards example output, eval=FALSE}
 # example of 'cards' code in AnalysisMethodCodeTemplate, populated with AnalysisMethodCodeParameters:
 
-Analysis_ARD = ard_continuous(
+Analysis_ARD <- ard_continuous(
   data = filtered_ADSL,
   by = c(TRT01A),
   variables = AGE

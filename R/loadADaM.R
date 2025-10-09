@@ -31,4 +31,3 @@
 
   paste0("\n# Load ADaM -------\n", paste(unique(lines), collapse = ""))
 }
-

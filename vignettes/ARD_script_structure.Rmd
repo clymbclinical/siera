@@ -47,16 +47,21 @@ This step applies the Analysis Set assigned to the output (e.g. Safety Populatio
 
 ```{r Analysis Sets, message=FALSE, eval=FALSE}
 overlap <- intersect(names(ADSL), names(ADAE))
-overlapfin <- setdiff(overlap, 'USUBJID') 
+overlapfin <- setdiff(overlap, "USUBJID")
 
-df_pop <- dplyr::filter(ADSL,
-            SAFFL == 'Y') |>
-            merge(ADAE |> dplyr::select(-dplyr::all_of(overlapfin)),
-                  by = 'USUBJID',
-                  all = FALSE)
+df_pop <- dplyr::filter(
+  ADSL,
+  SAFFL == "Y"
+) |>
+  merge(ADAE |> dplyr::select(-dplyr::all_of(overlapfin)),
+    by = "USUBJID",
+    all = FALSE
+  )
 
-df_poptot = dplyr::filter(ADSL,
-            SAFFL == 'Y')
+df_poptot <- dplyr::filter(
+  ADSL,
+  SAFFL == "Y"
+)
 ```
 
 Note: this is only done once for the first Analysis, and assigned by subsequent analyses, since the dataset(s) remain the same for the remainder of the program's analyses.
@@ -67,7 +72,7 @@ Based on the resulting dataset from step 1, further data subsetting is applied w
 
 ```{r Data Subsets, message=FALSE, eval=FALSE}
 df2_An07_03_SerTEAE_Summ_ByTrt <- df_pop |>
-        dplyr::filter(TRTEMFL == 'Y' & AESER == 'Y')
+  dplyr::filter(TRTEMFL == "Y" & AESER == "Y")
 ```
 
 #### Step 3: Apply "Method"
@@ -75,34 +80,38 @@ df2_An07_03_SerTEAE_Summ_ByTrt <- df_pop |>
 This step takes the subsetted dataset, and applies the required AnalysisMethod (e.g. counting subjects by treatment and a group, like RACE).  As explained in the vignette for [using `cards` and `cardx`](using-cards.html), functions from these packages are applied to handle the statistical operations for the analysis.  Typically, there would be some pre-work done on the dataset before passing it to a `cards` or `cardx` function.  When the function is applied, the result is an analysis-level ARD.  At the end of this step, record-level metadata from the ARS model is also merged to the ARD, to ensure the ability to trace each result back to ARS metadata.  See example below:
 
 ```{r MethodExample, eval=FALSE}
-
 # intermediate step: Prepare Denominator Dataset for `cards` function
-denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
+denom_dataset <- df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 # intermediate step: Prepare input dataset for `cards` function
-in_data = df2_An03_05_Race_Summ_ByTrt |>
+in_data <- df2_An03_05_Race_Summ_ByTrt |>
   dplyr::distinct(TRT01A, RACE, USUBJID) |>
-  dplyr::mutate(dummy = 'dummyvar')
+  dplyr::mutate(dummy = "dummyvar")
 
 # pass calculate subjects counts and % (based on big N) grouped by treatment and race
 cards::ard_categorical(
   data = in_data,
-  by = c('TRT01A', 'RACE'),
-  variables = 'dummy',
-  denominator = denom_dataset)
-    
+  by = c("TRT01A", "RACE"),
+  variables = "dummy",
+  denominator = denom_dataset
+)
+
 # select relevant statistics as defined by the Method, and assign operation Ids
-df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt|>
-  dplyr::filter(stat_name %in% c('n', 'p')) |>
-  dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_1_n',
-                                               stat_name == 'p' ~ 'Mth01_2_pct'))
+df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt |>
+  dplyr::filter(stat_name %in% c("n", "p")) |>
+  dplyr::mutate(operationid = dplyr::case_when(
+    stat_name == "n" ~ "Mth01_1_n",
+    stat_name == "p" ~ "Mth01_2_pct"
+  ))
 
 # add ARS metadata IDs to the dataset to enable tracing each result back to ARS metadata
 df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt |>
-  dplyr::mutate(AnalysisId = 'An03_05_Race_Summ_ByTrt',
-                MethodId = 'Mth01',
-                OutputId = 'Out14-1-1')
+  dplyr::mutate(
+    AnalysisId = "An03_05_Race_Summ_ByTrt",
+    MethodId = "Mth01",
+    OutputId = "Out14-1-1"
+  )
 ```
 
 ### Final steps
@@ -111,19 +120,21 @@ The above process repeats for each Analysis, although the code for each step wou
 
 ```{r append, message=FALSE, eval=FALSE}
 # combine analyses to create ARD ----
-ARD <- dplyr::bind_rows(df3_An01_05_SAF_Summ_ByTrt, 
-df3_An03_01_Age_Summ_ByTrt, 
-df3_An03_01_Age_Comp_ByTrt, 
-df3_An03_02_AgeGrp_Summ_ByTrt, 
-df3_An03_02_AgeGrp_Comp_ByTrt, 
-df3_An03_03_Sex_Summ_ByTrt, 
-df3_An03_03_Sex_Comp_ByTrt, 
-df3_An03_04_Ethnic_Summ_ByTrt, 
-df3_An03_04_Ethnic_Comp_ByTrt, 
-df3_An03_05_Race_Summ_ByTrt, 
-df3_An03_05_Race_Comp_ByTrt, 
-df3_An03_06_Height_Summ_ByTrt, 
-df3_An03_06_Height_Comp_ByTrt) 
+ARD <- dplyr::bind_rows(
+  df3_An01_05_SAF_Summ_ByTrt,
+  df3_An03_01_Age_Summ_ByTrt,
+  df3_An03_01_Age_Comp_ByTrt,
+  df3_An03_02_AgeGrp_Summ_ByTrt,
+  df3_An03_02_AgeGrp_Comp_ByTrt,
+  df3_An03_03_Sex_Summ_ByTrt,
+  df3_An03_03_Sex_Comp_ByTrt,
+  df3_An03_04_Ethnic_Summ_ByTrt,
+  df3_An03_04_Ethnic_Comp_ByTrt,
+  df3_An03_05_Race_Summ_ByTrt,
+  df3_An03_05_Race_Comp_ByTrt,
+  df3_An03_06_Height_Summ_ByTrt,
+  df3_An03_06_Height_Comp_ByTrt
+)
 ```
 
 ### Example
