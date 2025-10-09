@@ -36,10 +36,10 @@ datasets
 ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
 
 # output path for R programs
-output_dir = tempdir()
+output_dir <- tempdir()
 
 # folder containing ADaM datasets
-adam_folder = tempdir()
+adam_folder <- tempdir()
 
 # run function, write to temp directory
 readARS(ARS_path, output_dir, adam_folder)
