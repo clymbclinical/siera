@@ -109,7 +109,7 @@ in the <em>AnalysisMethodCodeTemplate</em> class:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># example of 'cards' code in AnalysisMethodCodeTemplate, using the ard_continuous function:</span></span>
 <span></span>
-<span><span class="va">Analysis_ARD</span> <span class="op">=</span> <span class="fu">ard_continuous</span><span class="op">(</span></span>
+<span><span class="va">Analysis_ARD</span> <span class="op">&lt;-</span> <span class="fu">ard_continuous</span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">filtered_ADSL</span>,</span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">byvariables_here</span><span class="op">)</span>,</span>
 <span>  variables <span class="op">=</span> <span class="va">analysisvariable_here</span></span>
@@ -137,7 +137,7 @@ the ARS metadata):</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># example of 'cards' code in AnalysisMethodCodeTemplate, populated with AnalysisMethodCodeParameters:</span></span>
 <span></span>
-<span><span class="va">Analysis_ARD</span> <span class="op">=</span> <span class="fu">ard_continuous</span><span class="op">(</span></span>
+<span><span class="va">Analysis_ARD</span> <span class="op">&lt;-</span> <span class="fu">ard_continuous</span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">filtered_ADSL</span>,</span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">TRT01A</span><span class="op">)</span>,</span>
 <span>  variables <span class="op">=</span> <span class="va">AGE</span></span>

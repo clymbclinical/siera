@@ -114,16 +114,21 @@ follows:</p>
 subsequent analyses. Example:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">overlap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">intersect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">ADSL</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">ADAE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">overlapfin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="va">overlap</span>, <span class="st">'USUBJID'</span><span class="op">)</span> </span>
+<span><span class="va">overlapfin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="va">overlap</span>, <span class="st">"USUBJID"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">df_pop</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">ADSL</span>,</span>
-<span>            <span class="va">SAFFL</span> <span class="op">==</span> <span class="st">'Y'</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>            <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">ADAE</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">overlapfin</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                  by <span class="op">=</span> <span class="st">'USUBJID'</span>,</span>
-<span>                  all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">df_pop</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
+<span>  <span class="va">ADSL</span>,</span>
+<span>  <span class="va">SAFFL</span> <span class="op">==</span> <span class="st">"Y"</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">ADAE</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">overlapfin</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    by <span class="op">=</span> <span class="st">"USUBJID"</span>,</span>
+<span>    all <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="va">df_poptot</span> <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">ADSL</span>,</span>
-<span>            <span class="va">SAFFL</span> <span class="op">==</span> <span class="st">'Y'</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">df_poptot</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
+<span>  <span class="va">ADSL</span>,</span>
+<span>  <span class="va">SAFFL</span> <span class="op">==</span> <span class="st">"Y"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>Note: this is only done once for the first Analysis, and assigned by
 subsequent analyses, since the dataset(s) remain the same for the
 remainder of the program’s analyses.</p>
@@ -139,7 +144,7 @@ is done with no ‘filter’ statement. This step has a convention of
 starting the dataframe name with “df2”, followed by the AnalysisId.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df2_An07_03_SerTEAE_Summ_ByTrt</span> <span class="op">&lt;-</span> <span class="va">df_pop</span> <span class="op">|&gt;</span></span>
-<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">TRTEMFL</span> <span class="op">==</span> <span class="st">'Y'</span> <span class="op">&amp;</span> <span class="va">AESER</span> <span class="op">==</span> <span class="st">'Y'</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">TRTEMFL</span> <span class="op">==</span> <span class="st">"Y"</span> <span class="op">&amp;</span> <span class="va">AESER</span> <span class="op">==</span> <span class="st">"Y"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="step-3-apply-method">Step 3: Apply “Method”<a class="anchor" aria-label="anchor" href="#step-3-apply-method"></a>
@@ -156,34 +161,38 @@ ARD. At the end of this step, record-level metadata from the ARS model
 is also merged to the ARD, to ensure the ability to trace each result
 back to ARS metadata. See example below:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># intermediate step: Prepare Denominator Dataset for `cards` function</span></span>
-<span><span class="va">denom_dataset</span> <span class="op">=</span> <span class="va">df2_An01_05_SAF_Summ_ByTrt</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="co"># intermediate step: Prepare Denominator Dataset for `cards` function</span></span>
+<span><span class="va">denom_dataset</span> <span class="op">&lt;-</span> <span class="va">df2_An01_05_SAF_Summ_ByTrt</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">TRT01A</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># intermediate step: Prepare input dataset for `cards` function</span></span>
-<span><span class="va">in_data</span> <span class="op">=</span> <span class="va">df2_An03_05_Race_Summ_ByTrt</span> <span class="op">|&gt;</span></span>
+<span><span class="va">in_data</span> <span class="op">&lt;-</span> <span class="va">df2_An03_05_Race_Summ_ByTrt</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">TRT01A</span>, <span class="va">RACE</span>, <span class="va">USUBJID</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>dummy <span class="op">=</span> <span class="st">'dummyvar'</span><span class="op">)</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>dummy <span class="op">=</span> <span class="st">"dummyvar"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># pass calculate subjects counts and % (based on big N) grouped by treatment and race</span></span>
 <span><span class="fu">cards</span><span class="fu">::</span><span class="fu"><a href="https://insightsengineering.github.io/cards/latest-tag/reference/deprecated.html" class="external-link">ard_categorical</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">in_data</span>,</span>
-<span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'TRT01A'</span>, <span class="st">'RACE'</span><span class="op">)</span>,</span>
-<span>  variables <span class="op">=</span> <span class="st">'dummy'</span>,</span>
-<span>  denominator <span class="op">=</span> <span class="va">denom_dataset</span><span class="op">)</span></span>
-<span>    </span>
+<span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRT01A"</span>, <span class="st">"RACE"</span><span class="op">)</span>,</span>
+<span>  variables <span class="op">=</span> <span class="st">"dummy"</span>,</span>
+<span>  denominator <span class="op">=</span> <span class="va">denom_dataset</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># select relevant statistics as defined by the Method, and assign operation Ids</span></span>
-<span><span class="va">df3_An03_05_Race_Summ_ByTrt</span> <span class="op">&lt;-</span> <span class="va">df3_An03_05_Race_Summ_ByTrt</span><span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">stat_name</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'n'</span>, <span class="st">'p'</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>operationid <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">stat_name</span> <span class="op">==</span> <span class="st">'n'</span> <span class="op">~</span> <span class="st">'Mth01_1_n'</span>,</span>
-<span>                                               <span class="va">stat_name</span> <span class="op">==</span> <span class="st">'p'</span> <span class="op">~</span> <span class="st">'Mth01_2_pct'</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">df3_An03_05_Race_Summ_ByTrt</span> <span class="op">&lt;-</span> <span class="va">df3_An03_05_Race_Summ_ByTrt</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">stat_name</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n"</span>, <span class="st">"p"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>operationid <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>    <span class="va">stat_name</span> <span class="op">==</span> <span class="st">"n"</span> <span class="op">~</span> <span class="st">"Mth01_1_n"</span>,</span>
+<span>    <span class="va">stat_name</span> <span class="op">==</span> <span class="st">"p"</span> <span class="op">~</span> <span class="st">"Mth01_2_pct"</span></span>
+<span>  <span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># add ARS metadata IDs to the dataset to enable tracing each result back to ARS metadata</span></span>
 <span><span class="va">df3_An03_05_Race_Summ_ByTrt</span> <span class="op">&lt;-</span> <span class="va">df3_An03_05_Race_Summ_ByTrt</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>AnalysisId <span class="op">=</span> <span class="st">'An03_05_Race_Summ_ByTrt'</span>,</span>
-<span>                MethodId <span class="op">=</span> <span class="st">'Mth01'</span>,</span>
-<span>                OutputId <span class="op">=</span> <span class="st">'Out14-1-1'</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    AnalysisId <span class="op">=</span> <span class="st">"An03_05_Race_Summ_ByTrt"</span>,</span>
+<span>    MethodId <span class="op">=</span> <span class="st">"Mth01"</span>,</span>
+<span>    OutputId <span class="op">=</span> <span class="st">"Out14-1-1"</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -195,19 +204,21 @@ for each Analysis). Once each Analysis ARD has been created, these ARDs
 are all appened to create output-level ARD. See example below:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># combine analyses to create ARD ----</span></span>
-<span><span class="va">ARD</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">df3_An01_05_SAF_Summ_ByTrt</span>, </span>
-<span><span class="va">df3_An03_01_Age_Summ_ByTrt</span>, </span>
-<span><span class="va">df3_An03_01_Age_Comp_ByTrt</span>, </span>
-<span><span class="va">df3_An03_02_AgeGrp_Summ_ByTrt</span>, </span>
-<span><span class="va">df3_An03_02_AgeGrp_Comp_ByTrt</span>, </span>
-<span><span class="va">df3_An03_03_Sex_Summ_ByTrt</span>, </span>
-<span><span class="va">df3_An03_03_Sex_Comp_ByTrt</span>, </span>
-<span><span class="va">df3_An03_04_Ethnic_Summ_ByTrt</span>, </span>
-<span><span class="va">df3_An03_04_Ethnic_Comp_ByTrt</span>, </span>
-<span><span class="va">df3_An03_05_Race_Summ_ByTrt</span>, </span>
-<span><span class="va">df3_An03_05_Race_Comp_ByTrt</span>, </span>
-<span><span class="va">df3_An03_06_Height_Summ_ByTrt</span>, </span>
-<span><span class="va">df3_An03_06_Height_Comp_ByTrt</span><span class="op">)</span> </span></code></pre></div>
+<span><span class="va">ARD</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
+<span>  <span class="va">df3_An01_05_SAF_Summ_ByTrt</span>,</span>
+<span>  <span class="va">df3_An03_01_Age_Summ_ByTrt</span>,</span>
+<span>  <span class="va">df3_An03_01_Age_Comp_ByTrt</span>,</span>
+<span>  <span class="va">df3_An03_02_AgeGrp_Summ_ByTrt</span>,</span>
+<span>  <span class="va">df3_An03_02_AgeGrp_Comp_ByTrt</span>,</span>
+<span>  <span class="va">df3_An03_03_Sex_Summ_ByTrt</span>,</span>
+<span>  <span class="va">df3_An03_03_Sex_Comp_ByTrt</span>,</span>
+<span>  <span class="va">df3_An03_04_Ethnic_Summ_ByTrt</span>,</span>
+<span>  <span class="va">df3_An03_04_Ethnic_Comp_ByTrt</span>,</span>
+<span>  <span class="va">df3_An03_05_Race_Summ_ByTrt</span>,</span>
+<span>  <span class="va">df3_An03_05_Race_Comp_ByTrt</span>,</span>
+<span>  <span class="va">df3_An03_06_Height_Summ_ByTrt</span>,</span>
+<span>  <span class="va">df3_An03_06_Height_Comp_ByTrt</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
