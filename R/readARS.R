@@ -418,15 +418,13 @@ readARS <- function(ARS_path,
         dplyr::filter(id == methodid) %>%
         dplyr::select(operation_id)
 
-      operation <- operations$operation_id
-      for (i in seq_len(nrow(operations))) {
-        assign(
-          paste0("operation_", i),
-          operation[i]
-          # ,
-          # envir = .GlobalEnv
+      operation_env <- rlang::env(
+        parent = environment(),
+        !!!rlang::set_names(
+          as.list(operations$operation_id),
+          paste0("operation_", seq_len(nrow(operations)))
         )
-      }
+      )
 
       methodname <- method$name
       methoddesc <- method$description
@@ -440,7 +438,13 @@ readARS <- function(ARS_path,
           context %in% c("R", "R (siera)", "siera"),
           specifiedAs == "Code"
         ) %>%
-        dplyr::select(templateCode)
+        dplyr::pull(templateCode)
+
+      if (length(anmetcode) == 0) {
+        anmetcode <- ""
+      } else {
+        anmetcode <- paste(anmetcode, collapse = "\n")
+      }
 
       # Parameters
       # to be replaced with Source values:
@@ -479,26 +483,46 @@ readARS <- function(ARS_path,
         code = anmetcode
       )
 
-      for (i in seq_len(nrow(anmetparam_s))) {
-        # Get the replacement value using get() based on the variable name in Column B
+      if (nrow(anmetparam_s) > 0) {
+        replacement_sources <- anmetparam_s$parameter_valueSource
+        replacement_names <- anmetparam_s$parameter_name
 
-        rep <- rlang::env_get(
-          env = environment(),
-          nm = anmetparam_s$parameter_valueSource[i],
-          default = NA,
-          inherit = TRUE
+        replacement_values <- vapply(
+          replacement_sources,
+          function(source) {
+            value <- rlang::env_get(
+              env = operation_env,
+              nm = source,
+              default = NA,
+              inherit = TRUE
+            )
+
+            if (length(value) == 0 || all(is.na(value))) {
+              return(NA_character_)
+            }
+
+            paste(as.character(value), collapse = ", ")
+          },
+          character(1)
         )
-        # Replace the placeholder in VAR with the variable's value
-        if (!is.na(rep)) {
-          anmetcode_temp <- gsub(
-            anmetparam_s$parameter_name[i],
-            rep,
-            anmetcode_temp
-          )
+
+        valid_replacements <- !is.na(replacement_values)
+
+        if (any(valid_replacements)) {
+          replacement_map <- as.list(replacement_values[valid_replacements])
+          names(replacement_map) <- replacement_names[valid_replacements]
+          anmetcode_temp <- stringr::str_replace_all(anmetcode_temp, replacement_map)
         }
       }
-      anmetcode_final <- gsub("methodidhere", methodid, anmetcode_temp)
-      anmetcode_final <- gsub("analysisidhere", Anas_j, anmetcode_final)
+
+      placeholder_replacements <- c(
+        methodidhere = as.character(methodid),
+        analysisidhere = as.character(Anas_j)
+      )
+      anmetcode_final <- stringr::str_replace_all(
+        anmetcode_temp,
+        placeholder_replacements
+      )
 
       code_method_tmp_2 <- anmetcode_final
 
