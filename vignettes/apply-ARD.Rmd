@@ -2,7 +2,7 @@
 title: "What do I do with my ARD?"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{4. apply-ARD}
+  %\VignetteIndexEntry{What do I do with my ARD?}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
