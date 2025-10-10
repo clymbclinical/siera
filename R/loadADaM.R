@@ -20,14 +20,25 @@
   }
 
   lines <- vapply(unique_datasets, function(ad) {
-    ad_path <- paste0(adam_path, "/", ad, ".csv")
-    paste0(
-      ad, " <- readr::read_csv('", ad_path, "',\n",
-      "                                      show_col_types = FALSE,\n",
-      "                                      progress = FALSE) |>\n",
-      "  dplyr::mutate(dplyr::across(dplyr::where(is.character), ~ tidyr::replace_na(.x, '')))\n"
+    ad_symbol <- rlang::sym(ad)
+    ad_path <- file.path(adam_path, paste0(ad, ".csv"))
+
+    read_call <- rlang::expr(
+      readr::read_csv(
+        !!ad_path,
+        show_col_types = FALSE,
+        progress = FALSE
+      ) |>
+        dplyr::mutate(
+          dplyr::across(
+            dplyr::where(is.character),
+            ~ tidyr::replace_na(.x, "")
+          )
+        )
     )
+
+    .expr_to_code(rlang::expr(!!ad_symbol <- !!read_call))
   }, character(1))
 
-  paste0("\n# Load ADaM -------\n", paste(unique(lines), collapse = ""))
+  paste0("\n# Load ADaM -------\n", paste(unique(lines), collapse = "\n"), "\n")
 }

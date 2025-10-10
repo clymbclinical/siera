@@ -88,7 +88,9 @@ readARS <- function(ARS_path,
     )
 
     run_code <- "" # variable to contain generated code
-    combine_analysis_code <- "" # variable containing code to combine analyses
+    analysis_set_code <- list()
+    data_subset_code <- list()
+    analysis_bind_targets <- character()
 
     # Programme header ----
     timenow <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
@@ -140,7 +142,7 @@ readARS <- function(ARS_path,
         analysis_id = Anas_j
       )
 
-      assign(paste0("code_AnalysisSet_", Anas_j), analysis_set_result$code)
+      analysis_set_code[[Anas_j]] <- analysis_set_result$code
       AnSetDataSubsets <- analysis_set_result$data_subset
       # Apply Grouping ----------------------------
 
@@ -344,361 +346,64 @@ readARS <- function(ARS_path,
 
       # Apply DataSubset -------------------------------------------------------------
 
-      if (exists("DataSubsets")) { # if there is a data subset for the RE
-        if (!is.na(subsetid)) { # if there is a data subset for this analysis
-          subsetrule <- DataSubsets %>%
-            dplyr::filter(id == subsetid)
+      df2_sym <- rlang::sym(paste0("df2_", Anas_j))
+      source_sym <- rlang::sym(AnSetDataSubsets)
 
-          DSname <- subsetrule %>%
-            dplyr::select(name) %>%
-            unique() %>%
-            as.character() %>%
-            gsub("[\r\n]", " ", .)
+      has_data_subsets <- !is.null(DataSubsets) && nrow(DataSubsets) > 0
 
-          if (nrow(subsetrule) == 1) { # if there's only one row
+      if (has_data_subsets && !is.na(subsetid)) {
+        subsetrule <- DataSubsets |> dplyr::filter(id == subsetid)
 
-            var <- subsetrule$condition_variable
-            val1 <- stringr::str_trim(subsetrule$condition_value)
-            vac <- subsetrule$condition_comparator
+        if (nrow(subsetrule) == 0) {
+          cli::cli_warn("No DataSubset rules found for {subsetid}; defaulting to analysis set data")
 
-            if (vac == "IN") {
-              rvac <- "%in%"
+          assignment_expr <- rlang::expr(!!df2_sym <- !!source_sym)
 
-              # multiple values
-              vals <- strsplit(val1, ",\\s*")[[1]]
-              is_num <- !is.na(suppressWarnings(as.numeric(vals)))
+          data_subset_code[[Anas_j]] <- paste0(
+            "# Apply Data Subset ---\n",
+            .expr_to_code(assignment_expr),
+            "\n"
+          )
+        } else {
+          DSname <- subsetrule |>
+            dplyr::pull(name) |>
+            unique() |>
+            as.character()
 
-              if (is_num[1] == TRUE) { # numeric values
-                vals_ <- suppressWarnings(as.numeric(vals))
-                val <- paste0("c(", paste0(vals_, collapse = ", "), ")")
-              } else {
-                val <- paste0("c(", paste0("'", vals, "'", collapse = ", "), ")")
-              }
-            } else {
-              if (vac == "EQ") rvac <- "=="
-              if (vac == "NE") rvac <- "!="
-              if (vac == "GT") rvac <- ">"
-              if (vac == "GE") rvac <- ">="
-              if (vac == "LT") rvac <- "<"
-              if (vac == "LE") rvac <- "<="
+          DSname <- DSname[!is.na(DSname)]
+          DSname <- DSname[seq_len(min(length(DSname), 1L))]
+          DSname <- gsub("[\\r\\n]", " ", DSname)
 
-              is_num <- !is.na(suppressWarnings(as.numeric(val1)))
-              if (is_num == TRUE) {
-                val <- suppressWarnings(as.numeric(val1))
-              } else {
-                val <- paste0("'", val1, "'")
-              }
-              # handle blank value
-              NEblankval <- FALSE
-              val1_chr <- suppressWarnings(as.character(val1))[1]
+          filter_exprs <- .build_subset_filter_expressions(subsetrule, file_ext)
 
-              if (!is.null(vac) && !is.na(vac) && vac == "NE" &&
-                !is.null(val1_chr) && (identical(val1_chr, "") ||
-                identical(val1_chr, "NA") ||
-                is.na(val1_chr))) {
-                NEblankval <- TRUE
-              }
-            }
-
-            rFilt_final <- paste0(var, " ", rvac, " ", val)
-            # handle blank value scenario:
-            if (exists("NEblankval")) {
-              if (NEblankval == TRUE) {
-                rFilt_final <- paste0("!is.na(", var, ") & ", var, "!= ''")
-              } else {
-                rFilt_final <- rFilt_final
-              }
-            }
-          } else { # if there are more than one rows
-
-            maxlev <- max(subsetrule$level)
-            if (maxlev <= 1) {
-              cli::cli_abort("Metadata issue in DataSubsets {subsetid}: DataSubset levels not incrementing")
-            }
-
-            for (m in 1:(maxlev - 1)) { # loop through levels
-              # get logical operators
-
-              log_oper <- subsetrule %>% # identify all rows for this level
-                dplyr::filter(
-                  level == m,
-                  !is.na(compoundExpression_logicalOperator)
-                ) %>%
-                dplyr::select(compoundExpression_logicalOperator) %>%
-                as.character()
-
-              if (log_oper == "character(0)") log_oper <- NA
-              assign(paste("log_oper", m, sep = ""), log_oper) # assign logical operator value
-              # R code
-              if (!is.na(log_oper)) {
-                if (log_oper == "AND") {
-                  rlog_oper <- "&"
-                } else if (log_oper == "OR") {
-                  rlog_oper <- "|"
-                } else {
-                  rlog_oper <- NA
-                }
-              }
-
-              lev <- subsetrule %>% # subset containing only first set of equations
-                dplyr::filter(
-                  level == m + 1,
-                  is.na(compoundExpression_logicalOperator)
-                )
-
-              rcode <- ""
-
-              if (file_ext == "json") {
-                for (n in 1:nrow(lev)) {
-                  ord1_ <- lev[n, ] # one row at a time
-
-                  # assign the variables
-                  var <- ord1_$condition_variable
-
-                  vac <- ord1_$condition_comparator
-
-                  val1 <- ord1_$condition_value %>%
-                    unlist()
-                  is_num <- !is.na(suppressWarnings(as.numeric(val1)))
-
-                  if (vac == "IN") {
-                    f_vac <- "%in%"
-
-                    # multiple values
-                    if (is_num[1] == TRUE) { # numeric values
-                      val1_ <- suppressWarnings(as.numeric(val1))
-                      val <- paste0("c(", paste0(val1_, collapse = ", "), ")")
-                    } else {
-                      val <- paste0("c(", paste0("'", val1, "'", collapse = ", "), ")")
-                    }
-                  } else {
-                    if (vac == "EQ") f_vac <- "=="
-                    if (vac == "NE") f_vac <- "!="
-                    if (vac == "GT") f_vac <- ">"
-                    if (vac == "GE") f_vac <- ">="
-                    if (vac == "LT") f_vac <- "<"
-                    if (vac == "LE") f_vac <- "<="
-
-                    # single value
-                    if (is_num == TRUE) {
-                      val <- suppressWarnings(as.numeric(val1))
-                    } else {
-                      val <- paste0("'", val1, "'")
-                    }
-                  }
-                  val1 <- ord1_$condition_value
-
-                  if (vac == "IN") {
-                    f_vac <- "%in%"
-
-                    # multiple values
-                    vals <- strsplit(val1, ",\\s*")[[1]]
-                    is_num <- !is.na(suppressWarnings(as.numeric(vals)))
-
-                    if (is_num[1] == TRUE) { # numeric values
-                      vals_ <- suppressWarnings(as.numeric(vals))
-                      val <- paste0("c(", paste0(vals_, collapse = ", "), ")")
-                    } else {
-                      val <- paste0("c(", paste0("'", vals, "'", collapse = ", "), ")")
-                    }
-                  } else {
-                    if (vac == "EQ") f_vac <- "=="
-                    if (vac == "NE") f_vac <- "!="
-                    if (vac == "GT") f_vac <- ">"
-                    if (vac == "GE") f_vac <- ">="
-                    if (vac == "LT") f_vac <- "<"
-                    if (vac == "LE") f_vac <- "<="
-
-                    # single value
-                    is_num <- !is.na(suppressWarnings(as.numeric(val1)))
-                    if (is_num == TRUE) { # value is numeric
-                      val <- suppressWarnings(as.numeric(val1))
-                    } else { # value is character
-                      val <- paste0("'", val1, "'")
-                    }
-                    # handle blank value
-                    NEblankval <- FALSE
-                    # normalize to length-1 character if possible
-                    val1_chr <- suppressWarnings(as.character(val1))[1]
-
-                    if (!is.null(vac) && !is.na(vac) && vac == "NE" &&
-                      !is.null(val1_chr) && (identical(val1_chr, "") ||
-                      identical(val1_chr, "NA") ||
-                      is.na(val1_chr))) {
-                      NEblankval <- TRUE
-                    }
-                  }
-                  # concatenate expression
-                  assign(paste("fexp", m, n, sep = "_"), paste0(var, " ", f_vac, " ", val))
-
-                  if (n > 1) {
-                    assign("rcode", paste0(rcode, " LOGOP ", var, " ", f_vac, " ", val))
-                  } else {
-                    assign("rcode", paste0(var, " ", f_vac, " ", val))
-                  }
-                } # end loop through rows
-                # combine total dplyr::filter
-              } else if (file_ext == "xlsx") {
-                for (n in 1:nrow(lev)) {
-                  ord1_ <- lev[n, ] # one row at a time
-
-                  # assign the variables
-                  var <- ord1_$condition_variable
-
-                  vac <- ord1_$condition_comparator
-
-
-                  val1 <- ord1_$condition_value
-                  val <- gsub("\\|", ",", val1)
-
-                  if (vac == "IN") {
-                    f_vac <- "%in%"
-
-                    # multiple values
-                    vals <- strsplit(val1, ",\\s*")[[1]]
-                    is_num <- !is.na(suppressWarnings(as.numeric(vals)))
-
-                    if (is_num[1] == TRUE) { # numeric values
-                      vals_ <- suppressWarnings(as.numeric(vals))
-                      f_val <- paste0("c(", paste0(vals_, collapse = ", "), ")")
-                    } else {
-                      f_val <- paste0("c(", paste0("'", vals, "'", collapse = ", "), ")")
-                    }
-                  } else { # vac is EQ or NE
-                    if (vac == "EQ") f_vac <- "=="
-                    if (vac == "NE") f_vac <- "!="
-                    if (vac == "GT") f_vac <- ">"
-                    if (vac == "GE") f_vac <- ">="
-                    if (vac == "LT") f_vac <- "<"
-                    if (vac == "LE") f_vac <- "<="
-
-                    # single value
-                    is_num <- !is.na(suppressWarnings(as.numeric(val1)))
-                    if (is_num == TRUE) {
-                      f_val <- suppressWarnings(as.numeric(val1))
-                    } else {
-                      f_val <- paste0("'", val1, "'")
-                    }
-                    # handle blank value
-                    NEblankval <- FALSE
-                    # normalize to length-1 character if possible
-                    val1_chr <- suppressWarnings(as.character(val1))[1]
-
-                    if (!is.null(vac) && !is.na(vac) && vac == "NE" &&
-                      !is.null(val1_chr) && (identical(val1_chr, "") ||
-                      identical(val1_chr, "NA") ||
-                      is.na(val1_chr))) {
-                      NEblankval <- TRUE
-                    }
-                  }
-                  # concatenate expression
-                  assign(paste("fexp", m, n, sep = "_"), paste0(var, " ", f_vac, " ", f_val))
-
-                  if (n > 1) {
-                    assign("rcode", paste0(rcode, " LOGOP ", var, " ", f_vac, " ", f_val))
-                  } else {
-                    assign("rcode", paste0(var, " ", f_vac, " ", f_val))
-                  }
-                } # end loop through rows
-              } # end xlsx case
-
-              # handle blank value scenario:
-              if (exists("NEblankval")) {
-                if (NEblankval == TRUE) {
-                  rcode <- paste0("!is.na(", var, ") & ", var, "!= ''")
-                } else {
-                  rcode <- rcode
-                }
-              }
-
-              assign(
-                paste("rFilt", m, sep = "_"),
-                gsub("LOGOP", rlog_oper, rcode)
-              )
-            } # end loop through levels
-
-            # combine all dplyr::filter values:
-            if (exists("rFilt_2")) {
-              rFilt_final <- paste(rFilt_1, rFilt_2, sep = ", ")
-              rm(rFilt_2) # clear it so it doesn't exist for future
-            } else {
-              rFilt_final <- rFilt_1
-            }
-          } # end case where there are more than one rows
-
-          func_DataSubset1 <- function(filterVal, ASID, DSNAME, Ansetds) {
-            template <- "
-# Apply Data Subset ---
-# Data subset: dsnamehere
-df2_analysisidhere <- ansetdshere |>
-        dplyr::filter(dplyr::filtertext1)
-"
-            code <- gsub("dplyr::filtertext1", filterVal, template)
-            code <- gsub("analysisidhere", ASID, code)
-            code <- gsub("dsnamehere", DSNAME, code)
-            code <- gsub("ansetdshere", Ansetds, code)
-
-            return(code)
+          pipeline_rhs <- if (length(filter_exprs) > 0) {
+            rlang::inject((!!source_sym) |> dplyr::filter(!!!filter_exprs))
+          } else {
+            source_sym
           }
 
-          # code_DataSubset <- func_DataSubset(rFilt_final, Anas_j)
-          assign(
-            paste0("code_DataSubset_", Anas_j),
-            func_DataSubset1(
-              rFilt_final,
-              Anas_j,
-              DSname,
-              AnSetDataSubsets
-            )
+          assignment_expr <- rlang::expr(!!df2_sym <- !!pipeline_rhs)
+
+          ds_comment <- if (length(DSname) == 1 && !identical(DSname, "")) {
+            glue::glue("# Data subset: {DSname}\n", .trim = FALSE)
+          } else {
+            ""
+          }
+
+          data_subset_code[[Anas_j]] <- paste0(
+            "# Apply Data Subset ---\n",
+            ds_comment,
+            .expr_to_code(assignment_expr),
+            "\n"
           )
-        } else { # there is no data subsetting for this analysis
+        }
+      } else {
+        assignment_expr <- rlang::expr(!!df2_sym <- !!source_sym)
 
-          func_DataSubset2 <- function(ASID, Ansetds) {
-            template <- "
-
-#Apply Data Subset ---
-df2_analysisidhere <- ansetdshere
-
-"
-
-            code <- gsub("analysisidhere", ASID, template)
-            code <- gsub("ansetdshere", Ansetds, code)
-            return(code)
-          } # end function
-
-          assign(
-            paste0("code_DataSubset_", Anas_j),
-            func_DataSubset2(
-              Anas_j,
-              AnSetDataSubsets
-            )
-          )
-        } # end case where no data subsetting
-      } # end case where no data subsetting for the entire RE
-
-      else { # no data subset for the RE
-
-
-        func_DataSubset3 <- function(ASID,
-                                     Ansetds) {
-          template <- "
-
-#Apply Data Subset ---
-df2_analysisidhere <- ansetdshere
-
-"
-
-          code <- gsub("analysisidhere", ASID, template)
-          code <- gsub("ansetdshere", Ansetds, code)
-          return(code)
-        } # end function
-
-        assign(
-          paste0("code_DataSubset_", Anas_j),
-          func_DataSubset3(
-            Anas_j,
-            AnSetDataSubsets
-          )
+        data_subset_code[[Anas_j]] <- paste0(
+          "# Apply Data Subset ---\n",
+          .expr_to_code(assignment_expr),
+          "\n"
         )
       }
 
@@ -758,30 +463,31 @@ df2_analysisidhere <- ansetdshere
       # refnew
       # intro part
 
-      template <- "
-# Method ID:              methodidhere
-# Method name:            methodnamehere
-# Method description:     methoddeschere
-"
-
-      code <- gsub("methodidhere", methodid, template)
-      code <- gsub("methodnamehere", methodname, code)
-      code_method_tmp_1 <- gsub("methoddeschere", methoddesc, code)
+      code_method_tmp_1 <- .render_template(
+        "# Method ID:              {methodid}\n# Method name:            {methodname}\n# Method description:     {methoddesc}\n",
+        methodid = methodid,
+        methodname = methodname,
+        methoddesc = methoddesc
+      )
 
       # code part
 
       ## using for loop
-      anmetcode_temp <- paste0(
-        "if(nrow(df2_analysisidhere) != 0) {
-                              ",
-        anmetcode,
-        "}"
+      anmetcode_temp <- .render_template(
+        "if (nrow(df2_{analysis_id}) != 0) {{\n{code}\n}}",
+        analysis_id = Anas_j,
+        code = anmetcode
       )
 
       for (i in seq_len(nrow(anmetparam_s))) {
         # Get the replacement value using get() based on the variable name in Column B
 
-        rep <- get(anmetparam_s$parameter_valueSource[i])
+        rep <- rlang::env_get(
+          env = environment(),
+          nm = anmetparam_s$parameter_valueSource[i],
+          default = NA,
+          inherit = TRUE
+        )
         # Replace the placeholder in VAR with the variable's value
         if (!is.na(rep)) {
           anmetcode_temp <- gsub(
@@ -797,24 +503,29 @@ df2_analysisidhere <- ansetdshere
       code_method_tmp_2 <- anmetcode_final
 
       # mutate part
-      template <-
-        "
-if(nrow(df2_analysisidhere) != 0){
-df3_analysisidhere <- df3_analysisidhere |>
-        dplyr::mutate(AnalysisId = 'analysisidhere',
-               MethodId = 'methodidhere',
-               OutputId = 'outputidhere')
-} else {
-    df3_analysisidhere = data.frame(AnalysisId = 'analysisidhere',
-               MethodId = 'methodidhere',
-               OutputId = 'outputidhere')
-}
-    "
+      df3_sym <- rlang::sym(paste0("df3_", Anas_j))
+      analysis_id_value <- as.character(Anas_j)
+      method_id_value <- as.character(methodid)
+      output_value <- as.character(Output)
 
-      code <- gsub("methodidhere", methodid, template)
-      code <- gsub("analysisidhere", Anas_j, code)
-      code_method_tmp_3 <- gsub("outputidhere", Output, code)
+      mutate_expr <- rlang::expr(
+        if (nrow(!!df2_sym) != 0) {
+          !!df3_sym <- !!df3_sym |>
+            dplyr::mutate(
+              AnalysisId = !!analysis_id_value,
+              MethodId = !!method_id_value,
+              OutputId = !!output_value
+            )
+        } else {
+          !!df3_sym <- data.frame(
+            AnalysisId = !!analysis_id_value,
+            MethodId = !!method_id_value,
+            OutputId = !!output_value
+          )
+        }
+      )
 
+      code_method_tmp_3 <- paste0(.expr_to_code(mutate_expr), "\n")
 
       code_method <- paste0(
         code_method_tmp_1, "\n",
@@ -825,98 +536,36 @@ df3_analysisidhere <- df3_analysisidhere |>
 
       # code to combine it all --------------------------------------------------
       # dplyr::rename groups to append
-      if (num_grp == 1) { # if 1 analysis grouping
-        func_rename1 <- function(groupvar1) {
-          template <- " %>%
-        dplyr::rename(Group1 = groupvar1here)
-"
-          code <- gsub("groupvar1here", groupvar1, template)
+      grouping_vars <- c(AG_var1, AG_var2, AG_var3)
+      grouping_vars <- grouping_vars[seq_len(min(num_grp, length(grouping_vars)))]
+      grouping_vars <- grouping_vars[!is.na(grouping_vars) & grouping_vars != ""]
 
-          return(code)
-        }
-
-        code_rename <- func_rename1(AG_var1)
-      } else if (num_grp == 2) { # if 2 analysis groupings
-        func_rename2 <- function(groupvar1,
-                                 groupvar2) {
-          template <- " |>
-        dplyr::rename(Group1 = groupvar1here,
-               Group2 = groupvar2here)
-"
-          code <- gsub("groupvar1here", groupvar1, template)
-          code <- gsub("groupvar2here", groupvar2, code)
-
-          return(code)
-        }
-        code_rename <- func_rename2(
-          AG_var1,
-          AG_var2
+      if (length(grouping_vars) > 0) {
+        rename_expr <- rlang::expr(
+          dplyr::rename(!!!rlang::set_names(rlang::syms(grouping_vars), paste0("Group", seq_along(grouping_vars))))
         )
-      } else if (num_grp == 3) { # if 3 analysis groupings
-        func_rename3 <- function(groupvar1,
-                                 groupvar2,
-                                 groupvar3) {
-          template <- " |>
-        dplyr::rename(Group1 = groupvar1here,
-               Group2 = groupvar2here,
-               Group3 = groupvar3here)
-"
-          code <- gsub("groupvar1here", groupvar1, template)
-          code <- gsub("groupvar2here", groupvar2, code)
-          code <- gsub("groupvar3here", groupvar3, code)
-
-          return(code)
-        }
-
-        code_rename <- func_rename3(
-          AG_var1,
-          AG_var2,
-          AG_var3
-        )
+        code_rename <- paste0(" |>\n", .expr_to_code(rename_expr, indent = 8L))
       } else {
         code_rename <- ""
-      } # if no analysis grouping
+      }
 
-
-      assign(
-        paste0("code_AnalysisMethod_", Anas_j),
-        paste0(
-          "#Apply Method --- \n",
-          code_method # ,
-          # code_rename
-        )
+      method_code_block <- paste0(
+        "#Apply Method --- \n",
+        code_method
       )
 
       # Generate code for analysis ----------------------------------------------
 
-      assign(
-        paste0("code_", Anas_j),
-        paste0(
-          "\n\n# Analysis ", Anas_j, "----\n#",
-          ana_name,
-          get(paste0("code_AnalysisSet_", Anas_j)),
-          # get(paste0("code_AnalysisGrouping_",Anas_j)),
-          get(paste0("code_DataSubset_", Anas_j)),
-          get(paste0("code_AnalysisMethod_", Anas_j))
-        )
+      analysis_block <- paste0(
+        "\n\n# Analysis ", Anas_j, "----\n#",
+        ana_name,
+        analysis_set_code[[Anas_j]],
+        data_subset_code[[Anas_j]],
+        method_code_block
       )
 
-      run_code <- paste0(
-        run_code,
-        get(paste0("code_", Anas_j))
-      )
-
-      if (j < max_j) {
-        combine_analysis_code <- paste0(
-          combine_analysis_code,
-          "df3_", Anas_j, ", \n"
-        )
-      } else {
-        combine_analysis_code <- paste0(
-          combine_analysis_code,
-          "df3_", Anas_j
-        )
-      }
+      run_code <- paste0(run_code, analysis_block)
+      analysis_bind_targets <- c(analysis_bind_targets, paste0("df3_", Anas_j))
     } # end of analysis
 
     # add pattern formatting
@@ -942,23 +591,28 @@ df3_analysisidhere <- df3_analysisidhere |>
 
 
     # add all code, combine analyses ARDs and apply pattern
-    assign(
-      paste0("code_", Output),
-      paste0(
-        code_header,
-        code_libraries,
-        code_ADaM,
-        run_code,
+    combine_code <- ""
+    if (length(analysis_bind_targets) > 0) {
+      analysis_syms <- rlang::syms(unique(analysis_bind_targets))
+      combine_expr <- rlang::expr(ARD <- dplyr::bind_rows(!!!analysis_syms))
+      combine_code <- paste0(
         "\n\n# combine analyses to create ARD ----\n",
-        "ARD <- dplyr::bind_rows(",
-        combine_analysis_code,
-        ") "
+        .expr_to_code(combine_expr),
+        "\n"
       )
+    }
+
+    final_code <- paste0(
+      code_header,
+      code_libraries,
+      code_ADaM,
+      run_code,
+      combine_code
     )
 
     writeLines(
-      get(paste0("code_", Output)),
-      paste0(output_path, "/ARD_", Output, ".R")
+      final_code,
+      file.path(output_path, paste0("ARD_", Output, ".R"))
     )
   } # end of outputs
 }

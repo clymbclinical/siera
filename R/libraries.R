@@ -1,3 +1,21 @@
 .generate_library_code <- function() {
-  "# load libraries ----\nlibrary(dplyr)\nlibrary(readxl)\nlibrary(readr)\nlibrary(cards)\nlibrary(cardx)\nlibrary(broom)\nlibrary(parameters)\nlibrary(tidyr)\nlibrary(magrittr)\n  "
+  calls <- rlang::exprs(
+    library(dplyr),
+    library(readxl),
+    library(readr),
+    library(cards),
+    library(cardx),
+    library(broom),
+    library(parameters),
+    library(tidyr),
+    library(magrittr)
+  )
+
+  library_code <- vapply(
+    calls,
+    function(expr) .expr_to_code(expr),
+    character(1)
+  )
+
+  paste0("# load libraries ----\n", paste(library_code, collapse = "\n"), "\n")
 }
