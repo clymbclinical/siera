@@ -509,8 +509,12 @@ readARS <- function(ARS_path,
       )
     )
 
+    script_code <- get(paste0("code_", Output))
+
+    styled_script_code <- styler::style_text(script_code)
+
     writeLines(
-      get(paste0("code_", Output)),
+      styled_script_code,
       paste0(output_path, "/ARD_", Output, ".R")
     )
   } # end of outputs
