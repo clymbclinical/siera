@@ -1,3 +1,13 @@
 .generate_library_code <- function() {
-  "# load libraries ----\nlibrary(dplyr)\nlibrary(readxl)\nlibrary(readr)\nlibrary(cards)\nlibrary(cardx)\nlibrary(broom)\nlibrary(parameters)\nlibrary(tidyr)\nlibrary(magrittr)\n  "
+  "# load libraries ----
+    library(dplyr)
+    library(readxl)
+    library(readr)
+    library(cards)
+    library(cardx)
+    library(broom)
+    library(parameters)
+    library(tidyr)
+    library(magrittr)
+  "
 }

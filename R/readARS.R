@@ -59,10 +59,10 @@ readARS <- function(ARS_path,
 
   # specific output
   if (spec_output != "") {
-    Lopo <- Lopo %>%
+    Lopo <- Lopo |>
       dplyr::filter(listItem_outputId == spec_output)
 
-    Lopa <- Lopa %>%
+    Lopa <- Lopa |>
       dplyr::filter(listItem_outputId == spec_output)
   }
 
@@ -72,7 +72,7 @@ readARS <- function(ARS_path,
     Output <- Lopo[i, ]$listItem_outputId
     OutputName <- Lopo[i, ]$listItem_name
 
-    Anas <- Lopa %>% # get all analyses for current output
+    Anas <- Lopa |> # get all analyses for current output
       dplyr::filter(
         listItem_outputId == Output,
         listItem_analysisId %in% Analyses$id
@@ -158,18 +158,18 @@ readARS <- function(ARS_path,
       NUM_analysisid <- Anas_s$referencedAnalysisOperations_analysisId1
       DEN_analysisid <- Anas_s$referencedAnalysisOperations_analysisId2
 
-      AG_denom_id <- Analyses %>%
-        dplyr::filter(id == DEN_analysisid) %>%
-        dplyr::select(groupingId1) %>%
-        unique() %>%
+      AG_denom_id <- Analyses |>
+        dplyr::filter(id == DEN_analysisid) |>
+        dplyr::select(groupingId1) |>
+        unique() |>
         as.character()
 
-      AG_denom_temp1 <- AnalysisGroupings %>%
+      AG_denom_temp1 <- AnalysisGroupings |>
         dplyr::filter(id == AG_denom_id)
 
-      AG_denom_var1 <- AG_denom_temp1 %>%
-        dplyr::select(groupingVariable) %>%
-        unique() %>%
+      AG_denom_var1 <- AG_denom_temp1 |>
+        dplyr::select(groupingVariable) |>
+        unique() |>
         as.character()
 
       if (AG_denom_var1 %in% c(NA, "NA", "")) {
@@ -177,22 +177,22 @@ readARS <- function(ARS_path,
       }
 
       if (max_group_number >= 1) {
-        AG_temp1 <- AnalysisGroupings %>%
+        AG_temp1 <- AnalysisGroupings |>
           dplyr::filter(id == groupid1)
 
-        AG_var1 <- AG_temp1 %>%
-          dplyr::select(groupingVariable) %>%
-          unique() %>%
+        AG_var1 <- AG_temp1 |>
+          dplyr::select(groupingVariable) |>
+          unique() |>
           as.character()
 
-        AG_ds1 <- AG_temp1 %>%
-          dplyr::select(groupingDataset) %>%
-          unique() %>%
+        AG_ds1 <- AG_temp1 |>
+          dplyr::select(groupingDataset) |>
+          unique() |>
           as.character()
 
-        AG_1_DataDriven <- AG_temp1 %>%
-          dplyr::select(dataDriven) %>%
-          unique() %>%
+        AG_1_DataDriven <- AG_temp1 |>
+          dplyr::select(dataDriven) |>
+          unique() |>
           as.character()
 
         # get the number of dplyr::group_by to perform in Grouping Apply
@@ -204,22 +204,22 @@ readARS <- function(ARS_path,
         }
 
         if (max_group_number >= 2) {
-          AG_temp2 <- AnalysisGroupings %>%
+          AG_temp2 <- AnalysisGroupings |>
             dplyr::filter(id == groupid2)
 
-          AG_var2 <- AG_temp2 %>%
-            dplyr::select(groupingVariable) %>%
-            unique() %>%
+          AG_var2 <- AG_temp2 |>
+            dplyr::select(groupingVariable) |>
+            unique() |>
             as.character()
 
-          AG_ds2 <- AG_temp2 %>%
-            dplyr::select(groupingDataset) %>%
-            unique() %>%
+          AG_ds2 <- AG_temp2 |>
+            dplyr::select(groupingDataset) |>
+            unique() |>
             as.character()
 
-          AG_2_DataDriven <- AG_temp2 %>%
-            dplyr::select(dataDriven) %>%
-            unique() %>%
+          AG_2_DataDriven <- AG_temp2 |>
+            dplyr::select(dataDriven) |>
+            unique() |>
             as.character()
 
           # get the number of dplyr::group_by to perform in Grouping Apply
@@ -235,22 +235,22 @@ readARS <- function(ARS_path,
           }
 
           if (max_group_number >= 3) {
-            AG_temp3 <- AnalysisGroupings %>%
+            AG_temp3 <- AnalysisGroupings |>
               dplyr::filter(id == groupid3)
 
-            AG_var3 <- AG_temp3 %>%
-              dplyr::select(groupingVariable) %>%
-              unique() %>%
+            AG_var3 <- AG_temp3 |>
+              dplyr::select(groupingVariable) |>
+              unique() |>
               as.character()
 
-            AG_ds3 <- AG_temp3 %>%
-              dplyr::select(groupingDataset) %>%
-              unique() %>%
+            AG_ds3 <- AG_temp3 |>
+              dplyr::select(groupingDataset) |>
+              unique() |>
               as.character()
 
-            AG_3_DataDriven <- AG_temp3 %>%
-              dplyr::select(dataDriven) %>%
-              unique() %>%
+            AG_3_DataDriven <- AG_temp3 |>
+              dplyr::select(dataDriven) |>
+              unique() |>
               as.character()
 
             # get the number of dplyr::group_by to perform in Grouping Apply
@@ -300,6 +300,7 @@ readARS <- function(ARS_path,
         distinct_list <- paste0(AG_var1, ", ", AG_var2, ", ", ana_var)
         by_listc <- paste0("'", AG_var1, "', '", AG_var2, "'")
         by_list <- paste0(AG_var1, ", ", AG_var2)
+        by_stmt <- paste0(", by = ", AG_var1, ", ", AG_var2)
 
         by_vars <- paste0(
           ", by = '",
@@ -319,6 +320,7 @@ readARS <- function(ARS_path,
         distinct_list <- paste0(AG_var1, ", ", AG_var2, ", ", AG_var3, ", ", ana_var)
         by_listc <- paste0("'", AG_var1, "', '", AG_var2, "', '", AG_var3, "'")
         by_list <- paste0(AG_var1, ", ", AG_var2, ", ", AG_var3)
+        by_stmt <- paste0(", by = ", AG_var1, ", ", AG_var2, ", ", AG_var3)
 
         by_vars <- paste0(
           ", by = c('",
@@ -340,6 +342,7 @@ readARS <- function(ARS_path,
       } else { # no grouping being done
         distinct_list <- ana_var
         by_stmt <- ""
+        cont_by_stmt <- ""
       }
 
       # Apply DataSubset -------------------------------------------------------------
@@ -380,7 +383,7 @@ readARS <- function(ARS_path,
       # dplyr::rename groups to append
       if (num_grp == 1) { # if 1 analysis grouping
         func_rename1 <- function(groupvar1) {
-          template <- " %>%
+          template <- " |>
         dplyr::rename(Group1 = groupvar1here)
 "
           code <- gsub("groupvar1here", groupvar1, template)
@@ -509,8 +512,27 @@ readARS <- function(ARS_path,
       )
     )
 
+    # script_code <- get(paste0("code_", Output))
+
+    # styled_script_code <- styler::style_text(script_code)
+    # # styled_script_code <- tryCatch(
+    # #   styler::style_text(script_code),
+    # #   error = function(err) {
+    # #     warning(
+    # #       paste(
+    # #         "Unable to style generated ARD script for",
+    # #         Output,
+    # #         "- writing unstyled code.",
+    # #         conditionMessage(err)
+    # #       )
+    # #     )
+    # #     script_code
+    # #   }
+    # # )
+
     writeLines(
       get(paste0("code_", Output)),
+      # styled_script_code,
       paste0(output_path, "/ARD_", Output, ".R")
     )
   } # end of outputs
