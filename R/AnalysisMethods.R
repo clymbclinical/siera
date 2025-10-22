@@ -19,11 +19,14 @@
                                               analysis_id,
                                               output_id,
                                               envir = parent.frame()) {
+  # Retrieve the method attributes that describe this analysis step.
   method <- analysis_methods %>%
     dplyr::filter(id == method_id) %>%
     dplyr::select(name, description, label, id) %>%
     unique()
 
+  # Capture every operation linked to the method so they can be referenced
+  # by the generated code when needed.
   operations <- analysis_methods %>%
     dplyr::filter(id == method_id) %>%
     dplyr::select(operation_id)
@@ -35,6 +38,8 @@
     paste0("operation_", seq_along(operation_values))
   )
 
+  # Assign operations into the parent environment, mirroring how
+  # ARS metadata references them in method templates.
   for (op_name in names(operations_named)) {
     assign(op_name, operations_named[[op_name]], envir = envir)
   }
@@ -52,6 +57,8 @@
     ) %>%
     dplyr::select(templateCode)
 
+  # Parameter substitution is based on ARS metadata entries that can refer
+  # to values calculated earlier in the script.
   anmetparam_s <- analysis_method_code_parameters %>%
     dplyr::filter(
       method_id == methodid,
