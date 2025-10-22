@@ -1,3 +1,17 @@
+#' Format numeric values consistently
+#'
+#' Internal helper to apply consistent number formatting across analyses.
+#' @param analysis_methods AnalysisMethod dataset for the reporting event
+#' @param analysis_method_code_template AnalysisMethodCodeTemplate dataset for the reporting event
+#' @param analysis_method_code_parameters AnalysisMethodCodeParameters dataset for the reporting event
+#' @param method_id MethodId for the method applied to current Analysis
+#' @param analysis_id AnalysisId for current Analysis
+#' @param output_id OutputId to which current Analysis belongs
+#' @param envir Environment (parent environment as default)
+
+#' @return Character vector with formatted numbers.
+#' @keywords internal
+
 .generate_analysis_method_section <- function(analysis_methods,
                                               analysis_method_code_template,
                                               analysis_method_code_parameters,
