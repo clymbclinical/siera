@@ -1,3 +1,17 @@
+#' Generate ADaM loading code
+#'
+#' Internal helper that inspects the analyses referenced by an output and
+#' builds the code required to read the relevant ADaM datasets. Only datasets
+#' referenced in the analyses, analysis sets, or data subsets are included in
+#' the returned code block.
+#' @param Anas Subset of analyses tied to the current output (Lopa rows).
+#' @param Analyses Analyses metadata for the reporting event.
+#' @param AnalysisSets AnalysisSets metadata for the reporting event.
+#' @param DataSubsets DataSubsets metadata for the reporting event.
+#' @param adam_path Directory containing the ADaM datasets on disk.
+#'
+#' @return Character string containing the code used to load ADaM datasets.
+#' @keywords internal
 .generate_adam_loading_code <- function(Anas, Analyses, AnalysisSets, DataSubsets, adam_path) {
   Analyses_IDs <- Analyses %>%
     dplyr::filter(id %in% Anas$listItem_analysisId)

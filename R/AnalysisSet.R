@@ -1,3 +1,19 @@
+#' Generate analysis set code and context
+#'
+#' Internal helper that builds the code needed to apply an analysis set to the
+#' current analysis. The function inspects the ARS metadata to determine filter
+#' conditions and returns the templated code together with the name of the
+#' resulting population dataset.
+#' @param j Index of the current analysis within the output loop.
+#' @param analysis_sets AnalysisSets metadata for the reporting event.
+#' @param analyses Analyses metadata for the reporting event.
+#' @param anas The analyses tied to the current output (Lopa subset).
+#' @param analysis_set_id Identifier for the analysis set used by the analysis.
+#' @param analysis_id Identifier for the analysis that is being generated.
+#'
+#' @return A list containing the generated code and the name of the dataset that
+#'   holds the filtered analysis population.
+#' @keywords internal
 .generate_analysis_set_code <- function(j,
                                         analysis_sets,
                                         analyses,

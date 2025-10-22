@@ -1,3 +1,15 @@
+#' Build a data subset condition
+#'
+#' Internal helper that translates ARS data-subset metadata into a filter
+#' expression suitable for inclusion in generated R code. Handles comparator
+#' translation, type coercion, and workbook-specific formatting differences.
+#' @param variable Variable name used in the subset definition.
+#' @param comparator Comparison operator from the metadata.
+#' @param value Value(s) associated with the comparator.
+#' @param file_ext Extension of the source ARS file, used to normalise parsing.
+#'
+#' @return Character string representing the filter expression to apply.
+#' @keywords internal
 .generate_data_subset_condition <- function(variable,
                                             comparator,
                                             value,
@@ -73,6 +85,21 @@
   paste0(variable, " ", operator, " ", formatted_value)
 }
 
+#' Generate data subset code
+#'
+#' Internal helper that assembles the code required to apply a data subset for a
+#' given analysis. The function prepares default code, augments it with
+#' conditional filters when required, and returns metadata describing the subset
+#' that was applied.
+#' @param data_subsets DataSubsets metadata for the reporting event.
+#' @param subset_id Identifier of the subset tied to the current analysis.
+#' @param analysis_id Identifier of the analysis for which code is generated.
+#' @param analysis_set_dataset Dataset name produced by the analysis set step.
+#' @param file_ext Extension of the source ARS metadata file (json or xlsx).
+#'
+#' @return A list containing the generated code, subset name, and filter
+#'   expression.
+#' @keywords internal
 .generate_data_subset_code <- function(data_subsets,
                                        subset_id,
                                        analysis_id,

@@ -1,3 +1,12 @@
+#' Read ARS metadata from disk
+#'
+#' Internal helper that validates the ARS file extension and dispatches to the
+#' JSON or XLSX reader before returning the harmonised metadata list.
+#' @param ARS_path Path to the ARS metadata file (JSON or XLSX).
+#'
+#' @return A list containing harmonised metadata tables, or `NULL` if the file
+#'   cannot be parsed.
+#' @keywords internal
 .read_ars_metadata <- function(ARS_path) {
   file_ext <- tolower(tools::file_ext(ARS_path))
 
@@ -21,6 +30,15 @@
   c(list(file_ext = file_ext), metadata)
 }
 
+#' Read ARS metadata from JSON
+#'
+#' Internal helper that ingests ARS metadata stored as JSON and converts it into
+#' the harmonised list of tibbles used elsewhere in the package.
+#' @param ARS_path Path to the JSON ARS metadata file.
+#'
+#' @return A list of metadata tables extracted from the JSON file, or `NULL`
+#'   when required sections are missing.
+#' @keywords internal
 .read_ars_json_metadata <- function(ARS_path) {
   json_from <- jsonlite::fromJSON(ARS_path)
 
@@ -366,7 +384,15 @@
   )
 }
 
-
+#' Read ARS metadata from XLSX
+#'
+#' Internal helper that ingests ARS metadata stored in Excel workbooks and
+#' converts each worksheet into the harmonised metadata list.
+#' @param ARS_path Path to the Excel workbook containing ARS metadata.
+#'
+#' @return A list of metadata tables extracted from the workbook, or `NULL`
+#'   when required sheets are missing.
+#' @keywords internal
 .read_ars_xlsx_metadata <- function(ARS_path) {
   ws <- readxl::excel_sheets(ARS_path)
 
