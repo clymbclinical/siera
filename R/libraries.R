@@ -8,6 +8,5 @@
     library(broom)
     library(parameters)
     library(tidyr)
-    library(magrittr)
   "
 }
