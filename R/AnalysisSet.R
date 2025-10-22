@@ -27,9 +27,13 @@
     ))
   }
 
+  # Pull the metadata describing the analysis set that applies to
+  # the first analysis for this output.
   temp_AnSet <- analysis_sets |>
     dplyr::filter(id == analysis_set_id)
 
+  # Extract the dataset, variable, comparison operator, and value used to
+  # define the population for this analysis set.
   cond_adam <- temp_AnSet |>
     dplyr::select(condition_dataset) |>
     as.character()
@@ -56,6 +60,8 @@
     as.character()
   anSetName <- anSetName[1]
 
+  # Translate the ARS comparator codes to R operators for evaluation in
+  # the generated script.
   oper <- dplyr::case_when(
     cond_oper == "EQ" ~ "==",
     cond_oper == "NE" ~ "!=",
@@ -78,6 +84,9 @@
 
   ana_adam2 <- Anas_s2$dataset
 
+  # Generate different population code depending on whether the analysis
+  # set is sourced from the same ADaM as the primary analysis or a
+  # companion dataset.
   if (isTRUE(cond_adam == ana_adam2)) {
     template <- "
 # Apply Analysis Set ---
