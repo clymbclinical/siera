@@ -12,6 +12,16 @@
 <url><loc>https://clymbclinical.github.io/siera/news/index.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/ARD_script_example.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/ARS_example.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_adam_loading_code.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_analysis_method_section.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_analysis_set_code.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_data_subset_code.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_data_subset_condition.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_library_code.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_program_header.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/dot-read_ars_json_metadata.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/dot-read_ars_metadata.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/dot-read_ars_xlsx_metadata.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/index.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/pipe.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/readARS.html</loc></url>
