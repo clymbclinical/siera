@@ -6,10 +6,12 @@
     return("")
   }
 
+  # Ensure we always work with defined comparator/value fields.
   comparator <- ifelse(is.null(comparator), "", comparator)
   value_vector <- unlist(value)
 
   if (identical(file_ext, "xlsx")) {
+    # Excel extracts pipe-delimited lists as comma-separated strings.
     value_vector <- gsub("\\|", ",", as.character(value_vector))
   }
 
@@ -42,6 +44,7 @@
     return(paste0(variable, " %in% ", value_string))
   }
 
+  # Map ARS comparator codes to R operators.
   operator <- dplyr::case_when(
     comparator == "EQ" ~ "==",
     comparator == "NE" ~ "!=",
@@ -67,6 +70,7 @@
     !is.null(comparator) && !is.na(comparator) && comparator == "NE" &&
       !is.null(blank_value) && (identical(blank_value, "") || identical(blank_value, "NA") || is.na(blank_value))
   ) {
+    # NE comparisons against blank values become explicit not-missing tests.
     return(paste0("!is.na(", variable, ") & ", variable, "!= ''"))
   }
 
@@ -89,6 +93,7 @@
     filter_expression = NULL
   )
 
+  # Without metadata or a subset identifier, fall back to the default code.
   if (is.null(data_subsets)) {
     return(result)
   }
@@ -104,6 +109,7 @@
     return(result)
   }
 
+  # Store a cleaned display name for informative comments in the generated code.
   subset_name <- subsetrule %>%
     dplyr::select(name) %>%
     unique() %>%
@@ -124,6 +130,7 @@
       file_ext
     )
   } else {
+    # Multi-level subsets require stitching compound expressions across levels.
     maxlev <- max(subsetrule$level)
 
     if (maxlev <= 1) {
@@ -147,6 +154,7 @@
         log_oper <- NA_character_
       }
 
+      # Convert logical operators to their R equivalents for combining filters.
       rlog_oper <- dplyr::case_when(
         log_oper == "AND" ~ "&",
         log_oper == "OR" ~ "|",

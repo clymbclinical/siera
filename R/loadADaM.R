@@ -1,7 +1,10 @@
 .generate_adam_loading_code <- function(Anas, Analyses, AnalysisSets, DataSubsets, adam_path) {
+  # Identify the analyses referenced for the current output.
   Analyses_IDs <- Analyses %>%
     dplyr::filter(id %in% Anas$listItem_analysisId)
 
+  # Collect every ADaM dataset referenced directly, in an analysis set,
+  # or within data subset metadata.
   unique_datasets <- c(
     Analyses_IDs$dataset,
     AnalysisSets %>%
@@ -19,6 +22,8 @@
     return("\n# Load ADaM -------\n")
   }
 
+  # Build readr::read_csv calls that standardise character NA handling to
+  # avoid downstream joins failing on missing text values.
   lines <- vapply(unique_datasets, function(ad) {
     ad_path <- paste0(adam_path, "/", ad, ".csv")
     paste0(
