@@ -512,27 +512,8 @@ readARS <- function(ARS_path,
       )
     )
 
-    # script_code <- get(paste0("code_", Output))
-
-    # styled_script_code <- styler::style_text(script_code)
-    # # styled_script_code <- tryCatch(
-    # #   styler::style_text(script_code),
-    # #   error = function(err) {
-    # #     warning(
-    # #       paste(
-    # #         "Unable to style generated ARD script for",
-    # #         Output,
-    # #         "- writing unstyled code.",
-    # #         conditionMessage(err)
-    # #       )
-    # #     )
-    # #     script_code
-    # #   }
-    # # )
-
     writeLines(
       get(paste0("code_", Output)),
-      # styled_script_code,
       paste0(output_path, "/ARD_", Output, ".R")
     )
   } # end of outputs
