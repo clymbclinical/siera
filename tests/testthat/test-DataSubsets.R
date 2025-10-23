@@ -58,6 +58,18 @@ test_that("generate_data_subset_condition maps standard comparators", {
   )
 })
 
+test_that("generate_data_subset_condition handles CONTAINS comparator", {
+  expect_equal(
+    condition_fun("AEDECOD", "CONTAINS", "pain", "json"),
+    "grepl('pain', AEDECOD, fixed = TRUE)"
+  )
+
+  expect_equal(
+    condition_fun("COMMENT", "CONTAINS", "O'Brien", "json"),
+    "grepl('O\\\\'Brien', COMMENT, fixed = TRUE)"
+    )
+  })
+          
 test_that("generate_data_subset_condition handles edge inputs", {
   expect_equal(
     condition_fun("VISIT", "IN", character(), "json"),

@@ -56,6 +56,20 @@
     return(paste0(variable, " %in% ", value_string))
   }
 
+  if (identical(comparator, "CONTAINS")) {
+    value_string <- as.character(value_vector)[1]
+
+    if (is.null(value_string) || is.na(value_string) || identical(value_string, "")) {
+      return("")
+    }
+
+    value_string <- gsub("\\\\", "\\\\\\\\", value_string)
+    value_string <- gsub("'", "\\\\'", value_string, fixed = TRUE)
+
+    return(paste0("grepl('", value_string, "', ", variable, ", fixed = TRUE)"))
+  }
+
+
   # Map ARS comparator codes to R operators.
   operator <- dplyr::case_when(
     comparator == "EQ" ~ "==",
