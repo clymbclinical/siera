@@ -68,7 +68,7 @@ test_that("generate_data_subset_condition handles CONTAINS comparator", {
     condition_fun("COMMENT", "CONTAINS", "O'Brien", "json"),
     "grepl('O\\\\'Brien', COMMENT, fixed = TRUE)"
     )
-  }
+  })
           
 test_that("generate_data_subset_condition handles edge inputs", {
   expect_equal(
