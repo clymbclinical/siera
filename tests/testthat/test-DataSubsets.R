@@ -58,6 +58,18 @@ test_that("generate_data_subset_condition maps standard comparators", {
   )
 })
 
+test_that("generate_data_subset_condition handles edge inputs", {
+  expect_equal(
+    condition_fun("VISIT", "IN", character(), "json"),
+    "VISIT %in% c('')"
+  )
+
+  expect_equal(
+    condition_fun("AGE", "IN", "1|2|3", "xlsx"),
+    "AGE %in% c(1, 2, 3)"
+  )
+})
+
 test_that("generate_data_subset_code returns defaults when metadata missing", {
   res_null <- code_fun(NULL, 1, "An_01", "adsl", "json")
   expect_true(grepl("Apply Data Subset", res_null$code))
@@ -106,4 +118,44 @@ test_that("generate_data_subset_code combines multiple expressions with logical 
   res <- code_fun(metadata, 200, "An_02", "adsl", "json")
   expect_equal(res$filter_expression, "AGE >= 65 & SEX == 'F'")
   expect_true(grepl("AGE >= 65 & SEX == 'F'", res$code))
+})
+
+
+test_that("generate_data_subset_code builds multi-level nested expressions", {
+  metadata <- tibble::tibble(
+    id = rep(300, 5),
+    name = rep("Complex subset", 5),
+    level = c(1, 2, 2, 3, 3),
+    condition_variable = c(NA, "REGION", NA, "AGE", "AGE"),
+    condition_comparator = c(NA, "EQ", NA, "GE", "GE"),
+    condition_value = c(NA, "EU", NA, "30", "40"),
+    compoundExpression_logicalOperator = c("AND", NA, "OR", NA, NA)
+  )
+
+  res <- code_fun(metadata, 300, "An_03", "adsl", "json")
+  expect_equal(res$subset_name, "Complex subset")
+  expect_equal(
+    res$filter_expression,
+    "REGION == 'EU', AGE >= 30 | AGE >= 40"
+  )
+  expect_true(
+    grepl("dplyr::filter(REGION == 'EU', AGE >= 30 | AGE >= 40)", res$code, fixed = TRUE)
+  )
+})
+
+test_that("generate_data_subset_code returns default code when no expressions created", {
+  metadata <- tibble::tibble(
+    id = rep(310, 3),
+    name = rep("Empty subset", 3),
+    level = c(1, 2, 2),
+    condition_variable = c(NA, NA, NA),
+    condition_comparator = c(NA, NA, NA),
+    condition_value = c(NA, NA, NA),
+    compoundExpression_logicalOperator = c("AND", NA, NA)
+  )
+
+  res <- code_fun(metadata, 310, "An_04", "adsl", "json")
+  expect_equal(res$subset_name, "Empty subset")
+  expect_null(res$filter_expression)
+  expect_true(grepl("Apply Data Subset", res$code))
 })
