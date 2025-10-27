@@ -93,11 +93,19 @@
   blank_value <- suppressWarnings(as.character(value_string))[1]
 
   if (
-    !is.null(comparator) && !is.na(comparator) && comparator == "NE" &&
-      !is.null(blank_value) && (identical(blank_value, "") || identical(blank_value, "NA") || is.na(blank_value))
+    !is.null(comparator) &&
+      !is.na(comparator) &&
+      # comparator == "NE" &&
+      !is.null(blank_value) &&
+      (identical(blank_value, "") || identical(blank_value, "NA") || is.na(blank_value))
   ) {
-    # NE comparisons against blank values become explicit not-missing tests.
-    return(paste0("!is.na(", variable, ") & ", variable, "!= ''"))
+    if (comparator == "NE") {
+      # NE comparisons against blank values become explicit not-missing tests.
+      return(paste0("!is.na(", variable, ") & ", variable, "!= ''"))
+    } else if (comparator == "EQ") {
+      # EQ comparisons against blank values become explicit not-missing tests.
+      return(paste0("(is.na(", variable, ") | ", variable, "== '')"))
+    }
   }
 
   paste0(variable, " ", operator, " ", formatted_value)
