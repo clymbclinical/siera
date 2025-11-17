@@ -1,0 +1,30 @@
+# What do I do with my ARD?
+
+``` r
+library(siera)
+```
+
+## Using ARDs: Options
+
+An Analysis Results Dataset (ARD) has multiple uses. Consisting of
+machine-readable results (as opposed to static RTF or PDF results),
+examples of ARD use cases are:
+
+- QC datasets
+- re-using results for different outputs, e.g. figures or tables
+- re-using results for various reporting events
+- creating final TFLs
+
+### Downstream R packages for table creation
+
+Two reputable R packages, part of the
+[pharmaverse](https://pharmaverse.org/) have an ARD-first approach to
+creating tables:
+
+- [`tfrmt`](https://github.com/GSK-Biostatistics/tfrmt)
+- [`gtsummary`](https://www.danieldsjoberg.com/gtsummary/)
+
+Below are presentations delivered at posit::conf 2025 on these packages:
+
+- [tfrmt](https://posit-conf-2025.github.io/pharmaverse/slides/05-tables-tfrmt/#/title-slide)
+- [gtsummary](https://posit-conf-2025.github.io/pharmaverse/slides/06-tables-gtsummary/#/title-slide)
