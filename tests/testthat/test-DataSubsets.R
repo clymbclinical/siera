@@ -47,6 +47,27 @@ test_that("generate_data_subset_condition handles NE blank values", {
   )
 })
 
+test_that("generate_data_subset_condition handles EQ blank values", {
+  expect_equal(
+    condition_fun(
+      variable = "TRT01AN",
+      comparator = "EQ",
+      value = "",
+      file_ext = "json"
+    ),
+    "(is.na(TRT01AN) | TRT01AN== '')"
+  )
+  expect_equal(
+    condition_fun(
+      variable = "TRT01AN",
+      comparator = "EQ",
+      value = NA_character_,
+      file_ext = "json"
+    ),
+    "(is.na(TRT01AN) | TRT01AN== '')"
+  )
+})
+
 test_that("generate_data_subset_condition maps standard comparators", {
   expect_equal(
     condition_fun("AGE", "GE", "65", "json"),
@@ -67,6 +88,17 @@ test_that("generate_data_subset_condition handles CONTAINS comparator", {
   expect_equal(
     condition_fun("COMMENT", "CONTAINS", "O'Brien", "json"),
     "grepl('O\\\\'Brien', COMMENT, fixed = TRUE)"
+  )
+})
+
+test_that("generate_data_subset_condition handles empty CONTAINS values", {
+  expect_equal(
+    condition_fun("COMMENT", "CONTAINS", "", "json"),
+    ""
+  )
+  expect_equal(
+    condition_fun("COMMENT", "CONTAINS", NA_character_, "json"),
+    ""
   )
 })
 
@@ -155,6 +187,23 @@ test_that("generate_data_subset_code builds multi-level nested expressions", {
   )
 })
 
+test_that("generate_data_subset_code warns when levels do not increment", {
+  metadata <- tibble::tibble(
+    id = rep(305, 2),
+    name = rep("Invalid levels", 2),
+    level = c(1, 1),
+    condition_variable = c("AGE", "SEX"),
+    condition_comparator = c("GE", "EQ"),
+    condition_value = c("65", "F"),
+    compoundExpression_logicalOperator = c(NA_character_, NA_character_)
+  )
+
+  expect_error(
+    code_fun(metadata, 305, "An_03", "adsl", "json"),
+    "DataSubset levels not incrementing"
+  )
+})
+
 test_that("generate_data_subset_code returns default code when no expressions created", {
   metadata <- tibble::tibble(
     id = rep(310, 3),
@@ -170,4 +219,20 @@ test_that("generate_data_subset_code returns default code when no expressions cr
   expect_equal(res$subset_name, "Empty subset")
   expect_null(res$filter_expression)
   expect_true(grepl("Apply Data Subset", res$code))
+})
+
+test_that("generate_data_subset_code handles missing logical operators", {
+  metadata <- tibble::tibble(
+    id = rep(320, 3),
+    name = rep("Missing logical", 3),
+    level = c(1, 2, 2),
+    condition_variable = c(NA, "AGE", "SEX"),
+    condition_comparator = c(NA, "GE", "EQ"),
+    condition_value = c(NA, "65", "F"),
+    compoundExpression_logicalOperator = c(NA, NA, NA)
+  )
+
+  res <- code_fun(metadata, 320, "An_05", "adsl", "json")
+  expect_equal(res$filter_expression, "AGE >= 65")
+  expect_true(grepl("AGE >= 65", res$code))
 })
