@@ -49,13 +49,22 @@
   methodlabel <- method$label
   methodid <- method$id
 
-  anmetcode <- analysis_method_code_template %>%
+  template_code <- analysis_method_code_template %>%
     dplyr::filter(
       method_id == methodid,
       context %in% c("R", "R (siera)", "siera"),
       specifiedAs == "Code"
     ) %>%
-    dplyr::select(templateCode)
+    dplyr::pull(templateCode)
+
+  if (length(template_code) == 0 || all(is.na(template_code))) {
+    cli::cli_warn(
+      "AnalysisMethod {.val {methodid}} linked to Analysis {.val {analysis_id}} does not have any AnalysisMethodCode entries. Method-specific code generation will be skipped."
+    )
+    template_code <- ""
+  } else {
+    template_code <- paste0(template_code, collapse = "\n")
+  }
 
   # Parameter substitution is based on ARS metadata entries that can refer
   # to values calculated earlier in the script.
@@ -67,7 +76,7 @@
 
   anmetcode_temp <- paste0(
     "if(nrow(df2_analysisidhere) != 0) {\n                              ",
-    anmetcode,
+    template_code,
     "}"
   )
 

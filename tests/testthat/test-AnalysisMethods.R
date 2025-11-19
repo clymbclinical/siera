@@ -90,3 +90,42 @@ test_that(".generate_analysis_method_section keeps placeholders when no paramete
   )
   expect_equal(result$operations, list(operation_1 = "OP10"))
 })
+
+test_that(".generate_analysis_method_section warns when no template exists", {
+  analysis_methods <- tibble(
+    id = "MTH200",
+    name = "Method without template",
+    description = "Used when templates are missing",
+    label = "label",
+    operation_id = "OP200"
+  )
+
+  template <- tibble(
+    method_id = character(),
+    context = character(),
+    specifiedAs = character(),
+    templateCode = character()
+  )
+
+  parameters <- tibble(
+    method_id = character(),
+    parameter_name = character(),
+    parameter_valueSource = character()
+  )
+
+  expect_warning(
+    result <- siera:::`.generate_analysis_method_section`(
+      analysis_methods = analysis_methods,
+      analysis_method_code_template = template,
+      analysis_method_code_parameters = parameters,
+      method_id = "MTH200",
+      analysis_id = "AN_WARN",
+      output_id = "OUT_WARN"
+    ),
+    "does not have any AnalysisMethodCode entries"
+  )
+
+  expect_match(result$code, "Method ID:\\s+MTH200")
+  expect_match(result$code, "Apply Method")
+  expect_equal(result$operations, list(operation_1 = "OP200"))
+})
