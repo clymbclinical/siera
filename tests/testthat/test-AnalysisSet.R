@@ -38,6 +38,88 @@ test_that("non-first analyses do not generate analysis set code", {
   expect_equal(result$data_subset, "df_pop")
 })
 
+test_that("missing analysis set id triggers a warning and fallback code", {
+  analysis_sets <- make_analysis_sets(
+    id = "AS1",
+    condition_dataset = "ADSL",
+    condition_variable = "SAFFL",
+    condition_comparator = "EQ",
+    condition_value = "Y",
+    name = "Safety"
+  )
+
+  analyses <- make_analyses(
+    id = "AN1",
+    dataset = "ADSL"
+  )
+
+  anas <- make_anas(
+    listItem_analysisId = c("AN1", "AN1", "AN1")
+  )
+
+  expect_warning(
+    result <- get_analysis_set_code(
+      j = 1,
+      analysis_sets = analysis_sets,
+      analyses = analyses,
+      anas = anas,
+      analysis_set_id = NA_character_,
+      analysis_id = "AN1"
+    ),
+    "missing an analysisSetId"
+  )
+
+  expected_lines <- c(
+    "# Apply Analysis Set ---",
+    "df_pop <- ADSL",
+    "df_poptot <- df_pop"
+  )
+
+  expect_code_lines(result$code, expected_lines)
+  expect_equal(result$data_subset, "df_poptot")
+})
+
+test_that("missing analysis set components warn the user and fall back", {
+  analysis_sets <- make_analysis_sets(
+    id = "AS1",
+    condition_dataset = "ADSL",
+    condition_variable = NA_character_,
+    condition_comparator = "EQ",
+    condition_value = "Y",
+    name = "Safety"
+  )
+
+  analyses <- make_analyses(
+    id = c("AN1", "AN2"),
+    dataset = c("ADSL", "ADSL")
+  )
+
+  anas <- make_anas(
+    listItem_analysisId = c("AN1", "AN2", "AN1")
+  )
+
+  expect_warning(
+    result <- get_analysis_set_code(
+      j = 1,
+      analysis_sets = analysis_sets,
+      analyses = analyses,
+      anas = anas,
+      analysis_set_id = "AS1",
+      analysis_id = "AN1"
+    ),
+    "missing condition variable"
+  )
+
+  expected_lines <- c(
+    "# Apply Analysis Set ---",
+    "df_pop <- ADSL",
+    "df_poptot <- df_pop"
+  )
+
+  expect_code_lines(result$code, expected_lines)
+  expect_equal(result$data_subset, "df_poptot")
+})
+
 test_that("analysis set code is generated when population comes from same dataset", {
   analysis_sets <- make_analysis_sets(
     id = "AS1",
