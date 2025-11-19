@@ -19,11 +19,25 @@
                                               analysis_id,
                                               output_id,
                                               envir = parent.frame()) {
+  if (is.null(method_id) || length(method_id) == 0 || is.na(method_id) || identical(method_id, "")) {
+    cli::cli_abort(
+      "Metadata issue in Analyses {analysis_id}: Analysis is missing a MethodId; method-specific code cannot be generated"
+    )
+  }
+
+  method_id <- as.character(method_id)[1]
+
   # Retrieve the method attributes that describe this analysis step.
   method <- analysis_methods %>%
     dplyr::filter(id == method_id) %>%
     dplyr::select(name, description, label, id) %>%
     unique()
+
+  if (nrow(method) == 0) {
+    cli::cli_abort(
+      "Metadata issue in Analyses {analysis_id}: MethodId {method_id} is not defined in AnalysisMethods metadata"
+    )
+  }
 
   # Capture every operation linked to the method so they can be referenced
   # by the generated code when needed.
@@ -81,10 +95,20 @@
   )
 
   for (i in seq_len(nrow(anmetparam_s))) {
-    rep <- get(anmetparam_s$parameter_valueSource[i], envir = envir)
+    value_source <- anmetparam_s$parameter_valueSource[i]
+    parameter_name <- anmetparam_s$parameter_name[i]
+
+    if (!exists(value_source, envir = envir, inherits = TRUE)) {
+      cli::cli_warn(
+        "Metadata issue in AnalysisMethodCodeParameters for Analysis {analysis_id}: parameter {.val {parameter_name}} references unknown valueSource {.val {value_source}}"
+      )
+      next
+    }
+
+    rep <- get(value_source, envir = envir)
     if (!is.na(rep)) {
       anmetcode_temp <- gsub(
-        anmetparam_s$parameter_name[i],
+        parameter_name,
         rep,
         anmetcode_temp
       )
