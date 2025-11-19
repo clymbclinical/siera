@@ -27,10 +27,51 @@
     ))
   }
 
+  analysis_dataset <- analyses %>%
+    dplyr::filter(id == analysis_id) %>%
+    dplyr::select(dataset) %>%
+    as.character()
+
+  analysis_dataset <- analysis_dataset[1]
+
+  if (is.na(analysis_dataset) || analysis_dataset %in% c("", "NA")) {
+    analysis_dataset <- "df_pop"
+  }
+
+  fallback_result <- list(
+    code = paste0(
+      "# Apply Analysis Set ---\n",
+      "df_pop <- ", analysis_dataset, "\n",
+      "df_poptot <- df_pop\n"
+    ),
+    data_subset = "df_poptot"
+  )
+
+  if (is.null(analysis_set_id) || analysis_set_id %in% c("", "NA") || is.na(analysis_set_id)) {
+    cli::cli_warn(
+      "Metadata issue in Analyses {analysis_id}: Analysis is missing an analysisSetId; using the analysis dataset without filtering"
+    )
+    return(fallback_result)
+  }
+
+  if (is.null(analysis_sets)) {
+    cli::cli_warn(
+      "Metadata issue in Analyses {analysis_id}: AnalysisSets metadata not supplied; using the analysis dataset without filtering"
+    )
+    return(fallback_result)
+  }
+
   # Pull the metadata describing the analysis set that applies to
   # the first analysis for this output.
   temp_AnSet <- analysis_sets |>
     dplyr::filter(id == analysis_set_id)
+
+  if (nrow(temp_AnSet) == 0) {
+    cli::cli_warn(
+      "Metadata issue in Analyses {analysis_id}: AnalysisSet {analysis_set_id} not found; using the analysis dataset without filtering"
+    )
+    return(fallback_result)
+  }
 
   # Extract the dataset, variable, comparison operator, and value used to
   # define the population for this analysis set.
@@ -59,6 +100,25 @@
     dplyr::select(name) |>
     as.character()
   anSetName <- anSetName[1]
+
+  required_components <- c(
+    `condition dataset` = cond_adam,
+    `condition variable` = cond_var,
+    `condition comparator` = cond_oper
+  )
+
+  is_missing <- function(x) {
+    length(x) == 0 || is.na(x) || x %in% c("", "NA")
+  }
+
+  missing_components <- names(required_components)[vapply(required_components, is_missing, logical(1))]
+
+  if (length(missing_components) > 0) {
+    cli::cli_warn(
+      "Metadata issue in AnalysisSets {analysis_set_id} for Analysis {analysis_id}: missing {paste(missing_components, collapse = ', ')}; using the analysis dataset without filtering"
+    )
+    return(fallback_result)
+  }
 
   # Translate the ARS comparator codes to R operators for evaluation in
   # the generated script.
