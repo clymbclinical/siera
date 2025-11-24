@@ -46,6 +46,7 @@
     "otherListsOfContents",
     "mainListOfContents",
     "dataSubsets",
+    "analysisSets",
     "analysisGroupings",
     "analyses",
     "methods"
@@ -400,9 +401,12 @@
     "OtherListsOfContents",
     "MainListOfContents",
     "DataSubsets",
+    "AnalysisSets",
     "AnalysisGroupings",
     "Analyses",
-    "AnalysisMethods"
+    "AnalysisMethods",
+    "AnalysisMethodCodeTemplate",
+    "AnalysisMethodCodeParameters"
   )
 
   missing_sheets <- setdiff(required_sheets, ws)
