@@ -8,9 +8,16 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera)
 [![R-CMD-check](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml)
+[![Codecov](https://codecov.io/gh/clymbclinical/siera/branch/main/graph/badge.svg)](https://app.codecov.io/gh/clymbclinical/siera?branch=main)
 [![Downloads](https://cranlogs.r-pkg.org/badges/siera)](https://cran.r-project.org/package=siera)
 
 <!-- badges: end -->
+
+The Codecov badge updates when the `CODECOV_TOKEN` repository secret is configured.
+You can copy the token from the repository settings at
+<https://app.codecov.io/gh/clymbclinical/siera/settings> and add it as the
+`CODECOV_TOKEN` secret in GitHub. Protected branches (such as `main`) require
+this token for uploads to succeed.
 
 ## Overview
 

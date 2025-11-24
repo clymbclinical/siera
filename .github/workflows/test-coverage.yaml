@@ -30,6 +30,15 @@ jobs:
       - name: Has CODECOV_TOKEN?
         run: echo "CODECOV_TOKEN present? ${{ secrets.CODECOV_TOKEN != '' }}"
 
+      - name: Require Codecov token on protected branches
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        run: |
+          if [ -z "${{ secrets.CODECOV_TOKEN }}" ]; then
+            echo "Codecov uploads to protected branches require the repository upload token."
+            echo "Add CODECOV_TOKEN as a repository secret from https://app.codecov.io/gh/${{ github.repository }}/settings."
+            exit 1
+          fi
+
       - name: Test coverage
         run: |
           cov <- covr::package_coverage(
