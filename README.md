@@ -4,11 +4,12 @@
 # siera <a href="https://clymbclinical.github.io/siera/"><img src="man/figures/logo.png" align="right" height="138" alt="siera website" /></a>
 
 <!-- badges: start -->
-[<img src="http://pharmaverse.org/shields/siera.svg">](https://pharmaverse.org)
+
 [![CRAN
 status](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/package=siera)
 [![R-CMD-check](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/clymbclinical/siera/actions/workflows/R-CMD-check.yaml)
 [![Downloads](https://cranlogs.r-pkg.org/badges/siera)](https://cran.r-project.org/package=siera)
+[![Codecov](https://codecov.io/gh/clymbclinical/siera/branch/main/graph/badge.svg)](https://app.codecov.io/gh/clymbclinical/siera?branch=main)
 
 <!-- badges: end -->
 
@@ -60,7 +61,7 @@ The `siera` package has one main function, called `readARS`. This
 function takes ARS metadata as input (either JSON or xlsx format), and
 makes use of the various metadata pieces to populate R scripts, which an
 be run as-is to produce ARDs. One R script is created for each output
-(table) as defined in the ARS metadata for the reporting event.
+(table) as defined in the ARS metadata for the reportingg event.
 
 In order to make use of this function, the following are required as
 arguments:
