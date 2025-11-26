@@ -279,8 +279,8 @@ test_that("missing analysis set record warns and uses fallback", {
     id = "AS_KNOWN",
     condition_dataset = "ADSL",
     condition_variable = "SAFFL",
-    condition_comparator = "GT",
-    condition_value = 0,
+    condition_comparator = "EQ",
+    condition_value = "Y",
     name = "Safety"
   )
 
@@ -320,8 +320,8 @@ test_that("missing analysis dataset defaults to df_pop and still runs", {
     id = "AS_DFPOP",
     condition_dataset = "ADSL",
     condition_variable = "SAFFL",
-    condition_comparator = "GT",
-    condition_value = 0,
+    condition_comparator = "EQ",
+    condition_value = "Y",
     name = "Safety"
   )
 
@@ -346,7 +346,7 @@ test_that("missing analysis dataset defaults to df_pop and still runs", {
   expected_lines <- c(
     "# Apply Analysis Set ---",
     "df_pop <- dplyr::filter(ADSL,",
-    "            SAFFL > '0')",
+    "            SAFFL == 'Y')",
     "df_poptot <- df_pop"
   )
 
