@@ -27,7 +27,7 @@ to):
 - Analysis Sets (e.g. SAFFL = “Y”)
 - AnalysisGroupings (e.g. group by Treatment)
 - DataSubsets (e.g. filter by Treatment-Emergent Adverse Events)
-- AnalysisMethods (e.g. calculate ‘n’, ‘Mean’, ‘Min’, ‘Max’)
+- AnalysisMethods (e.g. calculate ‘n’, ‘Mean’, ‘Min’, ‘Max’, ‘Q1’, ‘Q3’)
 
 Applying all these concepts to ADaM input data, yields Analysis Results
 in Dataset format (ARDs).
