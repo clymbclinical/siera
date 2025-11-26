@@ -241,3 +241,115 @@ test_that("missing condition values are replaced with empty strings", {
 
   expect_code_lines(result$code, expected_lines)
 })
+
+test_that("missing analysis set metadata triggers warning and fallback code", {
+  analyses <- make_analyses(
+    id = "AN1",
+    dataset = "ADSL"
+  )
+
+  anas <- make_anas(
+    listItem_analysisId = c("AN1", "AN1", "AN1")
+  )
+
+  expect_warning(
+    result <- get_analysis_set_code(
+      j = 1,
+      analysis_sets = NULL,
+      analyses = analyses,
+      anas = anas,
+      analysis_set_id = "AS_MISSING",
+      analysis_id = "AN1"
+    ),
+    "AnalysisSets metadata not supplied"
+  )
+
+  expected_lines <- c(
+    "# Apply Analysis Set ---",
+    "df_pop <- ADSL",
+    "df_poptot <- df_pop"
+  )
+
+  expect_code_lines(result$code, expected_lines)
+  expect_equal(result$data_subset, "df_poptot")
+})
+
+test_that("missing analysis set record warns and uses fallback", {
+  analysis_sets <- make_analysis_sets(
+    id = "AS_KNOWN",
+    condition_dataset = "ADSL",
+    condition_variable = "SAFFL",
+    condition_comparator = "GT",
+    condition_value = 0,
+    name = "Safety"
+  )
+
+  analyses <- make_analyses(
+    id = "AN1",
+    dataset = "ADSL"
+  )
+
+  anas <- make_anas(
+    listItem_analysisId = c("AN1", "AN1", "AN1")
+  )
+
+  expect_warning(
+    result <- get_analysis_set_code(
+      j = 1,
+      analysis_sets = analysis_sets,
+      analyses = analyses,
+      anas = anas,
+      analysis_set_id = "AS_UNKNOWN",
+      analysis_id = "AN1"
+    ),
+    "AnalysisSet AS_UNKNOWN not found"
+  )
+
+  expected_lines <- c(
+    "# Apply Analysis Set ---",
+    "df_pop <- ADSL",
+    "df_poptot <- df_pop"
+  )
+
+  expect_code_lines(result$code, expected_lines)
+  expect_equal(result$data_subset, "df_poptot")
+})
+
+test_that("missing analysis dataset defaults to df_pop and still runs", {
+  analysis_sets <- make_analysis_sets(
+    id = "AS_DFPOP",
+    condition_dataset = "ADSL",
+    condition_variable = "SAFFL",
+    condition_comparator = "GT",
+    condition_value = 0,
+    name = "Safety"
+  )
+
+  analyses <- make_analyses(
+    id = "AN1",
+    dataset = NA_character_
+  )
+
+  anas <- make_anas(
+    listItem_analysisId = c("AN1", "AN1", "AN1")
+  )
+
+  result <- get_analysis_set_code(
+    j = 1,
+    analysis_sets = analysis_sets,
+    analyses = analyses,
+    anas = anas,
+    analysis_set_id = "AS_DFPOP",
+    analysis_id = "AN1"
+  )
+
+  expected_lines <- c(
+    "# Apply Analysis Set ---",
+    "df_pop <- dplyr::filter(ADSL,",
+    "            SAFFL > '0')",
+    "df_poptot <- df_pop"
+  )
+
+  expect_code_lines(result$code, expected_lines)
+  expect_equal(result$data_subset, "df_poptot")
+})
