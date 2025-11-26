@@ -1,3 +1,7 @@
+# siera 0.5.5
+
+* Prepare package metadata for CRAN release
+
 # siera 0.5.4
 
 * Comprehensive testing added: checking generated ARD result values
