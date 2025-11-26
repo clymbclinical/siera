@@ -15,10 +15,14 @@ make_anas <- function(...) {
 }
 
 expect_code_lines <- function(code, expected) {
-  lines <- strsplit(code, "\n", fixed = TRUE)[[1]]
+  if (is.na(code) || identical(code, "")) {
+    lines <- character(0)
+  } else {
+    lines <- strsplit(code, "\n", fixed = TRUE)[[1]]
 
-  if (length(lines) > 0 && lines[[1]] == "") {
-    lines <- lines[-1]
+    if (length(lines) > 0 && !is.na(lines[[1]]) && lines[[1]] == "") {
+      lines <- lines[-1]
+    }
   }
 
   testthat::expect_equal(lines, expected)
