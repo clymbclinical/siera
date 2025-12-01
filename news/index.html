@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">siera</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,13 @@
       <small>Source: <a href="https://github.com/clymbclinical/siera/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.5" id="siera-055">siera 0.5.5<a class="anchor" aria-label="anchor" href="#siera-055"></a></h2>
+<ul><li>Strengthened analysis method validation with clear errors for missing or undefined <code>MethodId</code> values and warnings when method templates or parameter value sources cannot be resolved.</li>
+<li>Added guardrails for analysis set generation that warn on missing or incomplete metadata and fall back to the unfiltered analysis dataset when needed.</li>
+<li>Tightened ARS metadata ingestion by requiring <code>analysisSets</code> definitions in JSON and the analysis code template sheets in Excel workbooks.</li>
+<li>Expanded test coverage for analysis methods, analysis sets, and data subset condition handling to capture more metadata edge cases.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.4" id="siera-054">siera 0.5.4<a class="anchor" aria-label="anchor" href="#siera-054"></a></h2><p class="text-muted">CRAN release: 2025-09-25</p>
 <ul><li>Comprehensive testing added: checking generated ARD result values</li>

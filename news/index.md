@@ -1,5 +1,19 @@
 # Changelog
 
+## siera 0.5.5
+
+- Strengthened analysis method validation with clear errors for missing
+  or undefined `MethodId` values and warnings when method templates or
+  parameter value sources cannot be resolved.
+- Added guardrails for analysis set generation that warn on missing or
+  incomplete metadata and fall back to the unfiltered analysis dataset
+  when needed.
+- Tightened ARS metadata ingestion by requiring `analysisSets`
+  definitions in JSON and the analysis code template sheets in Excel
+  workbooks.
+- Expanded test coverage for analysis methods, analysis sets, and data
+  subset condition handling to capture more metadata edge cases.
+
 ## siera 0.5.4
 
 CRAN release: 2025-09-25
