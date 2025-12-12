@@ -13,12 +13,6 @@ status](https://www.r-pkg.org/badges/version/siera)](https://CRAN.R-project.org/
 
 <!-- badges: end -->
 
-The Codecov badge updates when the `CODECOV_TOKEN` repository secret is
-configured. You can copy the token from the repository settings at
-<https://app.codecov.io/gh/clymbclinical/siera/settings> and add it as
-the `CODECOV_TOKEN` secret in GitHub. Protected branches (such as
-`main`) require this token for uploads to succeed.
-
 ## Overview
 
 With siera, users ingest Analysis Results Standard (ARS) metadata and
