@@ -2,6 +2,8 @@
 
 ## siera 0.5.5
 
+CRAN release: 2025-12-01
+
 - Strengthened analysis method validation with clear errors for missing
   or undefined `MethodId` values and warnings when method templates or
   parameter value sources cannot be resolved.
