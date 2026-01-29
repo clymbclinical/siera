@@ -102,6 +102,36 @@ test_that("generate_data_subset_condition handles empty CONTAINS values", {
   )
 })
 
+test_that("generate_data_subset_condition translates NOTIN comparator for xlsx", {
+  out <- condition_fun(
+    variable = "PARAM",
+    comparator = "NOTIN",
+    value = "A|B|C",
+    file_ext = "xlsx"
+  )
+  expect_equal(out, "!(PARAM %in% c('A', 'B', 'C'))")
+})
+
+test_that("generate_data_subset_condition translates NOTIN comparator for numeric vectors", {
+  out <- condition_fun(
+    variable = "AGE",
+    comparator = "NOTIN",
+    value = c("1", "2", "3"),
+    file_ext = "json"
+  )
+  expect_equal(out, "!(AGE %in% c(1, 2, 3))")
+})
+
+test_that("generate_data_subset_condition translates NOTIN comparator for string vectors", {
+  out <- condition_fun(
+    variable = "RACE",
+    comparator = "NOTIN",
+    value = c("WHITE", "BLACK"),
+    file_ext = "json"
+  )
+  expect_equal(out, "!(RACE %in% c('WHITE', 'BLACK'))")
+})
+
 test_that("generate_data_subset_condition handles edge inputs", {
   expect_equal(
     condition_fun("VISIT", "IN", character(), "json"),

@@ -56,6 +56,35 @@
     return(paste0(variable, " %in% ", value_string))
   }
 
+  if (identical(comparator, "NOTIN")) {
+    if (identical(file_ext, "xlsx")) {
+      value_vector <- strsplit(value_vector[1], ",\\s*")[[1]]
+    }
+
+    if (length(value_vector) == 0) {
+      value_vector <- character()
+    }
+
+    numeric_values <- suppressWarnings(as.numeric(value_vector))
+    is_numeric <- !is.na(numeric_values)
+
+    if (length(is_numeric) > 0 && is_numeric[1]) {
+      value_string <- paste0(
+        "c(",
+        paste0(numeric_values[is_numeric], collapse = ", "),
+        ")"
+      )
+    } else {
+      value_string <- paste0(
+        "c(",
+        paste0("'", value_vector, "'", collapse = ", "),
+        ")"
+      )
+    }
+
+    return(paste0("!(", variable, " %in% ", value_string, ")"))
+  }
+
   if (identical(comparator, "CONTAINS")) {
     value_string <- as.character(value_vector)[1]
 
@@ -95,7 +124,6 @@
   if (
     !is.null(comparator) &&
       !is.na(comparator) &&
-      # comparator == "NE" &&
       !is.null(blank_value) &&
       (identical(blank_value, "") || identical(blank_value, "NA") || is.na(blank_value))
   ) {
