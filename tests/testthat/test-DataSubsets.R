@@ -132,6 +132,16 @@ test_that("generate_data_subset_condition translates NOTIN comparator for string
   expect_equal(out, "!(RACE %in% c('WHITE', 'BLACK'))")
 })
 
+test_that("generate_data_subset_condition handles NOTIN with empty vector", {
+  out <- condition_fun(
+    variable = "VISIT",
+    comparator = "NOTIN",
+    value = character(),
+    file_ext = "json"
+  )
+  expect_equal(out, "!(VISIT %in% c(''))")
+})
+
 test_that("generate_data_subset_condition handles edge inputs", {
   expect_equal(
     condition_fun("VISIT", "IN", character(), "json"),
