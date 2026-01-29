@@ -81,6 +81,66 @@ test_that("ADaM loading code includes all referenced datasets once", {
   expect_equal(extract_code_lines(code), expected_lines)
 })
 
+test_that("ADaM loading code handles a completely blank DataSubsets tibble", {
+  Anas <- make_anas(
+    listItem_analysisId = c("AN1")
+  )
+
+  Analyses <- make_analyses(
+    id = c("AN1"),
+    dataset = c("ADSL"),
+    analysisSetId = c("AS1"),
+    dataSubsetId = c(NA_character_)
+  )
+
+  AnalysisSets <- make_analysis_sets(
+    id = c("AS1"),
+    condition_dataset = c("ADSL")
+  )
+
+  # Simulate a completely blank sheet (0 rows, 0 columns)
+  DataSubsets <- tibble::tibble()
+
+  code <- get_adam_loading_code(
+    Anas,
+    Analyses,
+    AnalysisSets,
+    DataSubsets,
+    adam_path = "adam"
+  )
+
+  expect_true(grepl("ADSL", code))
+  expect_false(grepl("Error", code))
+})
+
+test_that("ADaM loading code handles NULL DataSubsets", {
+  Anas <- make_anas(
+    listItem_analysisId = c("AN1")
+  )
+
+  Analyses <- make_analyses(
+    id = c("AN1"),
+    dataset = c("ADSL"),
+    analysisSetId = c("AS1"),
+    dataSubsetId = c("DS1")
+  )
+
+  AnalysisSets <- make_analysis_sets(
+    id = c("AS1"),
+    condition_dataset = c("ADSL")
+  )
+
+  code <- get_adam_loading_code(
+    Anas,
+    Analyses,
+    AnalysisSets,
+    NULL,
+    adam_path = "adam"
+  )
+
+  expect_true(grepl("ADSL", code))
+})
+
 test_that("header-only code is returned when no datasets are referenced", {
   Anas <- make_anas(listItem_analysisId = character())
 
