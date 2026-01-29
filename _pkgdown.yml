@@ -1,3 +1,7 @@
 url: https://clymbclinical.github.io/siera/
 template:
   bootstrap: 5
+home:
+  links:
+  - text: Pharmaverse
+    href: https://pharmaverse.org
