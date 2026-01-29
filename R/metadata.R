@@ -424,6 +424,21 @@
   DataSubsets <- readxl::read_excel(ARS_xlsx, sheet = "DataSubsets")
   AnalysisSets <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisSets")
   AnalysisGroupings <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisGroupings")
+
+  # Ensure DataSubsets has the expected column structure even when the sheet
+  # is blank.
+  ds_required_cols <- c(
+    "id", "name", "label", "level", "order",
+    "condition_dataset", "condition_variable",
+    "condition_comparator", "condition_value",
+    "compoundExpression_logicalOperator"
+  )
+  ds_missing_cols <- setdiff(ds_required_cols, colnames(DataSubsets))
+  if (length(ds_missing_cols) > 0) {
+    for (col in ds_missing_cols) {
+      DataSubsets[[col]] <- character(0)
+    }
+  }
   Analyses <- readxl::read_excel(ARS_xlsx, sheet = "Analyses") %>%
     dplyr::filter(!is.na(method_id))
   AnalysisMethods <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisMethods")
