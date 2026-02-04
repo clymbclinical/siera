@@ -9,7 +9,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/clymbclinical/siera/blob/v0.5.5/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/clymbclinical/siera/blob/main/DESCRIPTION)
 
 Bosman M (2026). *siera: Generate Analysis Results Programmes Using ARS
 Metadata*. R package version 0.5.5,
