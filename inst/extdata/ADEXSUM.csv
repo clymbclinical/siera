@@ -1,0 +1,25 @@
+USUBJID,AEXTRT,PARAM,AVAL,AVALCAT1
+01-701-1015,PLACEBO,Duration on Therapy (days),182,>= 6 months
+01-701-1015,PLACEBO,Number of Administrations,5,
+01-701-1015,PLACEBO,Person Time (years),0.50,
+01-701-1015,PLACEBO,Number of Actual Cycles,5,
+01-701-1023,PLACEBO,Duration on Therapy (days),28,< 6 months
+01-701-1023,PLACEBO,Number of Administrations,2,
+01-701-1023,PLACEBO,Person Time (years),0.08,
+01-701-1023,PLACEBO,Number of Actual Cycles,2,
+01-701-1028,XANOMELINE,Duration on Therapy (days),180,>= 6 months
+01-701-1028,XANOMELINE,Number of Administrations,12,
+01-701-1028,XANOMELINE,Person Time (years),0.49,
+01-701-1028,XANOMELINE,Number of Actual Cycles,12,
+01-701-1033,XANOMELINE,Duration on Therapy (days),14,< 6 months
+01-701-1033,XANOMELINE,Number of Administrations,1,
+01-701-1033,XANOMELINE,Person Time (years),0.04,
+01-701-1033,XANOMELINE,Number of Actual Cycles,1,
+01-701-1034,XANOMELINE,Duration on Therapy (days),183,>= 6 months
+01-701-1034,XANOMELINE,Number of Administrations,13,
+01-701-1034,XANOMELINE,Person Time (years),0.50,
+01-701-1034,XANOMELINE,Number of Actual Cycles,13,
+01-701-1097,XANOMELINE,Duration on Therapy (days),190,>= 6 months
+01-701-1097,XANOMELINE,Number of Administrations,11,
+01-701-1097,XANOMELINE,Person Time (years),0.52,
+01-701-1097,XANOMELINE,Number of Actual Cycles,11,

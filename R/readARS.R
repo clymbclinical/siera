@@ -111,13 +111,21 @@ readARS <- function(ARS_path,
       ana_setId <- Anas_s$analysisSetId # AS ID (to be used in AS)
       ana_var <- Anas_s$variable # AS variable (to be used in MT)
 
-      # Analysis Grouping
-      groupid1 <- Anas_s$groupingId1 # group ID (to be used in AG)
-      resultsByGroup1 <- Anas_s$resultsByGroup1 # Y/N group by
-      groupid2 <- Anas_s$groupingId2
-      resultsByGroup2 <- Anas_s$resultsByGroup2
-      groupid3 <- Anas_s$groupingId3
-      resultsByGroup3 <- Anas_s$resultsByGroup3
+      # Analysis Grouping — dynamic extraction supporting any number of groupings
+      column_names <- colnames(Analyses)
+      group_cols <- column_names[grep("^groupingId[0-9]+$", column_names)]
+      max_group_number <- max(as.numeric(sub("groupingId", "", group_cols)))
+
+      groupids <- character(0)
+      results_by_group <- logical(0)
+      for (k in seq_len(max_group_number)) {
+        gid <- Anas_s[[paste0("groupingId", k)]]
+        if (is.null(gid) || length(gid) == 0 || is.na(gid) || nchar(as.character(gid)) == 0) break
+        groupids <- c(groupids, as.character(gid))
+        rbg_val <- Anas_s[[paste0("resultsByGroup", k)]]
+        results_by_group <- c(results_by_group, isTRUE(as.logical(rbg_val)))
+      }
+      n_actual_groups <- length(groupids)
 
       # Data Subset
       subsetid <- Anas_s$dataSubsetId # data subset ID (to be used in DS)
@@ -144,16 +152,6 @@ readARS <- function(ARS_path,
       AnSetDataSubsets <- analysis_set_result$data_subset
       # Apply Grouping ----------------------------
 
-      # determine maximum groupings
-      column_names <- colnames(Analyses)
-
-      # Filter column names that match the pattern "Group"
-      group_columns <- column_names[grep("^groupingId[0-9]+$", column_names)]
-
-      # Extract the numeric part of the group columns and find the maximum
-      group_numbers <- as.numeric(sub("groupingId", "", group_columns))
-      max_group_number <- max(group_numbers)
-
       # consider denominator analysis
       NUM_analysisid <- Anas_s$referencedAnalysisOperations_analysisId1
       DEN_analysisid <- Anas_s$referencedAnalysisOperations_analysisId2
@@ -173,176 +171,66 @@ readARS <- function(ARS_path,
         as.character()
 
       if (AG_denom_var1 %in% c(NA, "NA", "")) {
-        cli::cli_alert("Metadata issue in AnalysisGroupings {groupid1}: AnalysisGrouping has missing groupingVariable")
+        cli::cli_alert("Metadata issue in AnalysisGroupings {AG_denom_id}: AnalysisGrouping has missing groupingVariable")
       }
 
-      if (max_group_number >= 1) {
-        AG_temp1 <- AnalysisGroupings |>
-          dplyr::filter(id == groupid1)
+      # Fetch grouping variable info for each active grouping
+      AG_vars <- character(n_actual_groups)
+      AG_ds <- character(n_actual_groups)
+      AG_dataDriven <- character(n_actual_groups)
 
-        AG_var1 <- AG_temp1 |>
-          dplyr::select(groupingVariable) |>
-          unique() |>
-          as.character()
+      for (k in seq_len(n_actual_groups)) {
+        ag_temp <- AnalysisGroupings |> dplyr::filter(id == groupids[k])
+        AG_vars[k] <- ag_temp |> dplyr::select(groupingVariable) |> unique() |> as.character()
+        AG_ds[k] <- ag_temp |> dplyr::select(groupingDataset) |> unique() |> as.character()
+        AG_dataDriven[k] <- ag_temp |> dplyr::select(dataDriven) |> unique() |> as.character()
+      }
 
-        AG_ds1 <- AG_temp1 |>
-          dplyr::select(groupingDataset) |>
-          unique() |>
-          as.character()
+      # Backward-compatible scalar aliases for method templates that reference AG_var1/2/3
+      if (n_actual_groups >= 1) AG_var1 <- AG_vars[1]
+      if (n_actual_groups >= 2) AG_var2 <- AG_vars[2]
+      if (n_actual_groups >= 3) AG_var3 <- AG_vars[3]
 
-        AG_1_DataDriven <- AG_temp1 |>
-          dplyr::select(dataDriven) |>
-          unique() |>
-          as.character()
-
-        # get the number of dplyr::group_by to perform in Grouping Apply
-        if (resultsByGroup1 == TRUE && !is.na(resultsByGroup1)) {
-          num_grp <- 1
-          AG_max_dataDriven <- AG_1_DataDriven
+      # num_grp: count of leading consecutive TRUE resultsByGroup flags
+      num_grp <- 0
+      AG_max_dataDriven <- "FALSE"
+      for (k in seq_len(n_actual_groups)) {
+        if (isTRUE(results_by_group[k])) {
+          num_grp <- k
+          AG_max_dataDriven <- AG_dataDriven[k]
         } else {
-          num_grp <- 0
-        }
-
-        if (max_group_number >= 2) {
-          AG_temp2 <- AnalysisGroupings |>
-            dplyr::filter(id == groupid2)
-
-          AG_var2 <- AG_temp2 |>
-            dplyr::select(groupingVariable) |>
-            unique() |>
-            as.character()
-
-          AG_ds2 <- AG_temp2 |>
-            dplyr::select(groupingDataset) |>
-            unique() |>
-            as.character()
-
-          AG_2_DataDriven <- AG_temp2 |>
-            dplyr::select(dataDriven) |>
-            unique() |>
-            as.character()
-
-          # get the number of dplyr::group_by to perform in Grouping Apply
-          if (resultsByGroup1 == TRUE && !is.na(resultsByGroup1)) {
-            num_grp <- 1
-            AG_max_dataDriven <- AG_1_DataDriven
-            if (resultsByGroup2 == TRUE && !is.na(resultsByGroup2)) {
-              num_grp <- 2
-              AG_max_dataDriven <- AG_2_DataDriven
-            }
-          } else {
-            num_grp <- 0
-          }
-
-          if (max_group_number >= 3) {
-            AG_temp3 <- AnalysisGroupings |>
-              dplyr::filter(id == groupid3)
-
-            AG_var3 <- AG_temp3 |>
-              dplyr::select(groupingVariable) |>
-              unique() |>
-              as.character()
-
-            AG_ds3 <- AG_temp3 |>
-              dplyr::select(groupingDataset) |>
-              unique() |>
-              as.character()
-
-            AG_3_DataDriven <- AG_temp3 |>
-              dplyr::select(dataDriven) |>
-              unique() |>
-              as.character()
-
-            # get the number of dplyr::group_by to perform in Grouping Apply
-            if (resultsByGroup1 == TRUE && !is.na(resultsByGroup1)) {
-              num_grp <- 1
-              AG_max_dataDriven <- AG_1_DataDriven
-              if (resultsByGroup2 == TRUE && !is.na(resultsByGroup2)) {
-                num_grp <- 2
-                AG_max_dataDriven <- AG_2_DataDriven
-                if (resultsByGroup3 == TRUE && !is.na(resultsByGroup3)) {
-                  num_grp <- 3
-                  AG_max_dataDriven <- AG_3_DataDriven
-                }
-              }
-            } else {
-              num_grp <- 0
-            }
-
-            # get number of group_by for non-grouped operations
-            if (!is.na(resultsByGroup1)) {
-              num_grp_any <- 1
-              if (!is.na(resultsByGroup2)) {
-                num_grp_any <- 2
-                if (!is.na(resultsByGroup3)) {
-                  num_grp_any <- 3
-                }
-              }
-            } else {
-              num_grp_any <- 0
-            }
-          }
+          break
         }
       }
 
-      if (num_grp == 1) {
-        # cards part
-        distinct_list <- paste0(AG_var1, ", ", ana_var)
-        by_listc <- paste0("'", AG_var1, "'")
-        by_list <- paste0(AG_var1)
-        by_stmt <- paste0(", by = ", AG_var1)
+      num_grp_any <- n_actual_groups
 
+      if (num_grp > 0) {
+        active_vars <- AG_vars[seq_len(num_grp)]
+        distinct_list <- paste(c(active_vars, ana_var), collapse = ", ")
+        by_stmt <- paste0(", by = ", paste(active_vars, collapse = ", "))
+        by_listc <- paste(paste0("'", active_vars, "'"), collapse = ", ")
+        by_list <- paste(active_vars, collapse = ", ")
 
-        by_vars <- paste0(", variables = '", AG_var1, "'")
-        strata_vars <- paste0(", variables = '", AG_var1, "'")
-      } else if (num_grp == 2) {
-        # cards part
-        distinct_list <- paste0(AG_var1, ", ", AG_var2, ", ", ana_var)
-        by_listc <- paste0("'", AG_var1, "', '", AG_var2, "'")
-        by_list <- paste0(AG_var1, ", ", AG_var2)
-        by_stmt <- paste0(", by = ", AG_var1, ", ", AG_var2)
-
-        by_vars <- paste0(
-          ", by = '",
-          AG_var1,
-          "' , variables = '",
-          AG_var2, "'"
-        )
-
-        strata_vars <- paste0(
-          ", strata = '",
-          AG_var1,
-          "' , variables = '",
-          AG_var2, "'"
-        )
-      } else if (num_grp == 3) {
-        # cards part
-        distinct_list <- paste0(AG_var1, ", ", AG_var2, ", ", AG_var3, ", ", ana_var)
-        by_listc <- paste0("'", AG_var1, "', '", AG_var2, "', '", AG_var3, "'")
-        by_list <- paste0(AG_var1, ", ", AG_var2, ", ", AG_var3)
-        by_stmt <- paste0(", by = ", AG_var1, ", ", AG_var2, ", ", AG_var3)
-
-        by_vars <- paste0(
-          ", by = c('",
-          AG_var1,
-          "', '",
-          AG_var2,
-          "') , variables = '",
-          AG_var3, "'"
-        )
-
-        strata_vars <- paste0(
-          ", strata = c('",
-          AG_var1,
-          "', '",
-          AG_var2,
-          "') , variables = '",
-          AG_var3, "'"
-        )
-      } else { # no grouping being done
+        if (num_grp == 1) {
+          by_vars <- paste0(", variables = '", active_vars[1], "'")
+          strata_vars <- paste0(", variables = '", active_vars[1], "'")
+        } else if (num_grp == 2) {
+          by_vars <- paste0(", by = '", active_vars[1], "' , variables = '", active_vars[2], "'")
+          strata_vars <- paste0(", strata = '", active_vars[1], "' , variables = '", active_vars[2], "'")
+        } else {
+          inner_vars <- paste(paste0("'", active_vars[-num_grp], "'"), collapse = ", ")
+          by_vars <- paste0(", by = c(", inner_vars, ") , variables = '", active_vars[num_grp], "'")
+          strata_vars <- paste0(", strata = c(", inner_vars, ") , variables = '", active_vars[num_grp], "'")
+        }
+      } else {
         distinct_list <- ana_var
         by_stmt <- ""
         cont_by_stmt <- ""
+        by_listc <- ""
+        by_list <- ""
+        by_vars <- ""
+        strata_vars <- ""
       }
 
       # Apply DataSubset -------------------------------------------------------------
@@ -381,57 +269,15 @@ readARS <- function(ARS_path,
 
       # code to combine it all --------------------------------------------------
       # dplyr::rename groups to append
-      if (num_grp == 1) { # if 1 analysis grouping
-        func_rename1 <- function(groupvar1) {
-          template <- " |>
-        dplyr::rename(Group1 = groupvar1here)
-"
-          code <- gsub("groupvar1here", groupvar1, template)
-
-          return(code)
-        }
-
-        code_rename <- func_rename1(AG_var1)
-      } else if (num_grp == 2) { # if 2 analysis groupings
-        func_rename2 <- function(groupvar1,
-                                 groupvar2) {
-          template <- " |>
-        dplyr::rename(Group1 = groupvar1here,
-               Group2 = groupvar2here)
-"
-          code <- gsub("groupvar1here", groupvar1, template)
-          code <- gsub("groupvar2here", groupvar2, code)
-
-          return(code)
-        }
-        code_rename <- func_rename2(
-          AG_var1,
-          AG_var2
+      if (num_grp > 0) {
+        rename_pairs <- paste(
+          paste0("Group", seq_len(num_grp), " = ", AG_vars[seq_len(num_grp)]),
+          collapse = ",\n               "
         )
-      } else if (num_grp == 3) { # if 3 analysis groupings
-        func_rename3 <- function(groupvar1,
-                                 groupvar2,
-                                 groupvar3) {
-          template <- " |>
-        dplyr::rename(Group1 = groupvar1here,
-               Group2 = groupvar2here,
-               Group3 = groupvar3here)
-"
-          code <- gsub("groupvar1here", groupvar1, template)
-          code <- gsub("groupvar2here", groupvar2, code)
-          code <- gsub("groupvar3here", groupvar3, code)
-
-          return(code)
-        }
-
-        code_rename <- func_rename3(
-          AG_var1,
-          AG_var2,
-          AG_var3
-        )
+        code_rename <- paste0(" |>\n        dplyr::rename(", rename_pairs, ")\n")
       } else {
         code_rename <- ""
-      } # if no analysis grouping
+      }
 
 
       assign(

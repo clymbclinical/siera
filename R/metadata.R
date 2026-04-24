@@ -353,7 +353,7 @@
     method_id = json_from$methods$id,
     context = json_from$methods$codeTemplate$context,
     specifiedAs = "Code",
-    templateCode = json_from$methods$codeTemplate$code
+    templateCode = gsub("\r|_x000D_", "", json_from$methods$codeTemplate$code)
   )
 
   AnalysisMethodCodeParameters <- data.frame()
