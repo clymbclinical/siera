@@ -946,3 +946,115 @@ test_that("combined code created", {
 
   expect_true(any(grepl("ARD <- ", lines)))
 })
+
+test_that("ARD values - 4 grouping factors work correctly (JSON)", {
+  skip_on_cran()
+
+  ARS_path <- ARS_example("exampleARS_5.json")
+  adam_dir <- system.file("extdata", package = "siera")
+  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+
+  output_dir <- withr::local_tempdir()
+
+  readARS(ARS_path, output_dir, adam_dir, spec_output = "Out_01")
+
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_true(length(r_files) > 0, info = "No R scripts generated")
+
+  for (f in r_files) {
+    e <- new.env(parent = baseenv())
+
+    expect_error(
+      suppressWarnings(
+        suppressPackageStartupMessages(
+          source(f, local = e, chdir = TRUE)
+        )
+      ),
+      NA,
+      info = paste("Sourcing failed for", basename(f))
+    )
+
+    expect_true(exists("ARD", envir = e), info = paste("No ARD from", basename(f)))
+    ARD <- get("ARD", envir = e)
+    expect_true("stat" %in% names(ARD), info = "'stat' column missing in ARD")
+
+    # Verify all three analyses produced output
+    expect_true("An_01" %in% ARD$AnalysisId, info = "An_01 missing from ARD")
+    expect_true("An_03" %in% ARD$AnalysisId, info = "An_03 (3-grouping) missing from ARD")
+    expect_true("An_04" %in% ARD$AnalysisId, info = "An_04 (4-grouping) missing from ARD")
+
+    # Verify An_03 continuous mean: Placebo/PLACEBO/"Duration on Therapy (days)"
+    # subjects 01-701-1015 (182 days) and 01-701-1023 (28 days) -> mean = 105
+    an03_mean <- ARD %>%
+      filter(
+        AnalysisId == "An_03",
+        stat_name == "mean",
+        group2_level == "PLACEBO",
+        group3_level == "Duration on Therapy (days)"
+      ) %>%
+      select(stat) %>%
+      unlist()
+    expect_equal(round(an03_mean[[1]], 1), 105.0,
+                 info = "Mean AVAL for Placebo/PLACEBO/Duration on Therapy should be 105.0")
+
+    # Verify An_04 produced rows (4-grouping analysis)
+    an04_rows <- ARD %>% filter(AnalysisId == "An_04")
+    expect_true(nrow(an04_rows) > 0, info = "An_04 (4 groupings) produced no ARD rows")
+  }
+})
+
+test_that("ARD values - 4 grouping factors work correctly (xlsx)", {
+  skip_on_cran()
+
+  ARS_path <- ARS_example("exampleARS_5.xlsx")
+  adam_dir <- system.file("extdata", package = "siera")
+  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+
+  output_dir <- withr::local_tempdir()
+
+  readARS(ARS_path, output_dir, adam_dir, spec_output = "Out_01")
+
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_true(length(r_files) > 0, info = "No R scripts generated")
+
+  for (f in r_files) {
+    e <- new.env(parent = baseenv())
+
+    expect_error(
+      suppressWarnings(
+        suppressPackageStartupMessages(
+          source(f, local = e, chdir = TRUE)
+        )
+      ),
+      NA,
+      info = paste("Sourcing failed for", basename(f))
+    )
+
+    expect_true(exists("ARD", envir = e), info = paste("No ARD from", basename(f)))
+    ARD <- get("ARD", envir = e)
+    expect_true("stat" %in% names(ARD), info = "'stat' column missing in ARD")
+
+    # Verify all three analyses produced output
+    expect_true("An_01" %in% ARD$AnalysisId, info = "An_01 missing from ARD")
+    expect_true("An_03" %in% ARD$AnalysisId, info = "An_03 (3-grouping) missing from ARD")
+    expect_true("An_04" %in% ARD$AnalysisId, info = "An_04 (4-grouping) missing from ARD")
+
+    # Verify An_03 continuous mean: Placebo/PLACEBO/"Duration on Therapy (days)"
+    # subjects 01-701-1015 (182 days) and 01-701-1023 (28 days) -> mean = 105
+    an03_mean <- ARD %>%
+      filter(
+        AnalysisId == "An_03",
+        stat_name == "mean",
+        group2_level == "PLACEBO",
+        group3_level == "Duration on Therapy (days)"
+      ) %>%
+      select(stat) %>%
+      unlist()
+    expect_equal(round(an03_mean[[1]], 1), 105.0,
+                 info = "Mean AVAL for Placebo/PLACEBO/Duration on Therapy should be 105.0")
+
+    # Verify An_04 produced rows (4-grouping analysis)
+    an04_rows <- ARD %>% filter(AnalysisId == "An_04")
+    expect_true(nrow(an04_rows) > 0, info = "An_04 (4 groupings) produced no ARD rows")
+  }
+})
