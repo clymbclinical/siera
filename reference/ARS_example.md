@@ -24,14 +24,15 @@ used.
 
 ``` r
 ARS_example()
-#>  [1] "ADAE.csv"                          "ADSL.csv"                         
-#>  [3] "ADVS.csv"                          "ADZSDER.csv"                      
-#>  [5] "Common_Safety_Displays_cards.xlsx" "cards_constructs.xlsx"            
-#>  [7] "exampleARS_1.json"                 "exampleARS_1a.json"               
-#>  [9] "exampleARS_2.json"                 "exampleARS_2.xlsx"                
-#> [11] "exampleARS_2a.xlsx"                "exampleARS_3.json"                
-#> [13] "exampleARS_3.xlsx"                 "exampleARS_4.json"                
-#> [15] "test_cards.json"                  
+#>  [1] "ADAE.csv"                          "ADEXSUM.csv"                      
+#>  [3] "ADSL.csv"                          "ADVS.csv"                         
+#>  [5] "ADZSDER.csv"                       "Common_Safety_Displays_cards.xlsx"
+#>  [7] "cards_constructs.xlsx"             "exampleARS_1.json"                
+#>  [9] "exampleARS_1a.json"                "exampleARS_2.json"                
+#> [11] "exampleARS_2.xlsx"                 "exampleARS_2a.xlsx"               
+#> [13] "exampleARS_3.json"                 "exampleARS_3.xlsx"                
+#> [15] "exampleARS_4.json"                 "exampleARS_5.json"                
+#> [17] "exampleARS_5.xlsx"                 "test_cards.json"                  
 ARS_example("Common_Safety_Displays_cards.xlsx")
 #> [1] "/home/runner/work/_temp/Library/siera/extdata/Common_Safety_Displays_cards.xlsx"
 ```
