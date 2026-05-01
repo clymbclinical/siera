@@ -1,3 +1,9 @@
+# siera 0.5.6
+
+* Added `NOTIN` comparator support for data subset conditions.
+* Removed the limit on grouping factors per analysis (previously capped at 3).
+* Added Pharmaverse badge to README and pkgdown site.
+
 # siera 0.5.5
 
 * Strengthened analysis method validation with clear errors for missing or undefined `MethodId` values and warnings when method templates or parameter value sources cannot be resolved.
