@@ -70,3 +70,42 @@ test_that(".read_ars_xlsx_metadata returns the expected tables", {
   expect_gt(nrow(metadata$Analyses), 0)
   expect_true(all(c("listItem_analysisId", "listItem_outputId") %in% names(metadata$Lopa)))
 })
+
+
+test_that(".extract_lopa_ids returns empty tibble for NULL input", {
+  result <- siera:::`.extract_lopa_ids`(NULL, "Out_01")
+
+  expect_equal(nrow(result), 0L)
+  expect_true(all(c("listItem_analysisId", "listItem_outputId") %in% names(result)))
+})
+
+
+test_that(".extract_lopa_ids handles depth-3 nesting", {
+  # Use jsonlite to produce the same nested-data-frame structure the production
+  # code sees, rather than hand-crafting the fixture.
+  raw <- jsonlite::fromJSON(
+    '{"listItems": [{"analysisId": null, "sublist": {"listItems":
+       [{"analysisId": null, "sublist": {"listItems":
+         [{"analysisId": "An_deep"}]}}]}}]}'
+  )
+  node_df <- raw$listItems
+
+  result <- siera:::`.extract_lopa_ids`(node_df, "Out_01")
+
+  expect_equal(nrow(result), 1L)
+  expect_equal(result$listItem_analysisId, "An_deep")
+  expect_equal(result$listItem_outputId, "Out_01")
+})
+
+
+test_that(".read_ars_json_metadata captures all Lopa IDs including depth 3+", {
+  json_path <- ARS_example("exampleARS_6.json")
+
+  metadata <- siera:::`.read_ars_json_metadata`(json_path)
+
+  expect_true(all(c("listItem_analysisId", "listItem_outputId") %in% names(metadata$Lopa)))
+  expect_setequal(
+    metadata$Lopa$listItem_analysisId,
+    c("An_01", "An_02", "An_03", "An_04")
+  )
+})

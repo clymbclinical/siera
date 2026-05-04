@@ -30,6 +30,46 @@
   c(list(file_ext = file_ext), metadata)
 }
 
+#' Recursively extract analysis IDs from a list-of-contents node data frame
+#'
+#' @param node_df A data.frame produced by jsonlite for one level of
+#'   `sublist$listItems`. May contain columns `analysisId` (character) and/or
+#'   `sublist` (list column). Either column may be absent or entirely NA/NULL.
+#' @param output_id Scalar character; the `outputId` to attach to every row.
+#'
+#' @return A tibble with columns `listItem_analysisId` and `listItem_outputId`.
+#' @keywords internal
+.extract_lopa_ids <- function(node_df, output_id) {
+  if (is.null(node_df) || nrow(node_df) == 0L) {
+    return(tibble::tibble(
+      listItem_analysisId = character(0),
+      listItem_outputId   = character(0)
+    ))
+  }
+
+  direct <- if ("analysisId" %in% names(node_df)) {
+    tibble::tibble(
+      listItem_analysisId = as.character(node_df$analysisId),
+      listItem_outputId   = output_id
+    ) |> dplyr::filter(!is.na(listItem_analysisId))
+  } else {
+    tibble::tibble(listItem_analysisId = character(0), listItem_outputId = character(0))
+  }
+
+  children <- if ("sublist" %in% names(node_df)) {
+    sub_items <- node_df$sublist$listItems
+    dplyr::bind_rows(lapply(seq_len(length(sub_items)), function(i) {
+      child_df <- sub_items[[i]]
+      if (is.null(child_df)) return(NULL)
+      .extract_lopa_ids(child_df, output_id)
+    }))
+  } else {
+    tibble::tibble(listItem_analysisId = character(0), listItem_outputId = character(0))
+  }
+
+  dplyr::bind_rows(direct, children)
+}
+
 #' Read ARS metadata from JSON
 #'
 #' Internal helper that ingests ARS metadata stored as JSON and converts it into
@@ -72,41 +112,12 @@
 
   mainListOfContents <- json_from$mainListOfContents$contentsList$listItems
 
-  Lopa <- data.frame()
-  for (a in seq_len(nrow(otherListsOfContents))) {
-    tmp_PO <- otherListsOfContents[a, ]
-    tmp_json_Lopa <- mainListOfContents$sublist$listItems[[a]]
-
-    anaIds <- tmp_json_Lopa$analysisId |>
-      tibble::as_tibble() |>
-      dplyr::mutate(listItem_outputId = tmp_PO$outputId)
-
-    if (nrow(anaIds) > 0) {
-      anaIds <- anaIds |>
-        dplyr::rename(listItem_analysisId = value) |>
-        dplyr::filter(!is.na(listItem_analysisId))
-    }
-
-    Lopa <- rbind(Lopa, anaIds)
-
-    if ("sublist" %in% names(tmp_json_Lopa)) {
-      tmp_json_lopa_sub <- tmp_json_Lopa$sublist$listItems
-
-      forend <- length(tmp_json_lopa_sub)
-      subana_dset <- data.frame()
-      for (b in seq_len(forend)) {
-        if (!is.null(tmp_json_lopa_sub[[b]])) {
-          ana_ids <- tmp_json_lopa_sub[[b]]$analysisId |>
-            tibble::as_tibble() |>
-            dplyr::mutate(listItem_outputId = tmp_PO$outputId) |>
-            dplyr::rename(listItem_analysisId = value)
-
-          subana_dset <- rbind(subana_dset, ana_ids)
-        }
-      }
-      Lopa <- rbind(Lopa, subana_dset)
-    }
-  }
+  Lopa <- dplyr::bind_rows(
+    lapply(seq_len(nrow(otherListsOfContents)), function(a) {
+      top_df <- mainListOfContents$sublist$listItems[[a]]
+      .extract_lopa_ids(top_df, otherListsOfContents[a, "outputId"])
+    })
+  )
 
   JSON_DataSubsets <- json_from$dataSubsets
   JSONDSL1 <- tibble::tibble(
