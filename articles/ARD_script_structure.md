@@ -1,6 +1,7 @@
 # ARD program structure
 
 ``` r
+
 library(siera)
 ```
 
@@ -17,6 +18,7 @@ mind that each of these code sections are auto-populated with ARS
 metadata. This can be visualized as follows:
 
 ``` r
+
 # Section 1: Program header
 
 # Section 2: Load libraries
@@ -45,6 +47,7 @@ two separate datasets are created for downstream use in subsequent
 analyses. Example:
 
 ``` r
+
 overlap <- intersect(names(ADSL), names(ADAE))
 overlapfin <- setdiff(overlap, "USUBJID")
 
@@ -77,6 +80,7 @@ is done with no ‘filter’ statement. This step has a convention of
 starting the dataframe name with “df2”, followed by the AnalysisId.
 
 ``` r
+
 df2_An07_03_SerTEAE_Summ_ByTrt <- df_pop |>
   dplyr::filter(TRTEMFL == "Y" & AESER == "Y")
 ```
@@ -96,6 +100,7 @@ merged to the ARD, to ensure the ability to trace each result back to
 ARS metadata. See example below:
 
 ``` r
+
 # intermediate step: Prepare Denominator Dataset for `cards` function
 denom_dataset <- df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
@@ -138,6 +143,7 @@ each Analysis). Once each Analysis ARD has been created, these ARDs are
 all appened to create output-level ARD. See example below:
 
 ``` r
+
 # combine analyses to create ARD ----
 ARD <- dplyr::bind_rows(
   df3_An01_05_SAF_Summ_ByTrt,
@@ -168,18 +174,21 @@ are such examples, for
 Access these with the below functions:
 
 ``` r
+
 # see location of script:
 ARD_script_example("ARD_Out14-1-1.R")
 ARD_script_example("ARD_Out14-3-1-1.R")
 ```
 
 ``` r
+
 # open script to inspect:
 file.edit(ARD_script_example("ARD_Out14-1-1.R"))
 file.edit(ARD_script_example("ARD_Out14-3-1-1.R"))
 ```
 
 ``` r
+
 # run script locally:
 source(ARD_script_example("ARD_Out14-1-1.R"))
 source(ARD_script_example("ARD_Out14-3-1-1.R"))

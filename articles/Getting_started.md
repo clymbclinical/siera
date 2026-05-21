@@ -1,6 +1,7 @@
 # Getting Started
 
 ``` r
+
 library(siera)
 ```
 
@@ -18,6 +19,7 @@ ARS_example() with no arguments to list them or call it with an example
 filename to get the path.
 
 ``` r
+
 # To see a list of example files:
 ARS_example()
 #>  [1] "ADAE.csv"                          "ADEXSUM.csv"                      
@@ -59,6 +61,7 @@ file (note that this is meant as an example. Official ARS metadata is in
 json format, which can also be passed to the *readARS* function):
 
 ``` r
+
 # Path to the Excel ARS metadata file:
 ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
 
@@ -94,6 +97,7 @@ the package, and can be used by using the `ARD_script_example` function.
 Running this script will look like this:
 
 ``` r
+
 # Step 1: open ARD_xxx.R file
 # Step 2: Confirm the location of ADaM dataset(s) is correct in the code section "Load ADaM".
 # For the sake of simplicity, the only update made to the ARD_Out14-1-1.R script was to point to the ADaM folder to ARS_example("ADSL.csv")

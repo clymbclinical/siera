@@ -1,6 +1,7 @@
 # Making use of \`cards\` and \`cardx\`
 
 ``` r
+
 library(siera)
 ```
 
@@ -38,6 +39,7 @@ example of how a function *ard_continuous* from the *cards* package is
 used in the *AnalysisMethodCodeTemplate* class:
 
 ``` r
+
 # example of 'cards' code in AnalysisMethodCodeTemplate, using the ard_continuous function:
 
 Analysis_ARD <- ard_continuous(
@@ -69,6 +71,7 @@ example, how the above statement would be auto-populated with actual
 objects (from the ARS metadata):
 
 ``` r
+
 # example of 'cards' code in AnalysisMethodCodeTemplate, populated with AnalysisMethodCodeParameters:
 
 Analysis_ARD <- ard_continuous(
@@ -89,5 +92,6 @@ or pre-processing steps. A list of defined constructs and examples is
 shipped with this package, and can be accessed with:
 
 ``` r
+
 ARS_example("cards_constructs.xlsx")
 ```

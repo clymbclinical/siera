@@ -1,4 +1,4 @@
-pandoc: 3.1.11
+pandoc: 3.8.3
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
@@ -6,7 +6,7 @@ articles:
   ARD_script_structure: ARD_script_structure.html
   Getting_started: Getting_started.html
   using-cards: using-cards.html
-last_built: 2026-04-24T16:10Z
+last_built: 2026-05-21T11:57Z
 urls:
   reference: https://clymbclinical.github.io/siera/reference
   article: https://clymbclinical.github.io/siera/articles
