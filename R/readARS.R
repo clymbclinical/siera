@@ -275,6 +275,32 @@ readARS <- function(ARS_path,
         )
       )
 
+      # Determine how many group[n] columns this method produces in the ARD.
+      # Inspect the resolved code string directly: if by_vars or strata_vars
+      # appear, the last grouping went to variables= (one fewer group[n] column).
+      # If by_listc appears but not by_vars/strata_vars, all groupings are in
+      # by=c(...) and each produces a group[n] column.  Checking resolved code
+      # (not the parameter table) avoids false positives from unused parameters.
+      n_group_cols <- if (num_grp == 0L) {
+        0L
+      } else if (nchar(by_vars) > 0 &&
+                 (grepl(by_vars, code_method, fixed = TRUE) ||
+                  grepl(strata_vars, code_method, fixed = TRUE))) {
+        max(0L, num_grp - 1L)
+      } else if (nchar(by_listc) > 0 && grepl(by_listc, code_method, fixed = TRUE)) {
+        num_grp
+      } else {
+        0L
+      }
+
+      code_groupid <- .generate_groupid_code(
+        analysis_id        = Anas_j,
+        groupids           = groupids,
+        n_group_cols       = n_group_cols,
+        AG_dataDriven      = AG_dataDriven,
+        analysis_groupings = AnalysisGroupings
+      )
+
       # Generate code for analysis ----------------------------------------------
 
       assign(
@@ -285,7 +311,8 @@ readARS <- function(ARS_path,
           get(paste0("code_AnalysisSet_", Anas_j)),
           # get(paste0("code_AnalysisGrouping_",Anas_j)),
           get(paste0("code_DataSubset_", Anas_j)),
-          get(paste0("code_AnalysisMethod_", Anas_j))
+          get(paste0("code_AnalysisMethod_", Anas_j)),
+          code_groupid
         )
       )
 
@@ -349,4 +376,66 @@ readARS <- function(ARS_path,
       paste0(output_path, "/ARD_", Output, ".R")
     )
   } # end of outputs
+}
+
+# Generate mutate code that stamps group[n]_groupingId and group[n]_groupId
+# onto df3_<analysis_id> for each ARD group column produced by the method.
+# Works identically for XLSX- and JSON-sourced ARS files because both produce
+# the same AnalysisGroupings tibble with id, group_id, group_condition_value,
+# and dataDriven columns.
+.generate_groupid_code <- function(analysis_id, groupids, n_group_cols,
+                                   AG_dataDriven, analysis_groupings) {
+  if (n_group_cols < 1L) return("")
+
+  mutate_parts <- character(0)
+
+  for (k in seq_len(n_group_cols)) {
+    gid            <- groupids[k]
+    grp_level_col  <- paste0("group", k, "_level")
+    gid_col        <- paste0("group", k, "_groupingId")
+    gpid_col       <- paste0("group", k, "_groupId")
+
+    mutate_parts <- c(mutate_parts,
+      paste0("      ", gid_col, " = '", gid, "'")
+    )
+
+    if (isTRUE(as.logical(AG_dataDriven[k]))) {
+      mutate_parts <- c(mutate_parts,
+        paste0("      ", gpid_col, " = NA_character_")
+      )
+    } else {
+      grp_rows <- analysis_groupings[
+        analysis_groupings$id == gid &
+          !is.na(analysis_groupings$group_id) &
+          nchar(as.character(analysis_groupings$group_id)) > 0, ]
+
+      if (nrow(grp_rows) == 0L) {
+        mutate_parts <- c(mutate_parts,
+          paste0("      ", gpid_col, " = NA_character_")
+        )
+      } else {
+        cond_vals <- gsub("'", "\\'", grp_rows$group_condition_value, fixed = TRUE)
+        grp_ids   <- grp_rows$group_id
+        cases <- paste(
+          paste0("        as.character(", grp_level_col, ") == '",
+                 cond_vals, "' ~ '", grp_ids, "'"),
+          collapse = ",\n"
+        )
+        mutate_parts <- c(mutate_parts,
+          paste0("      ", gpid_col, " = dplyr::case_when(\n",
+                 cases, ",\n",
+                 "        TRUE ~ NA_character_\n",
+                 "      )")
+        )
+      }
+    }
+  }
+
+  paste0(
+    "if(nrow(df2_", analysis_id, ") != 0){\n",
+    "df3_", analysis_id, " <- df3_", analysis_id, " |>\n",
+    "  dplyr::mutate(\n",
+    paste(mutate_parts, collapse = ",\n"),
+    "\n  )\n}\n"
+  )
 }
