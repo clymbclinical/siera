@@ -399,9 +399,12 @@ readARS <- function(ARS_path,
       paste0("      ", gid_col, " = '", gid, "'")
     )
 
+    gpval_col <- paste0("group", k, "_groupValue")
+
     if (isTRUE(as.logical(AG_dataDriven[k]))) {
       mutate_parts <- c(mutate_parts,
-        paste0("      ", gpid_col, " = NA_character_")
+        paste0("      ", gpid_col,  " = NA_character_"),
+        paste0("      ", gpval_col, " = as.character(", grp_level_col, ")")
       )
     } else {
       grp_rows <- analysis_groupings[

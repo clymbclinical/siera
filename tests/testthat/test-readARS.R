@@ -332,6 +332,19 @@ test_that("group[n]_groupingId and group[n]_groupId stamped for by_listc methods
   expect_true(any(grepl("group1_groupId", all_lines)))
 })
 
+test_that("group[n]_groupValue stamped for data-driven groupings - json", {
+  ARS_path <- ARS_example("exampleARS_5.json")
+  output_dir <- withr::local_tempdir()
+  readARS(ARS_path, output_dir, tempdir())
+
+  lines <- readLines(file.path(output_dir, "ARD_Out_01.R"))
+  # data-driven grouping: groupId must be NA, groupValue must carry the level
+  expect_true(any(grepl("groupId = NA_character_", lines)))
+  expect_true(any(grepl("groupValue = as.character(group", lines, fixed = TRUE)))
+  # non-data-driven grouping in same script must NOT get groupValue
+  expect_false(any(grepl("group1_groupValue", lines)))
+})
+
 test_that("ARD values - xlsx 1", {
   skip_on_cran()
 
