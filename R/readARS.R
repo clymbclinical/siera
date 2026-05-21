@@ -267,25 +267,11 @@ readARS <- function(ARS_path,
       methodlabel <- method$label
       methodid <- method$id
 
-      # code to combine it all --------------------------------------------------
-      # dplyr::rename groups to append
-      if (num_grp > 0) {
-        rename_pairs <- paste(
-          paste0("Group", seq_len(num_grp), " = ", AG_vars[seq_len(num_grp)]),
-          collapse = ",\n               "
-        )
-        code_rename <- paste0(" |>\n        dplyr::rename(", rename_pairs, ")\n")
-      } else {
-        code_rename <- ""
-      }
-
-
       assign(
         paste0("code_AnalysisMethod_", Anas_j),
         paste0(
           "#Apply Method --- \n",
-          code_method # ,
-          # code_rename
+          code_method
         )
       )
 
