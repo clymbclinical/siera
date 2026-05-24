@@ -2,7 +2,7 @@
 title: "Making use of `cards` and `cardx`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{2. using-cards}
+  %\VignetteIndexEntry{2. Making use of cards and cardx}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
