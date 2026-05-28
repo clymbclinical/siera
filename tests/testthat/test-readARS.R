@@ -332,6 +332,27 @@ test_that("group[n]_groupingId and group[n]_groupId stamped for by_listc methods
   expect_true(any(grepl("group1_groupId", all_lines)))
 })
 
+test_that(".generate_groupid_code falls back to NA_character_ when grouping has no rows", {
+  # Covers the nrow(grp_rows) == 0 branch: a non-data-driven grouping whose
+  # id is not present in AnalysisGroupings (e.g. groups[] defined but all
+  # have empty group_id values, or the grouping is simply not found).
+  code <- siera:::`.generate_groupid_code`(
+    analysis_id        = "An_01",
+    groupids           = c("AG_MISSING"),   # id not in analysis_groupings
+    n_group_cols       = 1L,
+    AG_dataDriven      = c(FALSE),
+    analysis_groupings = tibble::tibble(    # empty — no rows match
+      id = character(0), group_id = character(0),
+      group_condition_value = character(0), dataDriven = character(0)
+    )
+  )
+
+  expect_true(grepl("group1_groupingId = 'AG_MISSING'", code, fixed = TRUE))
+  expect_true(grepl("group1_groupId = NA_character_",   code, fixed = TRUE))
+  # Must NOT contain a case_when (no groups to enumerate)
+  expect_false(grepl("case_when", code, fixed = TRUE))
+})
+
 test_that("group[n]_groupValue stamped for data-driven groupings - json", {
   ARS_path <- ARS_example("exampleARS_5.json")
   output_dir <- withr::local_tempdir()
