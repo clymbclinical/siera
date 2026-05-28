@@ -303,6 +303,20 @@ readARS <- function(ARS_path,
 
       # Generate code for analysis ----------------------------------------------
 
+      # Coerce *_level columns (variable_level, group[n]_level) to character on
+      # each individual df3 BEFORE bind_rows combines them.  Cards returns
+      # variable_level as a list-of-NULLs for continuous analyses, and as
+      # character for categorical ones; left as-is they create type conflicts
+      # during bind_rows.  The vapply converts NULL -> NA_character_ safely
+      # without touching the numeric 'stat' list column.
+      code_listcoerce <- paste0(
+        "df3_", Anas_j, " <- df3_", Anas_j, " |>\n",
+        "  dplyr::mutate(dplyr::across(\n",
+        "    dplyr::matches('_level$'),\n",
+        "    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))\n",
+        "  ))\n"
+      )
+
       assign(
         paste0("code_", Anas_j),
         paste0(
@@ -312,7 +326,8 @@ readARS <- function(ARS_path,
           # get(paste0("code_AnalysisGrouping_",Anas_j)),
           get(paste0("code_DataSubset_", Anas_j)),
           get(paste0("code_AnalysisMethod_", Anas_j)),
-          code_groupid
+          code_groupid,
+          code_listcoerce
         )
       )
 
