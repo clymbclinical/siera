@@ -81,6 +81,28 @@ test_that("ADaM loading code includes all referenced datasets once", {
   expect_equal(extract_code_lines(code), expected_lines)
 })
 
+test_that("Windows backslash paths are normalised to forward slashes", {
+  Anas <- make_anas(listItem_analysisId = "AN1")
+
+  Analyses <- make_analyses(
+    id = "AN1",
+    dataset = "ADSL",
+    analysisSetId = NA_character_,
+    dataSubsetId = NA_character_
+  )
+
+  AnalysisSets  <- make_analysis_sets(id = character(), condition_dataset = character())
+  DataSubsets   <- make_data_subsets(id = character(), condition_dataset = character())
+
+  code <- get_adam_loading_code(
+    Anas, Analyses, AnalysisSets, DataSubsets,
+    adam_path = "C:\\Users\\mbosman\\data"
+  )
+
+  expect_false(grepl("\\\\", code))             # no backslashes in output
+  expect_true(grepl("C:/Users/mbosman/data/ADSL.csv", code, fixed = TRUE))
+})
+
 test_that("header-only code is returned when no datasets are referenced", {
   Anas <- make_anas(listItem_analysisId = character())
 
