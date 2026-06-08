@@ -298,6 +298,74 @@ test_that("combined code created", {
   expect_true(any(grepl("ARD <- ", lines)))
 })
 
+test_that("group[n]_groupingId and group[n]_groupId stamped for by_listc methods - xlsx", {
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+  output_dir <- withr::local_tempdir()
+  adam_folder <- withr::local_tempdir()
+  readARS(ARS_path, output_dir, adam_folder, spec_output = "Out14-1-1")
+
+  lines <- readLines(file.path(output_dir, "ARD_Out14-1-1.R"))
+
+  # by_listc methods (continuous summary, n%) produce group[n] columns
+  expect_true(any(grepl("group1_groupingId", lines)))
+  expect_true(any(grepl("group1_groupId", lines)))
+
+  # by_vars count method with num_grp=1 must NOT produce group1_groupingId
+  # (the single grouping goes to variables=, not by=, so no group1 column in ARD)
+  an01_block <- grep("An01_05_SAF_Summ_ByTrt", lines)
+  expect_true(length(an01_block) > 0)
+  an01_has_groupingId <- any(grepl("group1_groupingId", lines[an01_block]))
+  expect_false(an01_has_groupingId)
+})
+
+test_that("group[n]_groupingId and group[n]_groupId stamped for by_listc methods - json", {
+  ARS_path <- ARS_example("test_cards.json")
+  output_dir <- withr::local_tempdir()
+  adam_folder <- withr::local_tempdir()
+  readARS(ARS_path, output_dir, adam_folder)
+
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_true(length(r_files) > 0)
+
+  all_lines <- unlist(lapply(r_files, readLines))
+  expect_true(any(grepl("group1_groupingId", all_lines)))
+  expect_true(any(grepl("group1_groupId", all_lines)))
+})
+
+test_that(".generate_groupid_code falls back to NA_character_ when grouping has no rows", {
+  # Covers the nrow(grp_rows) == 0 branch: a non-data-driven grouping whose
+  # id is not present in AnalysisGroupings (e.g. groups[] defined but all
+  # have empty group_id values, or the grouping is simply not found).
+  code <- siera:::`.generate_groupid_code`(
+    analysis_id        = "An_01",
+    groupids           = c("AG_MISSING"),   # id not in analysis_groupings
+    n_group_cols       = 1L,
+    AG_dataDriven      = c(FALSE),
+    analysis_groupings = tibble::tibble(    # empty — no rows match
+      id = character(0), group_id = character(0),
+      group_condition_value = character(0), dataDriven = character(0)
+    )
+  )
+
+  expect_true(grepl("group1_groupingId = 'AG_MISSING'", code, fixed = TRUE))
+  expect_true(grepl("group1_groupId = NA_character_",   code, fixed = TRUE))
+  # Must NOT contain a case_when (no groups to enumerate)
+  expect_false(grepl("case_when", code, fixed = TRUE))
+})
+
+test_that("group[n]_groupValue stamped for data-driven groupings - json", {
+  ARS_path <- ARS_example("exampleARS_5.json")
+  output_dir <- withr::local_tempdir()
+  readARS(ARS_path, output_dir, tempdir())
+
+  lines <- readLines(file.path(output_dir, "ARD_Out_01.R"))
+  # data-driven grouping: groupId must be NA, groupValue must carry the level
+  expect_true(any(grepl("groupId = NA_character_", lines)))
+  expect_true(any(grepl("groupValue = as.character(group", lines, fixed = TRUE)))
+  # non-data-driven grouping in same script must NOT get groupValue
+  expect_false(any(grepl("group1_groupValue", lines)))
+})
+
 test_that("ARD values - xlsx 1", {
   skip_on_cran()
 
