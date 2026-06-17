@@ -110,13 +110,14 @@
       anmetcode_temp <- gsub(
         parameter_name,
         rep,
-        anmetcode_temp
+        anmetcode_temp,
+        fixed = TRUE
       )
     }
   }
 
-  anmetcode_final <- gsub("methodidhere", methodid, anmetcode_temp)
-  anmetcode_final <- gsub("analysisidhere", analysis_id, anmetcode_final)
+  anmetcode_final <- gsub("methodidhere", methodid, anmetcode_temp, fixed = TRUE)
+  anmetcode_final <- gsub("analysisidhere", analysis_id, anmetcode_final, fixed = TRUE)
 
   template_intro <- "
 # Method ID:              methodidhere
@@ -124,9 +125,9 @@
 # Method description:     methoddeschere
 "
 
-  code_method_tmp_1 <- gsub("methodidhere", methodid, template_intro)
-  code_method_tmp_1 <- gsub("methodnamehere", methodname, code_method_tmp_1)
-  code_method_tmp_1 <- gsub("methoddeschere", methoddesc, code_method_tmp_1)
+  code_method_tmp_1 <- gsub("methodidhere", methodid, template_intro, fixed = TRUE)
+  code_method_tmp_1 <- gsub("methodnamehere", methodname, code_method_tmp_1, fixed = TRUE)
+  code_method_tmp_1 <- gsub("methoddeschere", methoddesc, code_method_tmp_1, fixed = TRUE)
 
   template <-
     "\nif(nrow(df2_analysisidhere) != 0){\ndf3_analysisidhere <- df3_analysisidhere |>
@@ -136,9 +137,9 @@
                MethodId = 'methodidhere',
                OutputId = 'outputidhere')\n}\n    "
 
-  code <- gsub("methodidhere", methodid, template)
-  code <- gsub("analysisidhere", analysis_id, code)
-  code_method_tmp_3 <- gsub("outputidhere", output_id, code)
+  code <- gsub("methodidhere", methodid, template, fixed = TRUE)
+  code <- gsub("analysisidhere", analysis_id, code, fixed = TRUE)
+  code_method_tmp_3 <- gsub("outputidhere", output_id, code, fixed = TRUE)
 
   code_method <- paste0(
     code_method_tmp_1, "\n",

@@ -150,38 +150,34 @@
   if (isTRUE(cond_adam == ana_adam2)) {
     template <- "
 # Apply Analysis Set ---
-df_pop <- dplyr::filter(ADaM,
-            var operator 'value')
+df_pop <- dplyr::filter(ADaMhere,
+            varhere operatorhere 'valuehere')
 df_poptot <- df_pop
 "
 
-    code <- gsub("ADaM", cond_adam, template)
-    code <- gsub("var", cond_var, code)
-    code <- gsub("operator", oper, code)
-    code <- gsub("value", cond_val, code)
-    code <- gsub("analysisidhere", analysis_id, code)
-    code <- gsub("Analysissetnamehere", anSetName, code)
+    code <- gsub("ADaMhere", cond_adam, template, fixed = TRUE)
+    code <- gsub("varhere", cond_var, code, fixed = TRUE)
+    code <- gsub("operatorhere", oper, code, fixed = TRUE)
+    code <- gsub("valuehere", cond_val, code, fixed = TRUE)
   } else {
     template <- "
 # Apply Analysis Set ---
-overlap <- intersect(names(ADaM), names(analysisADAMhere))
+overlap <- intersect(names(ADaMhere), names(analysisADAMhere))
 overlapfin <- setdiff(overlap, 'USUBJID')
-df_pop <- dplyr::filter(ADaM,
-            var operator 'value') |>
+df_pop <- dplyr::filter(ADaMhere,
+            varhere operatorhere 'valuehere') |>
             merge(analysisADAMhere |> dplyr::select(-dplyr::all_of(overlapfin)),
                   by = 'USUBJID',
                   all = FALSE)
-df_poptot = dplyr::filter(ADaM,
-            var operator 'value')
+df_poptot = dplyr::filter(ADaMhere,
+            varhere operatorhere 'valuehere')
 "
 
-    code <- gsub("ADaM", cond_adam, template)
-    code <- gsub("var", cond_var, code)
-    code <- gsub("operator", oper, code)
-    code <- gsub("value", cond_val, code)
-    code <- gsub("analysisidhere", analysis_id, code)
-    code <- gsub("analysisADAMhere", ana_adam2, code)
-    code <- gsub("Analysissetnamehere", anSetName, code)
+    code <- gsub("ADaMhere", cond_adam, template, fixed = TRUE)
+    code <- gsub("varhere", cond_var, code, fixed = TRUE)
+    code <- gsub("operatorhere", oper, code, fixed = TRUE)
+    code <- gsub("valuehere", cond_val, code, fixed = TRUE)
+    code <- gsub("analysisADAMhere", ana_adam2, code, fixed = TRUE)
   }
 
   list(

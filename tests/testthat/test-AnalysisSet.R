@@ -204,6 +204,40 @@ test_that("analysis set code merges companion dataset when needed", {
   expect_equal(result$data_subset, "df_poptot")
 })
 
+test_that("condition value containing regex special characters is preserved verbatim", {
+  # Without fixed = TRUE the replacement string can interact unexpectedly with
+  # regex back-references. A value like "Y(1)" contains "(" which is a regex
+  # metacharacter; with fixed = TRUE it is treated as a literal string.
+  analysis_sets <- make_analysis_sets(
+    id = "AS4",
+    condition_dataset = "ADSL",
+    condition_variable = "TRTGRP",
+    condition_comparator = "EQ",
+    condition_value = "A (High)",
+    name = "TrtGroup"
+  )
+
+  analyses <- make_analyses(
+    id = c("AN1", "AN2"),
+    dataset = c("ADSL", "ADSL")
+  )
+
+  anas <- make_anas(
+    listItem_analysisId = c("AN1", "AN2", "AN1")
+  )
+
+  result <- get_analysis_set_code(
+    j = 1,
+    analysis_sets = analysis_sets,
+    analyses = analyses,
+    anas = anas,
+    analysis_set_id = "AS4",
+    analysis_id = "AN1"
+  )
+
+  expect_true(grepl("A (High)", result$code, fixed = TRUE))
+})
+
 test_that("missing condition values are replaced with empty strings", {
   analysis_sets <- make_analysis_sets(
     id = "AS3",
