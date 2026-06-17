@@ -195,7 +195,12 @@
 
     DataSubsets <- dplyr::bind_rows(JSONDSL1, JSONDSL2, JSONDSL3) |>
       dplyr::arrange(id, level, order)
-    DataSubsets$condition_value[DataSubsets$condition_value == "NULL"] <- NA
+    # condition_value is absent when no condition in the ARS has a value field
+    # (e.g. bare NE comparators). Only clean up the "NULL" strings when the
+    # column exists.
+    if ("condition_value" %in% names(DataSubsets)) {
+      DataSubsets$condition_value[DataSubsets$condition_value == "NULL"] <- NA
+    }
   }
 
   AnalysisSets <- tibble::tibble(
@@ -276,8 +281,9 @@
   for (g in seq_len(nrow(JSON_AnalysesL1))) {
     tmp_id <- as.character(JSON_AN[g, ]$id)
 
-    if (nrow(JSON_AN[["orderedGroupings"]][[g]]) > 0) {
-      tmp <- JSON_AN[["orderedGroupings"]][[g]] %>%
+    og_g <- JSON_AN[["orderedGroupings"]][[g]]
+    if (!is.null(og_g) && nrow(og_g) > 0) {
+      tmp <- og_g %>%
         tidyr::pivot_wider(
           names_from = order,
           values_from = c(resultsByGroup, groupingId),
@@ -387,27 +393,37 @@
       all = TRUE
     )
 
+  # codeTemplate is optional per ARS; guard all accessors against a NULL column.
+  ct <- json_from$methods$codeTemplate
+  n_mth <- length(json_from$methods$id)
+
   AnalysisMethodCodeTemplate <- tibble::tibble(
-    method_id = json_from$methods$id,
-    context = json_from$methods$codeTemplate$context,
-    specifiedAs = "Code",
-    templateCode = gsub("\r|_x000D_", "", json_from$methods$codeTemplate$code)
+    method_id    = json_from$methods$id,
+    context      = if (!is.null(ct$context)) ct$context else rep(NA_character_, n_mth),
+    specifiedAs  = "Code",
+    templateCode = if (!is.null(ct$code))
+      gsub("\r|_x000D_", "", ct$code)
+    else
+      rep(NA_character_, n_mth)
   )
 
-  AnalysisMethodCodeParameters <- data.frame()
+  AnalysisMethodCodeParameters <- tibble::tibble(
+    method_id             = character(0),
+    parameter_name        = character(0),
+    parameter_description = character(0),
+    parameter_valueSource = character(0)
+  )
   for (i in seq_len(nrow(JSONAML1))) {
-    id <- as.character(JSONAML1[i, ]$id)
+    id      <- as.character(JSONAML1[i, ]$id)
+    params_i <- if (!is.null(ct$parameters)) ct$parameters[[i]] else NULL
+    if (is.null(params_i) || is.null(params_i$name)) next
     tmp_AMCP <- tibble::tibble(
-      method_id = id,
-      parameter_name = json_from$methods$codeTemplate$parameters[[i]]$name,
-      parameter_description = json_from$methods$codeTemplate$parameters[[i]]$description,
-      parameter_valueSource = json_from$methods$codeTemplate$parameters[[i]]$valueSource
+      method_id             = id,
+      parameter_name        = params_i$name,
+      parameter_description = params_i$description,
+      parameter_valueSource = params_i$valueSource
     )
-
-    AnalysisMethodCodeParameters <- dplyr::bind_rows(
-      AnalysisMethodCodeParameters,
-      tmp_AMCP
-    )
+    AnalysisMethodCodeParameters <- dplyr::bind_rows(AnalysisMethodCodeParameters, tmp_AMCP)
   }
 
   list(

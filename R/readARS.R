@@ -156,22 +156,33 @@ readARS <- function(ARS_path,
       NUM_analysisid <- Anas_s$referencedAnalysisOperations_analysisId1
       DEN_analysisid <- Anas_s$referencedAnalysisOperations_analysisId2
 
-      AG_denom_id <- Analyses |>
-        dplyr::filter(id == DEN_analysisid) |>
-        dplyr::select(groupingId1) |>
-        unique() |>
-        as.character()
+      # Continuous-only tables have no denominator; column may be absent (NULL).
+      has_denom <- !is.null(DEN_analysisid) &&
+                   length(DEN_analysisid) > 0 &&
+                   !is.na(DEN_analysisid) &&
+                   !DEN_analysisid %in% c("", "NA")
 
-      AG_denom_temp1 <- AnalysisGroupings |>
-        dplyr::filter(id == AG_denom_id)
+      if (has_denom) {
+        AG_denom_id <- Analyses |>
+          dplyr::filter(id == DEN_analysisid) |>
+          dplyr::select(groupingId1) |>
+          unique() |>
+          as.character()
 
-      AG_denom_var1 <- AG_denom_temp1 |>
-        dplyr::select(groupingVariable) |>
-        unique() |>
-        as.character()
+        AG_denom_temp1 <- AnalysisGroupings |>
+          dplyr::filter(id == AG_denom_id)
 
-      if (AG_denom_var1 %in% c(NA, "NA", "")) {
-        cli::cli_alert("Metadata issue in AnalysisGroupings {AG_denom_id}: AnalysisGrouping has missing groupingVariable")
+        AG_denom_var1 <- AG_denom_temp1 |>
+          dplyr::select(groupingVariable) |>
+          unique() |>
+          as.character()
+
+        if (AG_denom_var1 %in% c(NA, "NA", "")) {
+          cli::cli_alert("Metadata issue in AnalysisGroupings {AG_denom_id}: AnalysisGrouping has missing groupingVariable")
+        }
+      } else {
+        AG_denom_id   <- NA_character_
+        AG_denom_var1 <- NA_character_
       }
 
       # Fetch grouping variable info for each active grouping

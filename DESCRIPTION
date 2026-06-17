@@ -27,7 +27,7 @@ Imports:
     stringr,
     readxl,
     cli
-Suggests: 
+Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
