@@ -148,7 +148,7 @@ readARS <- function(ARS_path,
         analysis_id = Anas_j
       )
 
-      assign(paste0("code_AnalysisSet_", Anas_j), analysis_set_result$code)
+      code_as <- analysis_set_result$code
       AnSetDataSubsets <- analysis_set_result$data_subset
       # Apply Grouping ----------------------------
 
@@ -242,10 +242,7 @@ readARS <- function(ARS_path,
         file_ext = file_ext
       )
 
-      assign(
-        paste0("code_DataSubset_", Anas_j),
-        data_subset_result$code
-      )
+      code_ds <- data_subset_result$code
 
       # Apply AnalysisMethod -------------------------------------------------------------
 
@@ -267,13 +264,7 @@ readARS <- function(ARS_path,
       methodlabel <- method$label
       methodid <- method$id
 
-      assign(
-        paste0("code_AnalysisMethod_", Anas_j),
-        paste0(
-          "#Apply Method --- \n",
-          code_method
-        )
-      )
+      code_method_frag <- paste0("#Apply Method --- \n", code_method)
 
       # Determine how many group[n] columns this method produces in the ARD.
       # Inspect the resolved code string directly: if by_vars or strata_vars
@@ -317,24 +308,17 @@ readARS <- function(ARS_path,
         "  ))\n"
       )
 
-      assign(
-        paste0("code_", Anas_j),
-        paste0(
-          "\n\n# Analysis ", Anas_j, "----\n#",
-          ana_name,
-          get(paste0("code_AnalysisSet_", Anas_j)),
-          # get(paste0("code_AnalysisGrouping_",Anas_j)),
-          get(paste0("code_DataSubset_", Anas_j)),
-          get(paste0("code_AnalysisMethod_", Anas_j)),
-          code_groupid,
-          code_listcoerce
-        )
+      code_per_analysis <- paste0(
+        "\n\n# Analysis ", Anas_j, "----\n#",
+        ana_name,
+        code_as,
+        code_ds,
+        code_method_frag,
+        code_groupid,
+        code_listcoerce
       )
 
-      run_code <- paste0(
-        run_code,
-        get(paste0("code_", Anas_j))
-      )
+      run_code <- paste0(run_code, code_per_analysis)
 
       if (j < max_j) {
         combine_analysis_code <- paste0(
@@ -372,22 +356,19 @@ readARS <- function(ARS_path,
 
 
     # add all code, combine analyses ARDs and apply pattern
-    assign(
-      paste0("code_", Output),
-      paste0(
-        code_header,
-        code_libraries,
-        code_ADaM,
-        run_code,
-        "\n\n# combine analyses to create ARD ----\n",
-        "ARD <- dplyr::bind_rows(",
-        combine_analysis_code,
-        ") "
-      )
+    code_output <- paste0(
+      code_header,
+      code_libraries,
+      code_ADaM,
+      run_code,
+      "\n\n# combine analyses to create ARD ----\n",
+      "ARD <- dplyr::bind_rows(",
+      combine_analysis_code,
+      ") "
     )
 
     writeLines(
-      get(paste0("code_", Output)),
+      code_output,
       paste0(output_path, "/ARD_", Output, ".R")
     )
   } # end of outputs
