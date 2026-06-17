@@ -91,6 +91,53 @@ test_that(".generate_analysis_method_section keeps placeholders when no paramete
   expect_equal(result$operations, list(operation_1 = "OP10"))
 })
 
+test_that("parameter name containing a regex metacharacter is matched literally", {
+  # Without fixed = TRUE, gsub("param.name", ...) treats "." as regex wildcard
+  # and would also replace "paramXname" in addition to "param.name". With
+  # fixed = TRUE only the exact token is replaced.
+  analysis_methods <- tibble(
+    id = "MTH_DOT",
+    name = "Dot test",
+    description = "Test literal matching",
+    label = "dot",
+    operation_id = "OP_DOT"
+  )
+
+  template <- tibble(
+    method_id = "MTH_DOT",
+    context = "R",
+    specifiedAs = "Code",
+    # Contains both the placeholder "param.name" and a similar-looking string
+    # "paramXname" that should NOT be replaced.
+    templateCode = "df3_analysisidhere <- dplyr::filter(df, param.name == 'paramXname')"
+  )
+
+  parameters <- tibble(
+    method_id = "MTH_DOT",
+    parameter_name = "param.name",
+    parameter_valueSource = "operation_1"
+  )
+
+  target_env <- new.env(parent = emptyenv())
+
+  result <- siera:::`.generate_analysis_method_section`(
+    analysis_methods = analysis_methods,
+    analysis_method_code_template = template,
+    analysis_method_code_parameters = parameters,
+    method_id = "MTH_DOT",
+    analysis_id = "AN_DOT",
+    output_id = "OUT_DOT",
+    envir = target_env
+  )
+
+  # The literal placeholder "param.name" must be replaced with the operation ID
+  expect_false(grepl("param.name", result$code, fixed = TRUE))
+  # "paramXname" (which regex "param.name" would also match) must be untouched
+  expect_true(grepl("paramXname", result$code, fixed = TRUE))
+  # The substituted operation ID value must appear
+  expect_true(grepl("OP_DOT", result$code, fixed = TRUE))
+})
+
 test_that(".generate_analysis_method_section warns when no template exists", {
   analysis_methods <- tibble(
     id = "MTH200",
