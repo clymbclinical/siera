@@ -47,6 +47,84 @@ test_that(".read_ars_json_metadata returns the expected tables", {
 })
 
 
+test_that(".read_ars_json_metadata handles empty dataSubsets array", {
+  # dataSubsets is optional; an empty array [] must produce a zero-row tibble.
+  ars_json <- r"[{
+    "name": "Test RE", "id": "TEST_RE",
+    "otherListsOfContents": [{"name": "LOPO", "label": "LOPO",
+      "contentsList": {"listItems": [
+        {"name": "Out1", "level": 1, "order": 1, "outputId": "Out_01"}]}}],
+    "mainListOfContents": {"name": "LOPA", "label": "LOPA",
+      "contentsList": {"listItems": [
+        {"name": "Out1", "level": 1, "order": 1, "outputId": "Out_01",
+         "sublist": {"listItems": [
+           {"name": "An1", "level": 2, "order": 1, "analysisId": "An_01"}]}}]}},
+    "dataSubsets": [],
+    "analysisSets": [{"name": "Safety", "id": "AnalysisSet_01", "level": 1, "order": 1,
+      "condition": {"dataset": "ADSL", "variable": "SAFFL", "comparator": "EQ", "value": ["Y"]}}],
+    "analysisGroupings": [{"name": "Trt", "id": "AG_01",
+      "dataDriven": false, "groupingDataset": "ADSL", "groupingVariable": "TRT01A",
+      "groups": [{"name": "A", "id": "AG_01_1", "level": 1, "order": 1,
+        "condition": {"dataset": "ADSL", "variable": "TRT01A", "comparator": "EQ", "value": ["A"]}}]}],
+    "methods": [{"name": "Count", "label": "Count", "description": "n", "id": "Mth_01",
+      "operations": [{"name": "n", "label": "n", "id": "Mth_01_01_n", "order": 1, "resultPattern": "XX"}],
+      "codeTemplate": {"context": "R (siera)",
+        "code": "df3_analysisidhere <- cards::ard_tabulate(data = df2_analysisidhere, variables = anavarhere)",
+        "parameters": [{"name": "anavarhere", "description": "var", "valueSource": "ana_var"}]}}],
+    "analyses": [{"name": "An1", "id": "An_01", "methodId": "Mth_01", "version": 1,
+      "dataset": "ADSL", "variable": "USUBJID", "analysisSetId": "AnalysisSet_01",
+      "orderedGroupings": [{"order": 1, "groupingId": "AG_01", "resultsByGroup": true}]}]
+  }]"
+
+  ars_file <- withr::local_tempfile(fileext = ".json")
+  writeLines(ars_json, ars_file)
+
+  metadata <- siera:::`.read_ars_json_metadata`(ars_file)
+
+  expect_true("DataSubsets" %in% names(metadata))
+  expect_equal(nrow(metadata$DataSubsets), 0L)
+  expect_true(all(c("id", "condition_dataset", "condition_variable") %in% colnames(metadata$DataSubsets)))
+})
+
+
+test_that(".read_ars_json_metadata handles missing dataSubsets key", {
+  # dataSubsets may be absent; the parser must still return a zero-row tibble.
+  ars_json <- r"[{
+    "name": "Test RE", "id": "TEST_RE",
+    "otherListsOfContents": [{"name": "LOPO", "label": "LOPO",
+      "contentsList": {"listItems": [
+        {"name": "Out1", "level": 1, "order": 1, "outputId": "Out_01"}]}}],
+    "mainListOfContents": {"name": "LOPA", "label": "LOPA",
+      "contentsList": {"listItems": [
+        {"name": "Out1", "level": 1, "order": 1, "outputId": "Out_01",
+         "sublist": {"listItems": [
+           {"name": "An1", "level": 2, "order": 1, "analysisId": "An_01"}]}}]}},
+    "analysisSets": [{"name": "Safety", "id": "AnalysisSet_01", "level": 1, "order": 1,
+      "condition": {"dataset": "ADSL", "variable": "SAFFL", "comparator": "EQ", "value": ["Y"]}}],
+    "analysisGroupings": [{"name": "Trt", "id": "AG_01",
+      "dataDriven": false, "groupingDataset": "ADSL", "groupingVariable": "TRT01A",
+      "groups": [{"name": "A", "id": "AG_01_1", "level": 1, "order": 1,
+        "condition": {"dataset": "ADSL", "variable": "TRT01A", "comparator": "EQ", "value": ["A"]}}]}],
+    "methods": [{"name": "Count", "label": "Count", "description": "n", "id": "Mth_01",
+      "operations": [{"name": "n", "label": "n", "id": "Mth_01_01_n", "order": 1, "resultPattern": "XX"}],
+      "codeTemplate": {"context": "R (siera)",
+        "code": "df3_analysisidhere <- cards::ard_tabulate(data = df2_analysisidhere, variables = anavarhere)",
+        "parameters": [{"name": "anavarhere", "description": "var", "valueSource": "ana_var"}]}}],
+    "analyses": [{"name": "An1", "id": "An_01", "methodId": "Mth_01", "version": 1,
+      "dataset": "ADSL", "variable": "USUBJID", "analysisSetId": "AnalysisSet_01",
+      "orderedGroupings": [{"order": 1, "groupingId": "AG_01", "resultsByGroup": true}]}]
+  }]"
+
+  ars_file <- withr::local_tempfile(fileext = ".json")
+  writeLines(ars_json, ars_file)
+
+  metadata <- siera:::`.read_ars_json_metadata`(ars_file)
+
+  expect_true("DataSubsets" %in% names(metadata))
+  expect_equal(nrow(metadata$DataSubsets), 0L)
+})
+
+
 test_that(".read_ars_metadata dispatches to the XLSX reader", {
   skip_if_not_installed("readxl")
 
