@@ -288,22 +288,17 @@ readARS <- function(ARS_path,
       code_method_frag <- paste0("#Apply Method --- \n", code_method)
 
       # Determine how many group[n] columns this method produces in the ARD.
-      # Inspect the resolved code string directly: if by_vars or strata_vars
-      # appear, the last grouping went to variables= (one fewer group[n] column).
-      # If by_listc appears but not by_vars/strata_vars, all groupings are in
-      # by=c(...) and each produces a group[n] column.  Checking resolved code
-      # (not the parameter table) avoids false positives from unused parameters.
-      n_group_cols <- if (num_grp == 0L) {
-        0L
-      } else if (nchar(by_vars) > 0 &&
-                 (grepl(by_vars, code_method, fixed = TRUE) ||
-                  grepl(strata_vars, code_method, fixed = TRUE))) {
-        max(0L, num_grp - 1L)
-      } else if (nchar(by_listc) > 0 && grepl(by_listc, code_method, fixed = TRUE)) {
-        num_grp
-      } else {
-        0L
-      }
+      # Inspect the method CODE TEMPLATE (before substitution) to find which
+      # parameters are actually present as placeholder tokens, then check their
+      # valueSource types. This avoids both (a) inspecting the generated code
+      # string and (b) false positives from parameter-table rows whose
+      # placeholder names do not appear in the template.
+      n_group_cols <- .n_group_cols_from_template(
+        num_grp                       = num_grp,
+        method_id                     = methodid,
+        analysis_method_code_template = AnalysisMethodCodeTemplate,
+        analysis_method_code_parameters = AnalysisMethodCodeParameters
+      )
 
       code_groupid <- .generate_groupid_code(
         analysis_id        = Anas_j,
@@ -458,4 +453,52 @@ readARS <- function(ARS_path,
     paste(mutate_parts, collapse = ",\n"),
     "\n  )\n}\n"
   )
+}
+
+# Determine how many group[n] columns a method produces in the ARD output.
+#
+# Checks which valueSource types are used by parameters whose placeholder
+# tokens actually appear in the method's code template. Checking the template
+# (not the parameter table and not the generated code) avoids two failure
+# modes: (a) spurious parameter-table rows emitted by some tools even when
+# the placeholder is absent from the template; (b) coupling to the exact
+# string format of runtime-resolved values like by_vars or strata_vars.
+.n_group_cols_from_template <- function(num_grp,
+                                        method_id,
+                                        analysis_method_code_template,
+                                        analysis_method_code_parameters) {
+  if (num_grp == 0L) return(0L)
+
+  mid <- method_id
+
+  template_code <- analysis_method_code_template |>
+    dplyr::filter(
+      method_id == mid,
+      context %in% c("R", "R (siera)", "siera"),
+      specifiedAs == "Code"
+    ) |>
+    dplyr::pull(templateCode) |>
+    paste(collapse = "\n")
+
+  params <- analysis_method_code_parameters |>
+    dplyr::filter(
+      method_id == mid,
+      parameter_valueSource != ""
+    )
+
+  # Keep only parameters whose placeholder token is actually in the template.
+  in_template <- vapply(
+    params$parameter_name,
+    function(p) grepl(p, template_code, fixed = TRUE),
+    logical(1L)
+  )
+  active_sources <- params$parameter_valueSource[in_template]
+
+  if (any(active_sources %in% c("by_vars", "strata_vars"))) {
+    max(0L, num_grp - 1L)
+  } else if (any(active_sources == "by_listc")) {
+    num_grp
+  } else {
+    0L
+  }
 }
