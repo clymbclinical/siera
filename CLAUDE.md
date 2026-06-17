@@ -45,6 +45,21 @@ devtools::test_file("tests/testthat/test-readARS.R", filter = "4 grouping factor
 The “unable to verify current time” NOTE is a known environment artefact
 and can be ignored.
 
+## Key files
+
+| File | Purpose |
+|----|----|
+| `R/readARS.R` | Main entry point — [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md) orchestrates the full pipeline |
+| `R/metadata.R` | Parses ARS JSON/XLSX into flat R data frames |
+| `R/AnalysisSet.R` | Generates analysis set (population) filter code |
+| `R/DataSubsets.R` | Generates data subset filter code |
+| `R/AnalysisMethods.R` | Resolves method code templates and valueSource parameters |
+| `R/loadADaM.R` | Generates ADaM dataset loading code |
+| `R/libraries.R` | Generates [`library()`](https://rdrr.io/r/base/library.html) calls for generated scripts |
+| `R/program_header.R` | Generates programme header comments |
+| `inst/extdata/` | Example ARS files (JSON and XLSX) used in tests and examples |
+| `inst/script/` | Example generated ARD scripts |
+
 ## Architecture and data flow
 
 `readARS(ARS_path, output_path, adam_path)` is the single entry point:
@@ -139,6 +154,142 @@ and can be ignored.
   (e.g. `.read_ars_metadata`). Only four symbols are exported:
   `readARS`, `ARS_example`, `ARD_script_example`, `%>%`.
 
+## Coding standards (pharmaverse / admiral style)
+
+- **Tidyverse over base R**: use `dplyr`, `tidyr`, `stringr`; pipe with
+  `|>` (prefer native pipe over `%>%`).
+- **cli for output**:
+  [`cli::cli_abort()`](https://cli.r-lib.org/reference/cli_abort.html)
+  not [`stop()`](https://rdrr.io/r/base/stop.html),
+  [`cli::cli_warn()`](https://cli.r-lib.org/reference/cli_abort.html)
+  not [`warning()`](https://rdrr.io/r/base/warning.html),
+  [`cli::cli_inform()`](https://cli.r-lib.org/reference/cli_abort.html)
+  not [`message()`](https://rdrr.io/r/base/message.html).
+- **Fail fast**: check arguments early with
+  [`is.na()`](https://rdrr.io/r/base/NA.html),
+  [`nchar()`](https://rdrr.io/r/base/nchar.html),
+  [`is.null()`](https://rdrr.io/r/base/NULL.html) guards; emit errors
+  pointing at the bad input.
+- **No global state**: all inputs must be explicit arguments; no reads
+  from or writes to global objects.
+- **Function naming**: internal helpers prefixed with `.`
+  (e.g. [`.generate_analysis_set_code()`](https://clymbclinical.github.io/siera/reference/dot-generate_analysis_set_code.md));
+  exported functions in camelCase
+  (e.g. [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md),
+  [`ARS_example()`](https://clymbclinical.github.io/siera/reference/ARS_example.md)).
+- **Comments**: explain the *why*, not the *what*; section markers end
+  with `----` for RStudio outline (e.g. `# Load ADaMs ----`).
+
+## ADaM dataset conventions
+
+siera reads ADaM datasets to generate loading code and resolve variable
+references.
+
+### Common datasets
+
+| Dataset   | Contents                                                 |
+|-----------|----------------------------------------------------------|
+| `ADSL`    | One row per subject; demographics, treatment arms, flags |
+| `ADAE`    | Adverse events (one row per event)                       |
+| `ADVS`    | Vital signs parameters                                   |
+| `ADLB`    | Laboratory parameters                                    |
+| `ADEX`    | Exposure                                                 |
+| `ADEXSUM` | Exposure summary                                         |
+
+### Key variable conventions
+
+| Variable                   | Meaning                                      |
+|----------------------------|----------------------------------------------|
+| `STUDYID` / `USUBJID`      | Study and unique subject identifiers         |
+| `PARAMCD` / `PARAM`        | Parameter code / label (long datasets)       |
+| `AVAL` / `AVALC`           | Analysis value (numeric / character)         |
+| `TRT01P` / `TRT01A`        | Planned / actual treatment (period 1)        |
+| `AVISIT` / `AVISITN`       | Analysis visit (character / numeric)         |
+| `SAFFL` / `ITTFL`          | Safety / ITT population flags (`"Y"` / `""`) |
+| `--FL` suffix              | Flag variables (Y/blank pattern)             |
+| `--DT` / `--DTM` / `--DTC` | Date / datetime / character date variables   |
+
+ARS `analysisSets` map to ADaM flag variables
+(e.g. `ADSL.SAFFL EQ "Y"`); siera translates these into
+[`dplyr::filter()`](https://dplyr.tidyverse.org/reference/filter.html)
+calls. When `dataDriven: true`, groups are discovered from ADaM data at
+runtime.
+
+## Pharmaverse ecosystem context
+
+| Package | Role |
+|----|----|
+| [admiral](https://pharmaverse.github.io/admiral/) | ADaM dataset creation (upstream of siera) |
+| [cards](https://github.com/insightsengineering/cards) | ARD computation (`ard_tabulate()`, `ard_summary()`, etc.) |
+| [cardx](https://github.com/insightsengineering/cardx) | Extended ARD statistics (models, tests) |
+| [gtsummary](https://github.com/ddsjoberg/gtsummary) | TFL rendering from ARDs |
+| [admiraldev](https://pharmaverse.github.io/admiraldev/) | Development utilities for pharmaverse packages |
+
+siera sits between ARS metadata and
+[cards](https://github.com/insightsengineering/cards) — it generates the
+`cards`-based R code a statistician would otherwise write by hand.
+
+## GitHub API access
+
+`gh` CLI is **not installed** on this machine. Use the GitHub REST API
+directly via PowerShell instead.
+
+**Step 1 — retrieve the stored token** (Git Credential Manager holds a
+GitKraken OAuth token):
+
+``` powershell
+$token = (printf "protocol=https\nhost=github.com\n" | git credential fill | Select-String "^password=").ToString().Replace("password=","").Trim()
+```
+
+Or retrieve it once and reuse in the session:
+
+``` bash
+# in Bash tool
+printf "protocol=https\nhost=github.com\n" | git credential fill
+# copy the password= line value
+```
+
+**Step 2 — set up headers**:
+
+``` powershell
+$token   = "gho_..."   # from step 1
+$headers = @{ Authorization = "token $token"; Accept = "application/vnd.github.v3+json" }
+$repo    = "clymbclinical/siera"
+```
+
+**Common operations:**
+
+``` powershell
+# Create an issue
+$body = @{ title = "..."; body = "..." } | ConvertTo-Json
+Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/issues" -Method Post -Headers $headers -Body $body -ContentType "application/json"
+
+# Create a PR
+$body = @{ title = "..."; head = "branch-name"; base = "main"; body = "..." } | ConvertTo-Json
+Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/pulls" -Method Post -Headers $headers -Body $body -ContentType "application/json"
+
+# List open issues
+Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/issues?state=open" -Headers $headers
+
+# Get a specific issue
+Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/issues/139" -Headers $headers
+```
+
+The token is an OAuth token (`gho_` prefix) stored in Windows Credential
+Manager by GitKraken. It has repo scope and works for all standard
+issue/PR/label operations.
+
+## Git / branch workflow
+
+- Branch naming: `<issue-number>-short-description`
+  (e.g. `137-fix-windows-adam-paths`).
+- All work goes to feature branches; PRs target `main`. Never push
+  directly to `main`.
+- Commit messages: imperative mood, short
+  (e.g. `Fix #139: update cards_constructs.xlsx`).
+- Every PR must be linked to a GitHub issue. Inform the user when
+  editing siera source files if no issue exists yet.
+
 ## cards / cardx API alignment
 
 The generated R scripts and example scripts in `inst/script/` must
@@ -197,15 +348,19 @@ to use
 
 ## Notes:
 
-- always delete codes or datasets used for temporary testing once the
-  temp testing is completed (keep the repo clean)
-- after a reasonable development effort and milestone, capture learnings
-  and add to claude.md any information that might be useful in the
-  future regarding the understanding and workings of the project.  
-- notify the user when there are strong candidate processes for creating
-  a skill. Whenever there are repeated prompts or processes that would
-  fit a use case. Suggest the skill and its benefits.
-- keep in mind that the target audience are other industry members.
-  Whenever logic or usage or something important for a user to know is
-  affected, highlight this and suggest education material or a vignette
-  idea.
+- Always delete code or datasets used for temporary testing once done
+  (keep the repo clean).
+- After a reasonable development milestone, capture learnings and update
+  CLAUDE.md with anything useful for future sessions.
+- Notify the user when there are strong candidates for creating a Claude
+  skill — repeated prompts or processes that would benefit from
+  automation.
+- Target audience are clinical trial industry members; whenever logic or
+  usage changes, suggest education material or a vignette idea.
+- Inform the user before editing siera source files if there is no
+  linked GitHub issue — all changes should be traceable to an issue and
+  land on a feature branch.
+- Suggest documentation updates when features are added or functionality
+  changes (this is a public-facing CRAN package).
+- Add tests for all new code; ensure every new branch has test coverage
+  for its changes.

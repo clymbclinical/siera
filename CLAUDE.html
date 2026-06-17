@@ -64,6 +64,31 @@
 <p><strong>Before every PR</strong>: run <code>document()</code>, <code>load_all()</code>, and <code>check(vignettes = FALSE)</code> — all must pass with 0 errors, 0 warnings. The “unable to verify current time” NOTE is a known environment artefact and can be ignored.</p>
 </div>
 <div class="section level2">
+<h2 id="key-files">Key files<a class="anchor" aria-label="anchor" href="#key-files"></a></h2>
+<table class="table"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr><th>File</th>
+<th>Purpose</th>
+</tr></thead><tbody><tr><td><code>R/readARS.R</code></td>
+<td>Main entry point — <code><a href="reference/readARS.html">readARS()</a></code> orchestrates the full pipeline</td>
+</tr><tr><td><code>R/metadata.R</code></td>
+<td>Parses ARS JSON/XLSX into flat R data frames</td>
+</tr><tr><td><code>R/AnalysisSet.R</code></td>
+<td>Generates analysis set (population) filter code</td>
+</tr><tr><td><code>R/DataSubsets.R</code></td>
+<td>Generates data subset filter code</td>
+</tr><tr><td><code>R/AnalysisMethods.R</code></td>
+<td>Resolves method code templates and valueSource parameters</td>
+</tr><tr><td><code>R/loadADaM.R</code></td>
+<td>Generates ADaM dataset loading code</td>
+</tr><tr><td><code>R/libraries.R</code></td>
+<td>Generates <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library()</a></code> calls for generated scripts</td>
+</tr><tr><td><code>R/program_header.R</code></td>
+<td>Generates programme header comments</td>
+</tr><tr><td><code>inst/extdata/</code></td>
+<td>Example ARS files (JSON and XLSX) used in tests and examples</td>
+</tr><tr><td><code>inst/script/</code></td>
+<td>Example generated ARD scripts</td>
+</tr></tbody></table></div>
+<div class="section level2">
 <h2 id="architecture-and-data-flow">Architecture and data flow<a class="anchor" aria-label="anchor" href="#architecture-and-data-flow"></a></h2>
 <p><code>readARS(ARS_path, output_path, adam_path)</code> is the single entry point:</p>
 <ol style="list-style-type: decimal"><li>
@@ -121,6 +146,131 @@
 <strong>Internal functions</strong> are prefixed with <code>.</code> (e.g. <code>.read_ars_metadata</code>). Only four symbols are exported: <code>readARS</code>, <code>ARS_example</code>, <code>ARD_script_example</code>, <code>%&gt;%</code>.</li>
 </ul></div>
 <div class="section level2">
+<h2 id="coding-standards-pharmaverse--admiral-style">Coding standards (pharmaverse / admiral style)<a class="anchor" aria-label="anchor" href="#coding-standards-pharmaverse--admiral-style"></a></h2>
+<ul><li>
+<strong>Tidyverse over base R</strong>: use <code>dplyr</code>, <code>tidyr</code>, <code>stringr</code>; pipe with <code>|&gt;</code> (prefer native pipe over <code>%&gt;%</code>).</li>
+<li>
+<strong>cli for output</strong>: <code><a href="https://cli.r-lib.org/reference/cli_abort.html" class="external-link">cli::cli_abort()</a></code> not <code><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop()</a></code>, <code><a href="https://cli.r-lib.org/reference/cli_abort.html" class="external-link">cli::cli_warn()</a></code> not <code><a href="https://rdrr.io/r/base/warning.html" class="external-link">warning()</a></code>, <code><a href="https://cli.r-lib.org/reference/cli_abort.html" class="external-link">cli::cli_inform()</a></code> not <code><a href="https://rdrr.io/r/base/message.html" class="external-link">message()</a></code>.</li>
+<li>
+<strong>Fail fast</strong>: check arguments early with <code><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na()</a></code>, <code><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nchar()</a></code>, <code><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null()</a></code> guards; emit errors pointing at the bad input.</li>
+<li>
+<strong>No global state</strong>: all inputs must be explicit arguments; no reads from or writes to global objects.</li>
+<li>
+<strong>Function naming</strong>: internal helpers prefixed with <code>.</code> (e.g. <code><a href="reference/dot-generate_analysis_set_code.html">.generate_analysis_set_code()</a></code>); exported functions in camelCase (e.g. <code><a href="reference/readARS.html">readARS()</a></code>, <code><a href="reference/ARS_example.html">ARS_example()</a></code>).</li>
+<li>
+<strong>Comments</strong>: explain the <em>why</em>, not the <em>what</em>; section markers end with <code>----</code> for RStudio outline (e.g. <code># Load ADaMs ----</code>).</li>
+</ul></div>
+<div class="section level2">
+<h2 id="adam-dataset-conventions">ADaM dataset conventions<a class="anchor" aria-label="anchor" href="#adam-dataset-conventions"></a></h2>
+<p>siera reads ADaM datasets to generate loading code and resolve variable references.</p>
+<div class="section level3">
+<h3 id="common-datasets">Common datasets<a class="anchor" aria-label="anchor" href="#common-datasets"></a></h3>
+<table class="table"><thead><tr><th>Dataset</th>
+<th>Contents</th>
+</tr></thead><tbody><tr><td><code>ADSL</code></td>
+<td>One row per subject; demographics, treatment arms, flags</td>
+</tr><tr><td><code>ADAE</code></td>
+<td>Adverse events (one row per event)</td>
+</tr><tr><td><code>ADVS</code></td>
+<td>Vital signs parameters</td>
+</tr><tr><td><code>ADLB</code></td>
+<td>Laboratory parameters</td>
+</tr><tr><td><code>ADEX</code></td>
+<td>Exposure</td>
+</tr><tr><td><code>ADEXSUM</code></td>
+<td>Exposure summary</td>
+</tr></tbody></table></div>
+<div class="section level3">
+<h3 id="key-variable-conventions">Key variable conventions<a class="anchor" aria-label="anchor" href="#key-variable-conventions"></a></h3>
+<table class="table"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr><th>Variable</th>
+<th>Meaning</th>
+</tr></thead><tbody><tr><td>
+<code>STUDYID</code> / <code>USUBJID</code>
+</td>
+<td>Study and unique subject identifiers</td>
+</tr><tr><td>
+<code>PARAMCD</code> / <code>PARAM</code>
+</td>
+<td>Parameter code / label (long datasets)</td>
+</tr><tr><td>
+<code>AVAL</code> / <code>AVALC</code>
+</td>
+<td>Analysis value (numeric / character)</td>
+</tr><tr><td>
+<code>TRT01P</code> / <code>TRT01A</code>
+</td>
+<td>Planned / actual treatment (period 1)</td>
+</tr><tr><td>
+<code>AVISIT</code> / <code>AVISITN</code>
+</td>
+<td>Analysis visit (character / numeric)</td>
+</tr><tr><td>
+<code>SAFFL</code> / <code>ITTFL</code>
+</td>
+<td>Safety / ITT population flags (<code>"Y"</code> / <code>""</code>)</td>
+</tr><tr><td>
+<code>--FL</code> suffix</td>
+<td>Flag variables (Y/blank pattern)</td>
+</tr><tr><td>
+<code>--DT</code> / <code>--DTM</code> / <code>--DTC</code>
+</td>
+<td>Date / datetime / character date variables</td>
+</tr></tbody></table><p>ARS <code>analysisSets</code> map to ADaM flag variables (e.g. <code>ADSL.SAFFL EQ "Y"</code>); siera translates these into <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">dplyr::filter()</a></code> calls. When <code>dataDriven: true</code>, groups are discovered from ADaM data at runtime.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="pharmaverse-ecosystem-context">Pharmaverse ecosystem context<a class="anchor" aria-label="anchor" href="#pharmaverse-ecosystem-context"></a></h2>
+<table class="table"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr><th>Package</th>
+<th>Role</th>
+</tr></thead><tbody><tr><td><a href="https://pharmaverse.github.io/admiral/" class="external-link">admiral</a></td>
+<td>ADaM dataset creation (upstream of siera)</td>
+</tr><tr><td><a href="https://github.com/insightsengineering/cards" class="external-link">cards</a></td>
+<td>ARD computation (<code>ard_tabulate()</code>, <code>ard_summary()</code>, etc.)</td>
+</tr><tr><td><a href="https://github.com/insightsengineering/cardx" class="external-link">cardx</a></td>
+<td>Extended ARD statistics (models, tests)</td>
+</tr><tr><td><a href="https://github.com/ddsjoberg/gtsummary" class="external-link">gtsummary</a></td>
+<td>TFL rendering from ARDs</td>
+</tr><tr><td><a href="https://pharmaverse.github.io/admiraldev/" class="external-link">admiraldev</a></td>
+<td>Development utilities for pharmaverse packages</td>
+</tr></tbody></table><p>siera sits between ARS metadata and <a href="https://github.com/insightsengineering/cards" class="external-link">cards</a> — it generates the <code>cards</code>-based R code a statistician would otherwise write by hand.</p>
+</div>
+<div class="section level2">
+<h2 id="github-api-access">GitHub API access<a class="anchor" aria-label="anchor" href="#github-api-access"></a></h2>
+<p><code>gh</code> CLI is <strong>not installed</strong> on this machine. Use the GitHub REST API directly via PowerShell instead.</p>
+<p><strong>Step 1 — retrieve the stored token</strong> (Git Credential Manager holds a GitKraken OAuth token):</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="va">$token</span> <span class="op">=</span> <span class="op">(</span>printf <span class="st">"protocol=https\nhost=github.com\n"</span> <span class="op">|</span> git credential fill <span class="op">|</span> <span class="fu">Select-String</span> <span class="st">"^password="</span><span class="op">).</span><span class="fu">ToString</span><span class="op">().</span><span class="fu">Replace</span><span class="op">(</span><span class="st">"password="</span><span class="op">,</span><span class="st">""</span><span class="op">).</span><span class="fu">Trim</span><span class="op">()</span></span></code></pre></div>
+<p>Or retrieve it once and reuse in the session:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># in Bash tool</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="bu">printf</span> <span class="st">"protocol=https\nhost=github.com\n"</span> <span class="kw">|</span> <span class="fu">git</span> credential fill</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co"># copy the password= line value</span></span></code></pre></div>
+<p><strong>Step 2 — set up headers</strong>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="va">$token</span>   <span class="op">=</span> <span class="st">"gho_..."</span>   <span class="co"># from step 1</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="va">$headers</span> <span class="op">=</span> @<span class="op">{</span> Authorization <span class="op">=</span> <span class="st">"token </span><span class="va">$token</span><span class="st">"</span><span class="op">;</span> Accept <span class="op">=</span> <span class="st">"application/vnd.github.v3+json"</span> <span class="op">}</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="va">$repo</span>    <span class="op">=</span> <span class="st">"clymbclinical/siera"</span></span></code></pre></div>
+<p><strong>Common operations:</strong></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Create an issue</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="va">$body</span> <span class="op">=</span> @<span class="op">{</span> title <span class="op">=</span> <span class="st">"..."</span><span class="op">;</span> body <span class="op">=</span> <span class="st">"..."</span> <span class="op">}</span> <span class="op">|</span> <span class="fu">ConvertTo-Json</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="fu">Invoke-RestMethod</span> <span class="op">-</span>Uri <span class="st">"https://api.github.com/repos/</span><span class="va">$repo</span><span class="st">/issues"</span> <span class="op">-</span>Method Post <span class="op">-</span>Headers <span class="va">$headers</span> <span class="op">-</span>Body <span class="va">$body</span> <span class="op">-</span>ContentType <span class="st">"application/json"</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co"># Create a PR</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="va">$body</span> <span class="op">=</span> @<span class="op">{</span> title <span class="op">=</span> <span class="st">"..."</span><span class="op">;</span> head <span class="op">=</span> <span class="st">"branch-name"</span><span class="op">;</span> base <span class="op">=</span> <span class="st">"main"</span><span class="op">;</span> body <span class="op">=</span> <span class="st">"..."</span> <span class="op">}</span> <span class="op">|</span> <span class="fu">ConvertTo-Json</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="fu">Invoke-RestMethod</span> <span class="op">-</span>Uri <span class="st">"https://api.github.com/repos/</span><span class="va">$repo</span><span class="st">/pulls"</span> <span class="op">-</span>Method Post <span class="op">-</span>Headers <span class="va">$headers</span> <span class="op">-</span>Body <span class="va">$body</span> <span class="op">-</span>ContentType <span class="st">"application/json"</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co"># List open issues</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="fu">Invoke-RestMethod</span> <span class="op">-</span>Uri <span class="st">"https://api.github.com/repos/</span><span class="va">$repo</span><span class="st">/issues?state=open"</span> <span class="op">-</span>Headers <span class="va">$headers</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co"># Get a specific issue</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="fu">Invoke-RestMethod</span> <span class="op">-</span>Uri <span class="st">"https://api.github.com/repos/</span><span class="va">$repo</span><span class="st">/issues/139"</span> <span class="op">-</span>Headers <span class="va">$headers</span></span></code></pre></div>
+<p>The token is an OAuth token (<code>gho_</code> prefix) stored in Windows Credential Manager by GitKraken. It has repo scope and works for all standard issue/PR/label operations.</p>
+</div>
+<div class="section level2">
+<h2 id="git--branch-workflow">Git / branch workflow<a class="anchor" aria-label="anchor" href="#git--branch-workflow"></a></h2>
+<ul><li>Branch naming: <code>&lt;issue-number&gt;-short-description</code> (e.g. <code>137-fix-windows-adam-paths</code>).</li>
+<li>All work goes to feature branches; PRs target <code>main</code>. Never push directly to <code>main</code>.</li>
+<li>Commit messages: imperative mood, short (e.g. <code>Fix #139: update cards_constructs.xlsx</code>).</li>
+<li>Every PR must be linked to a GitHub issue. Inform the user when editing siera source files if no issue exists yet.</li>
+</ul></div>
+<div class="section level2">
 <h2 id="cards--cardx-api-alignment">cards / cardx API alignment<a class="anchor" aria-label="anchor" href="#cards--cardx-api-alignment"></a></h2>
 <p>The generated R scripts and example scripts in <code>inst/script/</code> must always use the current <code>cards</code> API. Key function renames from cards ≥ 0.7.0:</p>
 <ul><li>
@@ -134,7 +284,7 @@
 </li>
 </ul><p>When updating example scripts or code templates, check the cards changelog for any further deprecations. The <code>strata</code> argument exists in <code>ard_tabulate()</code> (unlike the old <code>ard_categorical()</code>) for computing percentages over observed combinations only — see cards docs for the <code>by</code> vs <code>strata</code> distinction.</p>
 <p><strong><code>ard_tabulate()</code> denominator pattern:</strong> For categorical n(%) analyses with a pre-computed denominator, the correct structure is <code>by = 'group_var', variables = 'analysis_var'</code> with a pre-counted denominator data frame that has the count column renamed to <code>...ard_N...</code>. The old pattern of <code>by = c('group_var', 'analysis_var'), variables = 'dummy_var'</code> with a raw data frame as denominator is no longer correct. Example:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">denom</span> <span class="op">&lt;-</span> <span class="va">df_pop</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">TRT01A</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>`...ard_N...` <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
 <span><span class="fu">cards</span><span class="fu">::</span><span class="fu"><a href="https://insightsengineering.github.io/cards/latest-tag/reference/ard_tabulate.html" class="external-link">ard_tabulate</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">in_data</span>, by <span class="op">=</span> <span class="st">'TRT01A'</span>, variables <span class="op">=</span> <span class="st">'AGEGR1'</span>, denominator <span class="op">=</span> <span class="va">denom</span><span class="op">)</span></span></code></pre></div>
 <p>Do not modify the test fixture xlsx files in <code>inst/extdata/</code> — the package owner updates those separately. The example R scripts in <code>inst/script/</code> are pre-generated and committed; regenerate them manually using <code><a href="reference/readARS.html">readARS()</a></code> after the xlsx templates are updated, then adjust the ADaM-loading lines to use <code><a href="reference/ARS_example.html">siera::ARS_example()</a></code>.</p>
@@ -150,10 +300,13 @@
 </ul></div>
 <div class="section level2">
 <h2 id="notes">Notes:<a class="anchor" aria-label="anchor" href="#notes"></a></h2>
-<ul><li>always delete codes or datasets used for temporary testing once the temp testing is completed (keep the repo clean)</li>
-<li>after a reasonable development effort and milestone, capture learnings and add to claude.md any information that might be useful in the future regarding the understanding and workings of the project.<br></li>
-<li>notify the user when there are strong candidate processes for creating a skill. Whenever there are repeated prompts or processes that would fit a use case. Suggest the skill and its benefits.</li>
-<li>keep in mind that the target audience are other industry members. Whenever logic or usage or something important for a user to know is affected, highlight this and suggest education material or a vignette idea.</li>
+<ul><li>Always delete code or datasets used for temporary testing once done (keep the repo clean).</li>
+<li>After a reasonable development milestone, capture learnings and update CLAUDE.md with anything useful for future sessions.</li>
+<li>Notify the user when there are strong candidates for creating a Claude skill — repeated prompts or processes that would benefit from automation.</li>
+<li>Target audience are clinical trial industry members; whenever logic or usage changes, suggest education material or a vignette idea.</li>
+<li>Inform the user before editing siera source files if there is no linked GitHub issue — all changes should be traceable to an issue and land on a feature branch.</li>
+<li>Suggest documentation updates when features are added or functionality changes (this is a public-facing CRAN package).</li>
+<li>Add tests for all new code; ensure every new branch has test coverage for its changes.</li>
 </ul></div>
 </div>
 
