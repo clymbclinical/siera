@@ -80,6 +80,23 @@ test_that(".extract_lopa_ids returns empty tibble for NULL input", {
 })
 
 
+test_that(".extract_lopa_ids handles node_df with no analysisId column", {
+  # A category-header node: has a sublist but no analysisId key at all.
+  # This covers the else branch on the 'analysisId %in% names(node_df)' check.
+  raw <- jsonlite::fromJSON(
+    '{"listItems": [{"name": "Category", "sublist": {"listItems":
+       [{"analysisId": "An_01"}]}}]}'
+  )
+  node_df <- raw$listItems
+
+  result <- siera:::`.extract_lopa_ids`(node_df, "Out_01")
+
+  expect_equal(nrow(result), 1L)
+  expect_equal(result$listItem_analysisId, "An_01")
+  expect_equal(result$listItem_outputId, "Out_01")
+})
+
+
 test_that(".extract_lopa_ids handles depth-3 nesting", {
   # Use jsonlite to produce the same nested-data-frame structure the production
   # code sees, rather than hand-crafting the fixture.
