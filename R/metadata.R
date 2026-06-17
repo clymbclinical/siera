@@ -40,7 +40,8 @@
 #' @return A tibble with columns `listItem_analysisId` and `listItem_outputId`.
 #' @keywords internal
 .extract_lopa_ids <- function(node_df, output_id) {
-  if (is.null(node_df) || nrow(node_df) == 0L) {
+  n <- nrow(node_df)
+  if (is.null(node_df) || is.null(n) || n == 0L) {
     return(tibble::tibble(
       listItem_analysisId = character(0),
       listItem_outputId   = character(0)
@@ -85,7 +86,6 @@
   required_json_sections <- c(
     "otherListsOfContents",
     "mainListOfContents",
-    "dataSubsets",
     "analysisSets",
     "analysisGroupings",
     "analyses",
@@ -120,65 +120,83 @@
   )
 
   JSON_DataSubsets <- json_from$dataSubsets
-  JSONDSL1 <- tibble::tibble(
-    id = json_from$dataSubsets[["id"]],
-    name = json_from$dataSubsets[["name"]],
-    label = json_from$dataSubsets[["label"]],
-    order = json_from$dataSubsets[["order"]],
-    level = json_from$dataSubsets[["level"]],
-    condition_dataset = json_from[["dataSubsets"]][["condition"]][["dataset"]],
-    condition_variable = json_from[["dataSubsets"]][["condition"]][["variable"]],
-    condition_comparator = json_from[["dataSubsets"]][["condition"]][["comparator"]],
-    condition_value = json_from[["dataSubsets"]][["condition"]][["value"]],
-    compoundExpression_logicalOperator = json_from[["dataSubsets"]][["compoundExpression"]][["logicalOperator"]]
-  )
+  ds_n <- if (is.data.frame(JSON_DataSubsets)) nrow(JSON_DataSubsets) else length(JSON_DataSubsets)
 
-  whereClauses <- JSON_DataSubsets[["compoundExpression"]][["whereClauses"]]
-  JSONDSL2 <- data.frame()
-  JSONDSL3 <- data.frame()
-  for (c in seq_len(nrow(JSON_DataSubsets))) {
-    tmp_DSID <- JSON_DataSubsets[c, "id"]
-    tmp_DSname <- JSON_DataSubsets[c, "name"]
-    tmp_DSlabel <- JSON_DataSubsets[c, "label"]
+  if (is.null(JSON_DataSubsets) || ds_n == 0) {
+    # dataSubsets is optional per ARS; produce a well-typed empty tibble.
+    DataSubsets <- tibble::tibble(
+      id = character(),
+      name = character(),
+      label = character(),
+      level = integer(),
+      order = integer(),
+      condition_dataset = character(),
+      condition_variable = character(),
+      condition_comparator = character(),
+      condition_value = character(),
+      compoundExpression_logicalOperator = character()
+    )
+  } else {
+    JSONDSL1 <- tibble::tibble(
+      id = json_from$dataSubsets[["id"]],
+      name = json_from$dataSubsets[["name"]],
+      label = json_from$dataSubsets[["label"]],
+      order = json_from$dataSubsets[["order"]],
+      level = json_from$dataSubsets[["level"]],
+      condition_dataset = json_from[["dataSubsets"]][["condition"]][["dataset"]],
+      condition_variable = json_from[["dataSubsets"]][["condition"]][["variable"]],
+      condition_comparator = json_from[["dataSubsets"]][["condition"]][["comparator"]],
+      condition_value = json_from[["dataSubsets"]][["condition"]][["value"]],
+      compoundExpression_logicalOperator = json_from[["dataSubsets"]][["compoundExpression"]][["logicalOperator"]]
+    )
 
-    if (!is.null(whereClauses[[c]])) {
-      tmp_DS <- tibble::tibble(
-        level = whereClauses[[c]][["level"]],
-        order = whereClauses[[c]][["order"]],
-        condition_dataset = whereClauses[[c]][["condition"]][["dataset"]],
-        condition_variable = whereClauses[[c]][["condition"]][["variable"]],
-        condition_comparator = whereClauses[[c]][["condition"]][["comparator"]],
-        condition_value = whereClauses[[c]][["condition"]][["value"]],
-        compoundExpression_logicalOperator = whereClauses[[c]]$compoundExpression$logicalOperator,
-        id = tmp_DSID,
-        name = tmp_DSname,
-        label = tmp_DSlabel
-      )
-      JSONDSL2 <- dplyr::bind_rows(JSONDSL2, tmp_DS)
+    whereClauses <- JSON_DataSubsets[["compoundExpression"]][["whereClauses"]]
+    JSONDSL2 <- data.frame()
+    JSONDSL3 <- data.frame()
+    for (c in seq_len(nrow(JSON_DataSubsets))) {
+      tmp_DSID <- JSON_DataSubsets[c, "id"]
+      tmp_DSname <- JSON_DataSubsets[c, "name"]
+      tmp_DSlabel <- JSON_DataSubsets[c, "label"]
 
-      whereClausesL2 <- whereClauses[[c]][["compoundExpression"]][["whereClauses"]]
-      for (d in seq_len(nrow(tmp_DS))) {
-        if (!is.null(whereClausesL2[[d]])) {
-          tmp_DSL2 <- tibble::tibble(
-            level = whereClausesL2[[d]][["level"]],
-            order = whereClausesL2[[d]][["order"]],
-            condition_dataset = whereClausesL2[[d]][["condition"]][["dataset"]],
-            condition_variable = whereClausesL2[[d]][["condition"]][["variable"]],
-            condition_comparator = whereClausesL2[[d]][["condition"]][["comparator"]],
-            condition_value = whereClausesL2[[d]][["condition"]][["value"]],
-            id = tmp_DSID,
-            name = tmp_DSname,
-            label = tmp_DSlabel
-          )
-          JSONDSL3 <- dplyr::bind_rows(JSONDSL3, tmp_DSL2)
+      if (!is.null(whereClauses[[c]])) {
+        tmp_DS <- tibble::tibble(
+          level = whereClauses[[c]][["level"]],
+          order = whereClauses[[c]][["order"]],
+          condition_dataset = whereClauses[[c]][["condition"]][["dataset"]],
+          condition_variable = whereClauses[[c]][["condition"]][["variable"]],
+          condition_comparator = whereClauses[[c]][["condition"]][["comparator"]],
+          condition_value = whereClauses[[c]][["condition"]][["value"]],
+          compoundExpression_logicalOperator = whereClauses[[c]]$compoundExpression$logicalOperator,
+          id = tmp_DSID,
+          name = tmp_DSname,
+          label = tmp_DSlabel
+        )
+        JSONDSL2 <- dplyr::bind_rows(JSONDSL2, tmp_DS)
+
+        whereClausesL2 <- whereClauses[[c]][["compoundExpression"]][["whereClauses"]]
+        for (d in seq_len(nrow(tmp_DS))) {
+          if (!is.null(whereClausesL2[[d]])) {
+            tmp_DSL2 <- tibble::tibble(
+              level = whereClausesL2[[d]][["level"]],
+              order = whereClausesL2[[d]][["order"]],
+              condition_dataset = whereClausesL2[[d]][["condition"]][["dataset"]],
+              condition_variable = whereClausesL2[[d]][["condition"]][["variable"]],
+              condition_comparator = whereClausesL2[[d]][["condition"]][["comparator"]],
+              condition_value = whereClausesL2[[d]][["condition"]][["value"]],
+              id = tmp_DSID,
+              name = tmp_DSname,
+              label = tmp_DSlabel
+            )
+            JSONDSL3 <- dplyr::bind_rows(JSONDSL3, tmp_DSL2)
+          }
         }
       }
     }
-  }
 
-  DataSubsets <- dplyr::bind_rows(JSONDSL1, JSONDSL2, JSONDSL3) |>
-    dplyr::arrange(id, level, order)
-  DataSubsets$condition_value[DataSubsets$condition_value == "NULL"] <- NA
+    DataSubsets <- dplyr::bind_rows(JSONDSL1, JSONDSL2, JSONDSL3) |>
+      dplyr::arrange(id, level, order)
+    DataSubsets$condition_value[DataSubsets$condition_value == "NULL"] <- NA
+  }
 
   AnalysisSets <- tibble::tibble(
     id = json_from$analysisSets$id,
@@ -442,6 +460,21 @@
   mainListOfContents <- readxl::read_excel(ARS_xlsx, sheet = "MainListOfContents")
   otherListsOfContents <- readxl::read_excel(ARS_xlsx, sheet = "OtherListsOfContents")
   DataSubsets <- readxl::read_excel(ARS_xlsx, sheet = "DataSubsets")
+
+  # Ensure DataSubsets has the expected column structure even when the sheet is blank.
+  ds_required_cols <- c(
+    "id", "name", "label", "level", "order",
+    "condition_dataset", "condition_variable",
+    "condition_comparator", "condition_value",
+    "compoundExpression_logicalOperator"
+  )
+  ds_missing_cols <- setdiff(ds_required_cols, colnames(DataSubsets))
+  if (length(ds_missing_cols) > 0) {
+    for (col in ds_missing_cols) {
+      DataSubsets[[col]] <- character(0)
+    }
+  }
+
   AnalysisSets <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisSets")
   AnalysisGroupings <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisGroupings")
   Analyses <- readxl::read_excel(ARS_xlsx, sheet = "Analyses") %>%

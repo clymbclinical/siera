@@ -19,14 +19,21 @@
 
   # Collect every ADaM dataset referenced directly, in an analysis set,
   # or within data subset metadata.
+  ds_datasets <- character(0)
+  if (!is.null(DataSubsets) &&
+      nrow(DataSubsets) > 0 &&
+      all(c("id", "condition_dataset") %in% colnames(DataSubsets))) {
+    ds_datasets <- DataSubsets %>%
+      dplyr::filter(id %in% Analyses_IDs$dataSubsetId, !is.na(condition_dataset)) %>%
+      dplyr::pull(condition_dataset)
+  }
+
   unique_datasets <- c(
     Analyses_IDs$dataset,
     AnalysisSets %>%
       dplyr::filter(id %in% Analyses_IDs$analysisSetId) %>%
       dplyr::pull(condition_dataset),
-    DataSubsets %>%
-      dplyr::filter(id %in% Analyses_IDs$dataSubsetId, !is.na(condition_dataset)) %>%
-      dplyr::pull(condition_dataset)
+    ds_datasets
   )
 
   unique_datasets <- unique(unique_datasets)
