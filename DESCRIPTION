@@ -1,20 +1,20 @@
 Package: siera
 Type: Package
 Title: Generate Analysis Results Programmes Using ARS Metadata
-Version: 0.5.5
+Version: 0.5.6
 Authors@R: c(
     person("Malan", "Bosman", email = "malanbos@gmail.com", role = c("aut", "cre")),
     person("Clymb Clinical", role = c("cph", "fnd")))
-Maintainer: Malan Bosman <malanbos@gmail.com>
 Description: Analysis Results Standard (ARS), a foundational standard by CDISC
     (Clinical Data Interchange Standards Consortium), provides a logical
-    data model for metadata describing all components to calculate Analysis Results. 
-    <https://www.cdisc.org/standards/foundational/analysis-results-standard>
-    Using 'siera' package, ARS metadata is ingested (JSON or Excel format),
-    producing programmes to generate Analysis Results Datasets (ARDs).
+    data model for metadata describing all components to calculate Analysis
+    Results. <https://www.cdisc.org/standards/foundational/analysis-results-standard>
+    Using 'siera', ARS metadata is ingested (JSON or Excel format), producing
+    R programmes to generate Analysis Results Datasets (ARDs). Supports
+    arbitrary-depth table structures, multi-value conditions, data-driven
+    groupings, and CDISC-compliant ARD column stamping.
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 RoxygenNote: 7.3.3
 Depends: 
     R (>= 4.1)
