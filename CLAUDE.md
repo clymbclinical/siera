@@ -29,6 +29,21 @@ devtools::test_file("tests/testthat/test-readARS.R", filter = "4 grouping factor
 
 **Before every PR**: run `document()`, `load_all()`, and `check(vignettes = FALSE)` — all must pass with 0 errors, 0 warnings. The "unable to verify current time" NOTE is a known environment artefact and can be ignored.
 
+## Key files
+
+| File | Purpose |
+|---|---|
+| `R/readARS.R` | Main entry point — `readARS()` orchestrates the full pipeline |
+| `R/metadata.R` | Parses ARS JSON/XLSX into flat R data frames |
+| `R/AnalysisSet.R` | Generates analysis set (population) filter code |
+| `R/DataSubsets.R` | Generates data subset filter code |
+| `R/AnalysisMethods.R` | Resolves method code templates and valueSource parameters |
+| `R/loadADaM.R` | Generates ADaM dataset loading code |
+| `R/libraries.R` | Generates `library()` calls for generated scripts |
+| `R/program_header.R` | Generates programme header comments |
+| `inst/extdata/` | Example ARS files (JSON and XLSX) used in tests and examples |
+| `inst/script/` | Example generated ARD scripts |
+
 ## Architecture and data flow
 
 `readARS(ARS_path, output_path, adam_path)` is the single entry point:
@@ -62,6 +77,62 @@ devtools::test_file("tests/testthat/test-readARS.R", filter = "4 grouping factor
 - **CDISC ARD compliance** — each ARD row must carry: `AnalysisId`, `operationid`, and per-resultGroup: `group[n]_groupingId` + either `group[n]_groupId` (pre-defined groups, via `case_when` on `group[n]_level`) or `group[n]_groupValue` (data-driven groupings). See `.generate_groupid_code()` in `readARS.R`.
 - **Internal functions** are prefixed with `.` (e.g. `.read_ars_metadata`). Only four symbols are exported: `readARS`, `ARS_example`, `ARD_script_example`, `%>%`.
 
+## Coding standards (pharmaverse / admiral style)
+
+- **Tidyverse over base R**: use `dplyr`, `tidyr`, `stringr`; pipe with `|>` (prefer native pipe over `%>%`).
+- **cli for output**: `cli::cli_abort()` not `stop()`, `cli::cli_warn()` not `warning()`, `cli::cli_inform()` not `message()`.
+- **Fail fast**: check arguments early with `is.na()`, `nchar()`, `is.null()` guards; emit errors pointing at the bad input.
+- **No global state**: all inputs must be explicit arguments; no reads from or writes to global objects.
+- **Function naming**: internal helpers prefixed with `.` (e.g. `.generate_analysis_set_code()`); exported functions in camelCase (e.g. `readARS()`, `ARS_example()`).
+- **Comments**: explain the *why*, not the *what*; section markers end with `----` for RStudio outline (e.g. `# Load ADaMs ----`).
+
+## ADaM dataset conventions
+
+siera reads ADaM datasets to generate loading code and resolve variable references.
+
+### Common datasets
+| Dataset | Contents |
+|---|---|
+| `ADSL` | One row per subject; demographics, treatment arms, flags |
+| `ADAE` | Adverse events (one row per event) |
+| `ADVS` | Vital signs parameters |
+| `ADLB` | Laboratory parameters |
+| `ADEX` | Exposure |
+| `ADEXSUM` | Exposure summary |
+
+### Key variable conventions
+| Variable | Meaning |
+|---|---|
+| `STUDYID` / `USUBJID` | Study and unique subject identifiers |
+| `PARAMCD` / `PARAM` | Parameter code / label (long datasets) |
+| `AVAL` / `AVALC` | Analysis value (numeric / character) |
+| `TRT01P` / `TRT01A` | Planned / actual treatment (period 1) |
+| `AVISIT` / `AVISITN` | Analysis visit (character / numeric) |
+| `SAFFL` / `ITTFL` | Safety / ITT population flags (`"Y"` / `""`) |
+| `--FL` suffix | Flag variables (Y/blank pattern) |
+| `--DT` / `--DTM` / `--DTC` | Date / datetime / character date variables |
+
+ARS `analysisSets` map to ADaM flag variables (e.g. `ADSL.SAFFL EQ "Y"`); siera translates these into `dplyr::filter()` calls. When `dataDriven: true`, groups are discovered from ADaM data at runtime.
+
+## Pharmaverse ecosystem context
+
+| Package | Role |
+|---|---|
+| `{admiral}` | ADaM dataset creation (upstream of siera) |
+| `{cards}` | ARD computation (`ard_tabulate()`, `ard_summary()`, etc.) |
+| `{cardx}` | Extended ARD statistics (models, tests) |
+| `{gtsummary}` | TFL rendering from ARDs |
+| `{admiraldev}` | Development utilities for pharmaverse packages |
+
+siera sits between ARS metadata and `{cards}` — it generates the `cards`-based R code a statistician would otherwise write by hand.
+
+## Git / branch workflow
+
+- Branch naming: `<issue-number>-short-description` (e.g. `137-fix-windows-adam-paths`).
+- All work goes to feature branches; PRs target `main`. Never push directly to `main`.
+- Commit messages: imperative mood, short (e.g. `Fix #139: update cards_constructs.xlsx`).
+- Every PR must be linked to a GitHub issue. Inform the user when editing siera source files if no issue exists yet.
+
 ## cards / cardx API alignment
 
 The generated R scripts and example scripts in `inst/script/` must always use the current `cards` API. Key function renames from cards ≥ 0.7.0:
@@ -90,7 +161,10 @@ Do not modify the test fixture xlsx files in `inst/extdata/` — the package own
 
 ## Notes: 
 
-- always delete codes or datasets used for temporary testing once the temp testing is completed (keep the repo clean)
-- after a reasonable development effort and milestone, capture learnings and add to claude.md any information that might be useful in the future regarding the understanding and workings of the project.  
-- notify the user when there are strong candidate processes for creating a skill.  Whenever there are repeated prompts or processes that would fit a use case.  Suggest the skill and its benefits.
-- keep in mind that the target audience are other industry members.  Whenever logic or usage or something important for a user to know is affected, highlight this and suggest education material or a vignette idea.
+- Always delete code or datasets used for temporary testing once done (keep the repo clean).
+- After a reasonable development milestone, capture learnings and update CLAUDE.md with anything useful for future sessions.
+- Notify the user when there are strong candidates for creating a Claude skill — repeated prompts or processes that would benefit from automation.
+- Target audience are clinical trial industry members; whenever logic or usage changes, suggest education material or a vignette idea.
+- Inform the user before editing siera source files if there is no linked GitHub issue — all changes should be traceable to an issue and land on a feature branch.
+- Suggest documentation updates when features are added or functionality changes (this is a public-facing CRAN package).
+- Add tests for all new code; ensure every new branch has test coverage for its changes.
