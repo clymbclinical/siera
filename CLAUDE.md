@@ -126,6 +126,49 @@ ARS `analysisSets` map to ADaM flag variables (e.g. `ADSL.SAFFL EQ "Y"`); siera 
 
 siera sits between ARS metadata and `{cards}` — it generates the `cards`-based R code a statistician would otherwise write by hand.
 
+## GitHub API access
+
+`gh` CLI is **not installed** on this machine. Use the GitHub REST API directly via PowerShell instead.
+
+**Step 1 — retrieve the stored token** (Git Credential Manager holds a GitKraken OAuth token):
+```powershell
+$token = (printf "protocol=https\nhost=github.com\n" | git credential fill | Select-String "^password=").ToString().Replace("password=","").Trim()
+```
+
+Or retrieve it once and reuse in the session:
+```bash
+# in Bash tool
+printf "protocol=https\nhost=github.com\n" | git credential fill
+# copy the password= line value
+```
+
+**Step 2 — set up headers**:
+```powershell
+$token   = "gho_..."   # from step 1
+$headers = @{ Authorization = "token $token"; Accept = "application/vnd.github.v3+json" }
+$repo    = "clymbclinical/siera"
+```
+
+**Common operations:**
+
+```powershell
+# Create an issue
+$body = @{ title = "..."; body = "..." } | ConvertTo-Json
+Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/issues" -Method Post -Headers $headers -Body $body -ContentType "application/json"
+
+# Create a PR
+$body = @{ title = "..."; head = "branch-name"; base = "main"; body = "..." } | ConvertTo-Json
+Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/pulls" -Method Post -Headers $headers -Body $body -ContentType "application/json"
+
+# List open issues
+Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/issues?state=open" -Headers $headers
+
+# Get a specific issue
+Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/issues/139" -Headers $headers
+```
+
+The token is an OAuth token (`gho_` prefix) stored in Windows Credential Manager by GitKraken. It has repo scope and works for all standard issue/PR/label operations.
+
 ## Git / branch workflow
 
 - Branch naming: `<issue-number>-short-description` (e.g. `137-fix-windows-adam-paths`).
