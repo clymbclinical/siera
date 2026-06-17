@@ -1,5 +1,30 @@
 # Changelog
 
+## siera 0.5.6
+
+- Fixed
+  [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+  crash when ARS metadata contains no `referencedAnalysisOperations`
+  (continuous-only tables such as shift tables) by ensuring accumulator
+  frames are initialised with their merge key columns.
+- Normalised Windows backslashes in ADaM file paths to forward slashes
+  so generated scripts run correctly on both Windows and Unix systems.
+- Added CDISC ARD-compliant column stamping: generated scripts now write
+  `group[n]_groupingId`, `group[n]_groupId` (for pre-defined groups) and
+  `group[n]_groupValue` (for data-driven groupings) onto each ARD row.
+- Supported arbitrarily deep nesting in `mainListOfContents` via a
+  recursive LOPA extraction helper, removing the previous three-level
+  hard limit.
+- Expanded support for multi-value ARS group conditions (`IN`/`NOTIN`)
+  by unnesting `condition.value` list columns in the JSON parser.
+- Coerced `*_level` columns to character on each individual ARD frame
+  before `bind_rows`, preventing type conflicts between continuous and
+  categorical analyses.
+- Allowed more than three grouping factors per analysis.
+- Updated bundled `cards_constructs.xlsx` example file and extended test
+  coverage across metadata parsing, ADaM loading, and ARD script
+  generation.
+
 ## siera 0.5.5
 
 CRAN release: 2025-12-01
