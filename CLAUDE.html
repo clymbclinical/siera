@@ -129,7 +129,7 @@
 <li>
 <strong>Code generation is string-based</strong>: method templates contain literal placeholder strings (e.g. <code>"analysisidhere"</code>, <code>"methodidhere"</code>) replaced with <code><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub()</a></code>. Don’t confuse these with R variables.</li>
 <li>
-<strong>jsonlite produces nested data frames</strong> (not list columns) when <code>simplifyDataFrame = TRUE</code>. The recursive helper <code>.extract_lopa_ids()</code> in <code>metadata.R</code> relies on this structure to traverse arbitrary-depth <code>sublist</code> nesting in <code>mainListOfContents</code>.</li>
+<strong>jsonlite produces nested data frames</strong> (not list columns) when <code>simplifyDataFrame = TRUE</code>. The recursive helper <code><a href="reference/dot-extract_lopa_ids.html">.extract_lopa_ids()</a></code> in <code>metadata.R</code> relies on this structure to traverse arbitrary-depth <code>sublist</code> nesting in <code>mainListOfContents</code>.</li>
 <li>
 <strong><code>analysisId</code> must be coerced to <code>character</code></strong> when binding rows from JSON because JSON <code>null</code> parses as logical <code>NA</code>, causing type conflicts in <code><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">dplyr::bind_rows</a></code>.</li>
 <li>

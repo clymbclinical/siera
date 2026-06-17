@@ -30,7 +30,8 @@ ARS_example()
 #> [11] "exampleARS_2.xlsx"                 "exampleARS_2a.xlsx"               
 #> [13] "exampleARS_3.json"                 "exampleARS_3.xlsx"                
 #> [15] "exampleARS_4.json"                 "exampleARS_5.json"                
-#> [17] "exampleARS_5.xlsx"                 "test_cards.json"
+#> [17] "exampleARS_5.xlsx"                 "exampleARS_6.json"                
+#> [19] "exampleARS_6.xlsx"                 "test_cards.json"
 
 # A temporary path to a specific file:
 ARS_example("exampleARS_1.json")

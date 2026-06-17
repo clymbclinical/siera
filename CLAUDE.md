@@ -111,7 +111,8 @@ and can be ignored.
   replaced with [`gsub()`](https://rdrr.io/r/base/grep.html). Don’t
   confuse these with R variables.
 - **jsonlite produces nested data frames** (not list columns) when
-  `simplifyDataFrame = TRUE`. The recursive helper `.extract_lopa_ids()`
+  `simplifyDataFrame = TRUE`. The recursive helper
+  [`.extract_lopa_ids()`](https://clymbclinical.github.io/siera/reference/dot-extract_lopa_ids.md)
   in `metadata.R` relies on this structure to traverse arbitrary-depth
   `sublist` nesting in `mainListOfContents`.
 - **`analysisId` must be coerced to `character`** when binding rows from
