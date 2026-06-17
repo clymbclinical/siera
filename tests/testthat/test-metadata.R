@@ -162,6 +162,103 @@ test_that("JSON parser returns plain character group_condition_value", {
 })
 
 
+test_that(".read_ars_json_metadata handles ARS with no referencedAnalysisOperations", {
+  # Regression test: bare data.frame() initialisers for AN_refs / JSONAML3 had
+  # no columns, causing merge(..., by = "id") to fail on continuous-only ARS.
+  ars_json <- r"[{
+    "name": "Continuous Only",
+    "id": "TEST_CONT",
+    "otherListsOfContents": [
+      {
+        "name": "LOPO", "label": "LOPO",
+        "contentsList": {
+          "listItems": [
+            {"name": "Output 1", "level": 1, "order": 1, "outputId": "Out_01"}
+          ]
+        }
+      }
+    ],
+    "mainListOfContents": {
+      "name": "LOPA", "label": "LOPA",
+      "contentsList": {
+        "listItems": [
+          {
+            "name": "Output 1", "level": 1, "order": 1, "outputId": "Out_01",
+            "sublist": {
+              "listItems": [
+                {"name": "Continuous summary", "level": 2, "order": 1, "analysisId": "An_01"}
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "dataSubsets": [
+      {
+        "name": "Deaths", "label": "Deaths", "id": "Dss_01", "level": 1, "order": 1,
+        "condition": {"dataset": "ADSL", "variable": "DTHFL", "comparator": "EQ", "value": ["Y"]}
+      }
+    ],
+    "analysisSets": [
+      {
+        "name": "Safety", "id": "AnalysisSet_01", "level": 1, "order": 1,
+        "condition": {"dataset": "ADSL", "variable": "SAFFL", "comparator": "EQ", "value": ["Y"]}
+      }
+    ],
+    "analysisGroupings": [
+      {
+        "name": "Treatment", "id": "AnlsGrouping_01_Trt01a",
+        "dataDriven": false, "groupingDataset": "ADSL", "groupingVariable": "TRT01A",
+        "groups": [
+          {
+            "name": "Active", "id": "AnlsGrouping_01_Trt01a_01", "level": 1, "order": 1,
+            "condition": {"dataset": "ADSL", "variable": "TRT01A", "comparator": "EQ", "value": ["Active"]}
+          }
+        ]
+      }
+    ],
+    "methods": [
+      {
+        "name": "Continuous summary", "description": "Descriptive stats",
+        "label": "Continuous summary", "id": "Mth_03",
+        "operations": [
+          {"name": "n",    "label": "n",    "id": "Mth_03_01_n",    "order": 1, "resultPattern": "XX"},
+          {"name": "Mean", "label": "Mean", "id": "Mth_03_02_Mean", "order": 2, "resultPattern": "XX.X"}
+        ],
+        "codeTemplate": {
+          "context": "R (siera)",
+          "code": "df3_analysisidhere <- cards::ard_continuous(data = df2_analysisidhere, by = c(byvarshere), variables = anavarhere)",
+          "parameters": [
+            {"name": "byvarshere", "description": "by vars",      "valueSource": "by_listc"},
+            {"name": "anavarhere", "description": "analysis var", "valueSource": "ana_var"}
+          ]
+        }
+      }
+    ],
+    "analyses": [
+      {
+        "name": "Continuous analysis", "id": "An_01",
+        "methodId": "Mth_03", "version": 1,
+        "dataset": "ADSL", "variable": "AGE", "analysisSetId": "AnalysisSet_01",
+        "orderedGroupings": [
+          {"order": 1, "groupingId": "AnlsGrouping_01_Trt01a", "resultsByGroup": true}
+        ]
+      }
+    ]
+  }]"
+
+  ars_file <- withr::local_tempfile(fileext = ".json")
+  writeLines(ars_json, ars_file)
+
+  meta <- siera:::`.read_ars_json_metadata`(ars_file)
+
+  expect_type(meta, "list")
+  expect_setequal(names(meta), expected_components)
+  expect_gt(nrow(meta$Analyses), 0L)
+  expect_true("An_01" %in% meta$Analyses$id)
+})
+
+
 test_that("generated script coerces _level columns to character per df3 before bind_rows", {
   ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
   output_dir <- withr::local_tempdir()

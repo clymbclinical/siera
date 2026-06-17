@@ -277,7 +277,7 @@
     AN_groupings <- dplyr::bind_rows(AN_groupings, tmp)
   }
 
-  AN_refs <- data.frame()
+  AN_refs <- data.frame(id = character(0))
   for (h in seq_len(nrow(JSON_AnalysesL1))) {
     tmp_id <- as.character(JSON_AN[h, ]$id)
 
@@ -317,7 +317,7 @@
   )
 
   JSONAML2 <- data.frame()
-  JSONAML3 <- data.frame()
+  JSONAML3 <- data.frame(operation_id = character(0))
   for (i in seq_len(nrow(JSONAML1))) {
     tmp_l2 <- tibble::tibble(
       operation_id = json_from$methods$operations[[i]]$id,
