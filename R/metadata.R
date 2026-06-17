@@ -225,6 +225,15 @@
       dataDriven = AG_dataDriven
     )
 
+    # JSON value[] is always a list-column (even single-element arrays).
+    # Unnesting expands IN/NOTIN groups — one row per value, group_id repeated —
+    # and collapses single-value list elements to a plain character column.
+    # Guard against data-driven groupings whose groups array is empty (no column).
+    if ("group_condition_value" %in% names(tmp_AG) &&
+          is.list(tmp_AG$group_condition_value)) {
+      tmp_AG <- tidyr::unnest(tmp_AG, cols = "group_condition_value")
+    }
+
     JSON_AG <- dplyr::bind_rows(JSON_AG, tmp_AG)
   }
 

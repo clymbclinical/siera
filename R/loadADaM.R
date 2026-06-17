@@ -39,7 +39,7 @@
   # Build readr::read_csv calls that standardise character NA handling to
   # avoid downstream joins failing on missing text values.
   lines <- vapply(unique_datasets, function(ad) {
-    ad_path <- paste0(adam_path, "/", ad, ".csv")
+    ad_path <- paste0(gsub("\\\\", "/", adam_path), "/", ad, ".csv")
     paste0(
       ad, " <- readr::read_csv('", ad_path, "',\n",
       "                                      show_col_types = FALSE,\n",
