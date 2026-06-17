@@ -12,7 +12,7 @@ Internal helper to apply consistent number formatting across analyses.
   method_id,
   analysis_id,
   output_id,
-  envir = parent.frame()
+  value_sources = list()
 )
 ```
 
@@ -42,9 +42,12 @@ Internal helper to apply consistent number formatting across analyses.
 
   OutputId to which current Analysis belongs
 
-- envir:
+- value_sources:
 
-  Environment (parent environment as default)
+  Named list of string values that ARS code-template parameters can
+  reference via their valueSource key (e.g. by_vars, ana_var, AG_var1).
+  Operation IDs (operation_1, operation_2, …) are derived from the
+  method itself and do not need to be supplied here.
 
 ## Value
 
