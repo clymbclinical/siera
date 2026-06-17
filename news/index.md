@@ -2,6 +2,8 @@
 
 ## siera 0.5.6
 
+CRAN release: 2026-06-17
+
 - Fixed
   [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
   crash when ARS metadata contains no `referencedAnalysisOperations`
