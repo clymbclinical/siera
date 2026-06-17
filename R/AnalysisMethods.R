@@ -7,7 +7,10 @@
 #' @param method_id MethodId for the method applied to current Analysis
 #' @param analysis_id AnalysisId for current Analysis
 #' @param output_id OutputId to which current Analysis belongs
-#' @param envir Environment (parent environment as default)
+#' @param value_sources Named list of string values that ARS code-template
+#'   parameters can reference via their valueSource key (e.g. by_vars, ana_var,
+#'   AG_var1). Operation IDs (operation_1, operation_2, …) are derived from the
+#'   method itself and do not need to be supplied here.
 
 #' @return Character vector with formatted numbers.
 #' @keywords internal
@@ -18,7 +21,7 @@
                                               method_id,
                                               analysis_id,
                                               output_id,
-                                              envir = parent.frame()) {
+                                              value_sources = list()) {
   if (is.null(method_id) || length(method_id) == 0 || is.na(method_id) || identical(method_id, "")) {
     cli::cli_abort(
       "Metadata issue in Analyses {analysis_id}: Analysis is missing a MethodId; method-specific code cannot be generated"
@@ -52,11 +55,10 @@
     paste0("operation_", seq_along(operation_values))
   )
 
-  # Assign operations into the parent environment, mirroring how
-  # ARS metadata references them in method templates.
-  for (op_name in names(operations_named)) {
-    assign(op_name, operations_named[[op_name]], envir = envir)
-  }
+  # Merge self-computed operation IDs with caller-supplied value sources so
+  # the parameter substitution loop has a single flat lookup table.
+  # Operation IDs always shadow caller-supplied values of the same name.
+  all_value_sources <- c(operations_named, value_sources)
 
   methodname <- method$name
   methoddesc <- method$description
@@ -98,15 +100,15 @@
     value_source <- anmetparam_s$parameter_valueSource[i]
     parameter_name <- anmetparam_s$parameter_name[i]
 
-    if (!exists(value_source, envir = envir, inherits = TRUE)) {
+    if (!value_source %in% names(all_value_sources)) {
       cli::cli_warn(
         "Metadata issue in AnalysisMethodCodeParameters for Analysis {analysis_id}: parameter {.val {parameter_name}} references unknown valueSource {.val {value_source}}"
       )
       next
     }
 
-    rep <- get(value_source, envir = envir)
-    if (!is.na(rep)) {
+    rep <- all_value_sources[[value_source]]
+    if (!is.null(rep) && !is.na(rep)) {
       anmetcode_temp <- gsub(
         parameter_name,
         rep,

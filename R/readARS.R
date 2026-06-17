@@ -246,6 +246,27 @@ readARS <- function(ARS_path,
 
       # Apply AnalysisMethod -------------------------------------------------------------
 
+      # Build the explicit lookup table of all computed string values that ARS
+      # code-template parameters can reference via their valueSource key.
+      # Operation IDs (operation_1 etc.) are computed inside the function itself.
+      value_sources <- c(
+        list(
+          distinct_list     = distinct_list,
+          by_stmt           = by_stmt,
+          by_vars           = by_vars,
+          strata_vars       = strata_vars,
+          by_listc          = by_listc,
+          by_list           = by_list,
+          ana_var           = ana_var,
+          AG_max_dataDriven = AG_max_dataDriven,
+          DEN_analysisid    = DEN_analysisid,
+          AG_denom_var1     = AG_denom_var1
+        ),
+        if (n_actual_groups >= 1) list(AG_var1 = AG_var1),
+        if (n_actual_groups >= 2) list(AG_var2 = AG_var2),
+        if (n_actual_groups >= 3) list(AG_var3 = AG_var3)
+      )
+
       analysis_method_result <- .generate_analysis_method_section(
         analysis_methods = AnalysisMethods,
         analysis_method_code_template = AnalysisMethodCodeTemplate,
@@ -253,7 +274,7 @@ readARS <- function(ARS_path,
         method_id = methodid,
         analysis_id = Anas_j,
         output_id = Output,
-        envir = environment()
+        value_sources = value_sources
       )
 
       code_method <- analysis_method_result$code
