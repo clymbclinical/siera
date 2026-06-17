@@ -94,7 +94,10 @@
     dplyr::select(condition_value) |>
     unlist()
 
-  cond_val <- cond_val[1]
+  # unlist() of a list-column containing NULL returns NULL (not character(0)),
+  # which causes is.na(NULL) == logical(0) and an "argument is of length zero"
+  # error in the if-branch below. Normalise to NA early.
+  cond_val <- if (is.null(cond_val) || length(cond_val) == 0) NA_character_ else cond_val[1]
 
   anSetName <- temp_AnSet |>
     dplyr::select(name) |>
