@@ -124,10 +124,14 @@ and can be ignored.
   groupings are present in `AnalysisGroupings`.
 - **`n_group_cols` determination** — the number of `group[n]` columns a
   method produces differs from `num_grp` when the last grouping goes to
-  `variables=` instead of `by=`. Always inspect the *resolved*
-  `code_method` string for the presence of `by_vars`/`strata_vars` or
-  `by_listc` substrings. Do NOT check the parameter table — it can
-  contain spurious unused parameters that give false positives.
+  `variables=` instead of `by=`. This is determined by
+  `.n_group_cols_from_template()` in `readARS.R`, which checks which
+  valueSource types (`by_vars`, `strata_vars`, `by_listc`) appear in
+  parameters whose placeholder tokens are actually present in the
+  method’s code template. Never check the parameter table alone — it can
+  contain spurious rows whose placeholder tokens are absent from the
+  template (false positives). Never check the generated code string —
+  the runtime-resolved values won’t match the placeholder names.
 - **`group_condition_value` in JSON is a list-column** — jsonlite always
   returns `condition.value` as a list, even for single-element EQ
   arrays. The JSON parser must call
@@ -365,3 +369,5 @@ to use
   changes (this is a public-facing CRAN package).
 - Add tests for all new code; ensure every new branch has test coverage
   for its changes.
+- Ask clarifying questions and check for understanding when there is
+  uncertainty about a request or approach.
