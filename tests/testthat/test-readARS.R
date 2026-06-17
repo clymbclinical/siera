@@ -1071,6 +1071,107 @@ test_that("ARD values - 4 grouping factors work correctly (JSON)", {
   }
 })
 
+test_that("R scripts are created for depth-3 nesting (JSON)", {
+  ARS_path <- ARS_example("exampleARS_6.json")
+  output_dir <- withr::local_tempdir()
+  adam_folder <- withr::local_tempdir()
+
+  readARS(ARS_path, output_dir, adam_folder)
+
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_true(length(r_files) > 0, info = "No R scripts generated for exampleARS_6.json")
+  expect_true(any(grepl("Out_01", basename(r_files))), info = "ARD_Out_01.R not created")
+})
+
+
+test_that("R scripts are created for depth-3 nesting (xlsx)", {
+  skip_if_not_installed("readxl")
+
+  ARS_path <- ARS_example("exampleARS_6.xlsx")
+  output_dir <- withr::local_tempdir()
+  adam_folder <- withr::local_tempdir()
+
+  readARS(ARS_path, output_dir, adam_folder)
+
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_true(length(r_files) > 0, info = "No R scripts generated for exampleARS_6.xlsx")
+  expect_true(any(grepl("Out_01", basename(r_files))), info = "ARD_Out_01.R not created")
+})
+
+
+test_that("ARD values - depth-3 nesting produces correct ARD (JSON)", {
+  skip_on_cran()
+
+  ARS_path <- ARS_example("exampleARS_6.json")
+  adam_dir  <- system.file("extdata", package = "siera")
+  output_dir <- withr::local_tempdir()
+
+  readARS(ARS_path, output_dir, adam_dir)
+
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_true(length(r_files) > 0, info = "No R scripts generated")
+
+  for (f in r_files) {
+    e <- new.env(parent = baseenv())
+
+    expect_error(
+      suppressWarnings(
+        suppressPackageStartupMessages(
+          source(f, local = e, chdir = TRUE)
+        )
+      ),
+      NA,
+      info = paste("Sourcing failed for", basename(f))
+    )
+
+    expect_true(exists("ARD", envir = e), info = paste("No ARD from", basename(f)))
+    ARD <- get("ARD", envir = e)
+    expect_true("stat" %in% names(ARD), info = "'stat' column missing in ARD")
+
+    expect_true("An_01" %in% ARD$AnalysisId, info = "An_01 missing from ARD")
+    expect_true("An_03" %in% ARD$AnalysisId, info = "An_03 (depth-3) missing from ARD")
+    expect_true("An_04" %in% ARD$AnalysisId, info = "An_04 (depth-3) missing from ARD")
+  }
+})
+
+
+test_that("ARD values - depth-3 nesting produces correct ARD (xlsx)", {
+  skip_on_cran()
+  skip_if_not_installed("readxl")
+
+  ARS_path <- ARS_example("exampleARS_6.xlsx")
+  adam_dir  <- system.file("extdata", package = "siera")
+  output_dir <- withr::local_tempdir()
+
+  readARS(ARS_path, output_dir, adam_dir)
+
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  expect_true(length(r_files) > 0, info = "No R scripts generated")
+
+  for (f in r_files) {
+    e <- new.env(parent = baseenv())
+
+    expect_error(
+      suppressWarnings(
+        suppressPackageStartupMessages(
+          source(f, local = e, chdir = TRUE)
+        )
+      ),
+      NA,
+      info = paste("Sourcing failed for", basename(f))
+    )
+
+    expect_true(exists("ARD", envir = e), info = paste("No ARD from", basename(f)))
+    ARD <- get("ARD", envir = e)
+    expect_true("stat" %in% names(ARD), info = "'stat' column missing in ARD")
+
+    expect_true("An_01" %in% ARD$AnalysisId, info = "An_01 missing from ARD")
+    expect_true("An_03" %in% ARD$AnalysisId, info = "An_03 (depth-3) missing from ARD")
+    expect_true("An_04" %in% ARD$AnalysisId, info = "An_04 (depth-3) missing from ARD")
+  }
+})
+
+
 test_that("ARD values - 4 grouping factors work correctly (xlsx)", {
   skip_on_cran()
 
