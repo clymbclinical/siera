@@ -1,0 +1,2640 @@
+{
+  "name": "Duration of Treatment Exposure",
+  "id": "FDA-EX-T05",
+  "mainListOfContents": {
+    "name": "List of Planned Analyses",
+    "label": "LOPA",
+    "contentsList": {
+      "listItems": [
+        {
+          "name": "Duration of Treatment Exposure",
+          "level": 1,
+          "order": 1,
+          "outputId": "Out_03",
+          "sublist": {
+            "listItems": [
+              {
+                "name": "    Summary of Subjects by Treatment",
+                "level": 2,
+                "order": 1,
+                "analysisId": "An_25"
+              },
+              {
+                "name": "    Duration of treatment, days [3]",
+                "level": 2,
+                "order": 2,
+                "sublist": {
+                  "listItems": [
+                    {
+                      "name": "        Summary of Duration of treatment, days [3] by Treatment",
+                      "level": 3,
+                      "order": 1,
+                      "analysisId": "An_26"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "    Subjects treated, by duration, n (%)",
+                "level": 2,
+                "order": 3,
+                "sublist": {
+                  "listItems": [
+                    {
+                      "name": "        Any duration (at least 1 dose)",
+                      "level": 3,
+                      "order": 1,
+                      "sublist": {
+                        "listItems": [
+                          {
+                            "name": "            Summary of subjects treated for any duration (at least 1 dose) by Treatment, n (%)",
+                            "level": 4,
+                            "order": 1,
+                            "analysisId": "An_28"
+                          },
+                          {
+                            "name": "            Comparison of subjects treated for any duration (at least 1 dose), Xanomeline Low Dose vs Placebo",
+                            "level": 4,
+                            "order": 2,
+                            "analysisId": "An_29"
+                          },
+                          {
+                            "name": "            Comparison of subjects treated for any duration (at least 1 dose), Xanomeline High Dose vs Placebo",
+                            "level": 4,
+                            "order": 3,
+                            "analysisId": "An_29_0"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "        <1 month",
+                      "level": 3,
+                      "order": 2,
+                      "sublist": {
+                        "listItems": [
+                          {
+                            "name": "            Summary of subjects treated for <1 month by Treatment, n (%)",
+                            "level": 4,
+                            "order": 1,
+                            "analysisId": "An_28_1"
+                          },
+                          {
+                            "name": "            Comparison of subjects treated for <1 month, Xanomeline Low Dose vs Placebo",
+                            "level": 4,
+                            "order": 2,
+                            "analysisId": "An_29_1"
+                          },
+                          {
+                            "name": "            Comparison of subjects treated for <1 month, Xanomeline High Dose vs Placebo",
+                            "level": 4,
+                            "order": 3,
+                            "analysisId": "An_29_2"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "        >=1 month",
+                      "level": 3,
+                      "order": 3,
+                      "sublist": {
+                        "listItems": [
+                          {
+                            "name": "            Summary of subjects treated for >=1 month by Treatment, n (%)",
+                            "level": 4,
+                            "order": 1,
+                            "analysisId": "An_28_2"
+                          },
+                          {
+                            "name": "            Comparison of subjects treated for >=1 month, Xanomeline Low Dose vs Placebo",
+                            "level": 4,
+                            "order": 2,
+                            "analysisId": "An_29_3"
+                          },
+                          {
+                            "name": "            Comparison of subjects treated for >=1 month, Xanomeline High Dose vs Placebo",
+                            "level": 4,
+                            "order": 3,
+                            "analysisId": "An_29_4"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "        >=3 month",
+                      "level": 3,
+                      "order": 4,
+                      "sublist": {
+                        "listItems": [
+                          {
+                            "name": "            Summary of subjects treated for >=3 month by Treatment, n (%)",
+                            "level": 4,
+                            "order": 1,
+                            "analysisId": "An_28_3"
+                          },
+                          {
+                            "name": "            Comparison of subjects treated for >=3 month by Treatment, Xanomeline Low Dose vs Placebo",
+                            "level": 4,
+                            "order": 2,
+                            "analysisId": "An_29_5"
+                          },
+                          {
+                            "name": "            Comparison of subjects treated for >=3 month by Treatment, Xanomeline High Dose vs Placebo",
+                            "level": 4,
+                            "order": 3,
+                            "analysisId": "An_29_6"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "        >=6 month",
+                      "level": 3,
+                      "order": 5,
+                      "sublist": {
+                        "listItems": [
+                          {
+                            "name": "            Summary of subjects treated for >=6 month by Treatment, n (%)",
+                            "level": 4,
+                            "order": 1,
+                            "analysisId": "An_28_4"
+                          },
+                          {
+                            "name": "            Comparison of subjects treated for >=6 month, Xanomeline Low Dose vs Placebo",
+                            "level": 4,
+                            "order": 2,
+                            "analysisId": "An_29_7"
+                          },
+                          {
+                            "name": "            Comparison of subjects treated for >=6 month, Xanomeline High Dose vs Placebo",
+                            "level": 4,
+                            "order": 3,
+                            "analysisId": "An_29_8"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "        >=12 month",
+                      "level": 3,
+                      "order": 6,
+                      "sublist": {
+                        "listItems": [
+                          {
+                            "name": "            Summary of subjects treated for >=12 month by Treatment, n (%)",
+                            "level": 4,
+                            "order": 1,
+                            "analysisId": "An_28_5"
+                          },
+                          {
+                            "name": "            Comparison of subjects treated for >=12 month, Xanomeline Low Dose vs Placebo",
+                            "level": 4,
+                            "order": 2,
+                            "analysisId": "An_29_9"
+                          },
+                          {
+                            "name": "            Comparison of subjects treated for >=12 month, Xanomeline High Dose vs Placebo",
+                            "level": 4,
+                            "order": 3,
+                            "analysisId": "An_29_10"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "version": 1,
+  "otherListsOfContents": [
+    {
+      "name": "List of Planned Outputs",
+      "label": "LOPO",
+      "contentsList": {
+        "listItems": [
+          {
+            "name": "Duration of Treatment Exposure",
+            "level": 1,
+            "order": 1,
+            "outputId": "Out_03"
+          }
+        ]
+      }
+    }
+  ],
+  "terminologyExtensions": [
+    {
+      "id": "TermEx01",
+      "sponsorTerms": [
+        {
+          "id": "TermEx01_01",
+          "submissionValue": "POPULATION SUMMARY",
+          "description": "Summary statistics describing the study population(s)."
+        }
+      ],
+      "enumeration": "AnalysisPurposeEnum"
+    }
+  ],
+  "analysisOutputCategorizations": [
+    {
+      "id": "ANSET",
+      "categories": [
+        {
+          "id": "ANSET_01",
+          "label": "Safety",
+          "subCategorizations": [
+            {
+              "id": "ANSET_01_ANINT",
+              "categories": [
+                {
+                  "id": "ANSET_01_ANINT_03",
+                  "label": "Exposure"
+                }
+              ],
+              "label": "Safety Analysis Of Interest"
+            }
+          ]
+        }
+      ],
+      "label": "Analysis Sets"
+    }
+  ],
+  "analysisSets": [
+    {
+      "name": "Safety Population",
+      "description": "All patients randomized and known to have taken at least one dose of randomized drug.",
+      "id": "AnalysisSet_01",
+      "level": 1,
+      "order": 1,
+      "condition": {
+        "dataset": "ADSL",
+        "variable": "SAFFL",
+        "comparator": "EQ",
+        "value": [
+          "Y"
+        ]
+      }
+    }
+  ],
+  "dataSubsets": [
+    {
+      "name": "Has duration of treatment, days",
+      "id": "Dss_44",
+      "level": 1,
+      "order": 1,
+      "condition": {
+        "dataset": "ADSL",
+        "variable": "TRTDURD",
+        "comparator": "NE"
+      }
+    },
+    {
+      "name": "Any duration (at least 1 dose)",
+      "label": "Any duration (at least 1 dose)",
+      "id": "Dss_45",
+      "level": 1,
+      "order": 1,
+      "compoundExpression": {
+        "logicalOperator": "AND",
+        "whereClauses": [
+          {
+            "level": 2,
+            "order": 1,
+            "condition": {
+              "dataset": "ADSL",
+              "variable": "TRTDURD",
+              "comparator": "NE"
+            }
+          },
+          {
+            "level": 2,
+            "order": 2,
+            "condition": {
+              "dataset": "ADSL",
+              "variable": "TRTDURM",
+              "comparator": "GT",
+              "value": [
+                "0"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "<1 month",
+      "label": "<1 month",
+      "id": "Dss_46",
+      "level": 1,
+      "order": 1,
+      "compoundExpression": {
+        "logicalOperator": "AND",
+        "whereClauses": [
+          {
+            "level": 2,
+            "order": 1,
+            "condition": {
+              "dataset": "ADSL",
+              "variable": "TRTDURD",
+              "comparator": "NE"
+            }
+          },
+          {
+            "level": 2,
+            "order": 2,
+            "condition": {
+              "dataset": "ADSL",
+              "variable": "TRTDURM",
+              "comparator": "LT",
+              "value": [
+                "1"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": ">=1 month",
+      "label": ">=1 month",
+      "id": "Dss_47",
+      "level": 1,
+      "order": 1,
+      "compoundExpression": {
+        "logicalOperator": "AND",
+        "whereClauses": [
+          {
+            "level": 2,
+            "order": 1,
+            "condition": {
+              "dataset": "ADSL",
+              "variable": "TRTDURD",
+              "comparator": "NE"
+            }
+          },
+          {
+            "level": 2,
+            "order": 2,
+            "condition": {
+              "dataset": "ADSL",
+              "variable": "TRTDURM",
+              "comparator": "GE",
+              "value": [
+                "1"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": ">=3 month",
+      "label": ">=3 month",
+      "id": "Dss_48",
+      "level": 1,
+      "order": 1,
+      "compoundExpression": {
+        "logicalOperator": "AND",
+        "whereClauses": [
+          {
+            "level": 2,
+            "order": 1,
+            "condition": {
+              "dataset": "ADSL",
+              "variable": "TRTDURD",
+              "comparator": "NE"
+            }
+          },
+          {
+            "level": 2,
+            "order": 2,
+            "condition": {
+              "dataset": "ADSL",
+              "variable": "TRTDURM",
+              "comparator": "GE",
+              "value": [
+                "3"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": ">=6 month",
+      "label": ">=6 month",
+      "id": "Dss_49",
+      "level": 1,
+      "order": 1,
+      "compoundExpression": {
+        "logicalOperator": "AND",
+        "whereClauses": [
+          {
+            "level": 2,
+            "order": 1,
+            "condition": {
+              "dataset": "ADSL",
+              "variable": "TRTDURD",
+              "comparator": "NE"
+            }
+          },
+          {
+            "level": 2,
+            "order": 2,
+            "condition": {
+              "dataset": "ADSL",
+              "variable": "TRTDURM",
+              "comparator": "GE",
+              "value": [
+                "6"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": ">=12 month",
+      "label": ">=12 month",
+      "id": "Dss_50",
+      "level": 1,
+      "order": 1,
+      "compoundExpression": {
+        "logicalOperator": "AND",
+        "whereClauses": [
+          {
+            "level": 2,
+            "order": 1,
+            "condition": {
+              "dataset": "ADSL",
+              "variable": "TRTDURD",
+              "comparator": "NE"
+            }
+          },
+          {
+            "level": 2,
+            "order": 2,
+            "condition": {
+              "dataset": "ADSL",
+              "variable": "TRTDURM",
+              "comparator": "GE",
+              "value": [
+                "12"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "analysisGroupings": [
+    {
+      "name": "Treatment",
+      "id": "AnlsGrouping_14_Trt01An",
+      "dataDriven": false,
+      "groupingDataset": "ADSL",
+      "groupingVariable": "TRT01AN",
+      "groups": [
+        {
+          "name": "Xanomeline Low Dose \n(N=XX)",
+          "id": "AnlsGrouping_14_Trt01An_01",
+          "level": 1,
+          "order": 1,
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "TRT01AN",
+            "comparator": "EQ",
+            "value": [
+              "1"
+            ]
+          }
+        },
+        {
+          "name": "Xanomeline High Dose \n(N=XX)",
+          "id": "AnlsGrouping_14_Trt01An_02",
+          "level": 1,
+          "order": 2,
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "TRT01AN",
+            "comparator": "EQ",
+            "value": [
+              "2"
+            ]
+          }
+        },
+        {
+          "name": "Placebo \n(N=XX)",
+          "id": "AnlsGrouping_14_Trt01An_03",
+          "level": 1,
+          "order": 3,
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "TRT01AN",
+            "comparator": "EQ",
+            "value": [
+              "3"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "methods": [
+    {
+      "name": "bigN",
+      "description": "Grouped summary of categorical variable",
+      "label": "Descriptive summary statistics across groups for a categorical variable, based on subject occurrence",
+      "id": "Mth_00_1",
+      "operations": [
+        {
+          "name": "n",
+          "label": "n",
+          "id": "Mth_00_1_01_n",
+          "order": 1,
+          "resultPattern": "(N=XX)"
+        }
+      ],
+      "codeTemplate": {
+        "context": "R (siera)",
+        "code": "in_data = df2_analysisidhere |>\n    dplyr::select(distinctlisthere) |>\n    unique() |>\n    dplyr::mutate(dummy = 'dummyvar')\n\ndf3_analysisidhere <-\n  cards::ard_tabulate(\n    data = in_data\n   ,by = c(byvarshere)\n   ,variables = dummy\n  ) |>\ndplyr::filter(stat_name == 'n') |>\n dplyr::mutate(operationid = 'opid1here')",
+        "parameters": [
+          {
+            "name": "distinctlisthere",
+            "label": "distinct list",
+            "description": "grouping+analysis vars",
+            "valueSource": "distinct_list"
+          },
+          {
+            "name": "byvarshere",
+            "label": "by vars",
+            "description": "by-variable character vector",
+            "valueSource": "by_listc"
+          },
+          {
+            "name": "opid1here",
+            "label": "op 1 id",
+            "description": "Operation 1 ID",
+            "valueSource": "operation_1"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Summary by group of a categorical variable",
+      "description": "Descriptive summary statistics across groups for a categorical variable, based on subject occurrence",
+      "label": "Grouped summary of categorical variable",
+      "id": "Mth_03",
+      "operations": [
+        {
+          "name": "n",
+          "label": "n",
+          "id": "Mth_03_01_n",
+          "order": 1,
+          "resultPattern": "XX"
+        },
+        {
+          "name": "%",
+          "label": "%",
+          "id": "Mth_03_02_%",
+          "order": 2,
+          "referencedOperationRelationships": [
+            {
+              "id": "Mth_03_pct_NUM",
+              "referencedOperationRole": {
+                "controlledTerm": "NUMERATOR"
+              },
+              "operationId": "Mth_03_01_n",
+              "description": "The numerator for the calculation of the percentage."
+            },
+            {
+              "id": "Mth_03_pct_DEN",
+              "referencedOperationRole": {
+                "controlledTerm": "DENOMINATOR"
+              },
+              "operationId": "Mth_00_1_01_n",
+              "description": "The denominator for the calculation of the percentage."
+            }
+          ],
+          "resultPattern": "(XX.X)"
+        }
+      ],
+      "codeTemplate": {
+        "context": "R (siera)",
+        "code": "denom_dataset = df2_denomanaidhere |>\n    dplyr::count(denom_anagroupvarshere) |>\n    dplyr::rename(`...ard_N...` = n) |>\n    dplyr::mutate(dplyr::across(-`...ard_N...`, as.character))\n\ndf3_analysisidhere <- tryCatch({\nin_data = df2_analysisidhere |>\n    dplyr::select(distinctlisthere) |>\n    unique() |>\n    dplyr::mutate(dplyr::across(everything(), as.character)) |>\n    dplyr::mutate(dummy = 'dummyvar')\n\ncards::ard_tabulate(\n    data = in_data\n   ,by = c(byvarshere)\n   ,variables = dummy\n   ,denominator = denom_dataset\n  ) |>\ndplyr::filter(stat_name %in% c('n', 'p')) |>\n dplyr::mutate(operationid = dplyr::case_when(\n    stat_name == 'n' ~ 'opid1here',\n    stat_name == 'p' ~ 'opid2here'\n  ))\n}, error = function(e) {\n  message('analysisidhere: ', conditionMessage(e))\n  tibble::tibble(group1_level=character(0),group2_level=character(0),group3_level=character(0))\n})",
+        "parameters": [
+          {
+            "name": "distinctlisthere",
+            "label": "distinct list",
+            "description": "grouping+analysis vars",
+            "valueSource": "distinct_list"
+          },
+          {
+            "name": "byvarshere",
+            "label": "by vars",
+            "description": "by-variable character vector",
+            "valueSource": "by_listc"
+          },
+          {
+            "name": "denomanaidhere",
+            "label": "denom ana id",
+            "description": "Denominator analysis ID",
+            "valueSource": "DEN_analysisid"
+          },
+          {
+            "name": "denom_anagroupvarshere",
+            "label": "denom grp var",
+            "description": "Denominator grouping variable",
+            "valueSource": "AG_denom_var1"
+          },
+          {
+            "name": "opid1here",
+            "label": "n id",
+            "description": "Operation ID for n",
+            "valueSource": "operation_1"
+          },
+          {
+            "name": "opid2here",
+            "label": "% id",
+            "description": "Operation ID for %",
+            "valueSource": "operation_2"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Summary by group of a categorical variable",
+      "description": "Descriptive summary statistics across groups for a categorical variable, based on subject occurrence",
+      "label": "Grouped summary of categorical variable",
+      "id": "Mth_03_1",
+      "operations": [
+        {
+          "name": "Risk Difference %",
+          "label": "Risk Difference %",
+          "id": "Mth_03_1_01_Risk_Difference_%",
+          "order": 1,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "95% CI Low",
+          "label": "95% CI Low",
+          "id": "Mth_03_1_02_95%_CI_Low",
+          "order": 2,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "95% CI High",
+          "label": "95% CI High",
+          "id": "Mth_03_1_03_95%_CI_High",
+          "order": 3,
+          "resultPattern": "XX.X"
+        }
+      ],
+      "codeTemplate": {
+        "context": "R (siera)",
+        "code": ".arms_analysisidhere <- unique(df2_analysisidhere$groupvar1here)\nfull_analysisidhere <- if (length(.arms_analysisidhere) >= 2) {\n  df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n} else {\n  df_poptot\n}\n\nsuccess_analysisidhere = df2_analysisidhere |>\n    dplyr::distinct(anavarhere) |>\n    dplyr::mutate(FL = 1L)\n\nana_analysisidhere = full_analysisidhere |>\n    dplyr::left_join(\n        success_analysisidhere |> dplyr::select(anavarhere, FL),\n        by = \"anavarhere\"\n    ) |>\n    dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n\ngrp_analysisidhere <- sort(unique(ana_analysisidhere$groupvar1here))\n\nif (length(grp_analysisidhere) >= 2) {\nn1_analysisidhere <- sum(ana_analysisidhere$groupvar1here == grp_analysisidhere[[1]])\nn2_analysisidhere <- sum(ana_analysisidhere$groupvar1here == grp_analysisidhere[[2]])\nx1_analysisidhere <- sum(ana_analysisidhere$FL[ana_analysisidhere$groupvar1here == grp_analysisidhere[[1]]])\nx2_analysisidhere <- sum(ana_analysisidhere$FL[ana_analysisidhere$groupvar1here == grp_analysisidhere[[2]]])\npt_analysisidhere <- stats::prop.test(\n    x = c(x1_analysisidhere, x2_analysisidhere),\n    n = c(n1_analysisidhere, n2_analysisidhere),\n    correct = FALSE\n)\n\ndf3_analysisidhere <- tibble::tibble(\n    variable = \"FL\",\n    variable_level = list(NULL, NULL, NULL),\n    stat_name = c(\"estimate\", \"conf.low\", \"conf.high\"),\n    stat = list(\n        (pt_analysisidhere$estimate[[1]] - pt_analysisidhere$estimate[[2]]) * 100,\n        pt_analysisidhere$conf.int[[1]] * 100,\n        pt_analysisidhere$conf.int[[2]] * 100\n    ),\n    operationid = c('opid1here', 'opid2here', 'opid3here')\n)\n} else {\ndf3_analysisidhere <- tibble::tibble(\n    variable = \"FL\",\n    variable_level = list(NULL, NULL, NULL),\n    stat_name = c(\"estimate\", \"conf.low\", \"conf.high\"),\n    stat = list(NA_real_, NA_real_, NA_real_),\n    operationid = c('opid1here', 'opid2here', 'opid3here')\n)\n}",
+        "parameters": [
+          {
+            "name": "groupvar1here",
+            "label": "grp var 1",
+            "description": "First analysis grouping variable",
+            "valueSource": "AG_var1"
+          },
+          {
+            "name": "anavarhere",
+            "label": "ana var",
+            "description": "Analysis variable (subject ID)",
+            "valueSource": "ana_var"
+          },
+          {
+            "name": "opid1here",
+            "label": "RD id",
+            "description": "Operation ID: Risk Difference %",
+            "valueSource": "operation_1"
+          },
+          {
+            "name": "opid2here",
+            "label": "CI low id",
+            "description": "Operation ID: 95% CI Low",
+            "valueSource": "operation_2"
+          },
+          {
+            "name": "opid3here",
+            "label": "CI high id",
+            "description": "Operation ID: 95% CI High",
+            "valueSource": "operation_3"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Summary by group of a continuous variable",
+      "description": "Descriptive summary statistics across groups for a continuous variable",
+      "label": "Grouped summary of continuous variable",
+      "id": "Mth_06",
+      "operations": [
+        {
+          "name": "n",
+          "label": "n",
+          "id": "Mth_06_01_n",
+          "order": 1,
+          "resultPattern": "XX"
+        },
+        {
+          "name": "Mean",
+          "label": "Mean",
+          "id": "Mth_06_02_Mean",
+          "order": 2,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "SD",
+          "label": "SD",
+          "id": "Mth_06_03_SD",
+          "order": 3,
+          "resultPattern": "(XX.XX)"
+        },
+        {
+          "name": "Median",
+          "label": "Median",
+          "id": "Mth_06_04_Median",
+          "order": 4,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "Q1",
+          "label": "Q1",
+          "id": "Mth_06_05_Q1",
+          "order": 5,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "Q3",
+          "label": "Q3",
+          "id": "Mth_06_06_Q3",
+          "order": 6,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "Min",
+          "label": "Min",
+          "id": "Mth_06_07_Min",
+          "order": 7,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "Max",
+          "label": "Max",
+          "id": "Mth_06_08_Max",
+          "order": 8,
+          "resultPattern": "XX.X"
+        }
+      ],
+      "codeTemplate": {
+        "context": "R (siera)",
+        "code": "in_data = df2_analysisidhere |>\n    dplyr::select(distinctlisthere)\n\ndf3_analysisidhere <-\n  cards::ard_summary(\n    data = in_data\n   ,by = c(byvarshere)\n   ,variables = c('anavarhere')\n   ,statistic = list('anavarhere' =\n       cards::continuous_summary_fns(\n           c(\"N\",\"mean\",\"sd\",\"median\",\"p25\",\"p75\",\"min\",\"max\")))\n  ) |>\n dplyr::mutate(operationid = dplyr::case_when(\n    stat_name == 'N'      ~ 'opid1here',\n    stat_name == 'mean'   ~ 'opid2here',\n    stat_name == 'sd'     ~ 'opid3here',\n    stat_name == 'median' ~ 'opid4here',\n    stat_name == 'p25'    ~ 'opid5here',\n    stat_name == 'p75'    ~ 'opid6here',\n    stat_name == 'min'    ~ 'opid7here',\n    stat_name == 'max'    ~ 'opid8here'\n  ))",
+        "parameters": [
+          {
+            "name": "distinctlisthere",
+            "label": "distinct list",
+            "description": "grouping+analysis vars",
+            "valueSource": "distinct_list"
+          },
+          {
+            "name": "byvarshere",
+            "label": "by vars",
+            "description": "by-variable character vector",
+            "valueSource": "by_listc"
+          },
+          {
+            "name": "anavarhere",
+            "label": "ana var",
+            "description": "Analysis variable name",
+            "valueSource": "ana_var"
+          },
+          {
+            "name": "opid1here",
+            "label": "N id",
+            "description": "Operation ID for N",
+            "valueSource": "operation_1"
+          },
+          {
+            "name": "opid2here",
+            "label": "mean id",
+            "description": "Operation ID for Mean",
+            "valueSource": "operation_2"
+          },
+          {
+            "name": "opid3here",
+            "label": "SD id",
+            "description": "Operation ID for SD",
+            "valueSource": "operation_3"
+          },
+          {
+            "name": "opid4here",
+            "label": "median id",
+            "description": "Operation ID for Median",
+            "valueSource": "operation_4"
+          },
+          {
+            "name": "opid5here",
+            "label": "Q1 id",
+            "description": "Operation ID for Q1",
+            "valueSource": "operation_5"
+          },
+          {
+            "name": "opid6here",
+            "label": "Q3 id",
+            "description": "Operation ID for Q3",
+            "valueSource": "operation_6"
+          },
+          {
+            "name": "opid7here",
+            "label": "min id",
+            "description": "Operation ID for Min",
+            "valueSource": "operation_7"
+          },
+          {
+            "name": "opid8here",
+            "label": "max id",
+            "description": "Operation ID for Max",
+            "valueSource": "operation_8"
+          }
+        ]
+      }
+    }
+  ],
+  "analyses": [
+    {
+      "name": "Summary of Subjects by Treatment",
+      "id": "An_25",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_00_1",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": true
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_00_1_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "84",
+          "formattedValue": "(N=84)"
+        },
+        {
+          "operationId": "Mth_00_1_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "84",
+          "formattedValue": "(N=84)"
+        },
+        {
+          "operationId": "Mth_00_1_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "86",
+          "formattedValue": "(N=86)"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Duration of treatment, days [3] by Treatment",
+      "id": "An_26",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_06",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "TRTDURD",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_44",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": true
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_06_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "84",
+          "formattedValue": "84"
+        },
+        {
+          "operationId": "Mth_06_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "84",
+          "formattedValue": "84"
+        },
+        {
+          "operationId": "Mth_06_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "86",
+          "formattedValue": "86"
+        },
+        {
+          "operationId": "Mth_06_02_Mean",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "99.023809524",
+          "formattedValue": "99.0"
+        },
+        {
+          "operationId": "Mth_06_02_Mean",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "99.392857143",
+          "formattedValue": "99.4"
+        },
+        {
+          "operationId": "Mth_06_02_Mean",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "149.06976744",
+          "formattedValue": "149.1"
+        },
+        {
+          "operationId": "Mth_06_03_SD",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "68.154674581",
+          "formattedValue": "(68.15)"
+        },
+        {
+          "operationId": "Mth_06_03_SD",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "70.642834519",
+          "formattedValue": "(70.64)"
+        },
+        {
+          "operationId": "Mth_06_03_SD",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "60.295505773",
+          "formattedValue": "(60.30)"
+        },
+        {
+          "operationId": "Mth_06_04_Median",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "82.5",
+          "formattedValue": "82.5"
+        },
+        {
+          "operationId": "Mth_06_04_Median",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "76.5",
+          "formattedValue": "76.5"
+        },
+        {
+          "operationId": "Mth_06_04_Median",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "182",
+          "formattedValue": "182.0"
+        },
+        {
+          "operationId": "Mth_06_07_Min",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "2",
+          "formattedValue": "2"
+        },
+        {
+          "operationId": "Mth_06_07_Min",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "1",
+          "formattedValue": "1"
+        },
+        {
+          "operationId": "Mth_06_07_Min",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "7",
+          "formattedValue": "7"
+        },
+        {
+          "operationId": "Mth_06_08_Max",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "212",
+          "formattedValue": "212"
+        },
+        {
+          "operationId": "Mth_06_08_Max",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "200",
+          "formattedValue": "200"
+        },
+        {
+          "operationId": "Mth_06_08_Max",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "210",
+          "formattedValue": "210"
+        }
+      ]
+    },
+    {
+      "name": "Summary of subjects treated for any duration (at least 1 dose) by Treatment, n (%)",
+      "id": "An_28",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_45",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": true
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "analysisId": "An_28"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "analysisId": "An_25"
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "84",
+          "formattedValue": "84"
+        },
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "84",
+          "formattedValue": "84"
+        },
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "86",
+          "formattedValue": "86"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "100",
+          "formattedValue": "(100)"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "100",
+          "formattedValue": "(100)"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "100",
+          "formattedValue": "(100)"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of subjects treated for any duration (at least 1 dose), Xanomeline Low Dose vs Placebo",
+      "id": "An_29",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03_1",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_45",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": false
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_1_01_Risk_Difference_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0.0"
+        },
+        {
+          "operationId": "Mth_03_1_02_95%_CI_Low",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0.0"
+        },
+        {
+          "operationId": "Mth_03_1_03_95%_CI_High",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0.0"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of subjects treated for any duration (at least 1 dose), Xanomeline High Dose vs Placebo",
+      "id": "An_29_0",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03_1",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_45",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": false
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_1_01_Risk_Difference_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0.0"
+        },
+        {
+          "operationId": "Mth_03_1_02_95%_CI_Low",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0.0"
+        },
+        {
+          "operationId": "Mth_03_1_03_95%_CI_High",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0.0"
+        }
+      ]
+    },
+    {
+      "name": "Summary of subjects treated for <1 month by Treatment, n (%)",
+      "id": "An_28_1",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_46",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": true
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "analysisId": "An_28"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "analysisId": "An_25"
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "18",
+          "formattedValue": "18"
+        },
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "15",
+          "formattedValue": "15"
+        },
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "7",
+          "formattedValue": "7"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "21.428571429",
+          "formattedValue": "(21.4)"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "17.857142857",
+          "formattedValue": "(17.9)"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "8.1395348837",
+          "formattedValue": "(8.1)"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of subjects treated for <1 month, Xanomeline Low Dose vs Placebo",
+      "id": "An_29_1",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03_1",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_46",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": false
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_1_01_Risk_Difference_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "13.3",
+          "formattedValue": "13.3"
+        },
+        {
+          "operationId": "Mth_03_1_02_95%_CI_Low",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "2.803475614",
+          "formattedValue": "2.8"
+        },
+        {
+          "operationId": "Mth_03_1_03_95%_CI_High",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "23.796524386",
+          "formattedValue": "23.8"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of subjects treated for <1 month, Xanomeline High Dose vs Placebo",
+      "id": "An_29_2",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03_1",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_46",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": false
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_1_01_Risk_Difference_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "13.3",
+          "formattedValue": "9.8"
+        },
+        {
+          "operationId": "Mth_03_1_02_95%_CI_Low",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-0.223022374",
+          "formattedValue": "-0.2"
+        },
+        {
+          "operationId": "Mth_03_1_03_95%_CI_High",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "19.823022374",
+          "formattedValue": "19.8"
+        }
+      ]
+    },
+    {
+      "name": "Summary of subjects treated for >=1 month by Treatment, n (%)",
+      "id": "An_28_2",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_47",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": true
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "analysisId": "An_28"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "analysisId": "An_25"
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "66",
+          "formattedValue": "66"
+        },
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "69",
+          "formattedValue": "69"
+        },
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "79",
+          "formattedValue": "79"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "78.571428571",
+          "formattedValue": "(78.6)"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "82.142857143",
+          "formattedValue": "(82.1)"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "91.860465116",
+          "formattedValue": "(91.9)"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of subjects treated for >=1 month, Xanomeline Low Dose vs Placebo",
+      "id": "An_29_3",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03_1",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_47",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": false
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_1_01_Risk_Difference_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-13.3",
+          "formattedValue": "-13.3"
+        },
+        {
+          "operationId": "Mth_03_1_02_95%_CI_Low",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-23.79652439",
+          "formattedValue": "-23.8"
+        },
+        {
+          "operationId": "Mth_03_1_03_95%_CI_High",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-2.803475614",
+          "formattedValue": "-2.8"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of subjects treated for >=1 month, Xanomeline High Dose vs Placebo",
+      "id": "An_29_4",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03_1",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_47",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": false
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_1_01_Risk_Difference_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-13.3",
+          "formattedValue": "-9.8"
+        },
+        {
+          "operationId": "Mth_03_1_02_95%_CI_Low",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-19.82302237",
+          "formattedValue": "-19.8"
+        },
+        {
+          "operationId": "Mth_03_1_03_95%_CI_High",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "0.2230223745",
+          "formattedValue": "0.2"
+        }
+      ]
+    },
+    {
+      "name": "Summary of subjects treated for >=3 month by Treatment, n (%)",
+      "id": "An_28_3",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_48",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": true
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "analysisId": "An_28"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "analysisId": "An_25"
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "41",
+          "formattedValue": "41"
+        },
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "39",
+          "formattedValue": "39"
+        },
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "68",
+          "formattedValue": "68"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "48.80952381",
+          "formattedValue": "(48.8)"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "46.428571429",
+          "formattedValue": "(46.4)"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "79.069767442",
+          "formattedValue": "(79.1)"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of subjects treated for >=3 month by Treatment, Xanomeline Low Dose vs Placebo",
+      "id": "An_29_5",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03_1",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_48",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": false
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_1_01_Risk_Difference_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-30.3",
+          "formattedValue": "-30.3"
+        },
+        {
+          "operationId": "Mth_03_1_02_95%_CI_Low",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-44.01550547",
+          "formattedValue": "-44.0"
+        },
+        {
+          "operationId": "Mth_03_1_03_95%_CI_High",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-16.58449453",
+          "formattedValue": "-16.6"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of subjects treated for >=3 month by Treatment, Xanomeline High Dose vs Placebo",
+      "id": "An_29_6",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03_1",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_48",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": false
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_1_01_Risk_Difference_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-30.3",
+          "formattedValue": "-32.7"
+        },
+        {
+          "operationId": "Mth_03_1_02_95%_CI_Low",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-46.39628571",
+          "formattedValue": "-46.4"
+        },
+        {
+          "operationId": "Mth_03_1_03_95%_CI_High",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-19.00371429",
+          "formattedValue": "-19.0"
+        }
+      ]
+    },
+    {
+      "name": "Summary of subjects treated for >=6 month by Treatment, n (%)",
+      "id": "An_28_4",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_49",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": true
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "analysisId": "An_28"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "analysisId": "An_25"
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "25",
+          "formattedValue": "25"
+        },
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "26",
+          "formattedValue": "26"
+        },
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "55",
+          "formattedValue": "55"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "29.761904762",
+          "formattedValue": "(29.8)"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "30.952380952",
+          "formattedValue": "(31.0)"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "63.953488372",
+          "formattedValue": "(64.0)"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of subjects treated for >=6 month, Xanomeline Low Dose vs Placebo",
+      "id": "An_29_7",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03_1",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_49",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": false
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_1_01_Risk_Difference_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-34.2",
+          "formattedValue": "-34.2"
+        },
+        {
+          "operationId": "Mth_03_1_02_95%_CI_Low",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-48.2922478",
+          "formattedValue": "-48.3"
+        },
+        {
+          "operationId": "Mth_03_1_03_95%_CI_High",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-20.1077522",
+          "formattedValue": "-20.1"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of subjects treated for >=6 month, Xanomeline High Dose vs Placebo",
+      "id": "An_29_8",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03_1",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_49",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": false
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_1_01_Risk_Difference_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-34.2",
+          "formattedValue": "-33.0"
+        },
+        {
+          "operationId": "Mth_03_1_02_95%_CI_Low",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-47.16837126",
+          "formattedValue": "-47.2"
+        },
+        {
+          "operationId": "Mth_03_1_03_95%_CI_High",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "-18.83162874",
+          "formattedValue": "-18.8"
+        }
+      ]
+    },
+    {
+      "name": "Summary of subjects treated for >=12 month by Treatment, n (%)",
+      "id": "An_28_5",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_50",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": true
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "analysisId": "An_28"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "analysisId": "An_25"
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0"
+        },
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0"
+        },
+        {
+          "operationId": "Mth_03_01_n",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_01"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "(0.0)"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_02"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "(0.0)"
+        },
+        {
+          "operationId": "Mth_03_02_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An",
+              "groupId": "AnlsGrouping_14_Trt01An_03"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "(0.0)"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of subjects treated for >=12 month, Xanomeline Low Dose vs Placebo",
+      "id": "An_29_9",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03_1",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_50",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": false
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_1_01_Risk_Difference_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0"
+        },
+        {
+          "operationId": "Mth_03_1_02_95%_CI_Low",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0.0"
+        },
+        {
+          "operationId": "Mth_03_1_03_95%_CI_High",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0.0"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of subjects treated for >=12 month, Xanomeline High Dose vs Placebo",
+      "id": "An_29_10",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "sponsorTermId": "TermEx01_01"
+      },
+      "methodId": "Mth_03_1",
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_01",
+      "dataSubsetId": "Dss_50",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "groupingId": "AnlsGrouping_14_Trt01An",
+          "resultsByGroup": false
+        }
+      ],
+      "results": [
+        {
+          "operationId": "Mth_03_1_01_Risk_Difference_%",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0"
+        },
+        {
+          "operationId": "Mth_03_1_02_95%_CI_Low",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0.0"
+        },
+        {
+          "operationId": "Mth_03_1_03_95%_CI_High",
+          "resultGroups": [
+            {
+              "groupingId": "AnlsGrouping_14_Trt01An"
+            }
+          ],
+          "rawValue": "0",
+          "formattedValue": "0.0"
+        }
+      ]
+    }
+  ],
+  "globalDisplaySections": [
+    {
+      "sectionType": "Header",
+      "subSections": [
+        {
+          "id": "GlobalDisp_Header_01",
+          "text": "CDISC - eTFL Portal"
+        },
+        {
+          "id": "GlobalDisp_Header_02",
+          "text": "Generated using TFL Designer (Community, v1.0)"
+        },
+        {
+          "id": "GlobalDisp_Header_03",
+          "text": "Page x of y"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Duration of Treatment Exposure",
+      "id": "Out_03",
+      "displays": [
+        {
+          "order": 1,
+          "display": {
+            "name": "=B3",
+            "id": "Disp_03",
+            "version": 1,
+            "displayTitle": "=F3",
+            "displaySections": [
+              {
+                "sectionType": "Header",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSectionId": "GlobalDisp_Header_01"
+                  },
+                  {
+                    "order": 2,
+                    "subSectionId": "GlobalDisp_Header_02"
+                  },
+                  {
+                    "order": 3,
+                    "subSectionId": "GlobalDisp_Header_03"
+                  }
+                ]
+              },
+              {
+                "sectionType": "Title",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp_03_Title_01",
+                      "text": "FDA-EX-T05"
+                    }
+                  },
+                  {
+                    "order": 2,
+                    "subSection": {
+                      "id": "Disp_03_Title_02",
+                      "text": "Duration of Treatment Exposure"
+                    }
+                  },
+                  {
+                    "order": 3,
+                    "subSection": {
+                      "id": "Disp_03_Title_03",
+                      "text": "Safety Population"
+                    }
+                  }
+                ]
+              },
+              {
+                "sectionType": "Footnote",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp_03_Footnote_01",
+                      "text": "Source: ADSL; Program name: fda-ex-t05.sas;"
+                    }
+                  },
+                  {
+                    "order": 2,
+                    "subSection": {
+                      "id": "Disp_03_Footnote_02",
+                      "text": "Abbreviations: CI, confidence interval; N, number of subjects in treatment arm; n, number of subjects with given treatment duration; NE, non evaluable; SD, standard deviation; Q1, 1st quartile; Q3, 3rd quartile."
+                    }
+                  },
+                  {
+                    "order": 3,
+                    "subSection": {
+                      "id": "Disp_03_Footnote_03",
+                      "text": "[1] Difference is shown between Xanomeline Low Dose vs. Placebo."
+                    }
+                  },
+                  {
+                    "order": 4,
+                    "subSection": {
+                      "id": "Disp_03_Footnote_04",
+                      "text": "[2] Difference is shown between Xanomeline High Dose vs. Placebo."
+                    }
+                  },
+                  {
+                    "order": 5,
+                    "subSection": {
+                      "id": "Disp_03_Footnote_05",
+                      "text": "[3] Duration of treatment = Number of days from first dose to last dose of study drug for each subject calculated as (treatment end date - treatment start date) + 1."
+                    }
+                  }
+                ]
+              },
+              {
+                "sectionType": "Rowlabel Header",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp_03_RowlabelHeader_01",
+                      "text": "Parameter"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "version": 1,
+      "categoryIds": [
+        "ANSET_01",
+        "ANSET_01_ANINT_03"
+      ]
+    }
+  ],
+  "@type": "ReportingEvent"
+}

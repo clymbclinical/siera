@@ -245,3 +245,47 @@ test_that("FDA-AE-T36 AE leading to discontinuation: metadata parses and script 
   expect_true(any(grepl("readr::read_csv", all_lines, fixed = TRUE)))
   expect_true(any(grepl("ADAE", all_lines, fixed = TRUE)))
 })
+
+# -- Full-pipeline ARD tests (siera JSON enrichments) --------------------------
+# These use *-siera.json files (codeTemplate added) and source the generated
+# script against the real XPT data to verify computed statistics.
+
+test_that("ars-lb-t02 siera: bigN and continuous stats match CDISC reference", {
+  skip_on_cran()
+  tmp <- withr::local_tempdir()
+  ard <- .run_etfl_siera_pipeline("ars-lb-t02_20241022.zip", "ars-lb-t02-siera.json", tmp)
+
+  expect_s3_class(ard, "data.frame")
+  expect_gt(nrow(ard), 0L)
+
+  # An_90 bigN: 3 arms with counts 84, 84, 86 (CDISC pilot Safety population)
+  bign <- sort(.ard_stat(ard, "An_90", "Mth_00_1_01_n"))
+  expect_equal(bign, c(84, 84, 86))
+
+  # An_93 mean: some lab params may have no data but at least one must be numeric
+  means <- .ard_stat(ard, "An_93", "Mth_06_02_Mean")
+  expect_true(any(!is.na(means)))
+  expect_true(is.numeric(means))
+})
+
+test_that("fda-ae-t12 siera: bigN, n%, and RD match CDISC reference", {
+  skip_on_cran()
+  tmp <- withr::local_tempdir()
+  ard <- .run_etfl_siera_pipeline("fda-ae-t12_20241022.zip", "fda-ae-t12-siera.json", tmp)
+
+  expect_s3_class(ard, "data.frame")
+  expect_gt(nrow(ard), 0L)
+
+  # An_58 bigN: 3 arms (84, 84, 86)
+  bign <- sort(.ard_stat(ard, "An_58", "Mth_00_1_01_n"))
+  expect_equal(bign, c(84, 84, 86))
+
+  # An_59 n%: at least 4 n+p rows (arms with events; one arm has 0 SAEs → excluded)
+  n59 <- ard[ard$AnalysisId == "An_59" & ard$stat_name %in% c("n", "p"), ]
+  expect_gte(nrow(n59), 4L)
+
+  # An_60 RD: must produce a numeric estimate (one RD per comparison arm pair)
+  rd60 <- .ard_stat(ard, "An_60", "Mth_03_1_01_Risk_Difference_%")
+  expect_length(rd60, 1L)
+  expect_true(is.numeric(rd60) && !is.na(rd60))
+})

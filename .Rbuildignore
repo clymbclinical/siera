@@ -13,3 +13,4 @@
 ^revdep$
 ^\.claude$
 ^CLAUDE\.md$
+^inst/extdata/R \(siera\)
