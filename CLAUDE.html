@@ -35,7 +35,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="logo.png" class="logo" alt=""><h1>CLAUDE.md</h1>
-      <small class="dont-index">Source: <a href="https://github.com/clymbclinical/siera/blob/main/CLAUDE.md" class="external-link"><code>CLAUDE.md</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/clymbclinical/siera/blob/v0.5.6/CLAUDE.md" class="external-link"><code>CLAUDE.md</code></a></small>
     </div>
 
 <div id="claudemd" class="section level1">
@@ -135,7 +135,7 @@
 <li>
 <strong>Dynamic grouping</strong> (<code>AG_vars</code>, <code>AG_var1/2/3…</code>) supports 1–N grouping factors; the code generation branches on how many <code>resultsBy</code> groupings are present in <code>AnalysisGroupings</code>.</li>
 <li>
-<strong><code>n_group_cols</code> determination</strong> — the number of <code>group[n]</code> columns a method produces differs from <code>num_grp</code> when the last grouping goes to <code>variables=</code> instead of <code>by=</code>. This is determined by <code>.n_group_cols_from_template()</code> in <code>readARS.R</code>, which checks which valueSource types (<code>by_vars</code>, <code>strata_vars</code>, <code>by_listc</code>) appear in parameters whose placeholder tokens are actually present in the method’s code template. Never check the parameter table alone — it can contain spurious rows whose placeholder tokens are absent from the template (false positives). Never check the generated code string — the runtime-resolved values won’t match the placeholder names.</li>
+<strong><code>n_group_cols</code> determination</strong> — the number of <code>group[n]</code> columns a method produces differs from <code>num_grp</code> when the last grouping goes to <code>variables=</code> instead of <code>by=</code>. Always inspect the <em>resolved</em> <code>code_method</code> string for the presence of <code>by_vars</code>/<code>strata_vars</code> or <code>by_listc</code> substrings. Do NOT check the parameter table — it can contain spurious unused parameters that give false positives.</li>
 <li>
 <strong><code>group_condition_value</code> in JSON is a list-column</strong> — jsonlite always returns <code>condition.value</code> as a list, even for single-element EQ arrays. The JSON parser must call <code>tidyr::unnest(tmp_AG, cols = "group_condition_value")</code> after building <code>tmp_AG</code> to expand IN/NOTIN multi-value conditions (one row per value, <code>group_id</code> repeated) and collapse single-value list elements to plain character. Use a quoted string in <code>cols=</code> to avoid R CMD check “no visible binding” NOTE.</li>
 <li>
@@ -307,7 +307,6 @@
 <li>Inform the user before editing siera source files if there is no linked GitHub issue — all changes should be traceable to an issue and land on a feature branch.</li>
 <li>Suggest documentation updates when features are added or functionality changes (this is a public-facing CRAN package).</li>
 <li>Add tests for all new code; ensure every new branch has test coverage for its changes.</li>
-<li>Ask clarifying questions and check for understanding when there is uncertainty about a request or approach.</li>
 </ul></div>
 </div>
 
