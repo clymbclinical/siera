@@ -206,6 +206,7 @@ Do not modify the test fixture xlsx files in `inst/extdata/` without explicit ow
 
 ## Documentation and vignettes
 
+- **Keep documentation and functionality in sync.** Any user-visible change — a new feature, a behaviour change, a change to generated-script or ARD output, or a new capability the user should know about — must be reflected in the documentation (vignettes, README, and `NEWS.md`) as part of the same change, not deferred. Treat user-facing docs as part of the definition of done. When in doubt about whether a change is user-visible, assume it is and update the docs. The `siera-docs-refresh` skill automates a full documentation pass.
 - Five vignettes, ordered via the number prefix in `%\VignetteIndexEntry{}`: 1. `Getting_started`, 2. `concepts` (Concepts and conventions), 3. `using-cards`, 4. `ARD_script_structure`, 5. `apply-ARD`. Keep the prefixes in sync with `_pkgdown.yml` if reordering.
 - `_pkgdown.yml` groups the Articles navbar (Get started / Concepts / Guides / Next steps). The reference index is intentionally left ungrouped.
 - The pipeline diagram is a hand-authored static **SVG** (CRAN-safe, no new dependency), committed twice: `vignettes/figures/siera-pipeline.svg` (used by `concepts.Rmd` via `knitr::include_graphics()`) and `man/figures/siera-pipeline.svg` (used by the README / pkgdown home). Update both copies together.
