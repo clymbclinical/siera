@@ -5,3 +5,21 @@ home:
   links:
   - text: Pharmaverse
     href: https://pharmaverse.org
+articles:
+- title: Get started
+  navbar: ~
+  contents:
+  - Getting_started
+- title: Concepts
+  navbar: Concepts
+  contents:
+  - concepts
+- title: Guides
+  navbar: Guides
+  contents:
+  - using-cards
+  - ARD_script_structure
+- title: Next steps
+  navbar: Next steps
+  contents:
+  - apply-ARD

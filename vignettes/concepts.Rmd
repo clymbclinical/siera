@@ -1,0 +1,79 @@
+---
+title: "Concepts and conventions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{2. Concepts and conventions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(siera)
+```
+
+This vignette steps back from the "how" (covered in the other vignettes) to explain the "why" behind _siera_: what an Analysis Results Dataset (ARD) is good for, how _siera_ fits into the workflow, and the conventions you will see in the generated scripts and their output.
+
+## Why an ARD?
+
+Traditionally, analysis results have lived inside static outputs - the numbers in an RTF or PDF table. An **Analysis Results Dataset (ARD)** instead stores those same results as _machine-readable data_, one row per result, with metadata describing exactly what each number is. Once results are data, several things become a lot easier:
+
+- **QC** - results can be compared programmatically against an independent calculation, instead of by eye.
+- **Re-use across outputs** - the same result can feed a table, a figure, or a listing without being re-calculated.
+- **Re-use across reporting events** - results computed once can be carried into a later submission or a different deliverable.
+- **Creating final TFLs** - downstream packages such as [`tfrmt`](https://gsk-biostatistics.github.io/tfrmt/) and [`gtsummary`](https://www.danieldsjoberg.com/gtsummary/) format ARDs straight into submission-ready tables.
+
+_siera's_ job is to get you to an ARD without writing the analysis code by hand: you supply ARS metadata, and _siera_ writes the R that produces the ARD.
+
+## The siera pipeline
+
+```{r pipeline diagram, echo=FALSE, out.width="100%", fig.alt="ARS metadata is read by readARS(), which writes one R script per output; each script runs against ADaM datasets to produce an ARD."}
+knitr::include_graphics("figures/siera-pipeline.svg")
+```
+
+The flow is always the same:
+
+1. You start with **ARS metadata** (the Analysis Results Standard description of your reporting event), in either JSON or Excel format.
+2. You pass it to **`readARS()`**, which writes **one R script per Output** defined in the metadata.
+3. You run a generated script against your **ADaM datasets**, and the result is an **ARD** - one row per result, ready for downstream use.
+
+The statistical computation itself is performed by the [`cards`](https://insightsengineering.github.io/cards/) and [`cardx`](https://insightsengineering.github.io/cardx/) packages, whose functions _siera_ writes into the generated scripts (see the vignette on [using `cards` and `cardx`](using-cards.html)).
+
+## The seven ARS sections siera consumes
+
+ARS metadata describes a whole reporting event, but _siera_ only needs seven sections to generate code. It is worth knowing what each one contributes:
+
+| ARS section | What siera does with it |
+|---|---|
+| _mainListOfContents_ | Links each Output to its analyses, and sets the row order and indentation of the table stub. |
+| _otherListsOfContents_ | Supplies Output-level metadata (the list of planned outputs). |
+| _analysisSets_ | Defines the population filter for the Output (e.g. Safety Population, `SAFFL == "Y"`). |
+| _dataSubsets_ | Adds row-level filters for individual analyses (e.g. serious, treatment-emergent AEs). |
+| _analysisGroupings_ | Defines the columns/subgroups results are split by (e.g. treatment arm), including data-driven groupings discovered at run time. |
+| _analyses_ | Ties everything together for one calculation: which method, population, subset and groupings apply. |
+| _methods_ | Describes the operations to perform, and carries the dynamic R code template _siera_ fills in. |
+
+Each generated script is assembled from these pieces, and every result it produces carries identifiers back to them (see "Reading an ARD row" below).
+
+## JSON and XLSX parity
+
+ARS metadata officially travels as JSON, but _siera_ also accepts an Excel (XLSX) representation of the same information. **The two are semantically equivalent** - `readARS()` produces the same generated scripts either way, so you can choose whichever format fits your tooling. The examples shipped with the package include both (see `ARS_example()`).
+
+## Reading an ARD row: CDISC traceability columns
+
+A core promise of the ARD is _traceability_: every result can be traced back to the metadata that defines it. To make that possible, each row of a _siera_-generated ARD carries identifier columns alongside the statistic itself:
+
+- **`AnalysisId`** - which analysis produced the row.
+- **`operationid`** - which operation within the method (e.g. the `n` count vs. the `%`).
+- For each grouping applied to the analysis, a set of `group[n]_*` columns:
+  - **`group[n]_groupingId`** - the grouping the column belongs to (e.g. the treatment-arm grouping).
+  - **`group[n]_groupId`** - for **pre-defined groups** (groups listed explicitly in the metadata), the identifier of the specific group.
+  - **`group[n]_groupValue`** - for **data-driven groupings** (`dataDriven: true`, where the categories are discovered from the ADaM data at run time, e.g. cause of death or AE term), the actual value found in the data.
+
+The distinction matters: a treatment-arm grouping is usually pre-defined, so its rows carry `group1_groupId`; a grouping such as "cause of death" is typically data-driven, so its rows carry `group1_groupValue` with whatever categories appeared in the data. A single ARD can contain both. The [ARD program structure](ARD_script_structure.html) vignette shows where these columns are stamped on in the generated code.

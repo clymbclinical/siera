@@ -2,7 +2,7 @@
 title: "What do I do with my ARD?"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{4. apply-ARD}
+  %\VignetteIndexEntry{5. What do I do with my ARD?}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -24,8 +24,10 @@ An Analysis Results Dataset (ARD) has multiple uses.  Consisting of machine-read
 
 - QC datasets
 - re-using results for different outputs, e.g. figures or tables
-- re-using results for various reporting events 
+- re-using results for various reporting events
 - creating final TFLs
+
+(The [Concepts and conventions](concepts.html) vignette discusses _why_ an ARD makes these use cases easier.)
 
 ### Downstream R packages for table creation
 
