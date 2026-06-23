@@ -41,7 +41,7 @@ The flow is always the same:
 
 1. You start with **ARS metadata** (the Analysis Results Standard description of your reporting event), in either JSON or Excel format.
 2. You pass it to **`readARS()`**, which writes **one R script per Output** defined in the metadata.
-3. You run a generated script against your **ADaM datasets**, and the result is an **ARD** - one row per result, ready for downstream use.
+3. You run a generated script against your **ADaM datasets** - supplied as either CSV (`.csv`) or SAS transport (`.xpt`) files - and the result is an **ARD** - one row per result, ready for downstream use. siera reads each ADaM dataset according to its file extension (`.csv` with `readr::read_csv()`, `.xpt` with `haven::read_xpt()`), so no extra argument is needed.
 
 The statistical computation itself is performed by the [`cards`](https://insightsengineering.github.io/cards/) and [`cardx`](https://insightsengineering.github.io/cardx/) packages, whose functions _siera_ writes into the generated scripts (see the vignette on [using `cards` and `cardx`](using-cards.html)).
 

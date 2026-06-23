@@ -21,7 +21,10 @@
 
 \item{DataSubsets}{DataSubsets metadata for the reporting event.}
 
-\item{adam_path}{Directory containing the ADaM datasets on disk.}
+\item{adam_path}{Directory containing the ADaM datasets on disk. ADaM
+datasets may be supplied as CSV (`.csv`) or SAS transport (`.xpt`) files;
+the reader emitted for each dataset is chosen from the file extension found
+on disk (see [.generate_one_adam_read()]).}
 }
 \value{
 Character string containing the code used to load ADaM datasets.

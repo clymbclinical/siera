@@ -18,7 +18,14 @@ readARS(
 \item{output_path}{Path to store .R ARD scripts}
 
 \item{adam_path}{Path to folder containing ADaM datasets, to be run in
-ARD program}
+ARD program. Datasets may be supplied as CSV (`.csv`) or SAS transport
+(`.xpt`) files. siera chooses the reader for each dataset from the file
+extension found in this folder — `.csv` files are read with
+\code{readr::read_csv()} and `.xpt` files with \code{haven::read_xpt()} —
+so no extra argument is required (mirroring how the ARS input format is
+inferred from `.json` vs `.xlsx`). Reading `.xpt` datasets in the generated
+script requires the \pkg{haven} package. When both a `.csv` and a `.xpt`
+exist for the same dataset, the `.csv` is used.}
 
 \item{spec_output}{The output ID for a specific output to be run from
 the metadata}
