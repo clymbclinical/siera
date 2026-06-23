@@ -55,6 +55,7 @@ and can be ignored.
 | `R/DataSubsets.R` | Generates data subset filter code |
 | `R/AnalysisMethods.R` | Resolves method code templates and valueSource parameters |
 | `R/loadADaM.R` | Generates ADaM dataset loading code |
+| `R/DatasetJSON.R` | Generates the optional CDISC Dataset-JSON export block appended to ARD scripts (`output_format = "datasetjson"`) |
 | `R/libraries.R` | Generates [`library()`](https://rdrr.io/r/base/library.html) calls for generated scripts |
 | `R/program_header.R` | Generates programme header comments |
 | `inst/extdata/` | Example ARS files (JSON and XLSX) used in tests and examples |
@@ -159,6 +160,37 @@ and can be ignored.
   `group[n]_groupId` (pre-defined groups, via `case_when` on
   `group[n]_level`) or `group[n]_groupValue` (data-driven groupings).
   See `.generate_groupid_code()` in `readARS.R`.
+- **Empty-data guard** — generated method code is wrapped in
+  `if(nrow(df2_<analysisid>) != 0){ ... } else { df3_<analysisid> = data.frame(AnalysisId, MethodId, OutputId) }`
+  (see
+  [`.generate_analysis_method_section()`](https://clymbclinical.github.io/siera/reference/dot-generate_analysis_method_section.md)
+  in `AnalysisMethods.R` ~L94/L135 and `readARS.R` ~L461). When a data
+  subset is empty the cards call is skipped and only a stub row (no
+  statistics) is emitted. This is correct for n/continuous (“no data →
+  no stats”) but is the root cause of \#156: a 0-event risk difference
+  yields no estimate row (→ NA) instead of the conventional RD = 0. Any
+  fix must special-case RD methods while preserving the general guard.
+- **Dataset-JSON export** (`output_format = "datasetjson"`, issue \#160)
+  — appends a self-contained block (built by
+  `.generate_datasetjson_code()` in `R/DatasetJSON.R`) to each generated
+  `ARD_<Output>.R`. The block runs *at script runtime* (not generation
+  time) because the ARD’s column set is only known after sourcing; it
+  introspects `names(ARD)`, derives Dataset-JSON column metadata, and
+  writes `ARD_<Output>.json` beside the script via the optional
+  [datasetjson](https://atorus-research.github.io/datasetjson/) package
+  (Suggests, guarded with
+  [`requireNamespace()`](https://rdrr.io/r/base/ns-load.html) in the
+  emitted code — absent package → message, not error). Two runtime
+  gotchas it handles: (a) the ARD carries **four
+  [cards](https://github.com/insightsengineering/cards) list-columns**
+  (`stat`, `fmt_fun`, `warning`, `error`) that must be flattened to
+  atomic — `stat`→numeric, the rest→character; (b) variable **labels**
+  use a built-in dictionary for siera +
+  [cards](https://github.com/insightsengineering/cards) vocabulary plus
+  a `group[n]_(groupingId|groupId|groupValue|level)` regex, falling back
+  to the raw name for data-driven ADaM columns. NB: the `code_pattern`
+  block in `readARS.R` is dead code — `pattern`/`res`/`disp` are never
+  produced; the numeric result lives in the `stat` list-column.
 - **Internal functions** are prefixed with `.`
   (e.g. `.read_ars_metadata`). Only four symbols are exported:
   `readARS`, `ARS_example`, `ARD_script_example`, `%>%`.

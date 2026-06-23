@@ -62,7 +62,8 @@ datasets</p>
 <span>  <span class="va">ARS_path</span>,</span>
 <span>  output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  adam_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  spec_output <span class="op">=</span> <span class="st">""</span></span>
+<span>  spec_output <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  output_format <span class="op">=</span> <span class="st">"none"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -86,6 +87,16 @@ ARD program</p></dd>
 <dt id="arg-spec-output">spec_output<a class="anchor" aria-label="anchor" href="#arg-spec-output"></a></dt>
 <dd><p>The output ID for a specific output to be run from
 the metadata</p></dd>
+
+
+<dt id="arg-output-format">output_format<a class="anchor" aria-label="anchor" href="#arg-output-format"></a></dt>
+<dd><p>Format for emitting the generated ARD. Must be exactly
+one of `"none"` or `"datasetjson"` (no partial matching). `"none"`
+(default) generates the ARD scripts only. `"datasetjson"` additionally
+appends code that writes each ARD as a CDISC Dataset-JSON file
+(`ARD_&lt;OutputId&gt;.json`) when the generated script is run. The
+Dataset-JSON export requires the optional <span class="pkg">datasetjson</span> package to be
+installed in the environment that runs the generated script.</p></dd>
 
 </dl></div>
     <div class="section level2">

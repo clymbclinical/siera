@@ -11,7 +11,8 @@ readARS(
   ARS_path,
   output_path = tempdir(),
   adam_path = tempdir(),
-  spec_output = ""
+  spec_output = "",
+  output_format = "none"
 )
 ```
 
@@ -32,6 +33,16 @@ readARS(
 - spec_output:
 
   The output ID for a specific output to be run from the metadata
+
+- output_format:
+
+  Format for emitting the generated ARD. Must be exactly one of
+  \`"none"\` or \`"datasetjson"\` (no partial matching). \`"none"\`
+  (default) generates the ARD scripts only. \`"datasetjson"\`
+  additionally appends code that writes each ARD as a CDISC Dataset-JSON
+  file (\`ARD\_\<OutputId\>.json\`) when the generated script is run.
+  The Dataset-JSON export requires the optional datasetjson package to
+  be installed in the environment that runs the generated script.
 
 ## Value
 
