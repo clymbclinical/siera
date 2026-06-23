@@ -10,6 +10,13 @@
 #'  ARD program
 #' @param spec_output The output ID for a specific output to be run from
 #' the metadata
+#' @param output_format Format for emitting the generated ARD. Must be exactly
+#'  one of `"none"` or `"datasetjson"` (no partial matching). `"none"`
+#'  (default) generates the ARD scripts only. `"datasetjson"` additionally
+#'  appends code that writes each ARD as a CDISC Dataset-JSON file
+#'  (`ARD_<OutputId>.json`) when the generated script is run. The
+#'  Dataset-JSON export requires the optional \pkg{datasetjson} package to be
+#'  installed in the environment that runs the generated script.
 #'
 #' @importFrom readxl read_excel
 #'
@@ -33,7 +40,19 @@
 readARS <- function(ARS_path,
                     output_path = tempdir(),
                     adam_path = tempdir(),
-                    spec_output = "") {
+                    spec_output = "",
+                    output_format = "none") {
+  # Strict validation: no partial matching, omitted/NULL -> "none"
+  if (is.null(output_format)) {
+    output_format <- "none"
+  }
+  if (length(output_format) != 1L ||
+      !output_format %in% c("none", "datasetjson")) {
+    cli::cli_abort(c(
+      "{.arg output_format} must be one of {.val none} or {.val datasetjson}.",
+      "x" = "You supplied {.val {output_format}}."
+    ))
+  }
   code_libraries <- .generate_library_code()
 
   # Read in ARS metadata ----------------------------------------------------
@@ -393,6 +412,14 @@ readARS <- function(ARS_path,
       combine_analysis_code,
       ") "
     )
+
+    # Optionally append CDISC Dataset-JSON export code ----
+    if (output_format == "datasetjson") {
+      code_output <- paste0(
+        code_output,
+        .generate_datasetjson_code(Output, output_path)
+      )
+    }
 
     writeLines(
       code_output,
