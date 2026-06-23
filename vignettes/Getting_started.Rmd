@@ -24,6 +24,18 @@ A modified *CDISC Common Safety Displays* ARS metadata (xlsx format, with exampl
 
 In order to facilitate the example, _siera_ includes several example files, which we use throughout the documentation.  These include several ARS files (json and xlsx), as well as csv-format ADaMs which can be run with the R scripts produced by readARS function. Use the helper ARS_example() with no arguments to list them or call it with an example filename to get the path.
 
+### What you will produce
+
+Before we start, it helps to see where we are headed.  The end product of _siera_ is an **Analysis Results Dataset (ARD)** - one result per row, in machine-readable form.  Below is the ARD for a Demographics output, produced by running one of the example scripts that _siera_ generates (more on running scripts further down).  This is what we are building toward:
+
+```{r target ARD, message=FALSE, warning=FALSE}
+# Run a ready-made example script shipped with siera; the result is the object `ARD`
+source(ARD_script_example("ARD_Out14-1-1.R"))
+head(ARD)
+```
+
+Each row carries the statistic together with metadata (such as `AnalysisId` and the grouping columns) that traces it back to the ARS definition.  The [Concepts and conventions](concepts.html) vignette explains these traceability columns in more detail.
+
 ```{r example files}
 # To see a list of example files:
 ARS_example()
@@ -44,9 +56,9 @@ The ARS metadata contains all ARS information for the Reporting Event. This info
 - _analyses_ (contains linking information to all components required for calculation of results)
 - _methods_ (describes operations to be performed on data to get results)
 
+For a fuller treatment of what each of these sections is for, and how they flow through _siera_, see the [Concepts and conventions](concepts.html) vignette.
 
-
-### Example 
+### Example
 
 The _readARS_ function reads in a completed ARS metadata file, and generates R scripts for each Output defined in the file.  Below is an example of how this can be done using a ready-to-use ARS metadata Excel file (note that this is meant as an example.  Official ARS metadata is in json format, which can also be passed to the _readARS_ function):
 
@@ -70,12 +82,14 @@ ADaM_folder <- tempdir()
 readARS(ARS_path, output_folder, ADaM_folder)
 ```
 
-You should now have 5 R scripts (named ARD_Out14-1-1.R, ARD_Out14-3-1-1.R, ARD_Out14-3-2-1.R, ARD_Out14-3-3-1a.R, and ARD_Out14-3-3-1b.R) in the folder specified as _output_folder_.  You can execute any of these 5 R scripts as-is (assuming the ADaM required for this script is available in the _ADaM_folder_), and the result will be an ARD (one result per row format) for each of the scripts.  
+You should now have 5 R scripts (named ARD_Out14-1-1.R, ARD_Out14-3-1-1.R, ARD_Out14-3-2-1.R, ARD_Out14-3-3-1a.R, and ARD_Out14-3-3-1b.R) in the folder specified as _output_folder_.  You can execute any of these 5 R scripts as-is (assuming the ADaM required for this script is available in the _ADaM_folder_), and the result will be an ARD (one result per row format) for each of the scripts.
+
+The generated scripts are portable across operating systems: any Windows-style backslashes in the ADaM path are normalised to forward slashes, so a script generated on Windows runs unchanged on macOS or Linux (and vice versa).
 
 #### Running a auto-generated ARD script
-The structure of the auto-generated ARD script is discussed the the [ARD structure](ARD_script_structure.html) vignette.  Examples of such an auto-generated ARD scripts are included in the package, and can be used by using the `ARD_script_example` function. Running this script will look like this:
+The structure of the auto-generated ARD script is discussed in the [ARD structure](ARD_script_structure.html) vignette.  Examples of such auto-generated ARD scripts are included in the package, and can be accessed with the `ARD_script_example` function. Running one (as we did to produce the preview at the top of this vignette) looks like this:
 
-```{r run ARD_xxx, message=FALSE, warning=FALSE, eval=TRUE}
+```{r run ARD_xxx, message=FALSE, warning=FALSE, eval=FALSE}
 # Step 1: open ARD_xxx.R file
 # Step 2: Confirm the location of ADaM dataset(s) is correct in the code section "Load ADaM".
 # For the sake of simplicity, the only update made to the ARD_Out14-1-1.R script was to point to the ADaM folder to ARS_example("ADSL.csv")
