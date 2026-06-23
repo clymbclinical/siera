@@ -105,6 +105,21 @@ ARS metadata. This can be visualized as follows:</p>
 <span><span class="co"># Section 4b (subsequent Analyses): Code to calculate results as an ARD</span></span>
 <span></span>
 <span><span class="co"># Section 5: Append Analysis-level ARDs</span></span></code></pre></div>
+<p>Section 3 (“Load ADaM datasets”) reads each ADaM dataset referenced
+by the output. siera supports two on-disk formats and chooses the reader
+from each file’s extension: CSV (<code>.csv</code>) files are read with
+<code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_csv()</a></code>, and SAS transport (<code>.xpt</code>)
+files with <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code>. This mirrors how the ARS
+input format is inferred from <code>.json</code> vs <code>.xlsx</code>,
+so no extra argument is needed - just point <code><a href="../reference/readARS.html">readARS()</a></code> at a
+folder of <code>.csv</code> or <code>.xpt</code> ADaMs. Reading
+<code>.xpt</code> datasets requires the <code>haven</code> package to be
+installed. The file lookup is case-insensitive, so the lower-case file
+names typical of regulatory submissions (e.g. <code>adsl.xpt</code>) are
+matched to the upper-case dataset names in the ARS metadata
+(<code>ADSL</code>). When both a <code>.csv</code> and a
+<code>.xpt</code> exist for the same dataset, the <code>.csv</code> is
+used.</p>
 <div class="section level3">
 <h3 id="analysis-level-code-to-calculate-ards">Analysis-level code to calculate ARDs<a class="anchor" aria-label="anchor" href="#analysis-level-code-to-calculate-ards"></a>
 </h3>

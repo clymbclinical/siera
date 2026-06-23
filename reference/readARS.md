@@ -28,7 +28,17 @@ readARS(
 
 - adam_path:
 
-  Path to folder containing ADaM datasets, to be run in ARD program
+  Path to folder containing ADaM datasets, to be run in ARD program.
+  Datasets may be supplied as CSV (\`.csv\`) or SAS transport (\`.xpt\`)
+  files. siera chooses the reader for each dataset from the file
+  extension found in this folder — \`.csv\` files are read with
+  [`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html)
+  and \`.xpt\` files with
+  [`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html)
+  — so no extra argument is required (mirroring how the ARS input format
+  is inferred from \`.json\` vs \`.xlsx\`). Reading \`.xpt\` datasets in
+  the generated script requires the haven package. When both a \`.csv\`
+  and a \`.xpt\` exist for the same dataset, the \`.csv\` is used.
 
 - spec_output:
 

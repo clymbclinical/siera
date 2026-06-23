@@ -78,7 +78,16 @@ arguments:
     Event (JSON or xlsx)
 2.  An output directory where the R scripts will be placed
 3.  A folder containing the related ADaM datasets for the ARDs to be
-    generated
+    generated, supplied as either CSV (`.csv`) or SAS transport (`.xpt`)
+    files
+
+siera picks the reader for each ADaM dataset from its file extension —
+`.csv` files are read with
+[`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html)
+and `.xpt` files with
+[`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html)
+— just as the ARS input format is inferred from `.json` vs `.xlsx`. No
+extra argument is needed.
 
 See the [Getting
 Started](https://clymbclinical.github.io/siera/articles/Getting_started.html)

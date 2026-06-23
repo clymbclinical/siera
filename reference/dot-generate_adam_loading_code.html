@@ -91,7 +91,10 @@ the returned code block.</p>
 
 
 <dt id="arg-adam-path">adam_path<a class="anchor" aria-label="anchor" href="#arg-adam-path"></a></dt>
-<dd><p>Directory containing the ADaM datasets on disk.</p></dd>
+<dd><p>Directory containing the ADaM datasets on disk. ADaM
+datasets may be supplied as CSV (`.csv`) or SAS transport (`.xpt`) files;
+the reader emitted for each dataset is chosen from the file extension found
+on disk (see [.generate_one_adam_read()]).</p></dd>
 
 </dl></div>
     <div class="section level2">

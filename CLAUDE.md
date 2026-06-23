@@ -54,7 +54,7 @@ and can be ignored.
 | `R/AnalysisSet.R` | Generates analysis set (population) filter code |
 | `R/DataSubsets.R` | Generates data subset filter code |
 | `R/AnalysisMethods.R` | Resolves method code templates and valueSource parameters |
-| `R/loadADaM.R` | Generates ADaM dataset loading code |
+| `R/loadADaM.R` | Generates ADaM dataset loading code (CSV via [`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html) or XPT via [`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html), chosen per dataset by file extension) |
 | `R/DatasetJSON.R` | Generates the optional CDISC Dataset-JSON export block appended to ARD scripts (`output_format = "datasetjson"`) |
 | `R/libraries.R` | Generates [`library()`](https://rdrr.io/r/base/library.html) calls for generated scripts |
 | `R/program_header.R` | Generates programme header comments |
@@ -191,6 +191,29 @@ and can be ignored.
   to the raw name for data-driven ADaM columns. NB: the `code_pattern`
   block in `readARS.R` is dead code — `pattern`/`res`/`disp` are never
   produced; the numeric result lives in the `stat` list-column.
+- **ADaM input format (CSV or XPT, issue \#161)** — `adam_path` may hold
+  CSV (`.csv`) or SAS transport (`.xpt`) ADaM files; siera picks the
+  reader **per dataset at generation time** from the extension found on
+  disk (no
+  [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+  argument, mirroring `.json`/`.xlsx` ARS dispatch).
+  [`.generate_one_adam_read()`](https://clymbclinical.github.io/siera/reference/dot-generate_one_adam_read.md)
+  in `R/loadADaM.R` resolves the file: it prefers an exact-case match,
+  else does a **case-insensitive**
+  [`list.files()`](https://rdrr.io/r/base/list.files.html) lookup (real
+  submission XPTs are lower-case like `adsl.xpt` while ARS names
+  datasets upper-case `ADSL`), and emits the real on-disk path.
+  `.csv`→[`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html),
+  `.xpt`→[`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html);
+  **CSV wins when both exist**; when neither exists it falls back to the
+  conventional `<dataset>.csv` path (so example/placeholder
+  [`tempdir()`](https://rdrr.io/r/base/tempfile.html) folders still
+  generate csv code, keeping old tests/examples green). `haven` is in
+  Suggests (was added for the eTFL suite) and the emitted call is
+  namespace-qualified — no
+  [`library(haven)`](https://haven.tidyverse.org) is generated, so
+  xpt-free scripts don’t require haven. The object on the LHS is always
+  the metadata dataset name regardless of the file’s case.
 - **Internal functions** are prefixed with `.`
   (e.g. `.read_ars_metadata`). Only four symbols are exported:
   `readARS`, `ARS_example`, `ARD_script_example`, `%>%`.
@@ -498,4 +521,4 @@ after the xlsx templates are updated, then
 - Add tests for all new code; ensure every new branch has test coverage
   for its changes.
 - Ask clarifying questions and check for understanding when there is
-  uncertainty about a request or approach.
+  uncertainty about a request or approach. Rather ask than guess.

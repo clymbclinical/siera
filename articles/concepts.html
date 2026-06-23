@@ -128,8 +128,13 @@ format.</li>
 <li>You pass it to <strong><code><a href="../reference/readARS.html">readARS()</a></code></strong>, which writes
 <strong>one R script per Output</strong> defined in the metadata.</li>
 <li>You run a generated script against your <strong>ADaM
-datasets</strong>, and the result is an <strong>ARD</strong> - one row
-per result, ready for downstream use.</li>
+datasets</strong> - supplied as either CSV (<code>.csv</code>) or SAS
+transport (<code>.xpt</code>) files - and the result is an
+<strong>ARD</strong> - one row per result, ready for downstream use.
+siera reads each ADaM dataset according to its file extension
+(<code>.csv</code> with <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_csv()</a></code>,
+<code>.xpt</code> with <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code>), so no extra
+argument is needed.</li>
 </ol>
 <p>The statistical computation itself is performed by the <a href="https://insightsengineering.github.io/cards/" class="external-link"><code>cards</code></a>
 and <a href="https://insightsengineering.github.io/cardx/" class="external-link"><code>cardx</code></a>

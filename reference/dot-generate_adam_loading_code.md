@@ -37,7 +37,10 @@ included in the returned code block.
 
 - adam_path:
 
-  Directory containing the ADaM datasets on disk.
+  Directory containing the ADaM datasets on disk. ADaM datasets may be
+  supplied as CSV (\`.csv\`) or SAS transport (\`.xpt\`) files; the
+  reader emitted for each dataset is chosen from the file extension
+  found on disk (see \[.generate_one_adam_read()\]).
 
 ## Value
 

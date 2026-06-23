@@ -4,6 +4,16 @@
 
 CRAN release: 2026-06-17
 
+- Accepted SAS transport (`.xpt`) ADaM datasets in addition to CSV.
+  [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+  chooses the reader for each ADaM dataset from its file extension
+  (`.csv` via
+  [`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html),
+  `.xpt` via
+  [`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html)),
+  with no new argument; the file lookup is case-insensitive so
+  lower-case submission file names (e.g. `adsl.xpt`) match upper-case
+  ARS dataset names. Reading `.xpt` requires the `haven` package.
 - Fixed
   [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
   crash when ARS metadata contains no `referencedAnalysisOperations`

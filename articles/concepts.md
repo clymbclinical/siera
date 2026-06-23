@@ -47,8 +47,15 @@ The flow is always the same:
 2.  You pass it to
     **[`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)**,
     which writes **one R script per Output** defined in the metadata.
-3.  You run a generated script against your **ADaM datasets**, and the
+3.  You run a generated script against your **ADaM datasets** - supplied
+    as either CSV (`.csv`) or SAS transport (`.xpt`) files - and the
     result is an **ARD** - one row per result, ready for downstream use.
+    siera reads each ADaM dataset according to its file extension
+    (`.csv` with
+    [`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html),
+    `.xpt` with
+    [`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html)),
+    so no extra argument is needed.
 
 The statistical computation itself is performed by the
 [`cards`](https://insightsengineering.github.io/cards/) and

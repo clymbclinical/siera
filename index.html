@@ -113,8 +113,9 @@
 <ol style="list-style-type: decimal">
 <li>A functional ARS file, representing ARS Metadata for a Reporting Event (JSON or xlsx)</li>
 <li>An output directory where the R scripts will be placed</li>
-<li>A folder containing the related ADaM datasets for the ARDs to be generated</li>
+<li>A folder containing the related ADaM datasets for the ARDs to be generated, supplied as either CSV (<code>.csv</code>) or SAS transport (<code>.xpt</code>) files</li>
 </ol>
+<p>siera picks the reader for each ADaM dataset from its file extension — <code>.csv</code> files are read with <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_csv()</a></code> and <code>.xpt</code> files with <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> — just as the ARS input format is inferred from <code>.json</code> vs <code>.xlsx</code>. No extra argument is needed.</p>
 <p>See the <a href="https://clymbclinical.github.io/siera/articles/Getting_started.html">Getting Started</a> vignette for examples and more detail on the process.</p>
 <div class="section level3">
 <h3 id="more-info">More info:<a class="anchor" aria-label="anchor" href="#more-info"></a>
