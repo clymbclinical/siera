@@ -132,6 +132,10 @@ and can be ignored.
   contain spurious rows whose placeholder tokens are absent from the
   template (false positives). Never check the generated code string —
   the runtime-resolved values won’t match the placeholder names.
+  **Practical consequence**: `by_stmt` resolves to `n_group_cols = 0`
+  (no group stamping, no `group1_groupingId` etc. in the ARD). Any
+  method that must emit CDISC-compliant group metadata columns must use
+  `by_listc` (or `by_vars`/`strata_vars`) — not `by_stmt`.
 - **`group_condition_value` in JSON is a list-column** — jsonlite always
   returns `condition.value` as a list, even for single-element EQ
   arrays. The JSON parser must call
@@ -375,6 +379,31 @@ after the xlsx templates are updated, then
 - Example ARS files live in `inst/extdata/` (`exampleARS_1` –
   `exampleARS_6`, both `.json` and `.xlsx`). Retrieve them in tests via
   `ARS_example("exampleARS_6.json")`.
+- **eTFL Portal integration testing** — `tests/testthat/testdata/etfl/`
+  holds the CDISC eTFL Portal fixtures unzipped into three subfolders
+  (no `.zip` files are committed): `metadata/<table>-siera.json` (ARS
+  metadata enriched with `codeTemplate` + `parameters` so siera emits
+  runnable scripts), `adam/<table>/*.xpt` (the ADaM data for that
+  table), and `reference/<table>-ard.json` (the published reference
+  ARD). `test-etfl-regression.R` runs the full pipeline for each of the
+  12 tables and compares the computed statistics against the reference
+  ARD; the machinery lives in `helper-etfl.R` (`.run_etfl_pipeline()`
+  reads XPT via
+  [`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html)
+  → CSV →
+  [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+  → sources the script; `.load_etfl_reference()`; the
+  `.cmp_bigN/.cmp_n_pct/.cmp_n_pct_2level/.cmp_continuous/.cmp_rd`
+  comparators; and `.expect_all_match()`). Reference ARDs are
+  Dataset-JSON; load with
+  `jsonlite::fromJSON(..., simplifyDataFrame=FALSE, simplifyVector=FALSE)`
+  to avoid row-parsing failures. `fda-ds-t04` derives `DISCONFL` from
+  `DCTREAS` via the `adsl_transform` hook. Known-limitation analyses are
+  exercised but not asserted: 0-event risk difference returns `NA`
+  (#156), per-term/per-category RD is not emitted (#157), and top-N AE
+  per-term subject counts can differ (#158). The raw XPT/JSON is ~28 MB
+  in the working tree but git-packs and tarball-gzips to ~2 MB, so it
+  ships fine for CRAN.
 
 ## Documentation and vignettes
 
