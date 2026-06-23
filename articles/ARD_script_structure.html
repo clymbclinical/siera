@@ -38,10 +38,17 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/apply-ARD.html">What do I do with my ARD?</a></li>
-    <li><a class="dropdown-item" href="../articles/ARD_script_structure.html">ARD program structure</a></li>
-    <li><a class="dropdown-item" href="../articles/Getting_started.html">Getting Started</a></li>
+<li><a class="dropdown-item" href="../articles/Getting_started.html">Getting Started</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
+    <li><a class="dropdown-item" href="../articles/concepts.html">Concepts and conventions</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Guides</h6></li>
     <li><a class="dropdown-item" href="../articles/using-cards.html">Making use of `cards` and `cardx`</a></li>
+    <li><a class="dropdown-item" href="../articles/ARD_script_structure.html">ARD program structure</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Next steps</h6></li>
+    <li><a class="dropdown-item" href="../articles/apply-ARD.html">What do I do with my ARD?</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -66,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>ARD program structure</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/clymbclinical/siera/blob/v0.5.6/vignettes/ARD_script_structure.Rmd" class="external-link"><code>vignettes/ARD_script_structure.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/clymbclinical/siera/blob/main/vignettes/ARD_script_structure.Rmd" class="external-link"><code>vignettes/ARD_script_structure.Rmd</code></a></small>
       <div class="d-none name"><code>ARD_script_structure.Rmd</code></div>
     </div>
 
@@ -170,8 +177,8 @@ back to ARS metadata. See example below:</p>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">TRT01A</span>, <span class="va">RACE</span>, <span class="va">USUBJID</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>dummy <span class="op">=</span> <span class="st">"dummyvar"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># pass calculate subjects counts and % (based on big N) grouped by treatment and race</span></span>
-<span><span class="fu">cards</span><span class="fu">::</span><span class="fu"><a href="https://insightsengineering.github.io/cards/latest-tag/reference/deprecated.html" class="external-link">ard_categorical</a></span><span class="op">(</span></span>
+<span><span class="co"># calculate subject counts and % (based on big N) grouped by treatment and race</span></span>
+<span><span class="va">df3_An03_05_Race_Summ_ByTrt</span> <span class="op">&lt;-</span> <span class="fu">cards</span><span class="fu">::</span><span class="fu"><a href="https://insightsengineering.github.io/cards/latest-tag/reference/ard_tabulate.html" class="external-link">ard_tabulate</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">in_data</span>,</span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRT01A"</span>, <span class="st">"RACE"</span><span class="op">)</span>,</span>
 <span>  variables <span class="op">=</span> <span class="st">"dummy"</span>,</span>
@@ -186,13 +193,44 @@ back to ARS metadata. See example below:</p>
 <span>    <span class="va">stat_name</span> <span class="op">==</span> <span class="st">"p"</span> <span class="op">~</span> <span class="st">"Mth01_2_pct"</span></span>
 <span>  <span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># add ARS metadata IDs to the dataset to enable tracing each result back to ARS metadata</span></span>
+<span><span class="co"># stamp CDISC ARD traceability metadata so each result traces back to the ARS definition</span></span>
 <span><span class="va">df3_An03_05_Race_Summ_ByTrt</span> <span class="op">&lt;-</span> <span class="va">df3_An03_05_Race_Summ_ByTrt</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    AnalysisId <span class="op">=</span> <span class="st">"An03_05_Race_Summ_ByTrt"</span>,</span>
 <span>    MethodId <span class="op">=</span> <span class="st">"Mth01"</span>,</span>
-<span>    OutputId <span class="op">=</span> <span class="st">"Out14-1-1"</span></span>
+<span>    OutputId <span class="op">=</span> <span class="st">"Out14-1-1"</span>,</span>
+<span>    <span class="co"># the grouping this column belongs to (here: the treatment-arm grouping)</span></span>
+<span>    group1_groupingId <span class="op">=</span> <span class="st">"AnlsGrouping_01_Trt"</span>,</span>
+<span>    <span class="co"># for pre-defined groups, map each observed level to its ARS group id</span></span>
+<span>    group1_groupId <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">group1_level</span><span class="op">)</span> <span class="op">==</span> <span class="st">"Placebo"</span>              <span class="op">~</span> <span class="st">"AnlsGrouping_01_Trt_1"</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">group1_level</span><span class="op">)</span> <span class="op">==</span> <span class="st">"Xanomeline Low Dose"</span>  <span class="op">~</span> <span class="st">"AnlsGrouping_01_Trt_2"</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">group1_level</span><span class="op">)</span> <span class="op">==</span> <span class="st">"Xanomeline High Dose"</span> <span class="op">~</span> <span class="st">"AnlsGrouping_01_Trt_3"</span></span>
+<span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
+<p>This example uses the current <code>cards</code> function name
+<code>ard_tabulate()</code> (formerly <code>ard_categorical()</code>);
+see the <a href="using-cards.html">using <code>cards</code> and
+<code>cardx</code></a> vignette for the full list of renames.</p>
+<p>The final <code>mutate()</code> is where <em>siera</em> stamps the
+<strong>CDISC ARD traceability columns</strong> onto every row. For each
+grouping applied to the analysis you will see a
+<code>group[n]_groupingId</code> (which grouping the column belongs to)
+plus one of:</p>
+<ul>
+<li>
+<code>group[n]_groupId</code> - for <strong>pre-defined
+groups</strong> (groups listed in the metadata, like treatment arms),
+mapped from <code>group[n]_level</code> via <code>case_when()</code>, as
+above; or</li>
+<li>
+<code>group[n]_groupValue</code> - for <strong>data-driven
+groupings</strong> (<code>dataDriven: true</code>, where categories such
+as cause of death are discovered from the ADaM data at run time),
+capturing the discovered value directly.</li>
+</ul>
+<p>See the <a href="concepts.html">Concepts and conventions</a> vignette
+for the full picture of these traceability columns.</p>
 </div>
 </div>
 <div class="section level3">
@@ -219,6 +257,22 @@ are all appened to create output-level ARD. See example below:</p>
 <span>  <span class="va">df3_An03_06_Height_Summ_ByTrt</span>,</span>
 <span>  <span class="va">df3_An03_06_Height_Comp_ByTrt</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="deeper-tables-and-more-groupings">Deeper tables and more groupings<a class="anchor" aria-label="anchor" href="#deeper-tables-and-more-groupings"></a>
+</h3>
+<p>The same pattern scales without special handling on your part:</p>
+<ul>
+<li>
+<strong>Arbitrarily deep table hierarchies</strong> - the table stub
+(defined in <em>mainListOfContents</em>) can nest as deeply as your
+output requires; there is no longer a three-level limit.</li>
+<li>
+<strong>More than three grouping factors</strong> - an analysis can
+be split by four or more groupings at once (e.g. Treatment x Age group x
+Sex x Region). Each grouping simply adds its own <code>group[n]_*</code>
+set of columns to the ARD.</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>

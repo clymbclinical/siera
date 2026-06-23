@@ -124,10 +124,14 @@ and can be ignored.
   groupings are present in `AnalysisGroupings`.
 - **`n_group_cols` determination** — the number of `group[n]` columns a
   method produces differs from `num_grp` when the last grouping goes to
-  `variables=` instead of `by=`. Always inspect the *resolved*
-  `code_method` string for the presence of `by_vars`/`strata_vars` or
-  `by_listc` substrings. Do NOT check the parameter table — it can
-  contain spurious unused parameters that give false positives.
+  `variables=` instead of `by=`. This is determined by
+  `.n_group_cols_from_template()` in `readARS.R`, which checks which
+  valueSource types (`by_vars`, `strata_vars`, `by_listc`) appear in
+  parameters whose placeholder tokens are actually present in the
+  method’s code template. Never check the parameter table alone — it can
+  contain spurious rows whose placeholder tokens are absent from the
+  template (false positives). Never check the generated code string —
+  the runtime-resolved values won’t match the placeholder names.
 - **`group_condition_value` in JSON is a list-column** — jsonlite always
   returns `condition.value` as a list, even for single-element EQ
   arrays. The JSON parser must call
@@ -321,14 +325,39 @@ denom <- df_pop |> dplyr::count(TRT01A) |> dplyr::rename(`...ard_N...` = n)
 cards::ard_tabulate(data = in_data, by = 'TRT01A', variables = 'AGEGR1', denominator = denom)
 ```
 
-Do not modify the test fixture xlsx files in `inst/extdata/` — the
-package owner updates those separately. The example R scripts in
-`inst/script/` are pre-generated and committed; regenerate them manually
-using
+**Where the cards API in generated output actually comes from:** the
+`cards`/`cardx` function names and argument patterns in generated (and
+`inst/script/`) ARDs are copied verbatim from the ARS metadata’s
+`AnalysisMethodCodeTemplate.templateCode` — siera only substitutes the
+placeholder parameters, it does not rewrite the cards calls.
+**Consequence:** you cannot bring generated scripts onto a newer cards
+API by editing siera’s R code or the vignettes alone; the example
+metadata’s `templateCode` must be updated. The bundled
+`Common_Safety_Displays_cards.xlsx` carries the templates in the
+`AnalysisMethodCodeTemplate` sheet (`templateCode` column, 5 rows). A
+name-only swap (`ard_categorical`→`ard_tabulate`,
+`ard_continuous`→`ard_summary`) runs fine on current cards —
+`ard_tabulate()` still accepts the legacy
+`by = c('grp','var'), variables = 'dummy', denominator = raw_df`
+pattern, so the “old” denominator pattern above still executes and
+yields identical results even though the `...ard_N...` form is preferred
+for new templates.
+
+Do not modify the test fixture xlsx files in `inst/extdata/` without
+explicit owner authorisation — the package owner normally updates those
+separately. (In PR \#162 the owner did authorise renaming the cards
+functions in `templateCode`; that edit was made with
+`openxlsx::loadWorkbook()` → `writeData()` on the single column →
+`saveWorkbook()`, which preserves all 24 sheets — verify the sheet count
+and re-run
 [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
-after the xlsx templates are updated, then adjust the ADaM-loading lines
-to use
-[`siera::ARS_example()`](https://clymbclinical.github.io/siera/reference/ARS_example.md).
+afterwards.) The example R scripts in `inst/script/` are pre-generated
+and committed; regenerate them manually using
+[`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+after the xlsx templates are updated, then
+[`gsub()`](https://rdrr.io/r/base/grep.html) the ADaM-loading
+`readr::read_csv('…/<DS>.csv'` lines to
+`readr::read_csv(siera::ARS_example("<DS>.csv")`.
 
 ## Test conventions
 
@@ -346,6 +375,48 @@ to use
 - Example ARS files live in `inst/extdata/` (`exampleARS_1` –
   `exampleARS_6`, both `.json` and `.xlsx`). Retrieve them in tests via
   `ARS_example("exampleARS_6.json")`.
+
+## Documentation and vignettes
+
+- **Keep documentation and functionality in sync.** Any user-visible
+  change — a new feature, a behaviour change, a change to
+  generated-script or ARD output, or a new capability the user should
+  know about — must be reflected in the documentation (vignettes,
+  README, and `NEWS.md`) as part of the same change, not deferred. Treat
+  user-facing docs as part of the definition of done. When in doubt
+  about whether a change is user-visible, assume it is and update the
+  docs. The `siera-docs-refresh` skill automates a full documentation
+  pass.
+- Five vignettes, ordered via the number prefix in
+  `%\VignetteIndexEntry{}`: 1. `Getting_started`, 2. `concepts`
+  (Concepts and conventions), 3. `using-cards`, 4.
+  `ARD_script_structure`, 5. `apply-ARD`. Keep the prefixes in sync with
+  `_pkgdown.yml` if reordering.
+- `_pkgdown.yml` groups the Articles navbar (Get started / Concepts /
+  Guides / Next steps). The reference index is intentionally left
+  ungrouped.
+- The pipeline diagram is a hand-authored static **SVG** (CRAN-safe, no
+  new dependency), committed twice:
+  `vignettes/figures/siera-pipeline.svg` (used by `concepts.Rmd` via
+  [`knitr::include_graphics()`](https://rdrr.io/pkg/knitr/man/include_graphics.html))
+  and `man/figures/siera-pipeline.svg` (used by the README / pkgdown
+  home). Update both copies together.
+- **Verifying vignettes without Pandoc:** full
+  [`rmarkdown::render()`](https://pkgs.rstudio.com/rmarkdown/reference/render.html)
+  / `build_vignettes()` needs Pandoc (unavailable locally), but
+  `knitr::knit(vig, output = tempfile())` executes all chunks without
+  Pandoc — use it to confirm chunks run. `Getting_started.Rmd` has a
+  **live** chunk that [`source()`](https://rdrr.io/r/base/source.html)s
+  an `inst/script/` example and prints `head(ARD)`, so it requires
+  `cards`/`cardx` installed and the example scripts to be current.
+- Tone is conversational, second-person, tutorial-style with
+  inline-commented chunks; match it when editing docs. Audience is
+  clinical-trial practitioners, not R developers.
+- `README.Rmd`’s install chunks lack `eval=FALSE`, so re-knitting would
+  actually run
+  [`install.packages()`](https://rdrr.io/r/utils/install.packages.html)/`install_github()`.
+  For small static edits, change `README.Rmd` and `README.md` by hand in
+  sync rather than re-knitting.
 
 ## Notes:
 
@@ -365,3 +436,5 @@ to use
   changes (this is a public-facing CRAN package).
 - Add tests for all new code; ensure every new branch has test coverage
   for its changes.
+- Ask clarifying questions and check for understanding when there is
+  uncertainty about a request or approach.

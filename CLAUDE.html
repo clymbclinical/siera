@@ -18,10 +18,17 @@
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="articles/apply-ARD.html">What do I do with my ARD?</a></li>
-    <li><a class="dropdown-item" href="articles/ARD_script_structure.html">ARD program structure</a></li>
-    <li><a class="dropdown-item" href="articles/Getting_started.html">Getting Started</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="articles/Getting_started.html">Getting Started</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
+    <li><a class="dropdown-item" href="articles/concepts.html">Concepts and conventions</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Guides</h6></li>
     <li><a class="dropdown-item" href="articles/using-cards.html">Making use of `cards` and `cardx`</a></li>
+    <li><a class="dropdown-item" href="articles/ARD_script_structure.html">ARD program structure</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Next steps</h6></li>
+    <li><a class="dropdown-item" href="articles/apply-ARD.html">What do I do with my ARD?</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -35,7 +42,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="logo.png" class="logo" alt=""><h1>CLAUDE.md</h1>
-      <small class="dont-index">Source: <a href="https://github.com/clymbclinical/siera/blob/v0.5.6/CLAUDE.md" class="external-link"><code>CLAUDE.md</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/clymbclinical/siera/blob/main/CLAUDE.md" class="external-link"><code>CLAUDE.md</code></a></small>
     </div>
 
 <div id="claudemd" class="section level1">
@@ -135,7 +142,7 @@
 <li>
 <strong>Dynamic grouping</strong> (<code>AG_vars</code>, <code>AG_var1/2/3…</code>) supports 1–N grouping factors; the code generation branches on how many <code>resultsBy</code> groupings are present in <code>AnalysisGroupings</code>.</li>
 <li>
-<strong><code>n_group_cols</code> determination</strong> — the number of <code>group[n]</code> columns a method produces differs from <code>num_grp</code> when the last grouping goes to <code>variables=</code> instead of <code>by=</code>. Always inspect the <em>resolved</em> <code>code_method</code> string for the presence of <code>by_vars</code>/<code>strata_vars</code> or <code>by_listc</code> substrings. Do NOT check the parameter table — it can contain spurious unused parameters that give false positives.</li>
+<strong><code>n_group_cols</code> determination</strong> — the number of <code>group[n]</code> columns a method produces differs from <code>num_grp</code> when the last grouping goes to <code>variables=</code> instead of <code>by=</code>. This is determined by <code>.n_group_cols_from_template()</code> in <code>readARS.R</code>, which checks which valueSource types (<code>by_vars</code>, <code>strata_vars</code>, <code>by_listc</code>) appear in parameters whose placeholder tokens are actually present in the method’s code template. Never check the parameter table alone — it can contain spurious rows whose placeholder tokens are absent from the template (false positives). Never check the generated code string — the runtime-resolved values won’t match the placeholder names.</li>
 <li>
 <strong><code>group_condition_value</code> in JSON is a list-column</strong> — jsonlite always returns <code>condition.value</code> as a list, even for single-element EQ arrays. The JSON parser must call <code>tidyr::unnest(tmp_AG, cols = "group_condition_value")</code> after building <code>tmp_AG</code> to expand IN/NOTIN multi-value conditions (one row per value, <code>group_id</code> repeated) and collapse single-value list elements to plain character. Use a quoted string in <code>cols=</code> to avoid R CMD check “no visible binding” NOTE.</li>
 <li>
@@ -287,7 +294,8 @@
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">denom</span> <span class="op">&lt;-</span> <span class="va">df_pop</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">TRT01A</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>`...ard_N...` <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
 <span><span class="fu">cards</span><span class="fu">::</span><span class="fu"><a href="https://insightsengineering.github.io/cards/latest-tag/reference/ard_tabulate.html" class="external-link">ard_tabulate</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">in_data</span>, by <span class="op">=</span> <span class="st">'TRT01A'</span>, variables <span class="op">=</span> <span class="st">'AGEGR1'</span>, denominator <span class="op">=</span> <span class="va">denom</span><span class="op">)</span></span></code></pre></div>
-<p>Do not modify the test fixture xlsx files in <code>inst/extdata/</code> — the package owner updates those separately. The example R scripts in <code>inst/script/</code> are pre-generated and committed; regenerate them manually using <code><a href="reference/readARS.html">readARS()</a></code> after the xlsx templates are updated, then adjust the ADaM-loading lines to use <code><a href="reference/ARS_example.html">siera::ARS_example()</a></code>.</p>
+<p><strong>Where the cards API in generated output actually comes from:</strong> the <code>cards</code>/<code>cardx</code> function names and argument patterns in generated (and <code>inst/script/</code>) ARDs are copied verbatim from the ARS metadata’s <code>AnalysisMethodCodeTemplate.templateCode</code> — siera only substitutes the placeholder parameters, it does not rewrite the cards calls. <strong>Consequence:</strong> you cannot bring generated scripts onto a newer cards API by editing siera’s R code or the vignettes alone; the example metadata’s <code>templateCode</code> must be updated. The bundled <code>Common_Safety_Displays_cards.xlsx</code> carries the templates in the <code>AnalysisMethodCodeTemplate</code> sheet (<code>templateCode</code> column, 5 rows). A name-only swap (<code>ard_categorical</code>→<code>ard_tabulate</code>, <code>ard_continuous</code>→<code>ard_summary</code>) runs fine on current cards — <code>ard_tabulate()</code> still accepts the legacy <code>by = c('grp','var'), variables = 'dummy', denominator = raw_df</code> pattern, so the “old” denominator pattern above still executes and yields identical results even though the <code>...ard_N...</code> form is preferred for new templates.</p>
+<p>Do not modify the test fixture xlsx files in <code>inst/extdata/</code> without explicit owner authorisation — the package owner normally updates those separately. (In PR #162 the owner did authorise renaming the cards functions in <code>templateCode</code>; that edit was made with <code>openxlsx::loadWorkbook()</code> → <code>writeData()</code> on the single column → <code>saveWorkbook()</code>, which preserves all 24 sheets — verify the sheet count and re-run <code><a href="reference/readARS.html">readARS()</a></code> afterwards.) The example R scripts in <code>inst/script/</code> are pre-generated and committed; regenerate them manually using <code><a href="reference/readARS.html">readARS()</a></code> after the xlsx templates are updated, then <code><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub()</a></code> the ADaM-loading <code>readr::read_csv('…/&lt;DS&gt;.csv'</code> lines to <code>readr::read_csv(siera::ARS_example("&lt;DS&gt;.csv")</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="test-conventions">Test conventions<a class="anchor" aria-label="anchor" href="#test-conventions"></a></h2>
@@ -299,6 +307,20 @@
 <li>Example ARS files live in <code>inst/extdata/</code> (<code>exampleARS_1</code> – <code>exampleARS_6</code>, both <code>.json</code> and <code>.xlsx</code>). Retrieve them in tests via <code>ARS_example("exampleARS_6.json")</code>.</li>
 </ul></div>
 <div class="section level2">
+<h2 id="documentation-and-vignettes">Documentation and vignettes<a class="anchor" aria-label="anchor" href="#documentation-and-vignettes"></a></h2>
+<ul><li>
+<strong>Keep documentation and functionality in sync.</strong> Any user-visible change — a new feature, a behaviour change, a change to generated-script or ARD output, or a new capability the user should know about — must be reflected in the documentation (vignettes, README, and <code>NEWS.md</code>) as part of the same change, not deferred. Treat user-facing docs as part of the definition of done. When in doubt about whether a change is user-visible, assume it is and update the docs. The <code>siera-docs-refresh</code> skill automates a full documentation pass.</li>
+<li>Five vignettes, ordered via the number prefix in <code>%\VignetteIndexEntry{}</code>: 1. <code>Getting_started</code>, 2. <code>concepts</code> (Concepts and conventions), 3. <code>using-cards</code>, 4. <code>ARD_script_structure</code>, 5. <code>apply-ARD</code>. Keep the prefixes in sync with <code>_pkgdown.yml</code> if reordering.</li>
+<li>
+<code>_pkgdown.yml</code> groups the Articles navbar (Get started / Concepts / Guides / Next steps). The reference index is intentionally left ungrouped.</li>
+<li>The pipeline diagram is a hand-authored static <strong>SVG</strong> (CRAN-safe, no new dependency), committed twice: <code>vignettes/figures/siera-pipeline.svg</code> (used by <code>concepts.Rmd</code> via <code><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html" class="external-link">knitr::include_graphics()</a></code>) and <code>man/figures/siera-pipeline.svg</code> (used by the README / pkgdown home). Update both copies together.</li>
+<li>
+<strong>Verifying vignettes without Pandoc:</strong> full <code><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">rmarkdown::render()</a></code> / <code>build_vignettes()</code> needs Pandoc (unavailable locally), but <code>knitr::knit(vig, output = tempfile())</code> executes all chunks without Pandoc — use it to confirm chunks run. <code>Getting_started.Rmd</code> has a <strong>live</strong> chunk that <code><a href="https://rdrr.io/r/base/source.html" class="external-link">source()</a></code>s an <code>inst/script/</code> example and prints <code>head(ARD)</code>, so it requires <code>cards</code>/<code>cardx</code> installed and the example scripts to be current.</li>
+<li>Tone is conversational, second-person, tutorial-style with inline-commented chunks; match it when editing docs. Audience is clinical-trial practitioners, not R developers.</li>
+<li>
+<code>README.Rmd</code>’s install chunks lack <code>eval=FALSE</code>, so re-knitting would actually run <code><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages()</a></code>/<code>install_github()</code>. For small static edits, change <code>README.Rmd</code> and <code>README.md</code> by hand in sync rather than re-knitting.</li>
+</ul></div>
+<div class="section level2">
 <h2 id="notes">Notes:<a class="anchor" aria-label="anchor" href="#notes"></a></h2>
 <ul><li>Always delete code or datasets used for temporary testing once done (keep the repo clean).</li>
 <li>After a reasonable development milestone, capture learnings and update CLAUDE.md with anything useful for future sessions.</li>
@@ -307,6 +329,7 @@
 <li>Inform the user before editing siera source files if there is no linked GitHub issue — all changes should be traceable to an issue and land on a feature branch.</li>
 <li>Suggest documentation updates when features are added or functionality changes (this is a public-facing CRAN package).</li>
 <li>Add tests for all new code; ensure every new branch has test coverage for its changes.</li>
+<li>Ask clarifying questions and check for understanding when there is uncertainty about a request or approach.</li>
 </ul></div>
 </div>
 

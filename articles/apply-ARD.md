@@ -16,6 +16,10 @@ examples of ARD use cases are:
 - re-using results for various reporting events
 - creating final TFLs
 
+(The [Concepts and
+conventions](https://clymbclinical.github.io/siera/articles/concepts.md)
+vignette discusses *why* an ARD makes these use cases easier.)
+
 ### Downstream R packages for table creation
 
 Two reputable R packages, part of the

@@ -26,6 +26,25 @@ to):
 Applying all these concepts to ADaM input data, yields Analysis Results
 in Dataset format (ARDs).
 
+![The siera pipeline: ARS metadata is read by readARS(), which writes
+one R script per output; each script runs against ADaM datasets to
+produce an ARD.](reference/figures/siera-pipeline.svg)
+
+The siera pipeline: ARS metadata is read by
+[`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md),
+which writes one R script per output; each script runs against ADaM
+datasets to produce an ARD.
+
+Within the [pharmaverse](https://pharmaverse.org/) ecosystem, siera sits
+between ARS metadata and the
+[`cards`](https://insightsengineering.github.io/cards/) package: ADaM
+datasets are typically built with
+[`admiral`](https://pharmaverse.github.io/admiral/), siera generates the
+`cards`/`cardx` code that computes the ARD, and packages such as
+[`gtsummary`](https://www.danieldsjoberg.com/gtsummary/) and
+[`tfrmt`](https://gsk-biostatistics.github.io/tfrmt/) turn that ARD into
+final tables.
+
 ## Installation
 
 `siera` can be installed from
@@ -84,13 +103,24 @@ vignette for examples and more detail on the process.
 
 # Articles
 
-### All vignettes
+### Get started
+
+- [Getting
+  Started](https://clymbclinical.github.io/siera/articles/Getting_started.md):
+
+### Concepts
+
+- [Concepts and
+  conventions](https://clymbclinical.github.io/siera/articles/concepts.md):
+
+### Guides
+
+- [Making use of \`cards\` and
+  \`cardx\`](https://clymbclinical.github.io/siera/articles/using-cards.md):
+- [ARD program
+  structure](https://clymbclinical.github.io/siera/articles/ARD_script_structure.md):
+
+### Next steps
 
 - [What do I do with my
   ARD?](https://clymbclinical.github.io/siera/articles/apply-ARD.md):
-- [ARD program
-  structure](https://clymbclinical.github.io/siera/articles/ARD_script_structure.md):
-- [Getting
-  Started](https://clymbclinical.github.io/siera/articles/Getting_started.md):
-- [Making use of \`cards\` and
-  \`cardx\`](https://clymbclinical.github.io/siera/articles/using-cards.md):

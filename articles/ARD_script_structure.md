@@ -110,8 +110,8 @@ in_data <- df2_An03_05_Race_Summ_ByTrt |>
   dplyr::distinct(TRT01A, RACE, USUBJID) |>
   dplyr::mutate(dummy = "dummyvar")
 
-# pass calculate subjects counts and % (based on big N) grouped by treatment and race
-cards::ard_categorical(
+# calculate subject counts and % (based on big N) grouped by treatment and race
+df3_An03_05_Race_Summ_ByTrt <- cards::ard_tabulate(
   data = in_data,
   by = c("TRT01A", "RACE"),
   variables = "dummy",
@@ -126,14 +126,44 @@ df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt |>
     stat_name == "p" ~ "Mth01_2_pct"
   ))
 
-# add ARS metadata IDs to the dataset to enable tracing each result back to ARS metadata
+# stamp CDISC ARD traceability metadata so each result traces back to the ARS definition
 df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt |>
   dplyr::mutate(
     AnalysisId = "An03_05_Race_Summ_ByTrt",
     MethodId = "Mth01",
-    OutputId = "Out14-1-1"
+    OutputId = "Out14-1-1",
+    # the grouping this column belongs to (here: the treatment-arm grouping)
+    group1_groupingId = "AnlsGrouping_01_Trt",
+    # for pre-defined groups, map each observed level to its ARS group id
+    group1_groupId = dplyr::case_when(
+      as.character(group1_level) == "Placebo"              ~ "AnlsGrouping_01_Trt_1",
+      as.character(group1_level) == "Xanomeline Low Dose"  ~ "AnlsGrouping_01_Trt_2",
+      as.character(group1_level) == "Xanomeline High Dose" ~ "AnlsGrouping_01_Trt_3"
+    )
   )
 ```
+
+This example uses the current `cards` function name `ard_tabulate()`
+(formerly `ard_categorical()`); see the [using `cards` and
+`cardx`](https://clymbclinical.github.io/siera/articles/using-cards.md)
+vignette for the full list of renames.
+
+The final `mutate()` is where *siera* stamps the **CDISC ARD
+traceability columns** onto every row. For each grouping applied to the
+analysis you will see a `group[n]_groupingId` (which grouping the column
+belongs to) plus one of:
+
+- `group[n]_groupId` - for **pre-defined groups** (groups listed in the
+  metadata, like treatment arms), mapped from `group[n]_level` via
+  `case_when()`, as above; or
+- `group[n]_groupValue` - for **data-driven groupings**
+  (`dataDriven: true`, where categories such as cause of death are
+  discovered from the ADaM data at run time), capturing the discovered
+  value directly.
+
+See the [Concepts and
+conventions](https://clymbclinical.github.io/siera/articles/concepts.md)
+vignette for the full picture of these traceability columns.
 
 ### Final steps
 
@@ -161,6 +191,18 @@ ARD <- dplyr::bind_rows(
   df3_An03_06_Height_Comp_ByTrt
 )
 ```
+
+### Deeper tables and more groupings
+
+The same pattern scales without special handling on your part:
+
+- **Arbitrarily deep table hierarchies** - the table stub (defined in
+  *mainListOfContents*) can nest as deeply as your output requires;
+  there is no longer a three-level limit.
+- **More than three grouping factors** - an analysis can be split by
+  four or more groupings at once (e.g. Treatment x Age group x Sex x
+  Region). Each grouping simply adds its own `group[n]_*` set of columns
+  to the ARD.
 
 ### Example
 

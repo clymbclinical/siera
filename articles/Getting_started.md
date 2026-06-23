@@ -18,6 +18,42 @@ with the R scripts produced by readARS function. Use the helper
 ARS_example() with no arguments to list them or call it with an example
 filename to get the path.
 
+### What you will produce
+
+Before we start, it helps to see where we are headed. The end product of
+*siera* is an **Analysis Results Dataset (ARD)** - one result per row,
+in machine-readable form. Below is the ARD for a Demographics output,
+produced by running one of the example scripts that *siera* generates
+(more on running scripts further down). This is what we are building
+toward:
+
+``` r
+
+# Run a ready-made example script shipped with siera; the result is the object `ARD`
+source(ARD_script_example("ARD_Out14-1-1.R"))
+head(ARD)
+#>   group1 group1_level group2 group2_level variable variable_level stat_name
+#> 1   <NA>           NA   <NA>           NA   TRT01A        Placebo         n
+#> 2   <NA>           NA   <NA>           NA   TRT01A      Xanomeli…         n
+#> 3   <NA>           NA   <NA>           NA   TRT01A      Xanomeli…         n
+#> 4 TRT01A      Placebo   <NA>           NA      AGE             NA         N
+#> 5 TRT01A      Placebo   <NA>           NA      AGE             NA      mean
+#> 6 TRT01A      Placebo   <NA>           NA      AGE             NA        sd
+#>   stat_label   stat
+#> 1          n     86
+#> 2          n     84
+#> 3          n     84
+#> 4          N     86
+#> 5       Mean 75.209
+#> 6         SD   8.59
+```
+
+Each row carries the statistic together with metadata (such as
+`AnalysisId` and the grouping columns) that traces it back to the ARS
+definition. The [Concepts and
+conventions](https://clymbclinical.github.io/siera/articles/concepts.md)
+vignette explains these traceability columns in more detail.
+
 ``` r
 
 # To see a list of example files:
@@ -52,6 +88,11 @@ This information includes:
   for calculation of results)
 - *methods* (describes operations to be performed on data to get
   results)
+
+For a fuller treatment of what each of these sections is for, and how
+they flow through *siera*, see the [Concepts and
+conventions](https://clymbclinical.github.io/siera/articles/concepts.md)
+vignette.
 
 ### Example
 
@@ -89,13 +130,19 @@ execute any of these 5 R scripts as-is (assuming the ADaM required for
 this script is available in the *ADaM_folder*), and the result will be
 an ARD (one result per row format) for each of the scripts.
 
+The generated scripts are portable across operating systems: any
+Windows-style backslashes in the ADaM path are normalised to forward
+slashes, so a script generated on Windows runs unchanged on macOS or
+Linux (and vice versa).
+
 #### Running a auto-generated ARD script
 
-The structure of the auto-generated ARD script is discussed the the [ARD
+The structure of the auto-generated ARD script is discussed in the [ARD
 structure](https://clymbclinical.github.io/siera/articles/ARD_script_structure.md)
-vignette. Examples of such an auto-generated ARD scripts are included in
-the package, and can be used by using the `ARD_script_example` function.
-Running this script will look like this:
+vignette. Examples of such auto-generated ARD scripts are included in
+the package, and can be accessed with the `ARD_script_example` function.
+Running one (as we did to produce the preview at the top of this
+vignette) looks like this:
 
 ``` r
 
@@ -108,20 +155,6 @@ Running this script will look like this:
 example_ARD_script <- ARD_script_example("ARD_Out14-1-1.R")
 source(example_ARD_script)
 head(ARD)
-#>   group1 group1_level group2 group2_level variable variable_level stat_name
-#> 1   <NA>                <NA>                TRT01A        Placebo         n
-#> 2   <NA>                <NA>                TRT01A      Xanomeli…         n
-#> 3   <NA>                <NA>                TRT01A      Xanomeli…         n
-#> 4 TRT01A      Placebo   <NA>                   AGE                        N
-#> 5 TRT01A      Placebo   <NA>                   AGE                     mean
-#> 6 TRT01A      Placebo   <NA>                   AGE                       sd
-#>   stat_label   stat
-#> 1          n     86
-#> 2          n     84
-#> 3          n     84
-#> 4          N     86
-#> 5       Mean 75.209
-#> 6         SD   8.59
 ```
 
 The `ARD` object is the result of appending all analysis-level ARD

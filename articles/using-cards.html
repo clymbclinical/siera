@@ -38,10 +38,17 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/apply-ARD.html">What do I do with my ARD?</a></li>
-    <li><a class="dropdown-item" href="../articles/ARD_script_structure.html">ARD program structure</a></li>
-    <li><a class="dropdown-item" href="../articles/Getting_started.html">Getting Started</a></li>
+<li><a class="dropdown-item" href="../articles/Getting_started.html">Getting Started</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
+    <li><a class="dropdown-item" href="../articles/concepts.html">Concepts and conventions</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Guides</h6></li>
     <li><a class="dropdown-item" href="../articles/using-cards.html">Making use of `cards` and `cardx`</a></li>
+    <li><a class="dropdown-item" href="../articles/ARD_script_structure.html">ARD program structure</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Next steps</h6></li>
+    <li><a class="dropdown-item" href="../articles/apply-ARD.html">What do I do with my ARD?</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -66,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Making use of `cards` and `cardx`</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/clymbclinical/siera/blob/v0.5.6/vignettes/using-cards.Rmd" class="external-link"><code>vignettes/using-cards.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/clymbclinical/siera/blob/main/vignettes/using-cards.Rmd" class="external-link"><code>vignettes/using-cards.Rmd</code></a></small>
       <div class="d-none name"><code>using-cards.Rmd</code></div>
     </div>
 
@@ -80,8 +87,8 @@
 <p><code>cards</code> and <code>cardx</code> are reputable R packages,
 part of the <code>pharmaverse</code>, which wrap statistical procedures
 and deliver Analysis Results Datasets (ARDs).</p>
-<p>Read more about <code>cards</code> <a href="https://insightsengineering.github.io/cards/latest-tag/" class="external-link">here</a>,
-and <code>cardx</code> <a href="https://insightsengineering.github.io/cards/latest-tag/" class="external-link">here</a>.</p>
+<p>Read more about <code>cards</code> <a href="https://insightsengineering.github.io/cards/" class="external-link">here</a>, and
+<code>cardx</code> <a href="https://insightsengineering.github.io/cardx/" class="external-link">here</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="using-cards-and-cardx-in-ars-metadata">Using <code>cards</code> and <code>cardx</code> in ARS metadata<a class="anchor" aria-label="anchor" href="#using-cards-and-cardx-in-ars-metadata"></a>
@@ -89,7 +96,7 @@ and <code>cardx</code> <a href="https://insightsengineering.github.io/cards/late
 <p>A powerful aspect of the ARS model, is that dynamic code can be
 supplied as part of the metadata and be evaluated on either 1. the
 Output level, 2. the Analysis level, or 3. the AnalysisMethod level. In
-an insightful insightful PHUSE paper by Richard Marshall <a href="https://www.lexjansen.com/phuse-us/2025/ds/PAP_DS09.pdf" class="external-link">here</a>,
+an insightful PHUSE paper by Richard Marshall <a href="https://www.lexjansen.com/phuse-us/2025/ds/PAP_DS09.pdf" class="external-link">here</a>,
 he explains how dynamic code can ‘drive’ automation in the ARS model by
 categorising it into 5 “geARS”.</p>
 <p>“Gear 5” entails making use of the
@@ -99,24 +106,34 @@ supplies dynamic R code (with the option of making use of parameters
 referring to metadata pieces), which will be executed to perform the
 relevant AnalysisMethod operations.</p>
 <div class="section level3">
-<h3 id="example-ard_continuous">Example: <code>ard_continuous</code><a class="anchor" aria-label="anchor" href="#example-ard_continuous"></a>
+<h3 id="example-ard_summary">Example: <code>ard_summary</code><a class="anchor" aria-label="anchor" href="#example-ard_summary"></a>
 </h3>
 <p>For the <code>siera</code> package, the R code used in
 <em>AnalysisMethodCodeTemplate</em> is aligned with the <em>cards</em>
 and <code>cardx</code> package. Below is a simple example of how a
-function <em>ard_continuous</em> from the <em>cards</em> package is used
-in the <em>AnalysisMethodCodeTemplate</em> class:</p>
+function <em>ard_summary</em> from the <em>cards</em> package is used in
+the <em>AnalysisMethodCodeTemplate</em> class:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># example of 'cards' code in AnalysisMethodCodeTemplate, using the ard_continuous function:</span></span>
+<code class="sourceCode R"><span><span class="co"># example of 'cards' code in AnalysisMethodCodeTemplate, using the ard_summary function:</span></span>
 <span></span>
-<span><span class="va">Analysis_ARD</span> <span class="op">&lt;-</span> <span class="fu">ard_continuous</span><span class="op">(</span></span>
+<span><span class="va">Analysis_ARD</span> <span class="op">&lt;-</span> <span class="fu">ard_summary</span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">filtered_ADSL</span>,</span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">byvariables_here</span><span class="op">)</span>,</span>
 <span>  variables <span class="op">=</span> <span class="va">analysisvariable_here</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<blockquote>
+<p><strong>A note on <code>cards</code> function names.</strong> Recent
+versions of <code>cards</code> renamed several functions:
+<code>ard_continuous()</code> is now <code>ard_summary()</code>,
+<code>ard_categorical()</code> is now <code>ard_tabulate()</code>, and
+<code>ard_complex()</code> is now <code>ard_mvsummary()</code>.
+<em>siera’s</em> example metadata and generated scripts use the current
+names; if you are reading scripts produced by an older <em>siera</em>
+version you may still see the previous names.</p>
+</blockquote>
 <p>In the above example of <em>AnalysisMethodCodeTemplate</em> code for
 a particular AnalysisMethod (summary statistics for a continuous
-variable), the <em>ard_continuous</em> function from the <em>cards</em>
+variable), the <em>ard_summary</em> function from the <em>cards</em>
 package is used. Notice, however, that two parameters are used in the
 code:</p>
 <ol style="list-style-type: decimal">
@@ -137,7 +154,7 @@ the ARS metadata):</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># example of 'cards' code in AnalysisMethodCodeTemplate, populated with AnalysisMethodCodeParameters:</span></span>
 <span></span>
-<span><span class="va">Analysis_ARD</span> <span class="op">&lt;-</span> <span class="fu">ard_continuous</span><span class="op">(</span></span>
+<span><span class="va">Analysis_ARD</span> <span class="op">&lt;-</span> <span class="fu">ard_summary</span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">filtered_ADSL</span>,</span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">TRT01A</span><span class="op">)</span>,</span>
 <span>  variables <span class="op">=</span> <span class="va">AGE</span></span>

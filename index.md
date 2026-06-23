@@ -26,6 +26,25 @@ to):
 Applying all these concepts to ADaM input data, yields Analysis Results
 in Dataset format (ARDs).
 
+![The siera pipeline: ARS metadata is read by readARS(), which writes
+one R script per output; each script runs against ADaM datasets to
+produce an ARD.](reference/figures/siera-pipeline.svg)
+
+The siera pipeline: ARS metadata is read by
+[`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md),
+which writes one R script per output; each script runs against ADaM
+datasets to produce an ARD.
+
+Within the [pharmaverse](https://pharmaverse.org/) ecosystem, siera sits
+between ARS metadata and the
+[`cards`](https://insightsengineering.github.io/cards/) package: ADaM
+datasets are typically built with
+[`admiral`](https://pharmaverse.github.io/admiral/), siera generates the
+`cards`/`cardx` code that computes the ARD, and packages such as
+[`gtsummary`](https://www.danieldsjoberg.com/gtsummary/) and
+[`tfrmt`](https://gsk-biostatistics.github.io/tfrmt/) turn that ARD into
+final tables.
+
 ## Installation
 
 `siera` can be installed from

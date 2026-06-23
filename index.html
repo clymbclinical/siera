@@ -41,10 +41,17 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/apply-ARD.html">What do I do with my ARD?</a></li>
-    <li><a class="dropdown-item" href="articles/ARD_script_structure.html">ARD program structure</a></li>
-    <li><a class="dropdown-item" href="articles/Getting_started.html">Getting Started</a></li>
+<li><a class="dropdown-item" href="articles/Getting_started.html">Getting Started</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
+    <li><a class="dropdown-item" href="articles/concepts.html">Concepts and conventions</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Guides</h6></li>
     <li><a class="dropdown-item" href="articles/using-cards.html">Making use of `cards` and `cardx`</a></li>
+    <li><a class="dropdown-item" href="articles/ARD_script_structure.html">ARD program structure</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Next steps</h6></li>
+    <li><a class="dropdown-item" href="articles/apply-ARD.html">What do I do with my ARD?</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -83,6 +90,10 @@
 <li>AnalysisMethods (e.g. calculate ‘n’, ‘Mean’, ‘Min’, ‘Max’, ‘Q1’, ‘Q3’)</li>
 </ul>
 <p>Applying all these concepts to ADaM input data, yields Analysis Results in Dataset format (ARDs).</p>
+<div class="float">
+<img src="reference/figures/siera-pipeline.svg" alt="The siera pipeline: ARS metadata is read by readARS(), which writes one R script per output; each script runs against ADaM datasets to produce an ARD."><div class="figcaption">The siera pipeline: ARS metadata is read by <code><a href="reference/readARS.html">readARS()</a></code>, which writes one R script per output; each script runs against ADaM datasets to produce an ARD.</div>
+</div>
+<p>Within the <a href="https://pharmaverse.org/" class="external-link">pharmaverse</a> ecosystem, siera sits between ARS metadata and the <a href="https://insightsengineering.github.io/cards/" class="external-link"><code>cards</code></a> package: ADaM datasets are typically built with <a href="https://pharmaverse.github.io/admiral/" class="external-link"><code>admiral</code></a>, siera generates the <code>cards</code>/<code>cardx</code> code that computes the ARD, and packages such as <a href="https://www.danieldsjoberg.com/gtsummary/" class="external-link"><code>gtsummary</code></a> and <a href="https://gsk-biostatistics.github.io/tfrmt/" class="external-link"><code>tfrmt</code></a> turn that ARD into final tables.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>

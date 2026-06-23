@@ -38,10 +38,17 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/apply-ARD.html">What do I do with my ARD?</a></li>
-    <li><a class="dropdown-item" href="../articles/ARD_script_structure.html">ARD program structure</a></li>
-    <li><a class="dropdown-item" href="../articles/Getting_started.html">Getting Started</a></li>
+<li><a class="dropdown-item" href="../articles/Getting_started.html">Getting Started</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Concepts</h6></li>
+    <li><a class="dropdown-item" href="../articles/concepts.html">Concepts and conventions</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Guides</h6></li>
     <li><a class="dropdown-item" href="../articles/using-cards.html">Making use of `cards` and `cardx`</a></li>
+    <li><a class="dropdown-item" href="../articles/ARD_script_structure.html">ARD program structure</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Next steps</h6></li>
+    <li><a class="dropdown-item" href="../articles/apply-ARD.html">What do I do with my ARD?</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -66,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Getting Started</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/clymbclinical/siera/blob/v0.5.6/vignettes/Getting_started.Rmd" class="external-link"><code>vignettes/Getting_started.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/clymbclinical/siera/blob/main/vignettes/Getting_started.Rmd" class="external-link"><code>vignettes/Getting_started.Rmd</code></a></small>
       <div class="d-none name"><code>Getting_started.Rmd</code></div>
     </div>
 
@@ -84,7 +91,39 @@ several ARS files (json and xlsx), as well as csv-format ADaMs which can
 be run with the R scripts produced by readARS function. Use the helper
 ARS_example() with no arguments to list them or call it with an example
 filename to get the path.</p>
+<div class="section level3">
+<h3 id="what-you-will-produce">What you will produce<a class="anchor" aria-label="anchor" href="#what-you-will-produce"></a>
+</h3>
+<p>Before we start, it helps to see where we are headed. The end product
+of <em>siera</em> is an <strong>Analysis Results Dataset (ARD)</strong>
+- one result per row, in machine-readable form. Below is the ARD for a
+Demographics output, produced by running one of the example scripts that
+<em>siera</em> generates (more on running scripts further down). This is
+what we are building toward:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Run a ready-made example script shipped with siera; the result is the object `ARD`</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="../reference/ARD_script_example.html">ARD_script_example</a></span><span class="op">(</span><span class="st">"ARD_Out14-1-1.R"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ARD</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   group1 group1_level group2 group2_level variable variable_level stat_name</span></span>
+<span><span class="co">#&gt; 1   &lt;NA&gt;           NA   &lt;NA&gt;           NA   TRT01A        Placebo         n</span></span>
+<span><span class="co">#&gt; 2   &lt;NA&gt;           NA   &lt;NA&gt;           NA   TRT01A      Xanomeli…         n</span></span>
+<span><span class="co">#&gt; 3   &lt;NA&gt;           NA   &lt;NA&gt;           NA   TRT01A      Xanomeli…         n</span></span>
+<span><span class="co">#&gt; 4 TRT01A      Placebo   &lt;NA&gt;           NA      AGE             NA         N</span></span>
+<span><span class="co">#&gt; 5 TRT01A      Placebo   &lt;NA&gt;           NA      AGE             NA      mean</span></span>
+<span><span class="co">#&gt; 6 TRT01A      Placebo   &lt;NA&gt;           NA      AGE             NA        sd</span></span>
+<span><span class="co">#&gt;   stat_label   stat</span></span>
+<span><span class="co">#&gt; 1          n     86</span></span>
+<span><span class="co">#&gt; 2          n     84</span></span>
+<span><span class="co">#&gt; 3          n     84</span></span>
+<span><span class="co">#&gt; 4          N     86</span></span>
+<span><span class="co">#&gt; 5       Mean 75.209</span></span>
+<span><span class="co">#&gt; 6         SD   8.59</span></span></code></pre></div>
+<p>Each row carries the statistic together with metadata (such as
+<code>AnalysisId</code> and the grouping columns) that traces it back to
+the ARS definition. The <a href="concepts.html">Concepts and
+conventions</a> vignette explains these traceability columns in more
+detail.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># To see a list of example files:</span></span>
 <span><span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "ADAE.csv"                          "ADEXSUM.csv"                      </span></span>
@@ -101,6 +140,7 @@ filename to get the path.</p>
 <span><span class="co"># A temporary path to a specific file:</span></span>
 <span><span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"exampleARS_1.json"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "/home/runner/work/_temp/Library/siera/extdata/exampleARS_1.json"</span></span></code></pre></div>
+</div>
 <div class="section level3">
 <h3 id="reading-in-ars-metadata---what-to-expect">Reading in ARS metadata - what to expect<a class="anchor" aria-label="anchor" href="#reading-in-ars-metadata---what-to-expect"></a>
 </h3>
@@ -127,6 +167,8 @@ required for calculation of results)</li>
 <em>methods</em> (describes operations to be performed on data to
 get results)</li>
 </ul>
+<p>For a fuller treatment of what each of these sections is for, and how
+they flow through <em>siera</em>, see the <a href="concepts.html">Concepts and conventions</a> vignette.</p>
 </div>
 <div class="section level3">
 <h3 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
@@ -137,7 +179,7 @@ example of how this can be done using a ready-to-use ARS metadata Excel
 file (note that this is meant as an example. Official ARS metadata is in
 json format, which can also be passed to the <em>readARS</em>
 function):</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Path to the Excel ARS metadata file:</span></span>
 <span><span class="va">ARS_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"Common_Safety_Displays_cards.xlsx"</span><span class="op">)</span></span>
 <span></span>
@@ -162,15 +204,19 @@ You can execute any of these 5 R scripts as-is (assuming the ADaM
 required for this script is available in the <em>ADaM_folder</em>), and
 the result will be an ARD (one result per row format) for each of the
 scripts.</p>
+<p>The generated scripts are portable across operating systems: any
+Windows-style backslashes in the ADaM path are normalised to forward
+slashes, so a script generated on Windows runs unchanged on macOS or
+Linux (and vice versa).</p>
 <div class="section level4">
 <h4 id="running-a-auto-generated-ard-script">Running a auto-generated ARD script<a class="anchor" aria-label="anchor" href="#running-a-auto-generated-ard-script"></a>
 </h4>
-<p>The structure of the auto-generated ARD script is discussed the the
-<a href="ARD_script_structure.html">ARD structure</a> vignette. Examples
-of such an auto-generated ARD scripts are included in the package, and
-can be used by using the <code>ARD_script_example</code> function.
-Running this script will look like this:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p>The structure of the auto-generated ARD script is discussed in the <a href="ARD_script_structure.html">ARD structure</a> vignette. Examples of
+such auto-generated ARD scripts are included in the package, and can be
+accessed with the <code>ARD_script_example</code> function. Running one
+(as we did to produce the preview at the top of this vignette) looks
+like this:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Step 1: open ARD_xxx.R file</span></span>
 <span><span class="co"># Step 2: Confirm the location of ADaM dataset(s) is correct in the code section "Load ADaM".</span></span>
 <span><span class="co"># For the sake of simplicity, the only update made to the ARD_Out14-1-1.R script was to point to the ADaM folder to ARS_example("ADSL.csv")</span></span>
@@ -179,21 +225,7 @@ Running this script will look like this:</p>
 <span></span>
 <span><span class="va">example_ARD_script</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ARD_script_example.html">ARD_script_example</a></span><span class="op">(</span><span class="st">"ARD_Out14-1-1.R"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="va">example_ARD_script</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ARD</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   group1 group1_level group2 group2_level variable variable_level stat_name</span></span>
-<span><span class="co">#&gt; 1   &lt;NA&gt;                &lt;NA&gt;                TRT01A        Placebo         n</span></span>
-<span><span class="co">#&gt; 2   &lt;NA&gt;                &lt;NA&gt;                TRT01A      Xanomeli…         n</span></span>
-<span><span class="co">#&gt; 3   &lt;NA&gt;                &lt;NA&gt;                TRT01A      Xanomeli…         n</span></span>
-<span><span class="co">#&gt; 4 TRT01A      Placebo   &lt;NA&gt;                   AGE                        N</span></span>
-<span><span class="co">#&gt; 5 TRT01A      Placebo   &lt;NA&gt;                   AGE                     mean</span></span>
-<span><span class="co">#&gt; 6 TRT01A      Placebo   &lt;NA&gt;                   AGE                       sd</span></span>
-<span><span class="co">#&gt;   stat_label   stat</span></span>
-<span><span class="co">#&gt; 1          n     86</span></span>
-<span><span class="co">#&gt; 2          n     84</span></span>
-<span><span class="co">#&gt; 3          n     84</span></span>
-<span><span class="co">#&gt; 4          N     86</span></span>
-<span><span class="co">#&gt; 5       Mean 75.209</span></span>
-<span><span class="co">#&gt; 6         SD   8.59</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ARD</span><span class="op">)</span></span></code></pre></div>
 <p>The <code>ARD</code> object is the result of appending all
 analysis-level ARD (created from the <code>cards</code> and
 <code>cardx</code> functions) for the output. It can be used (and
