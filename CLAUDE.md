@@ -164,12 +164,25 @@ and can be ignored.
   `if(nrow(df2_<analysisid>) != 0){ ... } else { df3_<analysisid> = data.frame(AnalysisId, MethodId, OutputId) }`
   (see
   [`.generate_analysis_method_section()`](https://clymbclinical.github.io/siera/reference/dot-generate_analysis_method_section.md)
-  in `AnalysisMethods.R` ~L94/L135 and `readARS.R` ~L461). When a data
-  subset is empty the cards call is skipped and only a stub row (no
-  statistics) is emitted. This is correct for n/continuous (“no data →
-  no stats”) but is the root cause of \#156: a 0-event risk difference
-  yields no estimate row (→ NA) instead of the conventional RD = 0. Any
-  fix must special-case RD methods while preserving the general guard.
+  in `AnalysisMethods.R` ~L94/L135 and `.generate_groupid_code()` in
+  `readARS.R` ~L495). When a data subset is empty the cards call is
+  skipped and only a stub row (no statistics) is emitted. This is
+  correct for n/continuous (“no data → no stats”). **\#156 fix
+  (population-based bypass):** methods whose template references
+  `df_poptot` compute over the full population (e.g. risk differences
+  via `prop.test` on a flag joined onto `df_poptot`) and stay valid on
+  an empty `df2` — a 0-event RD must yield `RD = 0`, `CI = [0, 0]`, not
+  a stub/NA.
+  [`.generate_analysis_method_section()`](https://clymbclinical.github.io/siera/reference/dot-generate_analysis_method_section.md)
+  sets
+  `population_based <- grepl("df_poptot", template_code, fixed = TRUE)`
+  and, when true, drops all three `nrow(df2)!=0` guards (the body wrap,
+  the df3 identifier-stamp `if/else`, and — via the `population_based`
+  arg threaded into `.generate_groupid_code()` — the group-stamp wrap).
+  `population_based` is returned in the method-section result list. The
+  non-empty path is unchanged: the guard only ever affected the empty
+  case. `prop.test(c(0,0), c(n1,n2), correct = FALSE)` returns
+  estimate/CI all `0`, matching the CDISC `fda-ae-t06 An_34` reference.
 - **Dataset-JSON export** (`output_format = "datasetjson"`, issue \#160)
   — appends a self-contained block (built by
   `.generate_datasetjson_code()` in `R/DatasetJSON.R`) to each generated
@@ -522,3 +535,4 @@ after the xlsx templates are updated, then
   for its changes.
 - Ask clarifying questions and check for understanding when there is
   uncertainty about a request or approach. Rather ask than guess.
+- when making a PR, ensure the updates to claude.md are pushed with it.

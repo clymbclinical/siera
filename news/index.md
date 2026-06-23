@@ -4,6 +4,12 @@
 
 CRAN release: 2026-06-17
 
+- Fixed zero-event risk-difference analyses returning `NA` instead of
+  `0`. Methods that compute over the full population (templates
+  referencing `df_poptot`, e.g. risk differences) now bypass the
+  empty-data subset guard, so an analysis with no events emits the
+  conventional risk difference of `0` with a `[0, 0]` confidence
+  interval ([\#156](https://github.com/clymbclinical/siera/issues/156)).
 - Accepted SAS transport (`.xpt`) ADaM datasets in addition to CSV.
   [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
   chooses the reader for each ADaM dataset from its file extension
