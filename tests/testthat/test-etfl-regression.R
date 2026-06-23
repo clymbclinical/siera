@@ -159,6 +159,48 @@ test_that("ars-lb-t01 lab shift: bigN and continuous n match reference", {
   .expect_all_match(.cmp_continuous(ard, ref, "An_85"))
 })
 
+# -- Direct XPT input (issue #161) --------------------------------------------
+# readARS() reads the real eTFL Portal .xpt ADaM files directly, with no
+# intermediate CSV conversion. The .xpt files are committed lower-case
+# (adsl.xpt, adlb.xpt) while the metadata names datasets in upper case, so this
+# also exercises the case-insensitive file lookup. Results must match the same
+# CDISC reference ARD as the CSV-driven test above.
+test_that("ars-lb-t01: readARS reads .xpt ADaM directly and matches reference", {
+  skip_on_cran()
+  for (pkg in c("haven", "readr", "cards", "cardx", "broom", "parameters")) {
+    if (!requireNamespace(pkg, quietly = TRUE)) skip(paste(pkg, "not installed"))
+  }
+
+  paths <- .etfl_paths("ars-lb-t01")
+  if (!file.exists(paths$metadata)) skip("metadata not found: ars-lb-t01")
+  if (!dir.exists(paths$adam_dir))  skip("adam data not found: ars-lb-t01")
+
+  script_dir <- withr::local_tempdir()
+  suppressWarnings(
+    readARS(ARS_path = paths$metadata, output_path = script_dir,
+            adam_path = paths$adam_dir)
+  )
+
+  scripts <- list.files(script_dir, pattern = "^ARD_.*\\.R$", full.names = TRUE)
+  expect_gt(length(scripts), 0L)
+
+  # The generated scripts must load ADaM via haven::read_xpt, never readr::read_csv.
+  all_code <- unlist(lapply(scripts, readLines))
+  expect_true(any(grepl("haven::read_xpt", all_code, fixed = TRUE)))
+  expect_false(any(grepl("read_csv", all_code, fixed = TRUE)))
+
+  ards <- lapply(scripts, function(s) {
+    env <- new.env(parent = baseenv())
+    suppressWarnings(suppressPackageStartupMessages(source(s, local = env)))
+    env$ARD
+  })
+  ard <- dplyr::bind_rows(ards)
+  ref <- .load_etfl_reference("ars-lb-t01")
+
+  expect_true(.cmp_bigN(ard, ref, "An_82")$match)
+  .expect_all_match(.cmp_continuous(ard, ref, "An_85"))
+})
+
 test_that("ars-lb-t02 lab summary: bigN and continuous summary match reference", {
   skip_on_cran()
   tmp <- withr::local_tempdir()

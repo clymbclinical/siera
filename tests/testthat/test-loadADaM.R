@@ -147,6 +147,89 @@ test_that("ADaM loading code handles NULL DataSubsets", {
   expect_true(grepl("ADSL", code))
 })
 
+test_that("XPT datasets emit haven::read_xpt when only a .xpt exists", {
+  adam_dir <- withr::local_tempdir()
+  file.create(file.path(adam_dir, "ADSL.xpt"))
+
+  Anas <- make_anas(listItem_analysisId = "AN1")
+  Analyses <- make_analyses(
+    id = "AN1",
+    dataset = "ADSL",
+    analysisSetId = NA_character_,
+    dataSubsetId = NA_character_
+  )
+  AnalysisSets <- make_analysis_sets(id = character(), condition_dataset = character())
+  DataSubsets  <- make_data_subsets(id = character(), condition_dataset = character())
+
+  code <- get_adam_loading_code(Anas, Analyses, AnalysisSets, DataSubsets, adam_path = adam_dir)
+
+  expect_true(grepl("ADSL <- haven::read_xpt(", code, fixed = TRUE))
+  expect_true(grepl("ADSL.xpt", code, fixed = TRUE))
+  expect_false(grepl("read_csv", code, fixed = TRUE))
+  # NA-handling mutate is still applied for XPT inputs
+  expect_true(grepl("tidyr::replace_na", code, fixed = TRUE))
+})
+
+test_that("CSV reader is used by default when no file is present", {
+  # Mirrors real-world examples where adam_path is a placeholder folder.
+  Anas <- make_anas(listItem_analysisId = "AN1")
+  Analyses <- make_analyses(
+    id = "AN1",
+    dataset = "ADSL",
+    analysisSetId = NA_character_,
+    dataSubsetId = NA_character_
+  )
+  AnalysisSets <- make_analysis_sets(id = character(), condition_dataset = character())
+  DataSubsets  <- make_data_subsets(id = character(), condition_dataset = character())
+
+  code <- get_adam_loading_code(Anas, Analyses, AnalysisSets, DataSubsets, adam_path = "adam")
+
+  expect_true(grepl("ADSL <- readr::read_csv('adam/ADSL.csv'", code, fixed = TRUE))
+  expect_false(grepl("read_xpt", code, fixed = TRUE))
+})
+
+test_that("CSV takes precedence when both .csv and .xpt exist", {
+  adam_dir <- withr::local_tempdir()
+  file.create(file.path(adam_dir, "ADSL.csv"))
+  file.create(file.path(adam_dir, "ADSL.xpt"))
+
+  Anas <- make_anas(listItem_analysisId = "AN1")
+  Analyses <- make_analyses(
+    id = "AN1",
+    dataset = "ADSL",
+    analysisSetId = NA_character_,
+    dataSubsetId = NA_character_
+  )
+  AnalysisSets <- make_analysis_sets(id = character(), condition_dataset = character())
+  DataSubsets  <- make_data_subsets(id = character(), condition_dataset = character())
+
+  code <- get_adam_loading_code(Anas, Analyses, AnalysisSets, DataSubsets, adam_path = adam_dir)
+
+  expect_true(grepl("readr::read_csv", code, fixed = TRUE))
+  expect_false(grepl("read_xpt", code, fixed = TRUE))
+})
+
+test_that("mixed CSV and XPT datasets each get the matching reader", {
+  adam_dir <- withr::local_tempdir()
+  file.create(file.path(adam_dir, "ADSL.csv"))
+  file.create(file.path(adam_dir, "ADAE.xpt"))
+
+  Anas <- make_anas(listItem_analysisId = c("AN1", "AN2"))
+  Analyses <- make_analyses(
+    id = c("AN1", "AN2"),
+    dataset = c("ADSL", "ADAE"),
+    analysisSetId = c(NA_character_, NA_character_),
+    dataSubsetId = c(NA_character_, NA_character_)
+  )
+  AnalysisSets <- make_analysis_sets(id = character(), condition_dataset = character())
+  DataSubsets  <- make_data_subsets(id = character(), condition_dataset = character())
+
+  code <- get_adam_loading_code(Anas, Analyses, AnalysisSets, DataSubsets, adam_path = adam_dir)
+
+  expect_true(grepl("ADSL <- readr::read_csv(", code, fixed = TRUE))
+  expect_true(grepl("ADAE <- haven::read_xpt(", code, fixed = TRUE))
+})
+
 test_that("header-only code is returned when no datasets are referenced", {
   Anas <- make_anas(listItem_analysisId = character())
 
