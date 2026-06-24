@@ -694,6 +694,77 @@
       }
     },
     {
+      "name": "Summary by group of a categorical variable, per inner category",
+      "description": "Risk difference per data-driven inner category (e.g. PT/SOC) across two treatment groups, based on subject occurrence",
+      "label": "Per-category risk difference across groups",
+      "id": "Mth_03_1a",
+      "operations": [
+        {
+          "name": "Risk Difference %",
+          "label": "Risk Difference %",
+          "id": "Mth_03_1a_01_Risk_Difference_%",
+          "order": 1,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "95% CI Low",
+          "label": "95% CI Low",
+          "id": "Mth_03_1a_02_95%_CI_Low",
+          "order": 2,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "95% CI High",
+          "label": "95% CI High",
+          "id": "Mth_03_1a_03_95%_CI_High",
+          "order": 3,
+          "resultPattern": "XX.X"
+        }
+      ],
+      "codeTemplate": {
+        "context": "R (siera)",
+        "code": ".arms_analysisidhere <- utils::head(sort(unique(df2_analysisidhere$groupvar1here)), 2)\nfull_analysisidhere <- df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n\n.cats_analysisidhere <- sort(unique(as.character(df2_analysisidhere$groupvar2here)))\n\n.rd_one_analysisidhere <- function(.cat) {\n  success <- df2_analysisidhere |>\n      dplyr::filter(as.character(groupvar2here) == .cat) |>\n      dplyr::distinct(anavarhere) |>\n      dplyr::mutate(FL = 1L)\n  ana <- full_analysisidhere |>\n      dplyr::left_join(dplyr::select(success, anavarhere, FL), by = \"anavarhere\") |>\n      dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n  cardx::ard_stats_prop_test(data = ana, by = groupvar1here, variables = FL, correct = FALSE) |>\n      dplyr::filter(stat_name %in% c(\"estimate\", \"conf.low\", \"conf.high\")) |>\n      dplyr::mutate(\n          stat = lapply(stat, function(.v) .v * 100),\n          group2_level = .cat,\n          operationid = dplyr::case_when(\n              stat_name == \"estimate\"  ~ \"opid1here\",\n              stat_name == \"conf.low\"  ~ \"opid2here\",\n              stat_name == \"conf.high\" ~ \"opid3here\"\n          )\n      )\n}\n\ndf3_analysisidhere <- if (length(.arms_analysisidhere) >= 2 && length(.cats_analysisidhere) > 0) {\n  dplyr::bind_rows(lapply(.cats_analysisidhere, .rd_one_analysisidhere))\n} else {\n  tibble::tibble(variable = character(0), group2_level = character(0),\n                 stat_name = character(0), stat = list(),\n                 operationid = character(0))\n}",
+        "parameters": [
+          {
+            "name": "groupvar1here",
+            "label": "grp var 1",
+            "description": "First analysis grouping variable (treatment arm)",
+            "valueSource": "AG_var1"
+          },
+          {
+            "name": "groupvar2here",
+            "label": "grp var 2",
+            "description": "Second analysis grouping variable (data-driven inner category)",
+            "valueSource": "AG_var2"
+          },
+          {
+            "name": "anavarhere",
+            "label": "ana var",
+            "description": "Analysis variable (subject ID)",
+            "valueSource": "ana_var"
+          },
+          {
+            "name": "opid1here",
+            "label": "RD id",
+            "description": "Operation ID: Risk Difference %",
+            "valueSource": "operation_1"
+          },
+          {
+            "name": "opid2here",
+            "label": "CI low id",
+            "description": "Operation ID: 95% CI Low",
+            "valueSource": "operation_2"
+          },
+          {
+            "name": "opid3here",
+            "label": "CI high id",
+            "description": "Operation ID: 95% CI High",
+            "valueSource": "operation_3"
+          }
+        ]
+      }
+    },
+    {
       "id": "Mth_03a",
       "name": "Categorical n% (2-grouping: last grouping -> variables=)",
       "description": "Categorical n% for 2-grouping analyses: first grouping = by=, second = variables= in ard_tabulate",
@@ -3184,7 +3255,7 @@
       "purpose": {
         "controlledTerm": "SECONDARY OUTCOME MEASURE"
       },
-      "methodId": "Mth_03_1",
+      "methodId": "Mth_03_1a",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -4184,7 +4255,7 @@
       "purpose": {
         "controlledTerm": "SECONDARY OUTCOME MEASURE"
       },
-      "methodId": "Mth_03_1",
+      "methodId": "Mth_03_1a",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
