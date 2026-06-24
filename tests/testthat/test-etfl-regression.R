@@ -11,7 +11,6 @@
 #
 # Known limitations are asserted only where siera currently matches the
 # reference; cases tracked by open issues are exercised but not asserted:
-#   * 0-event risk difference returns NA rather than 0        (#156)
 #   * per-term / per-category risk difference not yet emitted (#157)
 #   * per-term subject counts can differ for top-N AE tables  (#158)
 
@@ -72,9 +71,9 @@ test_that("fda-ae-t06 AE summary: bigN and n% match reference", {
 
   expect_true(.cmp_bigN(ard, ref, "An_30")$match)
   .expect_all_match(.cmp_n_pct(ard, ref, "An_31"))
-  # An_34 is a SAE-death risk difference with zero events; siera returns NA
-  # instead of 0, so the reference's 3 RD rows are not reproduced (#156).
-  expect_lt(sum(ard$AnalysisId == "An_34"), sum(ref$analysisId == "An_34"))
+  # An_34 is a SAE-death risk difference with zero events; siera now emits
+  # RD = 0 / CI = [0, 0] matching the reference (#156 fixed).
+  .expect_all_match(.cmp_rd(ard, ref, "An_34"))
 })
 
 test_that("fda-ae-t07 AE by cause: bigN and one- and two-level n% match reference", {

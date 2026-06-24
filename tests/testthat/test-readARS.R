@@ -395,6 +395,32 @@ test_that(".generate_groupid_code falls back to NA_character_ when grouping has 
   expect_false(grepl("case_when", code, fixed = TRUE))
 })
 
+test_that(".generate_groupid_code drops the empty-data guard for population-based methods (#156)", {
+  # Population-based methods (e.g. risk differences) keep a valid df3 even when
+  # df2 is empty, so the group-stamp mutate must not be wrapped in
+  # if(nrow(df2_<id>) != 0){...}. The default (population_based = FALSE) wraps it.
+  args <- list(
+    analysis_id        = "An_01",
+    groupids           = c("AG_MISSING"),
+    n_group_cols       = 1L,
+    AG_dataDriven      = c(FALSE),
+    analysis_groupings = tibble::tibble(
+      id = character(0), group_id = character(0),
+      group_condition_value = character(0), dataDriven = character(0)
+    )
+  )
+
+  guarded   <- do.call(siera:::`.generate_groupid_code`, args)
+  unguarded <- do.call(siera:::`.generate_groupid_code`,
+                       c(args, list(population_based = TRUE)))
+
+  # Default path keeps the empty-data guard; population-based path drops it.
+  expect_true(grepl("if(nrow(df2_An_01) != 0)", guarded, fixed = TRUE))
+  expect_false(grepl("if(nrow(df2_An_01) != 0)", unguarded, fixed = TRUE))
+  # Both still emit the group stamping itself.
+  expect_true(grepl("group1_groupingId = 'AG_MISSING'", unguarded, fixed = TRUE))
+})
+
 test_that("group[n]_groupValue stamped for data-driven groupings - json", {
   ARS_path <- ARS_example("exampleARS_5.json")
   output_dir <- withr::local_tempdir()

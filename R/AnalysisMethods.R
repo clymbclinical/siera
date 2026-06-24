@@ -82,6 +82,13 @@
     template_code <- paste0(template_code, collapse = "\n")
   }
 
+  # Methods that compute over the full population (i.e. their template refers to
+  # df_poptot, e.g. risk differences) are self-contained: with an empty data
+  # subset they still yield a valid result (0 events -> RD = 0). For these the
+  # empty-data guard `if(nrow(df2_<id>) != 0)` must be bypassed so a zero-event
+  # analysis still emits its estimate rows instead of a statistics-free stub (#156).
+  population_based <- grepl("df_poptot", template_code, fixed = TRUE)
+
   # Parameter substitution is based on ARS metadata entries that can refer
   # to values calculated earlier in the script.
   anmetparam_s <- analysis_method_code_parameters %>%
@@ -90,11 +97,15 @@
       parameter_valueSource != ""
     )
 
-  anmetcode_temp <- paste0(
-    "if(nrow(df2_analysisidhere) != 0) {\n                              ",
-    template_code,
-    "}"
-  )
+  anmetcode_temp <- if (population_based) {
+    template_code
+  } else {
+    paste0(
+      "if(nrow(df2_analysisidhere) != 0) {\n                              ",
+      template_code,
+      "}"
+    )
+  }
 
   for (i in seq_len(nrow(anmetparam_s))) {
     value_source <- anmetparam_s$parameter_valueSource[i]
@@ -131,13 +142,21 @@
   code_method_tmp_1 <- gsub("methodnamehere", methodname, code_method_tmp_1, fixed = TRUE)
   code_method_tmp_1 <- gsub("methoddeschere", methoddesc, code_method_tmp_1, fixed = TRUE)
 
-  template <-
+  template <- if (population_based) {
+    # df3 is always assigned by a population-based template, so stamp the
+    # identifiers unconditionally (no empty-data stub branch).
+    "\ndf3_analysisidhere <- df3_analysisidhere |>
+        dplyr::mutate(AnalysisId = 'analysisidhere',
+               MethodId = 'methodidhere',
+               OutputId = 'outputidhere')\n    "
+  } else {
     "\nif(nrow(df2_analysisidhere) != 0){\ndf3_analysisidhere <- df3_analysisidhere |>
         dplyr::mutate(AnalysisId = 'analysisidhere',
                MethodId = 'methodidhere',
                OutputId = 'outputidhere')\n} else {\n    df3_analysisidhere = data.frame(AnalysisId = 'analysisidhere',
                MethodId = 'methodidhere',
                OutputId = 'outputidhere')\n}\n    "
+  }
 
   code <- gsub("methodidhere", methodid, template, fixed = TRUE)
   code <- gsub("analysisidhere", analysis_id, code, fixed = TRUE)
@@ -152,6 +171,7 @@
   list(
     code = paste0("#Apply Method --- \n", code_method),
     operations = operations_named,
-    method = method
+    method = method,
+    population_based = population_based
   )
 }
