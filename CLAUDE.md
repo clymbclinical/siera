@@ -466,10 +466,14 @@ after the xlsx templates are updated, then
   Dataset-JSON; load with
   `jsonlite::fromJSON(..., simplifyDataFrame=FALSE, simplifyVector=FALSE)`
   to avoid row-parsing failures. `fda-ds-t04` derives `DISCONFL` from
-  `DCTREAS` via the `adsl_transform` hook. Known-limitation analyses are
-  exercised but not asserted: per-term/per-category RD is not emitted
-  (#157). The raw XPT/JSON is ~28 MB in the working tree but git-packs
-  and tarball-gzips to ~2 MB, so it ships fine for CRAN.
+  `DCTREAS` via the `adsl_transform` hook. The
+  `.cmp_pergroup_rd()`/`.etfl_pergroup_rd_truth()` helpers assert
+  per-category RD (#157, see below). Remaining known-limitation analyses
+  exercised but not asserted: per-(SOC × PT) RD (fda-ae-t36 An_57, a
+  3-grouping case `Mth_03_1a` doesn’t cover) and fda-ae-t06’s
+  per-action/per-severity RD (still on single-RD `Mth_03_1`). The raw
+  XPT/JSON is ~28 MB in the working tree but git-packs and tarball-gzips
+  to ~2 MB, so it ships fine for CRAN.
   - **\#158 — fda-ae-t13 An_80 arm × PT counts (resolved: reference
     defect, not a siera bug).** The published reference ARD for An_80
     was generated **without** the treatment-emergent filter
@@ -489,6 +493,43 @@ after the xlsx templates are updated, then
     `.cmp_ae_pt_te()`), not against the defective reference ARD. The
     earlier “siera under-counts” framing was the reference
     over-counting.
+  - **\#157 — per-category risk difference (resolved via new method
+    `Mth_03_1a`).** The single-RD method `Mth_03_1` collapses an
+    analysis to one overall risk difference; tables needing one RD per
+    data-driven inner category (fda-ae-t13 An_81/An_81_1 per PT;
+    fda-ae-t36 An_55/An_55_1 per SOC) need a variant that loops the
+    inner grouping. `Mth_03_1a` (added to the t13 + t36 `-siera.json`
+    metadata, and as a sheet in the owner master workbook
+    `R(siera)_codes_*.xlsx`) loops
+    `sort(unique(as.character(df2$AG_var2)))`, builds a 0/1 `FL` on
+    `df_poptot`, and calls
+    **`cardx::ard_stats_prop_test(by = AG_var1, variables = FL, correct = FALSE)`**
+    per category (`estimate`/`conf.low`/`conf.high` × 100, with
+    `group2_level` stamped). It uses only existing valueSources
+    (`AG_var1`, `AG_var2`, `ana_var`, `operation_1..3`) — **no
+    `R/readARS.R` change needed**. The two comparison arms are
+    self-derived from `df2` (`utils::head(sort(unique(...)), 2)`), so no
+    arm-filter construct (`trt_filter_stm`) is required; referencing
+    `df_poptot` makes it `population_based`. **Both references are
+    unsafe oracles for RD**: t13’s omits the TE filter (the \#158 defect
+    — e.g. DIARRHOEA Low-vs-Placebo reference -4.5 vs spec-correct
+    -5.7), and t36’s rounds component percentages before differencing.
+    So per-category RD is asserted against an **independent**
+    `stats::prop.test(correct = FALSE)` recomputation on
+    distinct-subject counts (`.etfl_pergroup_rd_truth()` /
+    `.cmp_pergroup_rd()`), full-join matching every category × statistic
+    — siera (cardx) matched it exactly on all 180/187 PTs and 22 SOCs.
+    Remaining gaps tracked as follow-ups: fda-ae-t06 per-action/severity
+    RD (just a repoint to `Mth_03_1a`, \#171) and fda-ae-t36 An_57
+    per-(SOC × PT) RD (needs a 3-grouping variant `Mth_03_1b`, \#172).
+    The owner master code-template library is git-tracked at
+    `inst/extdata/R_siera_codes.xlsx` (one sheet per method,
+    e.g. `Risk Difference (per grp)`, plus a `Constructs` registry) —
+    add new methods there too. It is **excluded from the CRAN tarball**
+    via `.Rbuildignore` (`^inst/extdata/R_siera_codes`), so it never
+    ships; edit it with `openpyxl` (load → `create_sheet` → save) to
+    preserve the other sheets. To author further methods see the
+    `siera-author-method` skill.
 
 ## Documentation and vignettes
 

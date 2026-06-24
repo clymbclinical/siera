@@ -4,6 +4,14 @@
 
 CRAN release: 2026-06-17
 
+- Added support for per-category risk differences. A new method template
+  computes one risk difference and 95% confidence interval for each
+  data-driven inner category (e.g. one per preferred term or system
+  organ class) by looping over the second grouping and calling
+  [`cardx::ard_stats_prop_test()`](https://insightsengineering.github.io/cardx/latest-tag/reference/ard_stats_prop_test.html)
+  within each, instead of collapsing the analysis to a single overall
+  risk difference
+  ([\#157](https://github.com/clymbclinical/siera/issues/157)).
 - Fixed zero-event risk-difference analyses returning `NA` instead of
   `0`. Methods that compute over the full population (templates
   referencing `df_poptot`, e.g. risk differences) now bypass the
