@@ -16,8 +16,8 @@
 # asserted for fda-ae-t13 (An_81/An_81_1, per PT) and fda-ae-t36 (An_55/An_55_1,
 # per SOC) against an independent prop.test ground truth. Remaining limitations
 # exercised but not asserted: per-(SOC x PT) RD (fda-ae-t36 An_57, a 3-grouping
-# case Mth_03_1a does not yet cover) and the per-action/per-severity RD in
-# fda-ae-t06 (still on the single-RD method Mth_03_1).
+# case Mth_03_1a does not yet cover -- #172) and the per-action/per-severity RD in
+# fda-ae-t06 (still on the single-RD method Mth_03_1 -- #171).
 
 # -- Demographics / disposition / exposure (ADSL-only, fast) -------------------
 
