@@ -467,11 +467,28 @@ after the xlsx templates are updated, then
   `jsonlite::fromJSON(..., simplifyDataFrame=FALSE, simplifyVector=FALSE)`
   to avoid row-parsing failures. `fda-ds-t04` derives `DISCONFL` from
   `DCTREAS` via the `adsl_transform` hook. Known-limitation analyses are
-  exercised but not asserted: 0-event risk difference returns `NA`
-  (#156), per-term/per-category RD is not emitted (#157), and top-N AE
-  per-term subject counts can differ (#158). The raw XPT/JSON is ~28 MB
-  in the working tree but git-packs and tarball-gzips to ~2 MB, so it
-  ships fine for CRAN.
+  exercised but not asserted: per-term/per-category RD is not emitted
+  (#157). The raw XPT/JSON is ~28 MB in the working tree but git-packs
+  and tarball-gzips to ~2 MB, so it ships fine for CRAN.
+  - **\#158 — fda-ae-t13 An_80 arm × PT counts (resolved: reference
+    defect, not a siera bug).** The published reference ARD for An_80
+    was generated **without** the treatment-emergent filter
+    (`TRTEMFL == "Y"`) that the analysis’s own ARS metadata mandates via
+    `Dss_04`, so its per-term distinct-subject counts are inflated for
+    the cells whose extra subjects have only non-treatment-emergent
+    occurrences of a PT (concretely: subject `01-701-1192`’s sole COUGH
+    event is `TRTEMFL` blank, yet the reference counts it). siera
+    applies `Dss_04` correctly. Proof: an independent ground truth
+    computed from the raw ADaM **with** the TE filter matches siera
+    exactly on all 354 non-zero arm × PT cells / 230 terms; **without**
+    the filter it matches the reference exactly. The sister TEAE table
+    fda-ae-t12 (whose subset includes `TRTEMFL == "Y"`) matches its
+    reference, confirming the reference tool normally applies the filter
+    — t13 An_80 is the anomaly. So An_80 is now **asserted** against
+    this independent TE ground truth (helpers `.etfl_ae_pt_te_truth()` /
+    `.cmp_ae_pt_te()`), not against the defective reference ARD. The
+    earlier “siera under-counts” framing was the reference
+    over-counting.
 
 ## Documentation and vignettes
 
