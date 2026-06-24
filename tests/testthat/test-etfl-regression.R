@@ -9,12 +9,15 @@
 # live in helper-etfl.R. All tests are skip_on_cran() because they source
 # generated scripts against multi-MB ADaM data and need cards/cardx installed.
 #
-# Known limitations are asserted only where siera currently matches the
-# reference; cases tracked by open issues are exercised but not asserted:
-#   * per-term / per-category risk difference not yet emitted (#157)
 # fda-ae-t13 An_80 (arm x PT) is asserted against an independent treatment-
 # emergent ground truth, since the published reference ARD omits the TRTEMFL
 # filter its own ARS metadata mandates (#158, reference defect).
+# Per-category risk difference (#157) is now emitted via method Mth_03_1a and
+# asserted for fda-ae-t13 (An_81/An_81_1, per PT) and fda-ae-t36 (An_55/An_55_1,
+# per SOC) against an independent prop.test ground truth. Remaining limitations
+# exercised but not asserted: per-(SOC x PT) RD (fda-ae-t36 An_57, a 3-grouping
+# case Mth_03_1a does not yet cover) and the per-action/per-severity RD in
+# fda-ae-t06 (still on the single-RD method Mth_03_1).
 
 # -- Demographics / disposition / exposure (ADSL-only, fast) -------------------
 
@@ -131,7 +134,24 @@ test_that("fda-ae-t13 AE by PT: bigN and two-level arm x PT n match spec (#158)"
   # matches the Safety + Treatment-Emergent distinct-subject count exactly. The
   # earlier "siera under-counts" reading was the reference over-counting.
   .expect_all_match(.cmp_ae_pt_te(ard, "fda-ae-t13", "An_80"))
-  # An_81 (per-PT risk difference) is still not emitted (#157).
+
+  # An_81 / An_81_1 (per-PT risk difference, #157) are asserted against the same
+  # INDEPENDENT treatment-emergent ground truth, for the same reason as An_80:
+  # the published reference RD is computed without the TRTEMFL filter (it matches
+  # the non-TE basis, e.g. DIARRHOEA Low-vs-Placebo = -4.5 vs the spec-correct
+  # -5.7). siera's Mth_03_1a emits one RD + 95% CI per PT over arms 1 vs 3
+  # (An_81, Low Dose) and 2 vs 3 (An_81_1, High Dose); every PT matches the
+  # distinct-subject prop.test recomputation.
+  .expect_all_match(.cmp_pergroup_rd(
+    ard, "fda-ae-t13", "An_81",
+    subset_fun = function(d) dplyr::filter(d, TRTEMFL == "Y", !is.na(AEDECOD),
+                                           AEDECOD != "", TRTAN %in% c(1, 3)),
+    cat_var = "AEDECOD", arms = c(1, 3)))
+  .expect_all_match(.cmp_pergroup_rd(
+    ard, "fda-ae-t13", "An_81_1",
+    subset_fun = function(d) dplyr::filter(d, TRTEMFL == "Y", !is.na(AEDECOD),
+                                           AEDECOD != "", TRTAN %in% c(2, 3)),
+    cat_var = "AEDECOD", arms = c(2, 3)))
 })
 
 test_that("fda-ae-t36 AE by severity: bigN, n%, and two-level n% match reference", {
@@ -143,6 +163,21 @@ test_that("fda-ae-t36 AE by severity: bigN, n%, and two-level n% match reference
   expect_true(.cmp_bigN(ard, ref, "An_51")$match)
   .expect_all_match(.cmp_n_pct(ard, ref, "An_52"))
   .expect_all_match(.cmp_n_pct_2level(ard, ref, "An_54"))
+
+  # An_55 / An_55_1 (per-SOC risk difference, #157): one RD + 95% CI per body
+  # system, over arms 1 vs 3 (Low Dose) and 2 vs 3 (High Dose), on first-
+  # occurrence-of-SOC subjects (Dss_75 / Dss_76). The t36 reference RD matches
+  # this spec at display precision, but rounds component percentages before
+  # differencing, so we assert against the full-precision independent ground
+  # truth (every SOC matches exactly).
+  .expect_all_match(.cmp_pergroup_rd(
+    ard, "fda-ae-t36", "An_55",
+    subset_fun = function(d) dplyr::filter(d, AOCCSFL == "Y", TRTAN %in% c(1, 3)),
+    cat_var = "AEBODSYS", arms = c(1, 3)))
+  .expect_all_match(.cmp_pergroup_rd(
+    ard, "fda-ae-t36", "An_55_1",
+    subset_fun = function(d) dplyr::filter(d, AOCCSFL == "Y", TRTAN %in% c(2, 3)),
+    cat_var = "AEBODSYS", arms = c(2, 3)))
 })
 
 # -- Vital signs / labs (large ADVS / ADLB, continuous) ------------------------

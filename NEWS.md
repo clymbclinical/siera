@@ -1,5 +1,6 @@
 # siera 0.5.6
 
+* Added support for per-category risk differences. A new method template computes one risk difference and 95% confidence interval for each data-driven inner category (e.g. one per preferred term or system organ class) by looping over the second grouping and calling `cardx::ard_stats_prop_test()` within each, instead of collapsing the analysis to a single overall risk difference (#157).
 * Fixed zero-event risk-difference analyses returning `NA` instead of `0`. Methods that compute over the full population (templates referencing `df_poptot`, e.g. risk differences) now bypass the empty-data subset guard, so an analysis with no events emits the conventional risk difference of `0` with a `[0, 0]` confidence interval (#156).
 * Accepted SAS transport (`.xpt`) ADaM datasets in addition to CSV. `readARS()` chooses the reader for each ADaM dataset from its file extension (`.csv` via `readr::read_csv()`, `.xpt` via `haven::read_xpt()`), with no new argument; the file lookup is case-insensitive so lower-case submission file names (e.g. `adsl.xpt`) match upper-case ARS dataset names. Reading `.xpt` requires the `haven` package.
 * Fixed `readARS()` crash when ARS metadata contains no `referencedAnalysisOperations` (continuous-only tables such as shift tables) by ensuring accumulator frames are initialised with their merge key columns.
