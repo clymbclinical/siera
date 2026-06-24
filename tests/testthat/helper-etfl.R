@@ -148,6 +148,48 @@
              siera_cat = "group2_level", ref_cat = "Group2")
 }
 
+# Independent ground truth for an arm x PT distinct-subject AE count (#158). ----
+# Computed straight from the raw ADaM XPT, NOT from the reference ARD: for
+# fda-ae-t13 An_80 the published reference ARD omits the treatment-emergent
+# (TRTEMFL == "Y") filter that the analysis's own ARS metadata mandates via
+# Dss_04, so it over-counts subjects whose only occurrence of a PT is a
+# non-treatment-emergent event and cannot serve as the oracle. This helper
+# applies the spec (Safety population + Treatment Emergent) and counts distinct
+# USUBJID per (arm, PT). The treatment grouping numbers map 1:1 to the trailing
+# digits of the siera groupId (AnlsGrouping_45_Trt01An_0N -> TRT01AN == N), as
+# defined by the grouping conditions in the metadata.
+.etfl_ae_pt_te_truth <- function(table, arm_var = "TRT01AN") {
+  paths <- .etfl_paths(table)
+  adsl <- haven::read_xpt(file.path(paths$adam_dir, "adsl.xpt"))
+  adae <- haven::read_xpt(file.path(paths$adam_dir, "adae.xpt"))
+  pop  <- adsl |> dplyr::filter(SAFFL == "Y")
+  armmap <- pop |> dplyr::transmute(USUBJID, armn = as.integer(.data[[arm_var]]))
+  adae |>
+    dplyr::filter(TRTEMFL == "Y", !is.na(AEDECOD), AEDECOD != "",
+                  USUBJID %in% pop$USUBJID) |>
+    dplyr::inner_join(armmap, by = "USUBJID") |>
+    dplyr::distinct(armn, AEDECOD, USUBJID) |>
+    dplyr::count(armn, AEDECOD, name = "truth")
+}
+
+# Compare siera's two-level (arm x PT) n against the spec-correct TE ground
+# truth from .etfl_ae_pt_te_truth(). Asserts EVERY siera n cell, so it also
+# guards against siera dropping or inventing arm x PT combinations.
+.cmp_ae_pt_te <- function(siera_ard, table, ana_id) {
+  truth <- .etfl_ae_pt_te_truth(table)
+  s <- siera_ard |>
+    dplyr::filter(AnalysisId == ana_id, stat_name == "n") |>
+    dplyr::mutate(siera = .etfl_safe_stat(stat),
+                  armn = as.integer(sub(".*_(\\d+)$", "\\1", group1_groupId)),
+                  AEDECOD = as.character(group2_level)) |>
+    dplyr::select(armn, AEDECOD, siera)
+  comp <- dplyr::full_join(s, truth, by = c("armn", "AEDECOD")) |>
+    dplyr::mutate(siera = ifelse(is.na(siera), 0, siera),
+                  truth = ifelse(is.na(truth), 0, truth),
+                  match = abs(siera - truth) < 0.01)
+  list(n_matched = sum(comp$match), n_total = nrow(comp), data = comp)
+}
+
 # Compare a continuous summary (n, Mean, SD, Median, Min, Max). ----------------
 .cmp_continuous <- function(siera_ard, ref_ard, ana_id) {
   ops <- c("Mth_06_01_n", "Mth_06_02_Mean", "Mth_06_03_SD",

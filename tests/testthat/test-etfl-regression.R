@@ -12,7 +12,9 @@
 # Known limitations are asserted only where siera currently matches the
 # reference; cases tracked by open issues are exercised but not asserted:
 #   * per-term / per-category risk difference not yet emitted (#157)
-#   * per-term subject counts can differ for top-N AE tables  (#158)
+# fda-ae-t13 An_80 (arm x PT) is asserted against an independent treatment-
+# emergent ground truth, since the published reference ARD omits the TRTEMFL
+# filter its own ARS metadata mandates (#158, reference defect).
 
 # -- Demographics / disposition / exposure (ADSL-only, fast) -------------------
 
@@ -112,17 +114,24 @@ test_that("fda-ae-t12 TEAE: bigN, n%, two-level n%, and risk difference match re
   .expect_all_match(.cmp_rd(ard, ref, "An_60"))
 })
 
-test_that("fda-ae-t13 AE by PT: bigN matches reference", {
+test_that("fda-ae-t13 AE by PT: bigN and two-level arm x PT n match spec (#158)", {
   skip_on_cran()
   tmp <- withr::local_tempdir()
   ard <- .run_etfl_pipeline("fda-ae-t13", tmp)
   ref <- .load_etfl_reference("fda-ae-t13")
 
   expect_true(.cmp_bigN(ard, ref, "An_79")$match)
-  # An_80 (arm x preferred term) and An_81 (per-PT risk difference) are not
-  # asserted: the reference lists only top AE terms and per-term subject counts
-  # can differ by deduplication (#158); per-PT RD is not yet emitted (#157).
-  expect_gt(sum(ard$AnalysisId == "An_80"), 0L)
+
+  # An_80 (arm x preferred term) is asserted against an INDEPENDENT ground truth
+  # computed from the raw ADaM, not against the published reference ARD. The
+  # reference ARD omits the treatment-emergent (TRTEMFL == "Y") filter that An_80's
+  # own ARS metadata mandates via Dss_04, so its per-term subject counts are
+  # inflated for the 9 cells whose extra subjects have only non-treatment-emergent
+  # occurrences of that PT (#158). siera applies the spec correctly: its arm x PT n
+  # matches the Safety + Treatment-Emergent distinct-subject count exactly. The
+  # earlier "siera under-counts" reading was the reference over-counting.
+  .expect_all_match(.cmp_ae_pt_te(ard, "fda-ae-t13", "An_80"))
+  # An_81 (per-PT risk difference) is still not emitted (#157).
 })
 
 test_that("fda-ae-t36 AE by severity: bigN, n%, and two-level n% match reference", {
