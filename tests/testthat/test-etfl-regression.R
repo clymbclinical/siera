@@ -12,7 +12,9 @@
 # Known limitations are asserted only where siera currently matches the
 # reference; cases tracked by open issues are exercised but not asserted:
 #   * per-term / per-category risk difference not yet emitted (#157)
-#   * per-term subject counts can differ for top-N AE tables  (#158)
+# fda-ae-t13 An_80 (arm x PT) is asserted against an independent treatment-
+# emergent ground truth, since the published reference ARD omits the TRTEMFL
+# filter its own ARS metadata mandates (#158, reference defect).
 
 # -- Demographics / disposition / exposure (ADSL-only, fast) -------------------
 
