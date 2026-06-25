@@ -1,0 +1,73 @@
+{
+  "id": "continuous_summary",
+  "name": "Summary of a continuous variable",
+  "label": "Continuous summary (N, mean, SD, median, Q1, Q3, min, max)",
+  "description": "Descriptive statistics of a continuous analysis variable per group. Verified against Common_Safety_Displays Mth02_ContVar_Summ_ByGrp; current cards API (ard_summary, by_listc). Fixes the legacy sheet which used the deprecated ard_continuous + by_stmt (the latter stamps no group metadata).",
+  "context": "R (siera)",
+  "status": "verified",
+  "verified_against": "Common_Safety_Displays_cards.xlsx Mth02_ContVar_Summ_ByGrp",
+  "operations": [
+    {
+      "order": 1,
+      "name": "N",
+      "label": "n",
+      "resultPattern": "xx"
+    },
+    {
+      "order": 2,
+      "name": "mean",
+      "label": "Mean",
+      "resultPattern": "xx.x"
+    },
+    {
+      "order": 3,
+      "name": "sd",
+      "label": "SD",
+      "resultPattern": "(xx.xx)"
+    },
+    {
+      "order": 4,
+      "name": "median",
+      "label": "Median",
+      "resultPattern": "xx.x"
+    },
+    {
+      "order": 5,
+      "name": "p25",
+      "label": "Q1",
+      "resultPattern": "xx.x"
+    },
+    {
+      "order": 6,
+      "name": "p75",
+      "label": "Q3",
+      "resultPattern": "xx.x"
+    },
+    {
+      "order": 7,
+      "name": "min",
+      "label": "Min",
+      "resultPattern": "xx"
+    },
+    {
+      "order": 8,
+      "name": "max",
+      "label": "Max",
+      "resultPattern": "xx"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "byvarshere",
+      "valueSource": "by_listc",
+      "label": "by vars (list)",
+      "description": "Grouping variables as a quoted, comma-separated list"
+    },
+    {
+      "name": "anavarhere",
+      "valueSource": "ana_var",
+      "label": "ana var",
+      "description": "Continuous analysis variable to summarise"
+    }
+  ]
+}
