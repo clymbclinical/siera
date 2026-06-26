@@ -1,0 +1,362 @@
+{
+  "$schema": "siera-method-manifest/v1",
+  "name": "siera method library",
+  "description": "Referenceable catalog of siera analysis-method code templates. Point an ARS method codeTemplate.documentRef at this file and select a method by its id via a pageRefs NamedDestination. Generated from inst/method-library/ - do not edit by hand.",
+  "context": "R (siera)",
+  "methods": [
+    {
+      "id": "total_n",
+      "name": "Big N denominator count by group",
+      "label": "Total N (per group)",
+      "description": "Distinct count of the analysis variable (typically USUBJID) per treatment group. Used as the N= header / denominator source. Verified against Common_Safety_Displays Mth01_CatVar_Count_ByGrp; current cards API.",
+      "status": "verified",
+      "operations": [
+        {
+          "order": 1,
+          "name": "n",
+          "label": "Count",
+          "resultPattern": "xx"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "anavarhere",
+          "valueSource": "ana_var",
+          "label": "ana var",
+          "description": "Analysis variable (e.g. USUBJID)"
+        },
+        {
+          "name": "groupvar1here",
+          "valueSource": "AG_var1",
+          "label": "grp var 1",
+          "description": "First grouping variable (treatment arm)"
+        },
+        {
+          "name": "bystmthere",
+          "valueSource": "by_vars",
+          "label": "by stmt",
+          "description": "by/variables argument string for the grouping(s)"
+        }
+      ],
+      "templateCode": "in_data = df2_analysisidhere |>\n    dplyr::select(anavarhere, groupvar1here) |>\n    unique()\ndf3_analysisidhere <-\n  cards::ard_tabulate(\n    data = in_data\n    bystmthere\n  ) |>\n  dplyr::filter(stat_name == 'n') |>\n  dplyr::mutate(operationid = 'opid1here')"
+    },
+    {
+      "id": "categorical_summary",
+      "name": "Summary of a categorical variable (n and %)",
+      "label": "Categorical n (%)",
+      "description": "n and percentage of a categorical analysis variable per group, with a referenced denominator analysis and a data-driven/pre-defined grouping branch. Verified against Common_Safety_Displays Mth01_CatVar_Summ_ByGrp; current cards API. Spurious by_vars/strata_vars params from the legacy sheet have been dropped (the template uses by_listc).",
+      "status": "verified",
+      "operations": [
+        {
+          "order": 1,
+          "name": "n",
+          "label": "Count",
+          "resultPattern": "xx"
+        },
+        {
+          "order": 2,
+          "name": "p",
+          "label": "Percentage",
+          "resultPattern": "(xx.x)"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "distinctlisthere",
+          "valueSource": "distinct_list",
+          "label": "distinct list",
+          "description": "Grouping variables + analysis variable, comma separated"
+        },
+        {
+          "name": "denomanaidhere",
+          "valueSource": "DEN_analysisid",
+          "label": "denom ana id",
+          "description": "Analysis ID supplying the denominator"
+        },
+        {
+          "name": "denom_anagroupvarshere",
+          "valueSource": "AG_denom_var1",
+          "label": "denom grp var",
+          "description": "Grouping variable(s) of the denominator analysis"
+        },
+        {
+          "name": "isdatadrivenhere",
+          "valueSource": "AG_max_dataDriven",
+          "label": "is dataDriven",
+          "description": "TRUE/FALSE: highest grouping is data-driven"
+        },
+        {
+          "name": "byvarshere",
+          "valueSource": "by_listc",
+          "label": "by vars (list)",
+          "description": "Grouping variables as a quoted, comma-separated list"
+        }
+      ],
+      "templateCode": "denom_dataset = df2_denomanaidhere |>\n  dplyr::select(denom_anagroupvarshere)\n\nin_data = df2_analysisidhere |>\n    dplyr::distinct(distinctlisthere) |>\n    dplyr::mutate(dummy = 'dummyvar')\n\ndataDriven = isdatadrivenhere\nif(dataDriven == TRUE){\ndf3_analysisidhere <-\n  cards::ard_tabulate(\n    data = in_data,\n    strata = c(byvarshere),\n    variables = 'dummy',\n    denominator = denom_dataset\n  ) } else {\ndf3_analysisidhere <-\n cards::ard_tabulate(\n    data = in_data,\n    by = c(byvarshere),\n    variables = 'dummy',\n    denominator = denom_dataset\n  ) }\ndf3_analysisidhere <- df3_analysisidhere|>\n  dplyr::filter(stat_name %in% c('n', 'p')) |>\n  dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'opid1here',\n                                               stat_name == 'p' ~ 'opid2here'))"
+    },
+    {
+      "id": "continuous_summary",
+      "name": "Summary of a continuous variable",
+      "label": "Continuous summary (N, mean, SD, median, Q1, Q3, min, max)",
+      "description": "Descriptive statistics of a continuous analysis variable per group. Verified against Common_Safety_Displays Mth02_ContVar_Summ_ByGrp; current cards API (ard_summary, by_listc). Fixes the legacy sheet which used the deprecated ard_continuous + by_stmt (the latter stamps no group metadata).",
+      "status": "verified",
+      "operations": [
+        {
+          "order": 1,
+          "name": "N",
+          "label": "n",
+          "resultPattern": "xx"
+        },
+        {
+          "order": 2,
+          "name": "mean",
+          "label": "Mean",
+          "resultPattern": "xx.x"
+        },
+        {
+          "order": 3,
+          "name": "sd",
+          "label": "SD",
+          "resultPattern": "(xx.xx)"
+        },
+        {
+          "order": 4,
+          "name": "median",
+          "label": "Median",
+          "resultPattern": "xx.x"
+        },
+        {
+          "order": 5,
+          "name": "p25",
+          "label": "Q1",
+          "resultPattern": "xx.x"
+        },
+        {
+          "order": 6,
+          "name": "p75",
+          "label": "Q3",
+          "resultPattern": "xx.x"
+        },
+        {
+          "order": 7,
+          "name": "min",
+          "label": "Min",
+          "resultPattern": "xx"
+        },
+        {
+          "order": 8,
+          "name": "max",
+          "label": "Max",
+          "resultPattern": "xx"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "byvarshere",
+          "valueSource": "by_listc",
+          "label": "by vars (list)",
+          "description": "Grouping variables as a quoted, comma-separated list"
+        },
+        {
+          "name": "anavarhere",
+          "valueSource": "ana_var",
+          "label": "ana var",
+          "description": "Continuous analysis variable to summarise"
+        }
+      ],
+      "templateCode": "df3_analysisidhere <-\n  cards::ard_summary(\n    data = df2_analysisidhere,\n    by = c(byvarshere),\n    variables = anavarhere\n  ) |>\n  dplyr::mutate(operationid = dplyr::case_when(stat_name == 'N'      ~ 'opid1here',\n                                               stat_name == 'mean'   ~ 'opid2here',\n                                               stat_name == 'sd'     ~ 'opid3here',\n                                               stat_name == 'median' ~ 'opid4here',\n                                               stat_name == 'p25'    ~ 'opid5here',\n                                               stat_name == 'p75'    ~ 'opid6here',\n                                               stat_name == 'min'    ~ 'opid7here',\n                                               stat_name == 'max'    ~ 'opid8here'))"
+    },
+    {
+      "id": "risk_difference",
+      "name": "Risk difference of two arms (overall)",
+      "label": "Risk difference + 95% CI",
+      "description": "One overall risk difference (%) and 95% CI between the two treatment arms present in the data subset. The two arms are self-derived from the data (no arm-filter construct). References df_poptot so a 0-event subset still yields RD = 0 / CI = [0,0] (population_based; matches the fda-ae-t06 An_34 reference). Uses base stats::prop.test rather than cardx because cardx::ard_stats_prop_test is unsafe on a fully degenerate (0-event in both arms) 2x2 table. Verified against fda-ae-t06 Mth_03_1.",
+      "status": "verified",
+      "operations": [
+        {
+          "order": 1,
+          "name": "Risk_Difference_%",
+          "label": "Risk Difference %",
+          "resultPattern": "xx.x"
+        },
+        {
+          "order": 2,
+          "name": "95%_CI_Low",
+          "label": "95% CI Low",
+          "resultPattern": "xx.x"
+        },
+        {
+          "order": 3,
+          "name": "95%_CI_High",
+          "label": "95% CI High",
+          "resultPattern": "xx.x"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "groupvar1here",
+          "valueSource": "AG_var1",
+          "label": "grp var 1",
+          "description": "Grouping variable (treatment arm)"
+        },
+        {
+          "name": "anavarhere",
+          "valueSource": "ana_var",
+          "label": "ana var",
+          "description": "Analysis variable (subject ID)"
+        }
+      ],
+      "templateCode": ".arms_analysisidhere <- unique(df2_analysisidhere$groupvar1here)\nfull_analysisidhere <- if (length(.arms_analysisidhere) >= 2) {\n  df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n} else {\n  df_poptot\n}\n\nsuccess_analysisidhere = df2_analysisidhere |>\n    dplyr::distinct(anavarhere) |>\n    dplyr::mutate(FL = 1L)\n\nana_analysisidhere = full_analysisidhere |>\n    dplyr::left_join(\n        success_analysisidhere |> dplyr::select(anavarhere, FL),\n        by = \"anavarhere\"\n    ) |>\n    dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n\ngrp_analysisidhere <- sort(unique(ana_analysisidhere$groupvar1here))\n\nif (length(grp_analysisidhere) >= 2) {\nn1_analysisidhere <- sum(ana_analysisidhere$groupvar1here == grp_analysisidhere[[1]])\nn2_analysisidhere <- sum(ana_analysisidhere$groupvar1here == grp_analysisidhere[[2]])\nx1_analysisidhere <- sum(ana_analysisidhere$FL[ana_analysisidhere$groupvar1here == grp_analysisidhere[[1]]])\nx2_analysisidhere <- sum(ana_analysisidhere$FL[ana_analysisidhere$groupvar1here == grp_analysisidhere[[2]]])\npt_analysisidhere <- stats::prop.test(\n    x = c(x1_analysisidhere, x2_analysisidhere),\n    n = c(n1_analysisidhere, n2_analysisidhere),\n    correct = FALSE\n)\n\ndf3_analysisidhere <- tibble::tibble(\n    variable = \"FL\",\n    variable_level = list(NULL, NULL, NULL),\n    stat_name = c(\"estimate\", \"conf.low\", \"conf.high\"),\n    stat = list(\n        (pt_analysisidhere$estimate[[1]] - pt_analysisidhere$estimate[[2]]) * 100,\n        pt_analysisidhere$conf.int[[1]] * 100,\n        pt_analysisidhere$conf.int[[2]] * 100\n    ),\n    operationid = c('opid1here', 'opid2here', 'opid3here')\n)\n} else {\ndf3_analysisidhere <- tibble::tibble(\n    variable = \"FL\",\n    variable_level = list(NULL, NULL, NULL),\n    stat_name = c(\"estimate\", \"conf.low\", \"conf.high\"),\n    stat = list(NA_real_, NA_real_, NA_real_),\n    operationid = c('opid1here', 'opid2here', 'opid3here')\n)\n}"
+    },
+    {
+      "id": "risk_difference_per_group",
+      "name": "Risk difference per data-driven inner category",
+      "label": "Risk difference + 95% CI (per group)",
+      "description": "One risk difference (%) + 95% CI per data-driven inner category (e.g. PT or SOC) of Group2, comparing the two arms present in the subset. The two arms are self-derived from the data. References df_poptot (population_based). Verified against fda-ae-t13/t36 Mth_03_1a using an independent stats::prop.test(correct = FALSE) recomputation (180/187 PTs, 22 SOCs).",
+      "status": "verified",
+      "operations": [
+        {
+          "order": 1,
+          "name": "Risk_Difference_%",
+          "label": "Risk Difference %",
+          "resultPattern": "xx.x"
+        },
+        {
+          "order": 2,
+          "name": "95%_CI_Low",
+          "label": "95% CI Low",
+          "resultPattern": "xx.x"
+        },
+        {
+          "order": 3,
+          "name": "95%_CI_High",
+          "label": "95% CI High",
+          "resultPattern": "xx.x"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "groupvar1here",
+          "valueSource": "AG_var1",
+          "label": "grp var 1",
+          "description": "Grouping variable from Group1 (treatment arm)"
+        },
+        {
+          "name": "groupvar2here",
+          "valueSource": "AG_var2",
+          "label": "grp var 2",
+          "description": "Grouping variable from Group2 (data-driven inner category)"
+        },
+        {
+          "name": "anavarhere",
+          "valueSource": "ana_var",
+          "label": "ana var",
+          "description": "Analysis variable (subject ID)"
+        }
+      ],
+      "templateCode": ".arms_analysisidhere <- utils::head(sort(unique(df2_analysisidhere$groupvar1here)), 2)\nfull_analysisidhere <- df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n\n.cats_analysisidhere <- sort(unique(as.character(df2_analysisidhere$groupvar2here)))\n\n.rd_one_analysisidhere <- function(.cat) {\n  success <- df2_analysisidhere |>\n      dplyr::filter(as.character(groupvar2here) == .cat) |>\n      dplyr::distinct(anavarhere) |>\n      dplyr::mutate(FL = 1L)\n  ana <- full_analysisidhere |>\n      dplyr::left_join(dplyr::select(success, anavarhere, FL), by = \"anavarhere\") |>\n      dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n  cardx::ard_stats_prop_test(data = ana, by = groupvar1here, variables = FL, correct = FALSE) |>\n      dplyr::filter(stat_name %in% c(\"estimate\", \"conf.low\", \"conf.high\")) |>\n      dplyr::mutate(\n          stat = lapply(stat, function(.v) .v * 100),\n          group2_level = .cat,\n          operationid = dplyr::case_when(\n              stat_name == \"estimate\"  ~ \"opid1here\",\n              stat_name == \"conf.low\"  ~ \"opid2here\",\n              stat_name == \"conf.high\" ~ \"opid3here\"\n          )\n      )\n}\n\ndf3_analysisidhere <- if (length(.arms_analysisidhere) >= 2 && length(.cats_analysisidhere) > 0) {\n  dplyr::bind_rows(lapply(.cats_analysisidhere, .rd_one_analysisidhere))\n} else {\n  tibble::tibble(variable = character(0), group2_level = character(0),\n                 stat_name = character(0), stat = list(),\n                 operationid = character(0))\n}"
+    },
+    {
+      "id": "fishers_exact",
+      "name": "Fisher's exact test of two arms",
+      "label": "Fisher's exact (odds ratio + 95% CI)",
+      "description": "Fisher's exact odds-ratio estimate and 95% CI between the two arms present in the subset. CORRECTED from the legacy sheet: arms are self-derived from the data (the legacy sheet used the unsupported trt_filter_stm valueSource), and the conf.high operation mapping is fixed (the legacy case_when mapped conf.low twice). References df_poptot (population_based). NOT YET validated against a reference ARD - no Fisher table exists in the bundled metadata; structure only is checked by the contract test.",
+      "status": "corrected-unvalidated",
+      "operations": [
+        {
+          "order": 1,
+          "name": "estimate",
+          "label": "Odds ratio",
+          "resultPattern": "xx.xx"
+        },
+        {
+          "order": 2,
+          "name": "conf.low",
+          "label": "95% CI Low",
+          "resultPattern": "xx.xx"
+        },
+        {
+          "order": 3,
+          "name": "conf.high",
+          "label": "95% CI High",
+          "resultPattern": "xx.xx"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "groupvar1here",
+          "valueSource": "AG_var1",
+          "label": "grp var 1",
+          "description": "Grouping variable (treatment arm)"
+        },
+        {
+          "name": "anavarhere",
+          "valueSource": "ana_var",
+          "label": "ana var",
+          "description": "Analysis variable (subject ID)"
+        }
+      ],
+      "templateCode": ".arms_analysisidhere <- utils::head(sort(unique(df2_analysisidhere$groupvar1here)), 2)\nfull_analysisidhere <- df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n\nsuccess_analysisidhere = df2_analysisidhere |>\n    dplyr::distinct(anavarhere) |>\n    dplyr::mutate(FL = 1L)\n\nana_analysisidhere = full_analysisidhere |>\n    dplyr::left_join(dplyr::select(success_analysisidhere, anavarhere, FL), by = \"anavarhere\") |>\n    dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n\ndf3_analysisidhere = if (length(.arms_analysisidhere) >= 2) {\n  cardx::ard_stats_fisher_test(data = ana_analysisidhere, by = groupvar1here, variables = FL) |>\n   dplyr::filter(stat_name %in% c('estimate', 'conf.low', 'conf.high')) |>\n   dplyr::mutate(operationid = dplyr::case_when(stat_name == 'estimate'  ~ 'opid1here',\n                                                stat_name == 'conf.low'  ~ 'opid2here',\n                                                stat_name == 'conf.high' ~ 'opid3here'))\n} else {\n  tibble::tibble(variable = character(0), stat_name = character(0),\n                 stat = list(), operationid = character(0))\n}"
+    },
+    {
+      "id": "chisq",
+      "name": "Chi-square test of a categorical variable across arms",
+      "label": "Chi-square p-value",
+      "description": "Chi-square test p-value of a categorical variable across treatment arms. Verified against Common_Safety_Displays Mth03_CatVar_Comp_PChiSq.",
+      "status": "verified",
+      "operations": [
+        {
+          "order": 1,
+          "name": "p.value",
+          "label": "p-value",
+          "resultPattern": "x.xxx"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "groupvar1here",
+          "valueSource": "AG_var1",
+          "label": "grp var 1",
+          "description": "Grouping variable (treatment arm), the by-variable"
+        },
+        {
+          "name": "groupvar2here",
+          "valueSource": "AG_var2",
+          "label": "grp var 2",
+          "description": "Categorical variable being tested"
+        }
+      ],
+      "templateCode": "df3_analysisidhere <-\n    cardx::ard_stats_chisq_test(by = groupvar1here, data = df2_analysisidhere, variables = groupvar2here) |>\n  dplyr::filter(stat_name == 'p.value') |>\n  dplyr::mutate(operationid = 'opid1here')"
+    },
+    {
+      "id": "anova",
+      "name": "One-way ANOVA of a continuous variable across arms",
+      "label": "ANOVA p-value",
+      "description": "One-way ANOVA p-value of a continuous variable across treatment arms. Verified against Common_Safety_Displays Mth04_ContVar_Comp_Anova.",
+      "status": "verified",
+      "operations": [
+        {
+          "order": 1,
+          "name": "p.value",
+          "label": "p-value",
+          "resultPattern": "x.xxx"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "anavarhere",
+          "valueSource": "ana_var",
+          "label": "ana var",
+          "description": "Continuous analysis variable (LHS of the formula)"
+        },
+        {
+          "name": "groupvar1here",
+          "valueSource": "AG_var1",
+          "label": "grp var 1",
+          "description": "Grouping variable (treatment arm), the RHS of the formula"
+        }
+      ],
+      "templateCode": "df3_analysisidhere <-\n    cardx::ard_stats_aov(anavarhere ~ groupvar1here, data = df2_analysisidhere) |>\n  dplyr::filter(stat_name == 'p.value') |>\n  dplyr::mutate(operationid = 'opid1here')"
+    }
+  ]
+}

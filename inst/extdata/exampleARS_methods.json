@@ -1,0 +1,220 @@
+{
+  "$schema": "siera-method-manifest/v1",
+  "name": "siera example method manifest",
+  "description": "Example method manifest referenced by exampleARS_5_documentref (issue #175 demo).",
+  "context": "R (siera)",
+  "methods": [
+    {
+      "id": "Mth_01",
+      "name": "Count by group for a categorical variable",
+      "label": "Grouped count for categorical variable",
+      "description": "Count across groups for a categorical variable, based on subject occurrence",
+      "operations": [
+        {
+          "name": "Count of subjects",
+          "label": "n",
+          "id": "Mth_01_01_n",
+          "order": 1,
+          "resultPattern": "(N=)"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "distinctlisthere",
+          "description": "Comma-separated list of all Analysis Grouping Variables, as well as the Analysis Variable (no quotes)",
+          "valueSource": "distinct_list"
+        },
+        {
+          "name": "opid1here",
+          "valueSource": "operation_1"
+        },
+        {
+          "name": "byhere",
+          "description": "By statement",
+          "valueSource": "by_stmt"
+        }
+      ],
+      "templateCode": "in_data = df2_analysisidhere |>_x000D_\n    dplyr::select(distinctlisthere) |>_x000D_\n    unique() |>_x000D_\n    dplyr::mutate(dummy = 'dummyvar')_x000D_\n_x000D_\ndf3_analysisidhere <-_x000D_\n  cards::ard_categorical(_x000D_\n    data = in_data_x000D_\n    byhere_x000D_\n   ,  variables = dummy_x000D_\n  ) |>_x000D_\ndplyr::filter(stat_name == 'n') |>_x000D_\n dplyr::mutate(operationid = 'opid1here')"
+    },
+    {
+      "id": "Mth_02",
+      "name": "Summary by group of a categorical variable",
+      "label": "Grouped summary of categorical variable",
+      "description": "Descriptive summary statistics across groups for a categorical variable, based on subject occurrence",
+      "operations": [
+        {
+          "name": "n",
+          "label": "n",
+          "id": "Mth_02_01_n",
+          "order": 1,
+          "resultPattern": "XX"
+        },
+        {
+          "name": "%",
+          "label": "%",
+          "id": "Mth_02_02_%",
+          "order": 2,
+          "referencedOperationRelationships": [
+            {
+              "id": "Mth_02_02_%_NUM",
+              "referencedOperationRole": {
+                "controlledTerm": "NUMERATOR"
+              },
+              "operationId": "Mth_02_01_n",
+              "description": "The count operation whose result provides the numerator for calculation of the percentage. The referenced analysis should be the analysis that contains this percent operation."
+            },
+            {
+              "id": "Mth_02_02_%_DEN",
+              "referencedOperationRole": {
+                "controlledTerm": "DENOMINATOR"
+              },
+              "operationId": "Mth_01_01_n",
+              "description": "The count operation whose result provides the denominator for calculation of the percentage. The referenced analysis should have the same analysis set and subject grouping(s) as the analysis containing this percent operation."
+            }
+          ],
+          "resultPattern": "(XX.XX)"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "distinctlisthere",
+          "description": "list of variables by which to apply the \"distinct\" function from dplyr",
+          "valueSource": "distinct_list"
+        },
+        {
+          "name": "denomanaidhere",
+          "description": "Analysis ID for Denominator Analysis",
+          "valueSource": "DEN_analysisid"
+        },
+        {
+          "name": "isdatadrivenhere",
+          "description": "dataDriven boolean value for highest Analysisgrouping factor",
+          "valueSource": "AG_max_dataDriven"
+        },
+        {
+          "name": "opid1here",
+          "valueSource": "operation_1"
+        },
+        {
+          "name": "opid2here",
+          "valueSource": "operation_2"
+        },
+        {
+          "name": "byvarshere",
+          "description": "variables to be used in \"by\" or \"strata\" statement",
+          "valueSource": "by_listc"
+        }
+      ],
+      "templateCode": "denom_dataset = df2_denomanaidhere \n\n                    in_data = df2_analysisidhere |>\n                        dplyr::distinct(distinctlisthere) |>\n                        dplyr::mutate(dummy = 'dummyvar')\n\n                    dataDriven = isdatadrivenhere\n                    if(dataDriven == TRUE){\n                    df3_analysisidhere <-\n                    cards::ard_categorical(\n                        data = in_data,\n                        strata = c(byvarshere),\n                        variables = 'dummy',\n                        denominator = denom_dataset\n                    ) } else {\n                    df3_analysisidhere <-\n                    cards::ard_categorical(\n                        data = in_data,\n                        by = c(byvarshere),\n                        variables = 'dummy',\n                        denominator = denom_dataset\n                    ) }\n                    df3_analysisidhere <- df3_analysisidhere|>\n                    dplyr::filter(stat_name %in% c('n', 'p')) |>\n                    dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'opid1here',\n                                                                        stat_name == 'p' ~ 'opid2here'))"
+    },
+    {
+      "id": "Mth_03",
+      "name": "Summary by group of a continuous variable",
+      "label": "Grouped summary of continuous variable",
+      "description": "Descriptive summary statistics across groups for a continuous variable",
+      "operations": [
+        {
+          "name": "n",
+          "label": "n",
+          "id": "Mth_03_01_n",
+          "order": 1,
+          "resultPattern": "XX"
+        },
+        {
+          "name": "Mean",
+          "label": "Mean",
+          "id": "Mth_03_02_Mean",
+          "order": 2,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "SD",
+          "label": "SD",
+          "id": "Mth_03_03_SD",
+          "order": 3,
+          "resultPattern": "(XX.XX)"
+        },
+        {
+          "name": "Median",
+          "label": "Median",
+          "id": "Mth_03_04_Median",
+          "order": 4,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "Q1",
+          "label": "Q1",
+          "id": "Mth_03_05_Q1",
+          "order": 5,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "Q3",
+          "label": "Q3",
+          "id": "Mth_03_06_Q3",
+          "order": 6,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "Min",
+          "label": "Min",
+          "id": "Mth_03_07_Min",
+          "order": 7,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "Max",
+          "label": "Max",
+          "id": "Mth_03_08_Max",
+          "order": 8,
+          "resultPattern": "XX.X"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "byvarshere",
+          "description": "string for \"by\" parameter for the ard_continuous function",
+          "valueSource": "by_listc"
+        },
+        {
+          "name": "opid1here",
+          "valueSource": "operation_1"
+        },
+        {
+          "name": "opid2here",
+          "valueSource": "operation_2"
+        },
+        {
+          "name": "opid3here",
+          "valueSource": "operation_3"
+        },
+        {
+          "name": "opid4here",
+          "valueSource": "operation_4"
+        },
+        {
+          "name": "opid5here",
+          "valueSource": "operation_5"
+        },
+        {
+          "name": "opid6here",
+          "valueSource": "operation_6"
+        },
+        {
+          "name": "opid7here",
+          "valueSource": "operation_7"
+        },
+        {
+          "name": "opid8here",
+          "valueSource": "operation_8"
+        },
+        {
+          "name": "anavarhere",
+          "description": "Analysis variable to be summarised",
+          "valueSource": "ana_var"
+        }
+      ],
+      "templateCode": "df3_analysisidhere <-\n                    cards::ard_continuous(\n                        data = df2_analysisidhere,\n                        by = c(byvarshere),\n                        variables = anavarhere\n                    ) |>\n                    dplyr::mutate(operationid = dplyr::case_when(stat_name == 'N' ~ 'opid1here',\n                                                stat_name == 'mean' ~ 'opid2here',\n                                                stat_name == 'sd' ~ 'opid3here',\n                                                stat_name == 'median' ~ 'opid4here',\n                                                stat_name == 'p25' ~ 'opid5here',\n                                                stat_name == 'p75' ~ 'opid6here',\n                                                stat_name == 'min' ~ 'opid7here',\n                                                stat_name == 'max' ~ 'opid8here'))"
+    }
+  ]
+}
