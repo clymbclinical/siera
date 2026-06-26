@@ -13,11 +13,11 @@
 # emergent ground truth, since the published reference ARD omits the TRTEMFL
 # filter its own ARS metadata mandates (#158, reference defect).
 # Per-category risk difference (#157) is now emitted via method Mth_03_1a and
-# asserted for fda-ae-t13 (An_81/An_81_1, per PT) and fda-ae-t36 (An_55/An_55_1,
-# per SOC) against an independent prop.test ground truth. Remaining limitations
-# exercised but not asserted: per-(SOC x PT) RD (fda-ae-t36 An_57, a 3-grouping
-# case Mth_03_1a does not yet cover -- #172) and the per-action/per-severity RD in
-# fda-ae-t06 (still on the single-RD method Mth_03_1 -- #171).
+# asserted for fda-ae-t13 (An_81/An_81_1, per PT), fda-ae-t36 (An_55/An_55_1,
+# per SOC) and fda-ae-t06 (An_48_2/An_48_3 per action, An_50_2/An_50_3 per
+# severity -- #171) against an independent prop.test ground truth. Remaining
+# limitation exercised but not asserted: per-(SOC x PT) RD (fda-ae-t36 An_57, a
+# 3-grouping case Mth_03_1a does not yet cover -- #172).
 
 # -- Demographics / disposition / exposure (ADSL-only, fast) -------------------
 
@@ -79,6 +79,32 @@ test_that("fda-ae-t06 AE summary: bigN and n% match reference", {
   # An_34 is a SAE-death risk difference with zero events; siera now emits
   # RD = 0 / CI = [0, 0] matching the reference (#156 fixed).
   .expect_all_match(.cmp_rd(ard, ref, "An_34"))
+
+  # An_48_2 / An_48_3 (per-action RD) and An_50_2 / An_50_3 (per-severity RD)
+  # now use the per-category method Mth_03_1a (#171): one RD + 95% CI per AEACN
+  # action / AESEV severity, over arms 1 vs 3 and 2 vs 3. Each subset already
+  # restricts to exactly those two arms (Dss_68/69 = TRTAN IN (1,3)/(2,3) with
+  # AEACN NOTIN the two no-change actions; Dss_71/72 = AESEV NE '' with the same
+  # arm pairs), so Mth_03_1a's sorted-arm logic is exact. Asserted against the
+  # independent prop.test ground truth (every category matches).
+  .expect_all_match(.cmp_pergroup_rd(
+    ard, "fda-ae-t06", "An_48_2",
+    subset_fun = function(d) dplyr::filter(
+      d, !AEACN %in% c("NOT APPLICABLE", "DOSE NOT CHANGED"), TRTAN %in% c(1, 3)),
+    cat_var = "AEACN", arms = c(1, 3)))
+  .expect_all_match(.cmp_pergroup_rd(
+    ard, "fda-ae-t06", "An_48_3",
+    subset_fun = function(d) dplyr::filter(
+      d, !AEACN %in% c("NOT APPLICABLE", "DOSE NOT CHANGED"), TRTAN %in% c(2, 3)),
+    cat_var = "AEACN", arms = c(2, 3)))
+  .expect_all_match(.cmp_pergroup_rd(
+    ard, "fda-ae-t06", "An_50_2",
+    subset_fun = function(d) dplyr::filter(d, AESEV != "", TRTAN %in% c(1, 3)),
+    cat_var = "AESEV", arms = c(1, 3)))
+  .expect_all_match(.cmp_pergroup_rd(
+    ard, "fda-ae-t06", "An_50_3",
+    subset_fun = function(d) dplyr::filter(d, AESEV != "", TRTAN %in% c(2, 3)),
+    cat_var = "AESEV", arms = c(2, 3)))
 })
 
 test_that("fda-ae-t07 AE by cause: bigN and one- and two-level n% match reference", {
