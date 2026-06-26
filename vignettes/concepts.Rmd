@@ -57,9 +57,11 @@ ARS metadata describes a whole reporting event, but _siera_ only needs seven sec
 | _dataSubsets_ | Adds row-level filters for individual analyses (e.g. serious, treatment-emergent AEs). |
 | _analysisGroupings_ | Defines the columns/subgroups results are split by (e.g. treatment arm), including data-driven groupings discovered at run time. |
 | _analyses_ | Ties everything together for one calculation: which method, population, subset and groupings apply. |
-| _methods_ | Describes the operations to perform, and carries the dynamic R code template _siera_ fills in. |
+| _methods_ | Describes the operations to perform, and carries the dynamic R code template _siera_ fills in (inline, or *referenced* from an external method library - see _Using cards_). |
 
 Each generated script is assembled from these pieces, and every result it produces carries identifiers back to them (see "Reading an ARD row" below).
+
+A method's code template need not be written inline: _siera_ can also resolve it from an external **reference document** (the ARS `codeTemplate.documentRef` mechanism), so an ARS file can point at a shared, tested method library by `id` rather than copy-pasting code. This builds on `referenceDocuments`, which is otherwise outside the seven sections above. See the _Using cards and cardx_ article for how to wire it up.
 
 ## JSON and XLSX parity
 

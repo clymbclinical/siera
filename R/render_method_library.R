@@ -101,3 +101,64 @@
 
   out
 }
+
+#' Render the method-template library as a referenceable JSON manifest catalog
+#'
+#' Internal generator that turns the plain-text method library into a single
+#' machine-readable **method manifest** (`inst/method-library/method-library.json`):
+#' a superset of each `method.json` that also carries the `templateCode` body, so
+#' the whole library ships as one ARS-referenceable document. An ARS file can then
+#' point a method's `codeTemplate.documentRef` at this catalog and select a method
+#' by its `id` via a `pageRefs` named destination (resolved by
+#' [.resolve_method_documentref()]). The committed catalog is produced by this
+#' function and a contract test asserts it matches, so the catalog can never drift
+#' from the per-method source files.
+#'
+#' Regenerate the committed catalog with:
+#' `writeLines(siera:::.render_method_library_json(), "inst/method-library/method-library.json")`
+#'
+#' @param lib_dir Path to the method-library directory. Defaults to the installed
+#'   (or `load_all()`ed) copy via `system.file()`.
+#' @return Character scalar of pretty-printed JSON (one trailing newline-free
+#'   string; write with [writeLines()]).
+#' @keywords internal
+.render_method_library_json <- function(lib_dir = NULL) {
+  if (is.null(lib_dir)) {
+    lib_dir <- system.file("method-library", package = "siera")
+  }
+
+  method_dirs <- list.dirs(lib_dir, recursive = FALSE)
+  method_dirs <- sort(method_dirs[file.exists(file.path(method_dirs, "method.json"))])
+
+  methods <- lapply(method_dirs, function(d) {
+    m <- jsonlite::fromJSON(file.path(d, "method.json"), simplifyDataFrame = FALSE, simplifyVector = TRUE)
+    template <- paste(readLines(file.path(d, "template.R"), warn = FALSE), collapse = "\n")
+    # Order keys deterministically; carry the catalog identity plus everything an
+    # ARS-referencing engine needs (operations + parameters + templateCode).
+    list(
+      id           = m$id,
+      name         = m$name,
+      label        = m$label,
+      description  = m$description,
+      status       = m$status,
+      operations   = m$operations,
+      parameters   = m$parameters,
+      templateCode = template
+    )
+  })
+
+  catalog <- list(
+    `$schema`   = "siera-method-manifest/v1",
+    name        = "siera method library",
+    description = paste(
+      "Referenceable catalog of siera analysis-method code templates.",
+      "Point an ARS method codeTemplate.documentRef at this file and select a",
+      "method by its id via a pageRefs NamedDestination. Generated from",
+      "inst/method-library/ - do not edit by hand."
+    ),
+    context = "R (siera)",
+    methods = methods
+  )
+
+  jsonlite::toJSON(catalog, pretty = TRUE, auto_unbox = TRUE, null = "null")
+}

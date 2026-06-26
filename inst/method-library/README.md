@@ -15,16 +15,55 @@ owner-facing Excel workbook can be *generated* from text rather than hand-edited
 ```
 inst/method-library/
   <NN_key>/
-    method.json     # metadata: id, name, label, description, status, operations[], parameters[]
-    template.R      # the codeTemplate.code, with placeholder tokens
-  constructs.json   # the reconciled valueSource vocabulary (supported keys only)
-  METHODS.md        # GENERATED human-readable catalog (do not hand-edit)
-  README.md         # this file
+    method.json          # metadata: id, name, label, description, status, operations[], parameters[]
+    template.R           # the codeTemplate.code, with placeholder tokens
+  constructs.json        # the reconciled valueSource vocabulary (supported keys only)
+  METHODS.md             # GENERATED human-readable catalog (do not hand-edit)
+  method-library.json    # GENERATED referenceable JSON manifest catalog (do not hand-edit)
+  README.md              # this file
 ```
 
-The `id` in each `method.json` is the **stable key**: the intended future
-mechanism is for an ARS file to *reference* a library method by `id` rather than
-embedding the `templateCode` inline.
+The `id` in each `method.json` is the **stable key**: an ARS file can
+*reference* a library method by `id` rather than embedding the `templateCode`
+inline (see "Referencing a method from ARS" below).
+
+## Referencing a method from ARS (issue #175)
+
+siera consumes the ARS `codeTemplate.documentRef` mechanism, so an ARS file can
+point a method's `codeTemplate` at an external document instead of carrying the
+template (and parameters) inline. The generated script is identical either way.
+
+The whole library ships as one referenceable **method manifest**,
+`method-library.json` (a superset of each `method.json` that also carries the
+`templateCode`). It is generated from the per-method text files, so it can never
+drift. Regenerate after any change with:
+
+```r
+writeLines(siera:::.render_method_library_json(), "inst/method-library/method-library.json")
+```
+
+An ARS author wires a method to a library entry like this (JSON):
+
+```json
+// ReportingEvent.referenceDocuments[]
+{ "id": "RefDoc_siera_methods", "name": "siera method library",
+  "location": "method-library.json" }
+
+// methods[].codeTemplate (no inline "code")
+{ "context": "R (siera)",
+  "documentRef": {
+    "referenceDocumentId": "RefDoc_siera_methods",
+    "pageRefs": [ { "refType": "NamedDestination", "pageNames": ["total_n"] } ]
+  } }
+```
+
+`location` resolves **locally only** (relative to the ARS file, or absolute);
+remote URLs are rejected. A single-method manifest or a bare `.R`/`.txt` code
+file (parameters then stay inline in the ARS) are also accepted. The XLSX ARS
+representation carries the same wiring in its `ReferenceDocuments` and
+`AnalysisMethodDocumentRefs` sheets. See the bundled
+`exampleARS_5_documentref.json` / `.xlsx` (with `exampleARS_methods.json`) for a
+runnable end-to-end example.
 
 Access from R with the exported accessor: `method_library()` lists the available
 ids, and `method_library("<id>")` returns the path to that method's directory.
@@ -65,7 +104,9 @@ R until substituted — the contract test parses a substituted copy, not the raw
 4. no duplicated `stat_name == '…'` left-hand side in a `case_when` (the class of bug
    that mapped `conf.low` twice and dropped `conf.high` in the legacy sheets);
 5. operation IDs referenced (`opidN`) do not exceed the declared `operations`;
-6. the committed `METHODS.md` equals the freshly rendered catalog (no drift).
+6. the committed `METHODS.md` equals the freshly rendered catalog (no drift);
+7. the committed `method-library.json` manifest equals the freshly rendered
+   catalog, and every method resolves out of it via the documentRef resolver.
 
 ## Human-readable catalog
 
@@ -79,9 +120,11 @@ writeLines(siera:::.render_method_library_md(), "inst/method-library/METHODS.md"
 ```
 
 The freshness contract test fails if you forget, so the human view can never
-silently drift from the source of truth. There is intentionally **no** generated
-xlsx - the legacy `inst/extdata/R_siera_codes.xlsx` is left untouched but is not
-part of this library.
+silently drift from the source of truth. The machine-readable
+`method-library.json` manifest (the ARS-referenceable catalog) is generated the
+same way and held to the same freshness test. There is intentionally **no**
+generated xlsx - the legacy `inst/extdata/R_siera_codes.xlsx` is left untouched
+but is not part of this library.
 
 ## Adding a method
 

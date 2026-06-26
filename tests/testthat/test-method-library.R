@@ -74,6 +74,39 @@ test_that("renderer resolves the library via system.file when no path given", {
   expect_true(any(grepl("siera method-template catalog", rendered, fixed = TRUE)))
 })
 
+test_that("committed method-library.json catalog matches the rendered catalog (no drift)", {
+  json_file <- file.path(.mlib_dir(), "method-library.json")
+  expect_true(file.exists(json_file))
+  expect_identical(
+    readLines(json_file, warn = FALSE),
+    strsplit(siera:::.render_method_library_json(.mlib_dir()), "\n", fixed = TRUE)[[1]]
+  )
+})
+
+test_that("the shipped catalog is a valid, resolvable method manifest", {
+  json_file <- file.path(.mlib_dir(), "method-library.json")
+  ids <- method_library()
+  # Each library id resolves out of the catalog via a pageRefs named destination.
+  for (id in ids) {
+    res <- siera:::.resolve_method_documentref(
+      reference_document_id = "RefDoc",
+      page_names            = id,
+      reference_documents   = tibble::tibble(id = "RefDoc", location = basename(json_file)),
+      ars_dir               = dirname(json_file)
+    )
+    expect_true(nzchar(res$templateCode), info = id)
+    ok <- res$parameters$valueSource %in% siera:::.supported_value_sources() |
+      grepl(siera:::.operation_value_source_pattern(), res$parameters$valueSource)
+    expect_true(all(ok), info = id)
+  }
+})
+
+test_that("renderer resolves the JSON catalog via system.file when no path given", {
+  rendered <- siera:::.render_method_library_json()
+  expect_type(rendered, "character")
+  expect_true(grepl("siera-method-manifest/v1", rendered, fixed = TRUE))
+})
+
 test_that("method_library() lists ids and resolves a method directory", {
   ids <- method_library()
   expect_type(ids, "character")
