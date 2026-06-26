@@ -184,6 +184,20 @@ The token is an OAuth token (`gho_` prefix) stored in Windows Credential Manager
 - Commit messages: imperative mood, short (e.g. `Fix #139: update cards_constructs.xlsx`).
 - Every PR must be linked to a GitHub issue. Inform the user when editing siera source files if no issue exists yet.
 
+### Parallel work / multiple sessions (use git worktrees)
+
+More than one Claude session may be active on this repo at once (typically one per issue). Sessions that share a single working tree also share **one index and one HEAD**, so any `git checkout`, `git stash`, `git reset`, or `git commit` in one session silently corrupts the other (e.g. a `git stash -u` to start a branch will drag a parallel session's uncommitted WIP onto your branch, and your commit can land on their branch).
+
+- **Before stashing or switching branches, check `git branch --show-current` and whether a parallel session is mid-edit.** If the working tree has untracked/modified files you did not create, a parallel session is likely active — stop and use a worktree instead.
+- **For genuinely parallel work, give each line of work its own checkout with `git worktree`** (branches, commits, and pushes are shared via the common `.git`; only the working files are isolated):
+  - New branch: `git worktree add -b <issue>-<slug> ../siera-<issue> origin/main`
+  - Existing branch: `git worktree add ../siera-<issue> <existing-branch>`
+  - Run that session with its working directory pointed at the new folder; edit/commit/push there.
+  - Clean up after merge: `git worktree remove ../siera-<issue>`.
+  - A branch can be checked out in only one worktree at a time (git enforces this). Stagger `devtools::check()`/`install()` across worktrees — they share the same installed-package library.
+- **Never `git stash` in a shared tree, and never `git add -A`** — stage only your own explicit paths.
+- **Never `git reset --hard` to undo a misplaced commit in a shared tree** — it destroys a parallel session's modified tracked files. To extract a commit onto its own branch without touching the working tree: `git branch -f <target-branch> <commit>`; `git reset --soft origin/main`; `git restore --source=origin/main --staged --worktree -- <only your files>`.
+
 ## cards / cardx API alignment
 
 The generated R scripts and example scripts in `inst/script/` must always use the current `cards` API. Key function renames from cards ≥ 0.7.0:
