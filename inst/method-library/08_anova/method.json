@@ -1,0 +1,31 @@
+{
+  "id": "anova",
+  "name": "One-way ANOVA of a continuous variable across arms",
+  "label": "ANOVA p-value",
+  "description": "One-way ANOVA p-value of a continuous variable across treatment arms. Verified against Common_Safety_Displays Mth04_ContVar_Comp_Anova.",
+  "context": "R (siera)",
+  "status": "verified",
+  "verified_against": "Common_Safety_Displays_cards.xlsx Mth04_ContVar_Comp_Anova",
+  "operations": [
+    {
+      "order": 1,
+      "name": "p.value",
+      "label": "p-value",
+      "resultPattern": "x.xxx"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "anavarhere",
+      "valueSource": "ana_var",
+      "label": "ana var",
+      "description": "Continuous analysis variable (LHS of the formula)"
+    },
+    {
+      "name": "groupvar1here",
+      "valueSource": "AG_var1",
+      "label": "grp var 1",
+      "description": "Grouping variable (treatment arm), the RHS of the formula"
+    }
+  ]
+}

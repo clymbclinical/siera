@@ -286,6 +286,9 @@ readARS <- function(ARS_path,
       # Build the explicit lookup table of all computed string values that ARS
       # code-template parameters can reference via their valueSource key.
       # Operation IDs (operation_1 etc.) are computed inside the function itself.
+      # NB: the set of names assembled here is the authoritative valueSource
+      # vocabulary; keep it in sync with .supported_value_sources() (the declared
+      # contract that the method-library test validates against).
       value_sources <- c(
         list(
           distinct_list     = distinct_list,

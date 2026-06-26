@@ -1,0 +1,37 @@
+{
+  "id": "total_n",
+  "name": "Big N denominator count by group",
+  "label": "Total N (per group)",
+  "description": "Distinct count of the analysis variable (typically USUBJID) per treatment group. Used as the N= header / denominator source. Verified against Common_Safety_Displays Mth01_CatVar_Count_ByGrp; current cards API.",
+  "context": "R (siera)",
+  "status": "verified",
+  "verified_against": "Common_Safety_Displays_cards.xlsx Mth01_CatVar_Count_ByGrp",
+  "operations": [
+    {
+      "order": 1,
+      "name": "n",
+      "label": "Count",
+      "resultPattern": "xx"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "anavarhere",
+      "valueSource": "ana_var",
+      "label": "ana var",
+      "description": "Analysis variable (e.g. USUBJID)"
+    },
+    {
+      "name": "groupvar1here",
+      "valueSource": "AG_var1",
+      "label": "grp var 1",
+      "description": "First grouping variable (treatment arm)"
+    },
+    {
+      "name": "bystmthere",
+      "valueSource": "by_vars",
+      "label": "by stmt",
+      "description": "by/variables argument string for the grouping(s)"
+    }
+  ]
+}

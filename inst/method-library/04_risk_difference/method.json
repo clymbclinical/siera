@@ -1,0 +1,43 @@
+{
+  "id": "risk_difference",
+  "name": "Risk difference of two arms (overall)",
+  "label": "Risk difference + 95% CI",
+  "description": "One overall risk difference (%) and 95% CI between the two treatment arms present in the data subset. The two arms are self-derived from the data (no arm-filter construct). References df_poptot so a 0-event subset still yields RD = 0 / CI = [0,0] (population_based; matches the fda-ae-t06 An_34 reference). Uses base stats::prop.test rather than cardx because cardx::ard_stats_prop_test is unsafe on a fully degenerate (0-event in both arms) 2x2 table. Verified against fda-ae-t06 Mth_03_1.",
+  "context": "R (siera)",
+  "status": "verified",
+  "verified_against": "tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03_1",
+  "operations": [
+    {
+      "order": 1,
+      "name": "Risk_Difference_%",
+      "label": "Risk Difference %",
+      "resultPattern": "xx.x"
+    },
+    {
+      "order": 2,
+      "name": "95%_CI_Low",
+      "label": "95% CI Low",
+      "resultPattern": "xx.x"
+    },
+    {
+      "order": 3,
+      "name": "95%_CI_High",
+      "label": "95% CI High",
+      "resultPattern": "xx.x"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "groupvar1here",
+      "valueSource": "AG_var1",
+      "label": "grp var 1",
+      "description": "Grouping variable (treatment arm)"
+    },
+    {
+      "name": "anavarhere",
+      "valueSource": "ana_var",
+      "label": "ana var",
+      "description": "Analysis variable (subject ID)"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "fishers_exact",
+  "name": "Fisher's exact test of two arms",
+  "label": "Fisher's exact (odds ratio + 95% CI)",
+  "description": "Fisher's exact odds-ratio estimate and 95% CI between the two arms present in the subset. CORRECTED from the legacy sheet: arms are self-derived from the data (the legacy sheet used the unsupported trt_filter_stm valueSource), and the conf.high operation mapping is fixed (the legacy case_when mapped conf.low twice). References df_poptot (population_based). NOT YET validated against a reference ARD - no Fisher table exists in the bundled metadata; structure only is checked by the contract test.",
+  "context": "R (siera)",
+  "status": "corrected-unvalidated",
+  "verified_against": null,
+  "operations": [
+    {
+      "order": 1,
+      "name": "estimate",
+      "label": "Odds ratio",
+      "resultPattern": "xx.xx"
+    },
+    {
+      "order": 2,
+      "name": "conf.low",
+      "label": "95% CI Low",
+      "resultPattern": "xx.xx"
+    },
+    {
+      "order": 3,
+      "name": "conf.high",
+      "label": "95% CI High",
+      "resultPattern": "xx.xx"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "groupvar1here",
+      "valueSource": "AG_var1",
+      "label": "grp var 1",
+      "description": "Grouping variable (treatment arm)"
+    },
+    {
+      "name": "anavarhere",
+      "valueSource": "ana_var",
+      "label": "ana var",
+      "description": "Analysis variable (subject ID)"
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "_comment": "Reconciled, single source of truth for the valueSource vocabulary siera resolves. 'simple' = direct ARS metadata lookup; 'complex' = an assembled argument/list string. The 'supported' flag MUST match .supported_value_sources() (operation_N is matched by pattern). Legacy docs also referenced trt_filter_stm, num_grp_any, anset_cond_stm, fisher_cond_stm and AG_ds1 - siera does NOT resolve these, so they are intentionally absent here.",
+  "constructs": [
+    {
+      "valueSource": "ana_var",
+      "type": "simple",
+      "details": "Analysis variable name",
+      "ars_location": "Analyses$variable",
+      "assumed_parameter_name": "anavarhere"
+    },
+    {
+      "valueSource": "AG_var1",
+      "type": "simple",
+      "details": "First analysis grouping variable",
+      "ars_location": "Analyses$groupingId1 -> AnalysisGroupings$groupingVariable",
+      "assumed_parameter_name": "groupvar1here"
+    },
+    {
+      "valueSource": "AG_var2",
+      "type": "simple",
+      "details": "Second analysis grouping variable",
+      "ars_location": "Analyses$groupingId2 -> AnalysisGroupings$groupingVariable",
+      "assumed_parameter_name": "groupvar2here"
+    },
+    {
+      "valueSource": "AG_var3",
+      "type": "simple",
+      "details": "Third analysis grouping variable",
+      "ars_location": "Analyses$groupingId3 -> AnalysisGroupings$groupingVariable",
+      "assumed_parameter_name": "groupvar3here"
+    },
+    {
+      "valueSource": "DEN_analysisid",
+      "type": "simple",
+      "details": "Analysis ID of the referenced denominator analysis",
+      "ars_location": "Analyses$referencedAnalysisOperations -> analysisId (denominator)",
+      "assumed_parameter_name": "denomanaidhere"
+    },
+    {
+      "valueSource": "AG_denom_var1",
+      "type": "simple",
+      "details": "First grouping variable of the referenced denominator analysis",
+      "ars_location": "denominator Analyses$groupingId1 -> AnalysisGroupings$groupingVariable",
+      "assumed_parameter_name": "denom_anagroupvarshere"
+    },
+    {
+      "valueSource": "AG_max_dataDriven",
+      "type": "simple",
+      "details": "TRUE/FALSE: whether the highest resultsByGroup grouping is data-driven",
+      "ars_location": "max resultsByGroup grouping -> AnalysisGroupings$dataDriven",
+      "assumed_parameter_name": "isdatadrivenhere"
+    },
+    {
+      "valueSource": "distinct_list",
+      "type": "complex",
+      "details": "All active grouping variables plus the analysis variable, comma separated, unquoted (for dplyr::distinct)",
+      "ars_location": "all Analyses$groupingIdX -> groupingVariable + Analyses$variable",
+      "assumed_parameter_name": "distinctlisthere"
+    },
+    {
+      "valueSource": "by_listc",
+      "type": "complex",
+      "details": "All grouping variables as a quoted, comma-separated list (to be wrapped in c(...)). Stamps CDISC group metadata. Preferred for grouped tabulations.",
+      "ars_location": "all Analyses$groupingIdX -> groupingVariable",
+      "assumed_parameter_name": "byvarshere"
+    },
+    {
+      "valueSource": "by_list",
+      "type": "complex",
+      "details": "All grouping variables as an UNQUOTED, comma-separated list. Same vars as by_listc but without quotes.",
+      "ars_location": "all Analyses$groupingIdX -> groupingVariable",
+      "assumed_parameter_name": "bylisthere"
+    },
+    {
+      "valueSource": "by_vars",
+      "type": "complex",
+      "details": "Leading-comma 'by/variables' argument string: the last grouping goes to variables=, the rest to by=. Stamps CDISC group metadata. The raw token is invalid R until substituted (it injects a leading comma).",
+      "ars_location": "all Analyses$groupingIdX -> groupingVariable",
+      "assumed_parameter_name": "bystmthere"
+    },
+    {
+      "valueSource": "strata_vars",
+      "type": "complex",
+      "details": "Leading-comma 'strata/variables' argument string (data-driven analogue of by_vars). Stamps CDISC group metadata.",
+      "ars_location": "all Analyses$groupingIdX -> groupingVariable",
+      "assumed_parameter_name": "stratastmthere"
+    },
+    {
+      "valueSource": "by_stmt",
+      "type": "complex",
+      "details": "Leading-comma 'by = ...' argument string (all groupings to by=). CAUTION: resolves to n_group_cols = 0, so siera stamps NO group[n] metadata columns - do not use where CDISC-compliant group metadata is required; prefer by_listc / by_vars / strata_vars.",
+      "ars_location": "all Analyses$groupingIdX -> groupingVariable",
+      "assumed_parameter_name": "byhere"
+    },
+    {
+      "valueSource": "operation_N",
+      "type": "pattern",
+      "details": "operation_1 ... operation_N: the method's own operation IDs in 'order'. Matched by pattern (^operation_[0-9]+$), never declared as a parameter.",
+      "ars_location": "Analyses$methodId -> AnalysisMethods$operations[order = N]$id",
+      "assumed_parameter_name": "opidNhere"
+    }
+  ]
+}
