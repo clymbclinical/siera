@@ -26,6 +26,9 @@ The `id` in each `method.json` is the **stable key**: the intended future
 mechanism is for an ARS file to *reference* a library method by `id` rather than
 embedding the `templateCode` inline.
 
+Access from R with the exported accessor: `method_library()` lists the available
+ids, and `method_library("<id>")` returns the path to that method's directory.
+
 ### `method.json`
 
 | Field | Meaning |

@@ -11,16 +11,12 @@
 #' `writeLines(siera:::.render_method_library_md(), "inst/method-library/METHODS.md")`
 #'
 #' @param lib_dir Path to the method-library directory. Defaults to the installed
-#'   copy via `system.file()`, falling back to `inst/method-library` in the source
-#'   tree.
+#'   (or `load_all()`ed) copy via `system.file()`.
 #' @return Character vector of Markdown lines.
 #' @keywords internal
 .render_method_library_md <- function(lib_dir = NULL) {
   if (is.null(lib_dir)) {
     lib_dir <- system.file("method-library", package = "siera")
-    if (is.null(lib_dir) || identical(lib_dir, "") || !dir.exists(lib_dir)) {
-      lib_dir <- file.path("inst", "method-library")
-    }
   }
 
   method_dirs <- list.dirs(lib_dir, recursive = FALSE)

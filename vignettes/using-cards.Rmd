@@ -67,13 +67,16 @@ In order to facilitate the use of placeholders and their replacement with actual
 The authoritative, tested reference for these constructs — together with a catalog of ready-to-use analysis-method templates that use them — ships with the package as a plain-text **method-template library**.  Each template is validated automatically (it parses, references only constructs _siera_ can resolve, and stays in sync with the catalog), so what you read there always reflects what _siera_ actually does.  You can browse it with:
 
 ```{r methodlib, eval=FALSE}
-# the method-template library that ships with siera:
+# list the available analysis-method templates:
+method_library()
+
+# resolve a particular method's files (method.json + template.R):
+method_library("risk_difference")
+
+# the library root also holds the authoritative construct (valueSource) list
+# and a human-readable catalog of all method templates:
 lib <- system.file("method-library", package = "siera")
-
-# the authoritative list of constructs (valueSources) siera resolves:
 file.path(lib, "constructs.json")
-
-# a human-readable catalog of the available method templates:
 file.path(lib, "METHODS.md")
 ```
 

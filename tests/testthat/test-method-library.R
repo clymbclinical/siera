@@ -68,6 +68,26 @@ test_that("committed METHODS.md matches the rendered catalog (no drift)", {
   )
 })
 
+test_that("renderer resolves the library via system.file when no path given", {
+  rendered <- siera:::.render_method_library_md()
+  expect_type(rendered, "character")
+  expect_true(any(grepl("siera method-template catalog", rendered, fixed = TRUE)))
+})
+
+test_that("method_library() lists ids and resolves a method directory", {
+  ids <- method_library()
+  expect_type(ids, "character")
+  expect_true(all(c("risk_difference", "chisq", "anova") %in% ids))
+  expect_identical(ids, sort(ids))
+
+  d <- method_library("risk_difference")
+  expect_true(dir.exists(d))
+  expect_true(file.exists(file.path(d, "method.json")))
+  expect_true(file.exists(file.path(d, "template.R")))
+
+  expect_error(method_library("does_not_exist"), "Unknown method library id")
+})
+
 test_that("constructs.json valueSources match the .supported_value_sources() contract", {
   cons <- jsonlite::fromJSON(
     file.path(.mlib_dir(), "constructs.json"),
