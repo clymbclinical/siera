@@ -1,0 +1,30 @@
+# Supported code-template valueSource keys
+
+The authoritative set of \`valueSource\` keys that siera can resolve
+when substituting tokens into an ARS method \`codeTemplate\`. A
+method-library template may only reference these keys (plus the
+operation-ID pattern, see below); any other key is left unsubstituted at
+generation time and the emitted script will not run.
+
+## Usage
+
+``` r
+.supported_value_sources()
+```
+
+## Value
+
+Character vector of supported valueSource keys.
+
+## Details
+
+This is the single declared contract for the valueSource vocabulary. It
+must stay in sync with the \`value_sources\` list assembled per analysis
+in \[readARS()\] (see \`R/readARS.R\`); the method-library contract test
+asserts the bundled templates reference only these keys.
+
+In addition to the keys returned here, templates may reference the
+operation-ID family \`operation_1\`, \`operation_2\`, ...
+\`operation_N\`. These are derived automatically from the method's own
+\`operations\` list (in \`order\`) and never declared as parameters, so
+they are matched by pattern rather than being listed here.

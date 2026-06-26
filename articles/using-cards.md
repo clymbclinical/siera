@@ -95,8 +95,33 @@ from the *AnalysisMethodCodeTemplate* and *AnalysisMethodCodeParameters*
 classes in the metadata. These constructs are either simple variables or
 datasets defined in the metadata, or complex, dynamic constructs from
 various metadata pieces, to be inserted in specific *cards* functions,
-or pre-processing steps. A list of defined constructs and examples is
-shipped with this package, and can be accessed with:
+or pre-processing steps.
+
+The authoritative, tested reference for these constructs — together with
+a catalog of ready-to-use analysis-method templates that use them —
+ships with the package as a plain-text **method-template library**. Each
+template is validated automatically (it parses, references only
+constructs *siera* can resolve, and stays in sync with the catalog), so
+what you read there always reflects what *siera* actually does. You can
+browse it with:
+
+``` r
+
+# list the available analysis-method templates:
+method_library()
+
+# resolve a particular method's files (method.json + template.R):
+method_library("risk_difference")
+
+# the library root also holds the authoritative construct (valueSource) list
+# and a human-readable catalog of all method templates:
+lib <- system.file("method-library", package = "siera")
+file.path(lib, "constructs.json")
+file.path(lib, "METHODS.md")
+```
+
+An earlier, illustrative list of constructs is also bundled as a
+spreadsheet (the method-template library above is the source of truth):
 
 ``` r
 

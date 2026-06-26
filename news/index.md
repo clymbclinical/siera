@@ -4,6 +4,26 @@
 
 CRAN release: 2026-06-17
 
+- Added
+  [`method_library()`](https://clymbclinical.github.io/siera/reference/method_library.md),
+  an exported accessor that lists the bundled analysis-method templates
+  and resolves a method’s files on disk (parallel to
+  [`ARS_example()`](https://clymbclinical.github.io/siera/reference/ARS_example.md)).
+- Added a plain-text, testable analysis-method template library under
+  `inst/method-library/` (one `method.json` + `template.R` per method,
+  plus a reconciled `constructs.json` valueSource registry and a
+  generated `METHODS.md` catalog). This becomes the reviewable,
+  diff-able source of truth for the code-template recipes that drive ARD
+  generation; its method `id`s are intended as stable keys an ARS file
+  can reference. A contract test validates every recipe on each run
+  (templates parse, only supported valueSources are referenced, no
+  orphan tokens, no duplicated `case_when` mappings, and the
+  human-readable catalog stays in sync). Introduced an internal
+  [`.supported_value_sources()`](https://clymbclinical.github.io/siera/reference/dot-supported_value_sources.md)
+  helper as the declared valueSource contract. The legacy
+  `inst/extdata/R_siera_codes.xlsx` and `cards_constructs.xlsx` are left
+  untouched
+  ([\#173](https://github.com/clymbclinical/siera/issues/173)).
 - Added support for per-category risk differences. A new method template
   computes one risk difference and 95% confidence interval for each
   data-driven inner category (e.g. one per preferred term or system

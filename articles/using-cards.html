@@ -167,9 +167,30 @@ to call from the <em>AnalysisMethodCodeTemplate</em> and
 constructs are either simple variables or datasets defined in the
 metadata, or complex, dynamic constructs from various metadata pieces,
 to be inserted in specific <em>cards</em> functions, or pre-processing
-steps. A list of defined constructs and examples is shipped with this
-package, and can be accessed with:</p>
+steps.</p>
+<p>The authoritative, tested reference for these constructs — together
+with a catalog of ready-to-use analysis-method templates that use them —
+ships with the package as a plain-text <strong>method-template
+library</strong>. Each template is validated automatically (it parses,
+references only constructs <em>siera</em> can resolve, and stays in sync
+with the catalog), so what you read there always reflects what
+<em>siera</em> actually does. You can browse it with:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># list the available analysis-method templates:</span></span>
+<span><span class="fu"><a href="../reference/method_library.html">method_library</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># resolve a particular method's files (method.json + template.R):</span></span>
+<span><span class="fu"><a href="../reference/method_library.html">method_library</a></span><span class="op">(</span><span class="st">"risk_difference"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># the library root also holds the authoritative construct (valueSource) list</span></span>
+<span><span class="co"># and a human-readable catalog of all method templates:</span></span>
+<span><span class="va">lib</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"method-library"</span>, package <span class="op">=</span> <span class="st">"siera"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">lib</span>, <span class="st">"constructs.json"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">lib</span>, <span class="st">"METHODS.md"</span><span class="op">)</span></span></code></pre></div>
+<p>An earlier, illustrative list of constructs is also bundled as a
+spreadsheet (the method-template library above is the source of
+truth):</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"cards_constructs.xlsx"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>

@@ -45,6 +45,24 @@ devtools::test_file("tests/testthat/test-readARS.R", filter = "4 grouping factor
 The “unable to verify current time” NOTE is a known environment artefact
 and can be ignored.
 
+**Test coverage**: cover every new/changed line and branch with tests
+*as part of the change*, so the `codecov/patch` check (effectively 100%
+patch target) is already green when you push — treat codecov as a
+backstop, not a TODO generator. Deliberately exercise the easy-to-miss
+paths: default-argument branches (a `function(x = NULL)` whose default
+body is bypassed when every test passes the arg — add a no-arg test),
+error/guard branches
+([`cli::cli_abort()`](https://cli.r-lib.org/reference/cli_abort.html) →
+`expect_error`), and each arm of `if`/`switch`/`case_when`. Remove
+dead/untestable code rather than shipping it uncovered. Verify locally
+when unsure with
+[`covr::file_coverage()`](http://covr.r-lib.org/reference/file_coverage.md)
+(a few files) or
+[`covr::package_coverage()`](http://covr.r-lib.org/reference/package_coverage.md) +
+[`covr::zero_coverage()`](http://covr.r-lib.org/reference/zero_coverage.md).
+(gh CLI is unavailable; if you do need to read codecov status, use the
+GitHub REST check-runs endpoint and the Codecov PR comment.)
+
 ## Key files
 
 | File | Purpose |
@@ -228,8 +246,9 @@ and can be ignored.
   xpt-free scripts don’t require haven. The object on the LHS is always
   the metadata dataset name regardless of the file’s case.
 - **Internal functions** are prefixed with `.`
-  (e.g. `.read_ars_metadata`). Only four symbols are exported:
-  `readARS`, `ARS_example`, `ARD_script_example`, `%>%`.
+  (e.g. `.read_ars_metadata`). Only five symbols are exported:
+  `readARS`, `ARS_example`, `ARD_script_example`, `method_library`
+  (accessor for the bundled `inst/method-library` templates), `%>%`.
 
 ## Coding standards (pharmaverse / admiral style)
 
@@ -355,6 +374,21 @@ Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/issues/139" -Headers 
 The token is an OAuth token (`gho_` prefix) stored in Windows Credential
 Manager by GitKraken. It has repo scope and works for all standard
 issue/PR/label operations.
+
+**Non-ASCII bodies (issue/PR markdown):** Windows PowerShell 5.1 sends
+`Invoke-RestMethod -Body` using the console ANSI codepage, which mangles
+any non-ASCII (em-dashes, arrows `→`/`←`, box-drawing `└─├─►`) — GitHub
+then 400s with `Problems parsing JSON` or
+`Invalid request … properties/body`. Fixes that work: (1) read the body
+file with `[System.IO.File]::ReadAllText($p,[Text.Encoding]::UTF8)` (NOT
+`Get-Content -Raw`, which reads ANSI), (2) `ConvertTo-Json -Depth 5`,
+then send `[Text.Encoding]::UTF8.GetBytes($payload)` as `-Body` with
+`-ContentType "application/json; charset=utf-8"`. Simplest robust
+option: pre-sanitise the body to ASCII first
+(`-replace [char]0x2014,'-'` etc.; note `String.Replace(char,char)`
+rejects multi-char targets like `->`, so use the `-replace` operator for
+those). Authoring issue bodies in ASCII from the start avoids the whole
+problem.
 
 ## Git / branch workflow
 
@@ -530,9 +564,50 @@ after the xlsx templates are updated, then
     ships; edit it with `openpyxl` (load → `create_sheet` → save) to
     preserve the other sheets. To author further methods see the
     `siera-author-method` skill.
+  - **\#173 — method-template library formalised as plain text
+    (supersedes the xlsx as source of truth).** The owner xlsx workbooks
+    (`inst/extdata/R_siera_codes.xlsx`, `cards_constructs.xlsx`) are
+    reference-only (siera never reads them at runtime) and had silently
+    drifted: the single `Risk Difference` and `Fisher's Exact test`
+    sheets referenced the **unsupported** valueSource `trt_filter_stm`
+    and carried a `case_when` copy-paste bug (`conf.low` mapped twice,
+    `conf.high` dropped), and `Total N`/`Categorical`/`Continuous` used
+    the deprecated `ard_categorical`/`ard_continuous` names. The new
+    **source of truth** is `inst/method-library/` — one folder per
+    method (`<NN_key>/method.json` + `template.R`), a reconciled
+    `constructs.json` (only valueSources siera actually resolves; legacy
+    `num_grp_any`/`anset_cond_stm`/`fisher_cond_stm`/`AG_ds1`/`trt_filter_stm`
+    are intentionally absent, `by_list` added), and a **generated**
+    `METHODS.md` catalog. siera’s authoritative valueSource list is
+    declared in `R/value_sources.R`
+    ([`.supported_value_sources()`](https://clymbclinical.github.io/siera/reference/dot-supported_value_sources.md)),
+    kept in sync with the `value_sources` assembly in `R/readARS.R`. The
+    catalog is produced by
+    [`.render_method_library_md()`](https://clymbclinical.github.io/siera/reference/dot-render_method_library_md.md)
+    in `R/render_method_library.R`; regenerate with
+    `writeLines(siera:::.render_method_library_md(), "inst/method-library/METHODS.md")`.
+    `tests/testthat/test-method-library.R` is the contract test
+    (templates parse after dummy substitution, only supported
+    valueSources, no orphan/unknown `…here` tokens, no duplicated
+    `case_when` LHS, `opidN` ≤ declared operations, `constructs.json` ==
+    [`.supported_value_sources()`](https://clymbclinical.github.io/siera/reference/dot-supported_value_sources.md),
+    and `METHODS.md` not stale). The legacy xlsx files are left
+    untouched. **Intended future direction:** ARS metadata references a
+    library method by its `id` instead of embedding `templateCode`
+    inline. Add new methods here (not the xlsx); there is intentionally
+    no generated xlsx.
 
 ## Documentation and vignettes
 
+- **Always review the full documentation set after any change — every
+  time, before opening a PR.** Do not only update the docs you assume
+  are affected. Walk the whole set and check each for needed updates:
+  all five vignettes, `README.md`/`README.Rmd`, `NEWS.md`,
+  `_pkgdown.yml`, `CLAUDE.md`, `man/` (via `document()`), and any
+  relevant `.claude/skills/`. Stale docs that merely *mention* a file or
+  workflow you changed (e.g. a vignette pointing at a now-superseded
+  reference) count as needed updates. Treat this documentation review as
+  a required, non-skippable pre-PR step.
 - **Keep documentation and functionality in sync.** Any user-visible
   change — a new feature, a behaviour change, a change to
   generated-script or ARD output, or a new capability the user should
@@ -594,3 +669,5 @@ after the xlsx templates are updated, then
 - Ask clarifying questions and check for understanding when there is
   uncertainty about a request or approach. Rather ask than guess.
 - when making a PR, ensure the updates to claude.md are pushed with it.
+- ensure the package structure is in line with best practices for CRAN R
+  Packages, and comparable to pharmaverse R packages.
