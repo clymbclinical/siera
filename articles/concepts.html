@@ -190,13 +190,22 @@ population, subset and groupings apply.</td>
 <tr class="odd">
 <td><em>methods</em></td>
 <td>Describes the operations to perform, and carries the dynamic R code
-template <em>siera</em> fills in.</td>
+template <em>siera</em> fills in (inline, or <em>referenced</em> from an
+external method library - see <em>Using cards</em>).</td>
 </tr>
 </tbody>
 </table>
 <p>Each generated script is assembled from these pieces, and every
 result it produces carries identifiers back to them (see “Reading an ARD
 row” below).</p>
+<p>A method’s code template need not be written inline: <em>siera</em>
+can also resolve it from an external <strong>reference document</strong>
+(the ARS <code>codeTemplate.documentRef</code> mechanism), so an ARS
+file can point at a shared, tested method library by <code>id</code>
+rather than copy-pasting code. This builds on
+<code>referenceDocuments</code>, which is otherwise outside the seven
+sections above. See the <em>Using cards and cardx</em> article for how
+to wire it up.</p>
 </div>
 <div class="section level2">
 <h2 id="json-and-xlsx-parity">JSON and XLSX parity<a class="anchor" aria-label="anchor" href="#json-and-xlsx-parity"></a>

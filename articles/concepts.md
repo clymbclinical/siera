@@ -78,11 +78,19 @@ contributes:
 | *dataSubsets* | Adds row-level filters for individual analyses (e.g. serious, treatment-emergent AEs). |
 | *analysisGroupings* | Defines the columns/subgroups results are split by (e.g. treatment arm), including data-driven groupings discovered at run time. |
 | *analyses* | Ties everything together for one calculation: which method, population, subset and groupings apply. |
-| *methods* | Describes the operations to perform, and carries the dynamic R code template *siera* fills in. |
+| *methods* | Describes the operations to perform, and carries the dynamic R code template *siera* fills in (inline, or *referenced* from an external method library - see *Using cards*). |
 
 Each generated script is assembled from these pieces, and every result
 it produces carries identifiers back to them (see “Reading an ARD row”
 below).
+
+A method’s code template need not be written inline: *siera* can also
+resolve it from an external **reference document** (the ARS
+`codeTemplate.documentRef` mechanism), so an ARS file can point at a
+shared, tested method library by `id` rather than copy-pasting code.
+This builds on `referenceDocuments`, which is otherwise outside the
+seven sections above. See the *Using cards and cardx* article for how to
+wire it up.
 
 ## JSON and XLSX parity
 

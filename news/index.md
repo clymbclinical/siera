@@ -4,6 +4,25 @@
 
 CRAN release: 2026-06-17
 
+- Added support for resolving a method’s code template from an
+  **external reference** instead of inline ARS metadata. When a method’s
+  `codeTemplate` carries a `documentRef` (rather than inline `code`),
+  [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+  now follows the ARS `referenceDocuments` chain to load the template -
+  and, where the method declares none inline, its parameters - from
+  either a siera *method manifest* (a `.json` superset of `method.json`
+  carrying `templateCode` + `parameters`, with a method selected by a
+  `pageRefs` named destination = the method `id`) or a bare `.R`/`.txt`
+  code file. Resolution is transparent: a `documentRef` ARS generates
+  the same script as its inline equivalent. The whole method library now
+  also ships as one referenceable catalog,
+  `inst/method-library/method-library.json`, and new bundled examples
+  (`exampleARS_5_documentref.json`/`.xlsx` + `exampleARS_methods.json`)
+  demonstrate the mechanism. v1 resolves local paths only (relative to
+  the ARS file, or absolute); remote URLs are rejected. JSON and XLSX
+  inputs are supported with parity (via the XLSX `ReferenceDocuments`
+  and `AnalysisMethodDocumentRefs` sheets)
+  ([\#175](https://github.com/clymbclinical/siera/issues/175)).
 - Added
   [`method_library()`](https://clymbclinical.github.io/siera/reference/method_library.md),
   an exported accessor that lists the bundled analysis-method templates

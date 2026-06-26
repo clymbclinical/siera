@@ -65,9 +65,11 @@ ARS_example()
 #>  [9] "exampleARS_1a.json"                "exampleARS_2.json"                
 #> [11] "exampleARS_2.xlsx"                 "exampleARS_2a.xlsx"               
 #> [13] "exampleARS_3.json"                 "exampleARS_3.xlsx"                
-#> [15] "exampleARS_4.json"                 "exampleARS_5.json"                
-#> [17] "exampleARS_5.xlsx"                 "exampleARS_6.json"                
-#> [19] "exampleARS_6.xlsx"                 "test_cards.json"
+#> [15] "exampleARS_4.json"                 "exampleARS_5_documentref.json"    
+#> [17] "exampleARS_5_documentref.xlsx"     "exampleARS_5.json"                
+#> [19] "exampleARS_5.xlsx"                 "exampleARS_6.json"                
+#> [21] "exampleARS_6.xlsx"                 "exampleARS_methods.json"          
+#> [23] "test_cards.json"
 
 # A temporary path to a specific file:
 ARS_example("exampleARS_1.json")

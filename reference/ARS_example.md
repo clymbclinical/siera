@@ -32,8 +32,10 @@ ARS_example()
 #> [11] "exampleARS_2.xlsx"                 "exampleARS_2a.xlsx"               
 #> [13] "exampleARS_3.json"                 "exampleARS_3.xlsx"                
 #> [15] "exampleARS_4.json"                 "exampleARS_5.json"                
-#> [17] "exampleARS_5.xlsx"                 "exampleARS_6.json"                
-#> [19] "exampleARS_6.xlsx"                 "test_cards.json"                  
+#> [17] "exampleARS_5.xlsx"                 "exampleARS_5_documentref.json"    
+#> [19] "exampleARS_5_documentref.xlsx"     "exampleARS_6.json"                
+#> [21] "exampleARS_6.xlsx"                 "exampleARS_methods.json"          
+#> [23] "test_cards.json"                  
 ARS_example("Common_Safety_Displays_cards.xlsx")
 #> [1] "/home/runner/work/_temp/Library/siera/extdata/Common_Safety_Displays_cards.xlsx"
 ```

@@ -1,0 +1,72 @@
+# Resolve an external method code-template reference (ARS \`documentRef\`)
+
+The ARS standard lets a method's \`codeTemplate\` point at an
+\*external\* document instead of carrying the template text inline:
+\`codeTemplate.documentRef\` is a \`DocumentReference\` whose
+\`referenceDocumentId\` resolves to an entry in the reporting event's
+\`referenceDocuments\[\]\`, and whose optional \`pageRefs\` (\`refType =
+"NamedDestination"\`, \`pageNames = \["\<method id\>"\]\`) selects one
+method out of a multi-method document. siera consumes that chain here so
+an ARS author can \*reference\* a library method by id rather than
+copy-pasting its \`templateCode\` (and parameters) inline - the
+copy-paste being exactly how the legacy workbooks silently drifted out
+of sync.
+
+## Usage
+
+``` r
+.resolve_method_documentref(
+  reference_document_id,
+  page_names = NULL,
+  reference_documents,
+  ars_dir
+)
+```
+
+## Arguments
+
+- reference_document_id:
+
+  Scalar character; the \`documentRef.referenceDocumentId\`.
+
+- page_names:
+
+  Character vector of \`pageRefs\` named-destination page names (method
+  ids). May be \`NULL\`/empty for a single-method document.
+
+- reference_documents:
+
+  A data frame / tibble of the reporting event's \`referenceDocuments\`
+  with at least \`id\` and \`location\` columns.
+
+- ars_dir:
+
+  Directory of the ARS input file; relative \`location\`s resolve
+  against it.
+
+## Value
+
+A list with \`templateCode\` (scalar character), \`parameters\` (a
+tibble with \`name\`, \`description\`, \`valueSource\`, or \`NULL\` for
+a bare code file), and \`context\` (scalar character; the resolved
+code-template context, defaulting to \`"R (siera)"\`).
+
+## Details
+
+Two reference-document formats are supported, dispatched on what the
+\`ReferenceDocument.location\` resolves to:
+
+\* a \*\*siera method manifest\*\* (\`.json\`) - a superset of a
+per-method \`method.json\` that carries \`templateCode\` \*\*and\*\*
+\`parameters\` (and \`operations\`) for one or many methods. The bundled
+\`inst/method-library/method-library.json\` catalog is exactly this
+shape, so the whole method library ships as a referenceable document. A
+method is selected by \`page_names\` (the named destination = the method
+\`id\`); a single-method manifest needs no \`page_names\`. \* a \*\*bare
+code file\*\* (\`.R\` / \`.txt\`) - the template body only (the ARS-pure
+/ Option A form). The ARS must then keep its \`codeTemplate.parameters\`
+inline; this resolver returns \`parameters = NULL\` for that case.
+
+Security / reproducibility: v1 resolves \*\*local paths only\*\* -
+relative (against the directory of the ARS input file) or absolute.
+Remote URIs (\`http(s)://\`, etc.) are rejected with an error.
