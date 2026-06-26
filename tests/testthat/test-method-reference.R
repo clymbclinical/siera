@@ -67,6 +67,35 @@ test_that(".extract_reference_documents normalises NULL, data frame and list", {
   expect_identical(siera:::.extract_reference_documents(df)$location, "x.json")
   lst <- list(list(id = "RD", name = "n", location = "x.json"))
   expect_identical(siera:::.extract_reference_documents(lst)$id, "RD")
+  # empty data frame and empty list both collapse to a 0-row tibble
+  expect_identical(nrow(siera:::.extract_reference_documents(df[0, ])), 0L)
+  expect_identical(nrow(siera:::.extract_reference_documents(list())), 0L)
+})
+
+test_that(".documentref_reference_id reads the i-th id or NA when absent", {
+  expect_identical(
+    siera:::.documentref_reference_id(list(referenceDocumentId = c("A", "B")), 2),
+    "B"
+  )
+  expect_true(is.na(siera:::.documentref_reference_id(list(other = 1), 1)))
+})
+
+test_that(".documentref_page_names handles every documentRef shape", {
+  # no pageRefs at all
+  expect_identical(siera:::.documentref_page_names(list(), 1), character(0))
+  # pageRefs present but the i-th entry is NULL
+  expect_identical(
+    siera:::.documentref_page_names(list(pageRefs = list(NULL)), 1), character(0)
+  )
+  # data-frame pageRefs without a pageNames column
+  pr_df <- list(pageRefs = list(data.frame(refType = "x", stringsAsFactors = FALSE)))
+  expect_identical(siera:::.documentref_page_names(pr_df, 1), character(0))
+  # data-frame pageRefs with a pageNames list-column
+  pr_ok <- list(pageRefs = list(data.frame(pageNames = I(list("total_n")))))
+  expect_identical(siera:::.documentref_page_names(pr_ok, 1), "total_n")
+  # list-form pageRefs (records not simplified to a data frame)
+  pr_lst <- list(pageRefs = list(list(list(pageNames = "total_n"))))
+  expect_identical(siera:::.documentref_page_names(pr_lst, 1), "total_n")
 })
 
 # ---- manifest resolution (Option B) ----------------------------------------
@@ -118,6 +147,18 @@ test_that("operation_N valueSources are accepted in a manifest", {
   d <- .write_manifest(list(m))
   res <- siera:::.resolve_method_documentref("RefDoc", "ops", .ref_docs("manifest.json"), d)
   expect_true("operation_1" %in% res$parameters$valueSource)
+})
+
+test_that("context defaults to R (siera) when the manifest declares none", {
+  d <- withr::local_tempdir()
+  m <- .total_n_method("noctx")
+  # manifest with no top-level context and a method with no context
+  writeLines(
+    jsonlite::toJSON(list(methods = list(m)), auto_unbox = TRUE, null = "null"),
+    file.path(d, "manifest.json")
+  )
+  res <- siera:::.resolve_method_documentref("RefDoc", "noctx", .ref_docs("manifest.json"), d)
+  expect_identical(res$context, "R (siera)")
 })
 
 test_that("a method with no parameters resolves to NULL parameters", {
@@ -248,6 +289,53 @@ test_that("XLSX documentRef example generates the same script as the inline ARS"
   inline <- .gen_script_norm(ARS_example("exampleARS_5.xlsx"), adam)
   docref <- .gen_script_norm(ARS_example("exampleARS_5_documentref.xlsx"), adam)
   expect_identical(docref, inline)
+})
+
+test_that("methods mix inline code and documentRef; empty refIds are skipped", {
+  # Build a 3-method ARS where Mth_01 keeps inline code (resolution is skipped
+  # for it), Mth_02 resolves from a manifest, and Mth_03 carries a documentRef
+  # with an empty referenceDocumentId (also skipped, leaving its template NA).
+  src <- jsonlite::fromJSON(ARS_example("exampleARS_5.json"),
+                            simplifyVector = FALSE, simplifyDataFrame = FALSE)
+  d <- withr::local_tempdir()
+  manifest <- list(
+    `$schema` = "siera-method-manifest/v1", context = "R (siera)",
+    methods = list(list(
+      id           = src$methods[[2]]$id,
+      parameters   = src$methods[[2]]$codeTemplate$parameters,
+      templateCode = src$methods[[2]]$codeTemplate$code
+    ))
+  )
+  writeLines(jsonlite::toJSON(manifest, auto_unbox = TRUE, null = "null"),
+             file.path(d, "manifest.json"))
+
+  src$referenceDocuments <- list(list(id = "RD", name = "m", location = "manifest.json"))
+  # Mth_01 left inline; Mth_02 -> manifest (and drops its inline context, so the
+  # context falls back to the resolved one); Mth_03 -> empty refId (skipped) and
+  # also drops its inline parameters (so it has neither inline nor resolved ones).
+  src$methods[[2]]$codeTemplate$code <- NULL
+  src$methods[[2]]$codeTemplate$parameters <- NULL
+  src$methods[[2]]$codeTemplate$context <- NULL
+  src$methods[[2]]$codeTemplate$documentRef <- list(
+    referenceDocumentId = "RD",
+    pageRefs = list(list(refType = "NamedDestination",
+                         pageNames = list(src$methods[[2]]$id))))
+  src$methods[[3]]$codeTemplate$code <- NULL
+  src$methods[[3]]$codeTemplate$parameters <- NULL
+  src$methods[[3]]$codeTemplate$documentRef <- list(referenceDocumentId = "")
+  ars <- file.path(d, "mixed.json")
+  writeLines(jsonlite::toJSON(src, auto_unbox = TRUE, null = "null"), ars)
+
+  meta <- siera:::.read_ars_metadata(ars)
+  tc <- meta$AnalysisMethodCodeTemplate
+  m1 <- meta$AnalysisMethods$id[1]
+  m2 <- src$methods[[2]]$id
+  m3 <- src$methods[[3]]$id
+  expect_true(nzchar(tc$templateCode[tc$method_id == m1]))   # inline kept
+  expect_true(nzchar(tc$templateCode[tc$method_id == m2]))   # resolved
+  expect_true(is.na(tc$templateCode[tc$method_id == m3]))    # empty refId skipped
+  # Mth_02 dropped its inline context -> filled from the resolved manifest.
+  expect_identical(tc$context[tc$method_id == m2], "R (siera)")
 })
 
 test_that("the shipped documentRef example carries no inline templateCode", {

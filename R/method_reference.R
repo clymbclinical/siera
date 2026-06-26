@@ -36,9 +36,10 @@
 #' @param ars_dir Directory of the ARS input file; relative `location`s resolve
 #'   against it.
 #'
-#' @return A list with `templateCode` (scalar character) and `parameters` (a
+#' @return A list with `templateCode` (scalar character), `parameters` (a
 #'   tibble with `name`, `description`, `valueSource`, or `NULL` for a bare code
-#'   file).
+#'   file), and `context` (scalar character; the resolved code-template context,
+#'   defaulting to `"R (siera)"`).
 #' @keywords internal
 .resolve_method_documentref <- function(reference_document_id,
                                         page_names = NULL,
@@ -88,7 +89,8 @@
   } else if (ext %in% c("r", "txt")) {
     list(
       templateCode = .read_template_code_file(path),
-      parameters   = NULL
+      parameters   = NULL,
+      context      = "R (siera)"
     )
   } else {
     cli::cli_abort(c(
@@ -142,7 +144,13 @@
 
   parameters <- .manifest_parameters_tibble(selected$parameters, selected$id, path)
 
-  list(templateCode = template_code, parameters = parameters)
+  # Context drives the downstream template filter (R (siera)/R/siera); take the
+  # method's own, else the manifest-level context, else the siera default.
+  context <- selected$context
+  if (is.null(context) || !nzchar(context)) context <- manifest$context
+  if (is.null(context) || !nzchar(context)) context <- "R (siera)"
+
+  list(templateCode = template_code, parameters = parameters, context = context)
 }
 
 #' Convert manifest `parameters` to a tibble and validate their valueSources

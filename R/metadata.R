@@ -404,6 +404,7 @@
   } else {
     rep(NA_character_, n_mth)
   }
+  contextVec <- if (!is.null(ct$context)) ct$context else rep(NA_character_, n_mth)
 
   # External method-template references (ARS codeTemplate.documentRef ->
   # referenceDocuments). Resolve only where inline code is absent; resolved
@@ -423,6 +424,11 @@
         ars_dir               = ars_dir
       )
       templateCode[i] <- resolved$templateCode
+      # The downstream template filter requires a known context; a documentRef
+      # method that omits codeTemplate.context falls back to the resolved one.
+      if (is.na(contextVec[i]) || !nzchar(contextVec[i])) {
+        contextVec[i] <- resolved$context
+      }
       if (!is.null(resolved$parameters)) {
         resolved_parameters[[method_ids[i]]] <- resolved$parameters
       }
@@ -431,7 +437,7 @@
 
   AnalysisMethodCodeTemplate <- tibble::tibble(
     method_id    = json_from$methods$id,
-    context      = if (!is.null(ct$context)) ct$context else rep(NA_character_, n_mth),
+    context      = contextVec,
     specifiedAs  = "Code",
     templateCode = templateCode
   )
@@ -588,7 +594,7 @@
             AnalysisMethodCodeTemplate,
             tibble::tibble(
               method_id    = mid,
-              context      = NA_character_,
+              context      = resolved$context,
               specifiedAs  = "Code",
               templateCode = resolved$templateCode
             )

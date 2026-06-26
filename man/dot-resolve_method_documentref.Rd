@@ -24,9 +24,10 @@
 against it.}
 }
 \value{
-A list with `templateCode` (scalar character) and `parameters` (a
+A list with `templateCode` (scalar character), `parameters` (a
   tibble with `name`, `description`, `valueSource`, or `NULL` for a bare code
-  file).
+  file), and `context` (scalar character; the resolved code-template context,
+  defaulting to `"R (siera)"`).
 }
 \description{
 The ARS standard lets a method's `codeTemplate` point at an *external*
