@@ -1,0 +1,31 @@
+{
+  "id": "chisq",
+  "name": "Chi-square test of a categorical variable across arms",
+  "label": "Chi-square p-value",
+  "description": "Chi-square test p-value of a categorical variable across treatment arms. Verified against Common_Safety_Displays Mth03_CatVar_Comp_PChiSq.",
+  "context": "R (siera)",
+  "status": "verified",
+  "verified_against": "Common_Safety_Displays_cards.xlsx Mth03_CatVar_Comp_PChiSq",
+  "operations": [
+    {
+      "order": 1,
+      "name": "p.value",
+      "label": "p-value",
+      "resultPattern": "x.xxx"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "groupvar1here",
+      "valueSource": "AG_var1",
+      "label": "grp var 1",
+      "description": "Grouping variable (treatment arm), the by-variable"
+    },
+    {
+      "name": "groupvar2here",
+      "valueSource": "AG_var2",
+      "label": "grp var 2",
+      "description": "Categorical variable being tested"
+    }
+  ]
+}

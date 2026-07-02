@@ -286,6 +286,9 @@ readARS <- function(ARS_path,
       # Build the explicit lookup table of all computed string values that ARS
       # code-template parameters can reference via their valueSource key.
       # Operation IDs (operation_1 etc.) are computed inside the function itself.
+      # NB: the set of names assembled here is the authoritative valueSource
+      # vocabulary; keep it in sync with .supported_value_sources() (the declared
+      # contract that the method-library test validates against).
       value_sources <- c(
         list(
           distinct_list     = distinct_list,
@@ -315,6 +318,7 @@ readARS <- function(ARS_path,
       )
 
       code_method <- analysis_method_result$code
+      population_based <- isTRUE(analysis_method_result$population_based)
 
       method <- analysis_method_result$method
       methodname <- method$name
@@ -342,7 +346,8 @@ readARS <- function(ARS_path,
         groupids           = groupids,
         n_group_cols       = n_group_cols,
         AG_dataDriven      = AG_dataDriven,
-        analysis_groupings = AnalysisGroupings
+        analysis_groupings = AnalysisGroupings,
+        population_based   = population_based
       )
 
       # Generate code for analysis ----------------------------------------------
@@ -441,7 +446,8 @@ readARS <- function(ARS_path,
 # the same AnalysisGroupings tibble with id, group_id, group_condition_value,
 # and dataDriven columns.
 .generate_groupid_code <- function(analysis_id, groupids, n_group_cols,
-                                   AG_dataDriven, analysis_groupings) {
+                                   AG_dataDriven, analysis_groupings,
+                                   population_based = FALSE) {
   if (n_group_cols < 1L) return("")
 
   mutate_parts <- character(0)
@@ -491,13 +497,20 @@ readARS <- function(ARS_path,
     }
   }
 
-  paste0(
-    "if(nrow(df2_", analysis_id, ") != 0){\n",
+  mutate_block <- paste0(
     "df3_", analysis_id, " <- df3_", analysis_id, " |>\n",
     "  dplyr::mutate(\n",
     paste(mutate_parts, collapse = ",\n"),
-    "\n  )\n}\n"
+    "\n  )\n"
   )
+
+  # Population-based methods (e.g. risk differences) keep a valid df3 even when
+  # df2 is empty, so the group stamping must not be skipped in that case (#156).
+  if (population_based) {
+    mutate_block
+  } else {
+    paste0("if(nrow(df2_", analysis_id, ") != 0){\n", mutate_block, "}\n")
+  }
 }
 
 # Determine how many group[n] columns a method produces in the ARD output.

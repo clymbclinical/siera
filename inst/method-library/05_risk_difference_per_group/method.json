@@ -1,0 +1,49 @@
+{
+  "id": "risk_difference_per_group",
+  "name": "Risk difference per data-driven inner category",
+  "label": "Risk difference + 95% CI (per group)",
+  "description": "One risk difference (%) + 95% CI per data-driven inner category (e.g. PT or SOC) of Group2, comparing the two arms present in the subset. The two arms are self-derived from the data. References df_poptot (population_based). Verified against fda-ae-t13/t36 Mth_03_1a using an independent stats::prop.test(correct = FALSE) recomputation (180/187 PTs, 22 SOCs).",
+  "context": "R (siera)",
+  "status": "verified",
+  "verified_against": "tests/testthat/testdata/etfl/metadata/fda-ae-t13-siera.json Mth_03_1a",
+  "operations": [
+    {
+      "order": 1,
+      "name": "Risk_Difference_%",
+      "label": "Risk Difference %",
+      "resultPattern": "xx.x"
+    },
+    {
+      "order": 2,
+      "name": "95%_CI_Low",
+      "label": "95% CI Low",
+      "resultPattern": "xx.x"
+    },
+    {
+      "order": 3,
+      "name": "95%_CI_High",
+      "label": "95% CI High",
+      "resultPattern": "xx.x"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "groupvar1here",
+      "valueSource": "AG_var1",
+      "label": "grp var 1",
+      "description": "Grouping variable from Group1 (treatment arm)"
+    },
+    {
+      "name": "groupvar2here",
+      "valueSource": "AG_var2",
+      "label": "grp var 2",
+      "description": "Grouping variable from Group2 (data-driven inner category)"
+    },
+    {
+      "name": "anavarhere",
+      "valueSource": "ana_var",
+      "label": "ana var",
+      "description": "Analysis variable (subject ID)"
+    }
+  ]
+}

@@ -396,15 +396,50 @@
   # codeTemplate is optional per ARS; guard all accessors against a NULL column.
   ct <- json_from$methods$codeTemplate
   n_mth <- length(json_from$methods$id)
+  method_ids <- as.character(json_from$methods$id)
+
+  # Inline template text (today's behaviour); NA where a method carries none.
+  templateCode <- if (!is.null(ct$code)) {
+    gsub("\r|_x000D_", "", ct$code)
+  } else {
+    rep(NA_character_, n_mth)
+  }
+  contextVec <- if (!is.null(ct$context)) ct$context else rep(NA_character_, n_mth)
+
+  # External method-template references (ARS codeTemplate.documentRef ->
+  # referenceDocuments). Resolve only where inline code is absent; resolved
+  # parameters are collected to backfill methods that have no inline parameters.
+  reference_documents <- .extract_reference_documents(json_from$referenceDocuments)
+  resolved_parameters <- list()
+  if (!is.null(ct$documentRef)) {
+    ars_dir <- dirname(ARS_path)
+    for (i in seq_len(n_mth)) {
+      if (!is.na(templateCode[i]) && nzchar(templateCode[i])) next
+      ref_id <- .documentref_reference_id(ct$documentRef, i)
+      if (is.null(ref_id) || is.na(ref_id) || !nzchar(ref_id)) next
+      resolved <- .resolve_method_documentref(
+        reference_document_id = ref_id,
+        page_names            = .documentref_page_names(ct$documentRef, i),
+        reference_documents   = reference_documents,
+        ars_dir               = ars_dir
+      )
+      templateCode[i] <- resolved$templateCode
+      # The downstream template filter requires a known context; a documentRef
+      # method that omits codeTemplate.context falls back to the resolved one.
+      if (is.na(contextVec[i]) || !nzchar(contextVec[i])) {
+        contextVec[i] <- resolved$context
+      }
+      if (!is.null(resolved$parameters)) {
+        resolved_parameters[[method_ids[i]]] <- resolved$parameters
+      }
+    }
+  }
 
   AnalysisMethodCodeTemplate <- tibble::tibble(
     method_id    = json_from$methods$id,
-    context      = if (!is.null(ct$context)) ct$context else rep(NA_character_, n_mth),
+    context      = contextVec,
     specifiedAs  = "Code",
-    templateCode = if (!is.null(ct$code))
-      gsub("\r|_x000D_", "", ct$code)
-    else
-      rep(NA_character_, n_mth)
+    templateCode = templateCode
   )
 
   AnalysisMethodCodeParameters <- tibble::tibble(
@@ -416,7 +451,20 @@
   for (i in seq_len(nrow(JSONAML1))) {
     id      <- as.character(JSONAML1[i, ]$id)
     params_i <- if (!is.null(ct$parameters)) ct$parameters[[i]] else NULL
-    if (is.null(params_i) || is.null(params_i$name)) next
+    if (is.null(params_i) || is.null(params_i$name)) {
+      # Inline parameters absent: fall back to parameters from a resolved
+      # external manifest (Option B), if the resolver supplied any.
+      resolved_i <- resolved_parameters[[id]]
+      if (is.null(resolved_i)) next
+      tmp_AMCP <- tibble::tibble(
+        method_id             = id,
+        parameter_name        = resolved_i$name,
+        parameter_description = resolved_i$description,
+        parameter_valueSource = resolved_i$valueSource
+      )
+      AnalysisMethodCodeParameters <- dplyr::bind_rows(AnalysisMethodCodeParameters, tmp_AMCP)
+      next
+    }
     tmp_AMCP <- tibble::tibble(
       method_id             = id,
       parameter_name        = params_i$name,
@@ -498,6 +546,75 @@
   AnalysisMethods <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisMethods")
   AnalysisMethodCodeTemplate <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisMethodCodeTemplate")
   AnalysisMethodCodeParameters <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisMethodCodeParameters")
+
+  # External method-template references (parity with the JSON documentRef path).
+  # The CDISC ARS xlsx representation carries these in two optional sheets:
+  #   ReferenceDocuments         (id, name, location, ...)
+  #   AnalysisMethodDocumentRefs (method_id, refDocumentId, pageRef_pages, ...)
+  # Resolve only where a method has no inline templateCode; backfill parameters
+  # from the resolved manifest when the method declares none inline.
+  if (all(c("ReferenceDocuments", "AnalysisMethodDocumentRefs") %in% ws)) {
+    method_doc_refs <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisMethodDocumentRefs")
+    if (nrow(method_doc_refs) > 0) {
+      ars_dir  <- dirname(ARS_path)
+      ref_docs <- .extract_reference_documents(
+        readxl::read_excel(ARS_xlsx, sheet = "ReferenceDocuments")
+      )
+      # An all-blank parameters sheet (every param supplied by the manifest)
+      # reads back with logical columns; re-type so bind_rows can combine it.
+      if (nrow(AnalysisMethodCodeParameters) == 0) {
+        AnalysisMethodCodeParameters <- tibble::tibble(
+          method_id             = character(0),
+          parameter_name        = character(0),
+          parameter_description = character(0),
+          parameter_valueSource = character(0)
+        )
+      }
+      for (k in seq_len(nrow(method_doc_refs))) {
+        mid     <- as.character(method_doc_refs$method_id[k])
+        row_idx <- which(AnalysisMethodCodeTemplate$method_id == mid)
+        existing <- if (length(row_idx) > 0) {
+          AnalysisMethodCodeTemplate$templateCode[row_idx[1]]
+        } else {
+          NA_character_
+        }
+        if (!is.na(existing) && nzchar(existing)) next
+
+        resolved <- .resolve_method_documentref(
+          reference_document_id = as.character(method_doc_refs$refDocumentId[k]),
+          page_names            = .split_page_names(method_doc_refs$pageRef_pages[k]),
+          reference_documents   = ref_docs,
+          ars_dir               = ars_dir
+        )
+
+        if (length(row_idx) > 0) {
+          AnalysisMethodCodeTemplate$templateCode[row_idx[1]] <- resolved$templateCode
+        } else {
+          AnalysisMethodCodeTemplate <- dplyr::bind_rows(
+            AnalysisMethodCodeTemplate,
+            tibble::tibble(
+              method_id    = mid,
+              context      = resolved$context,
+              specifiedAs  = "Code",
+              templateCode = resolved$templateCode
+            )
+          )
+        }
+
+        if (!mid %in% AnalysisMethodCodeParameters$method_id && !is.null(resolved$parameters)) {
+          AnalysisMethodCodeParameters <- dplyr::bind_rows(
+            AnalysisMethodCodeParameters,
+            tibble::tibble(
+              method_id             = mid,
+              parameter_name        = resolved$parameters$name,
+              parameter_description = resolved$parameters$description,
+              parameter_valueSource = resolved$parameters$valueSource
+            )
+          )
+        }
+      }
+    }
+  }
 
   Lopo <- otherListsOfContents
 

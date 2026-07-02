@@ -148,6 +148,108 @@
              siera_cat = "group2_level", ref_cat = "Group2")
 }
 
+# Independent ground truth for an arm x PT distinct-subject AE count (#158). ----
+# Computed straight from the raw ADaM XPT, NOT from the reference ARD: for
+# fda-ae-t13 An_80 the published reference ARD omits the treatment-emergent
+# (TRTEMFL == "Y") filter that the analysis's own ARS metadata mandates via
+# Dss_04, so it over-counts subjects whose only occurrence of a PT is a
+# non-treatment-emergent event and cannot serve as the oracle. This helper
+# applies the spec (Safety population + Treatment Emergent) and counts distinct
+# USUBJID per (arm, PT). The treatment grouping numbers map 1:1 to the trailing
+# digits of the siera groupId (AnlsGrouping_45_Trt01An_0N -> TRT01AN == N), as
+# defined by the grouping conditions in the metadata.
+.etfl_ae_pt_te_truth <- function(table, arm_var = "TRT01AN") {
+  paths <- .etfl_paths(table)
+  adsl <- haven::read_xpt(file.path(paths$adam_dir, "adsl.xpt"))
+  adae <- haven::read_xpt(file.path(paths$adam_dir, "adae.xpt"))
+  pop  <- adsl |> dplyr::filter(SAFFL == "Y")
+  armmap <- pop |> dplyr::transmute(USUBJID, armn = as.integer(.data[[arm_var]]))
+  adae |>
+    dplyr::filter(TRTEMFL == "Y", !is.na(AEDECOD), AEDECOD != "",
+                  USUBJID %in% pop$USUBJID) |>
+    dplyr::inner_join(armmap, by = "USUBJID") |>
+    dplyr::distinct(armn, AEDECOD, USUBJID) |>
+    dplyr::count(armn, AEDECOD, name = "truth")
+}
+
+# Compare siera's two-level (arm x PT) n against the spec-correct TE ground
+# truth from .etfl_ae_pt_te_truth(). Asserts EVERY siera n cell, so it also
+# guards against siera dropping or inventing arm x PT combinations.
+.cmp_ae_pt_te <- function(siera_ard, table, ana_id) {
+  truth <- .etfl_ae_pt_te_truth(table)
+  s <- siera_ard |>
+    dplyr::filter(AnalysisId == ana_id, stat_name == "n") |>
+    dplyr::mutate(siera = .etfl_safe_stat(stat),
+                  armn = as.integer(sub(".*_(\\d+)$", "\\1", group1_groupId)),
+                  AEDECOD = as.character(group2_level)) |>
+    dplyr::select(armn, AEDECOD, siera)
+  comp <- dplyr::full_join(s, truth, by = c("armn", "AEDECOD")) |>
+    dplyr::mutate(siera = ifelse(is.na(siera), 0, siera),
+                  truth = ifelse(is.na(truth), 0, truth),
+                  match = abs(siera - truth) < 0.01)
+  list(n_matched = sum(comp$match), n_total = nrow(comp), data = comp)
+}
+
+# Independent per-category risk-difference ground truth (#157). ----------------
+# Computed straight from the raw ADaM, NOT from the reference ARD. siera emits a
+# per-category RD via cardx::ard_stats_prop_test (method Mth_03_1a); this helper
+# recomputes the same quantity by an independent route -- distinct-subject counts
+# fed to stats::prop.test(correct = FALSE) -- so agreement cross-validates the
+# template instead of echoing it. A reference comparison is unsafe here: for
+# fda-ae-t13 the published reference omits the treatment-emergent filter (the
+# #158 defect), and for fda-ae-t36 it rounds the component percentages before
+# differencing; both disagree with the spec-correct value siera computes.
+# subset_fun applies the analysis's data subset to the merged ADSL x ADAE; cat_var
+# is the data-driven inner grouping variable; arms[1]/arms[2] are the two TRT01AN
+# levels compared (RD = p(arms[1]) - p(arms[2]), matching siera's sorted-arm
+# convention in Mth_03_1a).
+.etfl_pergroup_rd_truth <- function(table, subset_fun, cat_var, arms) {
+  paths <- .etfl_paths(table)
+  adsl <- haven::read_xpt(file.path(paths$adam_dir, "adsl.xpt"))
+  adae <- haven::read_xpt(file.path(paths$adam_dir, "adae.xpt"))
+  saf <- adsl |> dplyr::filter(SAFFL == "Y")
+  overlap <- setdiff(intersect(names(adsl), names(adae)), "USUBJID")
+  df_pop <- merge(saf, dplyr::select(adae, -dplyr::all_of(overlap)),
+                  by = "USUBJID", all = FALSE)
+  df2 <- subset_fun(df_pop)
+  N <- saf |> dplyr::filter(TRT01AN %in% arms) |> dplyr::count(TRT01AN, name = "N")
+  cats <- sort(unique(as.character(df2[[cat_var]])))
+  dplyr::bind_rows(lapply(cats, function(.c) {
+    x <- df2 |>
+      dplyr::filter(as.character(.data[[cat_var]]) == .c) |>
+      dplyr::distinct(TRT01AN, USUBJID) |>
+      dplyr::count(TRT01AN, name = "x")
+    tt <- N |> dplyr::left_join(x, by = "TRT01AN") |>
+      dplyr::mutate(x = ifelse(is.na(x), 0, x))
+    pp <- suppressWarnings(stats::prop.test(
+      x = c(tt$x[tt$TRT01AN == arms[1]], tt$x[tt$TRT01AN == arms[2]]),
+      n = c(tt$N[tt$TRT01AN == arms[1]], tt$N[tt$TRT01AN == arms[2]]),
+      correct = FALSE))
+    data.frame(cat = .c,
+               estimate  = (pp$estimate[[1]] - pp$estimate[[2]]) * 100,
+               conf.low  = pp$conf.int[[1]] * 100,
+               conf.high = pp$conf.int[[2]] * 100,
+               stringsAsFactors = FALSE)
+  }))
+}
+
+# Compare siera's per-category RD (estimate + 95% CI) against the ground truth.
+# A full join asserts EVERY category on both sides, so siera dropping or
+# inventing a category (or a CI bound) fails the test, not just a value mismatch.
+.cmp_pergroup_rd <- function(siera_ard, table, ana_id, subset_fun, cat_var, arms) {
+  truth <- .etfl_pergroup_rd_truth(table, subset_fun, cat_var, arms)
+  s <- siera_ard |>
+    dplyr::filter(AnalysisId == ana_id) |>
+    dplyr::mutate(val = .etfl_safe_stat(stat), cat = as.character(group2_level)) |>
+    dplyr::select(cat, stat_name, val) |>
+    tidyr::pivot_wider(names_from = stat_name, values_from = val)
+  comp <- dplyr::full_join(s, truth, by = "cat", suffix = c(".s", ".t"))
+  comp$match <- abs(comp$estimate.s  - comp$estimate.t)  < 0.01 &
+                abs(comp$conf.low.s  - comp$conf.low.t)  < 0.01 &
+                abs(comp$conf.high.s - comp$conf.high.t) < 0.01
+  list(n_matched = sum(comp$match, na.rm = TRUE), n_total = nrow(comp), data = comp)
+}
+
 # Compare a continuous summary (n, Mean, SD, Median, Min, Max). ----------------
 .cmp_continuous <- function(siera_ard, ref_ard, ana_id) {
   ops <- c("Mth_06_01_n", "Mth_06_02_Mean", "Mth_06_03_SD",

@@ -1,0 +1,55 @@
+{
+  "id": "categorical_summary",
+  "name": "Summary of a categorical variable (n and %)",
+  "label": "Categorical n (%)",
+  "description": "n and percentage of a categorical analysis variable per group, with a referenced denominator analysis and a data-driven/pre-defined grouping branch. Verified against Common_Safety_Displays Mth01_CatVar_Summ_ByGrp; current cards API. Spurious by_vars/strata_vars params from the legacy sheet have been dropped (the template uses by_listc).",
+  "context": "R (siera)",
+  "status": "verified",
+  "verified_against": "Common_Safety_Displays_cards.xlsx Mth01_CatVar_Summ_ByGrp",
+  "operations": [
+    {
+      "order": 1,
+      "name": "n",
+      "label": "Count",
+      "resultPattern": "xx"
+    },
+    {
+      "order": 2,
+      "name": "p",
+      "label": "Percentage",
+      "resultPattern": "(xx.x)"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "distinctlisthere",
+      "valueSource": "distinct_list",
+      "label": "distinct list",
+      "description": "Grouping variables + analysis variable, comma separated"
+    },
+    {
+      "name": "denomanaidhere",
+      "valueSource": "DEN_analysisid",
+      "label": "denom ana id",
+      "description": "Analysis ID supplying the denominator"
+    },
+    {
+      "name": "denom_anagroupvarshere",
+      "valueSource": "AG_denom_var1",
+      "label": "denom grp var",
+      "description": "Grouping variable(s) of the denominator analysis"
+    },
+    {
+      "name": "isdatadrivenhere",
+      "valueSource": "AG_max_dataDriven",
+      "label": "is dataDriven",
+      "description": "TRUE/FALSE: highest grouping is data-driven"
+    },
+    {
+      "name": "byvarshere",
+      "valueSource": "by_listc",
+      "label": "by vars (list)",
+      "description": "Grouping variables as a quoted, comma-separated list"
+    }
+  ]
+}
