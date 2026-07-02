@@ -40,7 +40,8 @@ Suggests:
     covr,
     parameters,
     broom,
-    broom.helpers
+    broom.helpers,
+    openxlsx
 VignetteBuilder: knitr
 URL: https://clymbclinical.github.io/siera/, https://github.com/clymbclinical/siera
 BugReports: https://github.com/clymbclinical/siera/issues
