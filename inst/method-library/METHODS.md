@@ -16,7 +16,7 @@ reference.
 | `categorical_summary` | Categorical n (%) | verified | n, p | Common_Safety_Displays_cards.xlsx Mth01_CatVar_Summ_ByGrp |
 | `continuous_summary` | Continuous summary (N, mean, SD, median, Q1, Q3, min, max) | verified | N, mean, sd, median, p25, p75, min, max | Common_Safety_Displays_cards.xlsx Mth02_ContVar_Summ_ByGrp |
 | `risk_difference` | Risk difference + 95% CI | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03_1 |
-| `risk_difference_per_group` | Risk difference + 95% CI (per group) | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t13-siera.json Mth_03_1a |
+| `risk_difference_per_group` | Risk difference + 95% CI (per group) | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t13-siera.json + fda-ae-t06-siera.json Mth_03_1a |
 | `fishers_exact` | Fisher's exact (odds ratio + 95% CI) | corrected-unvalidated | estimate, conf.low, conf.high | - |
 | `chisq` | Chi-square p-value | verified | p.value | Common_Safety_Displays_cards.xlsx Mth03_CatVar_Comp_PChiSq |
 | `anova` | ANOVA p-value | verified | p.value | Common_Safety_Displays_cards.xlsx Mth04_ContVar_Comp_Anova |
@@ -262,11 +262,11 @@ df3_analysisidhere <- tibble::tibble(
 
 ---
 
-## `risk_difference_per_group` - Risk difference per data-driven inner category
+## `risk_difference_per_group` - Risk difference per inner category
 
-One risk difference (%) + 95% CI per data-driven inner category (e.g. PT or SOC) of Group2, comparing the two arms present in the subset. The two arms are self-derived from the data. References df_poptot (population_based). Verified against fda-ae-t13/t36 Mth_03_1a using an independent stats::prop.test(correct = FALSE) recomputation (180/187 PTs, 22 SOCs).
+One risk difference (%) + 95% CI per observed inner category (e.g. PT, SOC, severity, action taken) of Group2, comparing the two arms present in the subset. The two arms are self-derived from the data. Loops the OBSERVED values of the Group2 variable, so it serves both data-driven groupings (fda-ae-t13/t36) and pre-defined ones (fda-ae-t06); the ARD identifies each category via group2_level (the raw observed value; no group[n] metadata columns are stamped since the template uses no by_listc/by_vars/strata_vars token), and pre-defined categories with no qualifying rows emit no row. References df_poptot (population_based). Verified against fda-ae-t13/t36/t06 Mth_03_1a using an independent stats::prop.test(correct = FALSE) recomputation (180/187 PTs, 22 SOCs, 4 actions + 3 severities per arm pair).
 
-**Status:** verified &nbsp; **Verified against:** tests/testthat/testdata/etfl/metadata/fda-ae-t13-siera.json Mth_03_1a
+**Status:** verified &nbsp; **Verified against:** tests/testthat/testdata/etfl/metadata/fda-ae-t13-siera.json + fda-ae-t06-siera.json Mth_03_1a
 
 **Operations**
 
@@ -281,7 +281,7 @@ One risk difference (%) + 95% CI per data-driven inner category (e.g. PT or SOC)
 | token | valueSource | label | description |
 |-------|-------------|-------|-------------|
 | `groupvar1here` | `AG_var1` | grp var 1 | Grouping variable from Group1 (treatment arm) |
-| `groupvar2here` | `AG_var2` | grp var 2 | Grouping variable from Group2 (data-driven inner category) |
+| `groupvar2here` | `AG_var2` | grp var 2 | Grouping variable from Group2 (inner category; data-driven or pre-defined) |
 | `anavarhere` | `ana_var` | ana var | Analysis variable (subject ID) |
 
 **Template**

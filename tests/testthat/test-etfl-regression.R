@@ -13,11 +13,11 @@
 # emergent ground truth, since the published reference ARD omits the TRTEMFL
 # filter its own ARS metadata mandates (#158, reference defect).
 # Per-category risk difference (#157) is now emitted via method Mth_03_1a and
-# asserted for fda-ae-t13 (An_81/An_81_1, per PT) and fda-ae-t36 (An_55/An_55_1,
-# per SOC) against an independent prop.test ground truth. Remaining limitations
-# exercised but not asserted: per-(SOC x PT) RD (fda-ae-t36 An_57, a 3-grouping
-# case Mth_03_1a does not yet cover -- #172) and the per-action/per-severity RD in
-# fda-ae-t06 (still on the single-RD method Mth_03_1 -- #171).
+# asserted for fda-ae-t13 (An_81/An_81_1, per PT), fda-ae-t36 (An_55/An_55_1,
+# per SOC), and fda-ae-t06 (An_48_2/An_48_3 per action taken, An_50_2/An_50_3
+# per severity -- #171) against an independent prop.test ground truth. The one
+# remaining limitation exercised but not asserted: per-(SOC x PT) RD
+# (fda-ae-t36 An_57, a 3-grouping case Mth_03_1a does not yet cover -- #172).
 
 # -- Demographics / disposition / exposure (ADSL-only, fast) -------------------
 
@@ -68,7 +68,7 @@ test_that("fda-ex-t05 exposure: bigN, continuous summary, and risk difference ma
 
 # -- Adverse events (ADAE / ADSL) ----------------------------------------------
 
-test_that("fda-ae-t06 AE summary: bigN and n% match reference", {
+test_that("fda-ae-t06 AE summary: bigN, n%, and per-category RD match spec (#171)", {
   skip_on_cran()
   tmp <- withr::local_tempdir()
   ard <- .run_etfl_pipeline("fda-ae-t06", tmp)
@@ -79,6 +79,38 @@ test_that("fda-ae-t06 AE summary: bigN and n% match reference", {
   # An_34 is a SAE-death risk difference with zero events; siera now emits
   # RD = 0 / CI = [0, 0] matching the reference (#156 fixed).
   .expect_all_match(.cmp_rd(ard, ref, "An_34"))
+
+  # An_48_2/An_48_3 (RD per action taken) and An_50_2/An_50_3 (RD per severity)
+  # are asserted against an INDEPENDENT prop.test ground truth, not against the
+  # published reference ARD (#171). The reference is a defective oracle here: its
+  # per-category counts are reproduced exactly by collapsing ADAE to ONE row per
+  # subject (the first row) BEFORE applying the data-subset and group conditions
+  # (e.g. An_50_2 arm-1 severity partition 45 MILD / 30 MODERATE / 2 SEVERE is
+  # the first-row severity split, and sums to the 77 any-AE subjects), whereas
+  # the ARS metadata defines event-level conditions (AESEV EQ / AEACN EQ), under
+  # which a subject counts in EVERY category they have a qualifying event for.
+  # siera applies the spec correctly and matches the full-event distinct-subject
+  # recomputation on all categories. NB: the AEACN subset keeps the raw value
+  # "NOT APPLICALE" (data typo) because Dss_68/Dss_69 exclude the correctly
+  # spelt "NOT APPLICABLE" only.
+  .expect_all_match(.cmp_pergroup_rd(
+    ard, "fda-ae-t06", "An_48_2",
+    subset_fun = function(d) dplyr::filter(d, !(AEACN %in% c("NOT APPLICABLE", "DOSE NOT CHANGED")),
+                                           TRTAN %in% c(1, 3)),
+    cat_var = "AEACN", arms = c(1, 3)))
+  .expect_all_match(.cmp_pergroup_rd(
+    ard, "fda-ae-t06", "An_48_3",
+    subset_fun = function(d) dplyr::filter(d, !(AEACN %in% c("NOT APPLICABLE", "DOSE NOT CHANGED")),
+                                           TRTAN %in% c(2, 3)),
+    cat_var = "AEACN", arms = c(2, 3)))
+  .expect_all_match(.cmp_pergroup_rd(
+    ard, "fda-ae-t06", "An_50_2",
+    subset_fun = function(d) dplyr::filter(d, !is.na(AESEV), AESEV != "", TRTAN %in% c(1, 3)),
+    cat_var = "AESEV", arms = c(1, 3)))
+  .expect_all_match(.cmp_pergroup_rd(
+    ard, "fda-ae-t06", "An_50_3",
+    subset_fun = function(d) dplyr::filter(d, !is.na(AESEV), AESEV != "", TRTAN %in% c(2, 3)),
+    cat_var = "AESEV", arms = c(2, 3)))
 })
 
 test_that("fda-ae-t07 AE by cause: bigN and one- and two-level n% match reference", {
