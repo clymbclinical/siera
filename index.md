@@ -89,6 +89,13 @@ and `.xpt` files with
 — just as the ARS input format is inferred from `.json` vs `.xlsx`. No
 extra argument is needed.
 
+JSON is the recommended ARS representation. If you have an ARS Excel
+workbook,
+[`ars_xlsx_to_json()`](https://clymbclinical.github.io/siera/reference/ars_xlsx_to_json.md)
+converts it to a faithful ARS JSON file (an R-native equivalent of
+CDISC’s `excel2ars.py`) that can then be passed to
+[`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md).
+
 See the [Getting
 Started](https://clymbclinical.github.io/siera/articles/Getting_started.html)
 vignette for examples and more detail on the process.

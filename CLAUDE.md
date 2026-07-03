@@ -69,6 +69,7 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
 |----|----|
 | `R/readARS.R` | Main entry point — [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md) orchestrates the full pipeline |
 | `R/metadata.R` | Parses ARS JSON/XLSX into flat R data frames |
+| `R/ars_xlsx_to_json.R` | [`ars_xlsx_to_json()`](https://clymbclinical.github.io/siera/reference/ars_xlsx_to_json.md) — faithful ARS Excel-to-JSON converter (R port of CDISC `excel2ars.py`) |
 | `R/AnalysisSet.R` | Generates analysis set (population) filter code |
 | `R/DataSubsets.R` | Generates data subset filter code |
 | `R/AnalysisMethods.R` | Resolves method code templates and valueSource parameters |
@@ -246,9 +247,41 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   xpt-free scripts don’t require haven. The object on the LHS is always
   the metadata dataset name regardless of the file’s case.
 - **Internal functions** are prefixed with `.`
-  (e.g. `.read_ars_metadata`). Only five symbols are exported:
-  `readARS`, `ARS_example`, `ARD_script_example`, `method_library`
-  (accessor for the bundled `inst/method-library` templates), `%>%`.
+  (e.g. `.read_ars_metadata`). Only six symbols are exported: `readARS`,
+  `ARS_example`, `ARD_script_example`, `ars_xlsx_to_json`,
+  `method_library` (accessor for the bundled `inst/method-library`
+  templates), `%>%`.
+- **[`ars_xlsx_to_json()`](https://clymbclinical.github.io/siera/reference/ars_xlsx_to_json.md)
+  (issue \#178)** — R-native reimplementation of CDISC’s Python
+  `excel2ars.py`; a faithful *whole-workbook* Excel→JSON converter (all
+  ARS sheets, not just the ~9 siera consumes: `about`/`studyInfo`,
+  content lists, categorizations, terminology/reference docs,
+  sets/groupings/subsets/methods/analyses, global display sections,
+  outputs/displays, plus `AnalysisResults`, document refs + pageRefs,
+  and controlled-vs-sponsor term dispatch). Lives entirely in the
+  **metadata/serialisation layer** (`R/ars_xlsx_to_json.R`) — no change
+  to `readARS.R`/`AnalysisMethods.R`. Serialises with
+  `jsonlite::toJSON(auto_unbox=TRUE)`; internal builders prefixed
+  `.x2a_*`. **Detail standard = match excel2ars.py** (its fidelity is
+  the ceiling); the one deliberate extra is reading `About`/`StudyInfo`
+  (excel2ars.py skips them). **Controlled-term enums** (`.x2a_enums`:
+  OperationRole/AnalysisReason/AnalysisPurpose/OutputFileType) are
+  mirrored from the ARS LinkML model and must be re-synced on ARS
+  version bumps. **Test oracle** (`test-ars-xlsx-to-json.R`):
+  `readARS(converted json)` generates byte-identical ARD scripts to
+  `readARS(xlsx)` after normalising the timestamp line +
+  carriage-returns/blank-lines (the JSON reader strips `\r` from
+  `templateCode`, the xlsx reader does not — so converted output is
+  actually *cleaner*). exampleARS_2/6 are exact; exampleARS_3 differs by
+  exactly one line (An_14 is a malformed source row: a denominator
+  `analysisId` with no relationship id, which excel2ars.py — and thus
+  siera — correctly drops). Advanced branches (results/docrefs/sponsor
+  terms/output files/DocumentRef code) are covered by a synthetic
+  `openxlsx`-built workbook (openxlsx added to Suggests). **This does
+  NOT yet make
+  [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+  JSON-only — that is \#179.** NEWS entry deferred to next version bump
+  (0.5.6 is on CRAN / mid-submission).
 
 ## Coding standards (pharmaverse / admiral style)
 
@@ -505,9 +538,9 @@ Do not modify the test fixture xlsx files in `inst/extdata/` without
 explicit owner authorisation — the package owner normally updates those
 separately. (In PR \#162 the owner did authorise renaming the cards
 functions in `templateCode`; that edit was made with
-`openxlsx::loadWorkbook()` → `writeData()` on the single column →
-`saveWorkbook()`, which preserves all 24 sheets — verify the sheet count
-and re-run
+[`openxlsx::loadWorkbook()`](https://rdrr.io/pkg/openxlsx/man/loadWorkbook.html)
+→ `writeData()` on the single column → `saveWorkbook()`, which preserves
+all 24 sheets — verify the sheet count and re-run
 [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
 afterwards.) The example R scripts in `inst/script/` are pre-generated
 and committed; regenerate them manually using

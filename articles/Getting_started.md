@@ -102,7 +102,16 @@ The *readARS* function reads in a completed ARS metadata file, and
 generates R scripts for each Output defined in the file. Below is an
 example of how this can be done using a ready-to-use ARS metadata Excel
 file (note that this is meant as an example. Official ARS metadata is in
-json format, which can also be passed to the *readARS* function):
+json format, which can also be passed to the *readARS* function).
+
+If you have an ARS workbook and prefer to work in the recommended JSON
+format, the
+[`ars_xlsx_to_json()`](https://clymbclinical.github.io/siera/reference/ars_xlsx_to_json.md)
+helper performs a faithful whole-workbook conversion (an R-native
+equivalent of CDISC’s `excel2ars.py`). For example,
+`json_path <- ars_xlsx_to_json(ARS_example("Common_Safety_Displays_cards.xlsx"))`
+writes a `.json` file that can then be passed to
+[`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md):
 
 ``` r
 

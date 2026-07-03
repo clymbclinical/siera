@@ -180,7 +180,14 @@ and generates R scripts for each Output defined in the file. Below is an
 example of how this can be done using a ready-to-use ARS metadata Excel
 file (note that this is meant as an example. Official ARS metadata is in
 json format, which can also be passed to the <em>readARS</em>
-function):</p>
+function).</p>
+<p>If you have an ARS workbook and prefer to work in the recommended
+JSON format, the <code><a href="../reference/ars_xlsx_to_json.html">ars_xlsx_to_json()</a></code> helper performs a
+faithful whole-workbook conversion (an R-native equivalent of CDISC’s
+<code>excel2ars.py</code>). For example,
+<code>json_path &lt;- ars_xlsx_to_json(ARS_example("Common_Safety_Displays_cards.xlsx"))</code>
+writes a <code>.json</code> file that can then be passed to
+<code><a href="../reference/readARS.html">readARS()</a></code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Path to the Excel ARS metadata file:</span></span>
 <span><span class="va">ARS_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"Common_Safety_Displays_cards.xlsx"</span><span class="op">)</span></span>

@@ -116,6 +116,7 @@
 <li>A folder containing the related ADaM datasets for the ARDs to be generated, supplied as either CSV (<code>.csv</code>) or SAS transport (<code>.xpt</code>) files</li>
 </ol>
 <p>siera picks the reader for each ADaM dataset from its file extension — <code>.csv</code> files are read with <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_csv()</a></code> and <code>.xpt</code> files with <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> — just as the ARS input format is inferred from <code>.json</code> vs <code>.xlsx</code>. No extra argument is needed.</p>
+<p>JSON is the recommended ARS representation. If you have an ARS Excel workbook, <code><a href="reference/ars_xlsx_to_json.html">ars_xlsx_to_json()</a></code> converts it to a faithful ARS JSON file (an R-native equivalent of CDISC’s <code>excel2ars.py</code>) that can then be passed to <code><a href="reference/readARS.html">readARS()</a></code>.</p>
 <p>See the <a href="https://clymbclinical.github.io/siera/articles/Getting_started.html">Getting Started</a> vignette for examples and more detail on the process.</p>
 <div class="section level3">
 <h3 id="more-info">More info:<a class="anchor" aria-label="anchor" href="#more-info"></a>
