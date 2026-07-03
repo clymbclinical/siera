@@ -3,6 +3,7 @@
 export("%>%")
 export(ARD_script_example)
 export(ARS_example)
+export(ars_xlsx_to_json)
 export(method_library)
 export(readARS)
 importFrom(magrittr,"%>%")

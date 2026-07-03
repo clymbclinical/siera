@@ -93,6 +93,11 @@ siera picks the reader for each ADaM dataset from its file extension —
 `haven::read_xpt()` — just as the ARS input format is inferred from
 `.json` vs `.xlsx`. No extra argument is needed.
 
+JSON is the recommended ARS representation. If you have an ARS Excel
+workbook, `ars_xlsx_to_json()` converts it to a faithful ARS JSON file (an
+R-native equivalent of CDISC's `excel2ars.py`) that can then be passed to
+`readARS()`.
+
 See the [Getting
 Started](https://clymbclinical.github.io/siera/articles/Getting_started.html)
 vignette for examples and more detail on the process.
