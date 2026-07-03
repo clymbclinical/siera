@@ -1,0 +1,55 @@
+{
+  "id": "risk_difference_per_predefined_group",
+  "name": "Risk difference per pre-defined inner category",
+  "label": "Risk difference + 95% CI (per pre-defined group)",
+  "description": "One risk difference (%) + 95% CI per PRE-DEFINED group of Group2 (dataDriven: false), comparing the two arms present in the subset. Unlike risk_difference_per_group (which loops observed data values and suits data-driven groupings), this loops the groups DEFINED in the ARS metadata via the AG_var2_group_values valueSource: every defined group is emitted - a group with no qualifying events yields RD = 0 / CI = [0, 0] - and data values matching no defined group are excluded. Only single-value EQ group conditions are supported (non-EQ groups are skipped with a warning at generation time). Uses base stats::prop.test rather than cardx because empty defined groups produce a fully degenerate (0-event in both arms) 2x2 table, which cardx::ard_stats_prop_test does not handle. The ARD identifies each category via group2_level (the group condition value; no group[n] metadata columns are stamped since the template uses no by_listc/by_vars/strata_vars token). References df_poptot (population_based). Verified against fda-ae-t06 Mth_03_1p (An_48_2/3 per action taken, An_50_2/3 per severity) using an independent stats::prop.test(correct = FALSE) recomputation over the defined groups; the published t06 reference matches on category shape and zero-groups but its non-zero values derive from only the first ADAE record per subject (a documented reference defect, #171).",
+  "context": "R (siera)",
+  "status": "verified",
+  "verified_against": "tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03_1p",
+  "operations": [
+    {
+      "order": 1,
+      "name": "Risk_Difference_%",
+      "label": "Risk Difference %",
+      "resultPattern": "xx.x"
+    },
+    {
+      "order": 2,
+      "name": "95%_CI_Low",
+      "label": "95% CI Low",
+      "resultPattern": "xx.x"
+    },
+    {
+      "order": 3,
+      "name": "95%_CI_High",
+      "label": "95% CI High",
+      "resultPattern": "xx.x"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "groupvar1here",
+      "valueSource": "AG_var1",
+      "label": "grp var 1",
+      "description": "Grouping variable from Group1 (treatment arm)"
+    },
+    {
+      "name": "groupvar2here",
+      "valueSource": "AG_var2",
+      "label": "grp var 2",
+      "description": "Grouping variable from Group2 (pre-defined inner category)"
+    },
+    {
+      "name": "group2valueshere",
+      "valueSource": "AG_var2_group_values",
+      "label": "grp 2 values",
+      "description": "Quoted, comma-separated condition values of Group2's pre-defined groups, in group order"
+    },
+    {
+      "name": "anavarhere",
+      "valueSource": "ana_var",
+      "label": "ana var",
+      "description": "Analysis variable (subject ID)"
+    }
+  ]
+}

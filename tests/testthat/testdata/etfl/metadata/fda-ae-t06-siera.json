@@ -1761,36 +1761,36 @@
       }
     },
     {
-      "name": "Summary by group of a categorical variable, per inner category",
-      "description": "Risk difference per data-driven inner category (e.g. PT/SOC) across two treatment groups, based on subject occurrence",
-      "label": "Per-category risk difference across groups",
-      "id": "Mth_03_1a",
+      "name": "Summary by group of a categorical variable, per pre-defined inner category",
+      "description": "Risk difference per pre-defined inner category (e.g. action taken, severity) across two treatment groups, based on subject occurrence; every defined group is emitted (empty groups yield RD = 0)",
+      "label": "Per-pre-defined-category risk difference across groups",
+      "id": "Mth_03_1p",
       "operations": [
         {
           "name": "Risk Difference %",
           "label": "Risk Difference %",
-          "id": "Mth_03_1a_01_Risk_Difference_%",
+          "id": "Mth_03_1p_01_Risk_Difference_%",
           "order": 1,
           "resultPattern": "XX.X"
         },
         {
           "name": "95% CI Low",
           "label": "95% CI Low",
-          "id": "Mth_03_1a_02_95%_CI_Low",
+          "id": "Mth_03_1p_02_95%_CI_Low",
           "order": 2,
           "resultPattern": "XX.X"
         },
         {
           "name": "95% CI High",
           "label": "95% CI High",
-          "id": "Mth_03_1a_03_95%_CI_High",
+          "id": "Mth_03_1p_03_95%_CI_High",
           "order": 3,
           "resultPattern": "XX.X"
         }
       ],
       "codeTemplate": {
         "context": "R (siera)",
-        "code": ".arms_analysisidhere <- utils::head(sort(unique(df2_analysisidhere$groupvar1here)), 2)\nfull_analysisidhere <- df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n\n.cats_analysisidhere <- sort(unique(as.character(df2_analysisidhere$groupvar2here)))\n\n.rd_one_analysisidhere <- function(.cat) {\n  success <- df2_analysisidhere |>\n      dplyr::filter(as.character(groupvar2here) == .cat) |>\n      dplyr::distinct(anavarhere) |>\n      dplyr::mutate(FL = 1L)\n  ana <- full_analysisidhere |>\n      dplyr::left_join(dplyr::select(success, anavarhere, FL), by = \"anavarhere\") |>\n      dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n  cardx::ard_stats_prop_test(data = ana, by = groupvar1here, variables = FL, correct = FALSE) |>\n      dplyr::filter(stat_name %in% c(\"estimate\", \"conf.low\", \"conf.high\")) |>\n      dplyr::mutate(\n          stat = lapply(stat, function(.v) .v * 100),\n          group2_level = .cat,\n          operationid = dplyr::case_when(\n              stat_name == \"estimate\"  ~ \"opid1here\",\n              stat_name == \"conf.low\"  ~ \"opid2here\",\n              stat_name == \"conf.high\" ~ \"opid3here\"\n          )\n      )\n}\n\ndf3_analysisidhere <- if (length(.arms_analysisidhere) >= 2 && length(.cats_analysisidhere) > 0) {\n  dplyr::bind_rows(lapply(.cats_analysisidhere, .rd_one_analysisidhere))\n} else {\n  tibble::tibble(variable = character(0), group2_level = character(0),\n                 stat_name = character(0), stat = list(),\n                 operationid = character(0))\n}",
+        "code": ".groupvals_analysisidhere <- c(group2valueshere)\n.arms_analysisidhere <- utils::head(sort(unique(df2_analysisidhere$groupvar1here)), 2)\nfull_analysisidhere <- df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n\n.rd_one_analysisidhere <- function(.val) {\n  success <- df2_analysisidhere |>\n      dplyr::filter(as.character(groupvar2here) == .val) |>\n      dplyr::distinct(anavarhere) |>\n      dplyr::mutate(FL = 1L)\n  ana <- full_analysisidhere |>\n      dplyr::left_join(dplyr::select(success, anavarhere, FL), by = \"anavarhere\") |>\n      dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n  x1 <- sum(ana$FL[ana$groupvar1here == .arms_analysisidhere[[1]]])\n  x2 <- sum(ana$FL[ana$groupvar1here == .arms_analysisidhere[[2]]])\n  n1 <- sum(ana$groupvar1here == .arms_analysisidhere[[1]])\n  n2 <- sum(ana$groupvar1here == .arms_analysisidhere[[2]])\n  pt <- suppressWarnings(stats::prop.test(x = c(x1, x2), n = c(n1, n2), correct = FALSE))\n  tibble::tibble(\n      variable = \"FL\",\n      variable_level = list(NULL, NULL, NULL),\n      stat_name = c(\"estimate\", \"conf.low\", \"conf.high\"),\n      stat = list(\n          (pt$estimate[[1]] - pt$estimate[[2]]) * 100,\n          pt$conf.int[[1]] * 100,\n          pt$conf.int[[2]] * 100\n      ),\n      group2_level = .val,\n      operationid = c('opid1here', 'opid2here', 'opid3here')\n  )\n}\n\ndf3_analysisidhere <- if (length(.arms_analysisidhere) >= 2 && length(.groupvals_analysisidhere) > 0) {\n  dplyr::bind_rows(lapply(.groupvals_analysisidhere, .rd_one_analysisidhere))\n} else {\n  tibble::tibble(variable = character(0), group2_level = character(0),\n                 stat_name = character(0), stat = list(),\n                 operationid = character(0))\n}",
         "parameters": [
           {
             "name": "groupvar1here",
@@ -1801,8 +1801,14 @@
           {
             "name": "groupvar2here",
             "label": "grp var 2",
-            "description": "Second analysis grouping variable (data-driven inner category)",
+            "description": "Second analysis grouping variable (pre-defined inner category)",
             "valueSource": "AG_var2"
+          },
+          {
+            "name": "group2valueshere",
+            "label": "grp 2 values",
+            "description": "Quoted, comma-separated condition values of Group2's pre-defined groups, in group order",
+            "valueSource": "AG_var2_group_values"
           },
           {
             "name": "anavarhere",
@@ -4393,7 +4399,7 @@
       "purpose": {
         "controlledTerm": "PRIMARY OUTCOME MEASURE"
       },
-      "methodId": "Mth_03_1a",
+      "methodId": "Mth_03_1p",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -4595,7 +4601,7 @@
       "purpose": {
         "controlledTerm": "PRIMARY OUTCOME MEASURE"
       },
-      "methodId": "Mth_03_1a",
+      "methodId": "Mth_03_1p",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -5334,7 +5340,7 @@
       "purpose": {
         "controlledTerm": "PRIMARY OUTCOME MEASURE"
       },
-      "methodId": "Mth_03_1a",
+      "methodId": "Mth_03_1p",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -5494,7 +5500,7 @@
       "purpose": {
         "controlledTerm": "PRIMARY OUTCOME MEASURE"
       },
-      "methodId": "Mth_03_1a",
+      "methodId": "Mth_03_1p",
       "version": 1,
       "categoryIds": [
         "ANSET_01",

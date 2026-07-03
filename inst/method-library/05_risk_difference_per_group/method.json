@@ -1,11 +1,11 @@
 {
   "id": "risk_difference_per_group",
-  "name": "Risk difference per inner category",
+  "name": "Risk difference per data-driven inner category",
   "label": "Risk difference + 95% CI (per group)",
-  "description": "One risk difference (%) + 95% CI per observed inner category (e.g. PT, SOC, severity, action taken) of Group2, comparing the two arms present in the subset. The two arms are self-derived from the data. Loops the OBSERVED values of the Group2 variable, so it serves both data-driven groupings (fda-ae-t13/t36) and pre-defined ones (fda-ae-t06); the ARD identifies each category via group2_level (the raw observed value; no group[n] metadata columns are stamped since the template uses no by_listc/by_vars/strata_vars token), and pre-defined categories with no qualifying rows emit no row. References df_poptot (population_based). Verified against fda-ae-t13/t36/t06 Mth_03_1a using an independent stats::prop.test(correct = FALSE) recomputation (180/187 PTs, 22 SOCs, 4 actions + 3 severities per arm pair).",
+  "description": "One risk difference (%) + 95% CI per data-driven inner category (e.g. PT or SOC) of Group2, comparing the two arms present in the subset. The two arms are self-derived from the data. References df_poptot (population_based). Verified against fda-ae-t13/t36 Mth_03_1a using an independent stats::prop.test(correct = FALSE) recomputation (180/187 PTs, 22 SOCs).",
   "context": "R (siera)",
   "status": "verified",
-  "verified_against": "tests/testthat/testdata/etfl/metadata/fda-ae-t13-siera.json + fda-ae-t06-siera.json Mth_03_1a",
+  "verified_against": "tests/testthat/testdata/etfl/metadata/fda-ae-t13-siera.json Mth_03_1a",
   "operations": [
     {
       "order": 1,
@@ -37,7 +37,7 @@
       "name": "groupvar2here",
       "valueSource": "AG_var2",
       "label": "grp var 2",
-      "description": "Grouping variable from Group2 (inner category; data-driven or pre-defined)"
+      "description": "Grouping variable from Group2 (data-driven inner category)"
     },
     {
       "name": "anavarhere",

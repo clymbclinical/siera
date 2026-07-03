@@ -200,10 +200,16 @@
 # #158 defect), and for fda-ae-t36 it rounds the component percentages before
 # differencing; both disagree with the spec-correct value siera computes.
 # subset_fun applies the analysis's data subset to the merged ADSL x ADAE; cat_var
-# is the data-driven inner grouping variable; arms[1]/arms[2] are the two TRT01AN
-# levels compared (RD = p(arms[1]) - p(arms[2]), matching siera's sorted-arm
-# convention in Mth_03_1a).
-.etfl_pergroup_rd_truth <- function(table, subset_fun, cat_var, arms) {
+# is the inner grouping variable; arms[1]/arms[2] are the two TRT01AN levels
+# compared (RD = p(arms[1]) - p(arms[2]), matching siera's sorted-arm convention
+# in Mth_03_1a / Mth_03_1p). cats controls the category basis: NULL (default)
+# loops the OBSERVED values of cat_var, matching the data-driven method
+# Mth_03_1a; an explicit character vector loops those PRE-DEFINED categories
+# (metadata group condition values), matching Mth_03_1p -- a defined category
+# with no qualifying events then yields RD = 0 / CI = [0, 0] via
+# prop.test(c(0, 0), ...), and observed values outside cats are excluded.
+.etfl_pergroup_rd_truth <- function(table, subset_fun, cat_var, arms,
+                                    cats = NULL) {
   paths <- .etfl_paths(table)
   adsl <- haven::read_xpt(file.path(paths$adam_dir, "adsl.xpt"))
   adae <- haven::read_xpt(file.path(paths$adam_dir, "adae.xpt"))
@@ -213,7 +219,9 @@
                   by = "USUBJID", all = FALSE)
   df2 <- subset_fun(df_pop)
   N <- saf |> dplyr::filter(TRT01AN %in% arms) |> dplyr::count(TRT01AN, name = "N")
-  cats <- sort(unique(as.character(df2[[cat_var]])))
+  if (is.null(cats)) {
+    cats <- sort(unique(as.character(df2[[cat_var]])))
+  }
   dplyr::bind_rows(lapply(cats, function(.c) {
     x <- df2 |>
       dplyr::filter(as.character(.data[[cat_var]]) == .c) |>
@@ -236,8 +244,9 @@
 # Compare siera's per-category RD (estimate + 95% CI) against the ground truth.
 # A full join asserts EVERY category on both sides, so siera dropping or
 # inventing a category (or a CI bound) fails the test, not just a value mismatch.
-.cmp_pergroup_rd <- function(siera_ard, table, ana_id, subset_fun, cat_var, arms) {
-  truth <- .etfl_pergroup_rd_truth(table, subset_fun, cat_var, arms)
+.cmp_pergroup_rd <- function(siera_ard, table, ana_id, subset_fun, cat_var, arms,
+                             cats = NULL) {
+  truth <- .etfl_pergroup_rd_truth(table, subset_fun, cat_var, arms, cats = cats)
   s <- siera_ard |>
     dplyr::filter(AnalysisId == ana_id) |>
     dplyr::mutate(val = .etfl_safe_stat(stat), cat = as.character(group2_level)) |>

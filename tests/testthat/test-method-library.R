@@ -22,6 +22,7 @@
     AG_var1           = "TRT01A",
     AG_var2           = "AESOC",
     AG_var3           = "GRP3",
+    AG_var2_group_values = "'SEVERE', 'MODERATE', 'MILD'",
     DEN_analysisid    = "An_99",
     AG_denom_var1     = "TRT01A",
     AG_max_dataDriven = "FALSE",

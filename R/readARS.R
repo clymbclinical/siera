@@ -304,7 +304,15 @@ readARS <- function(ARS_path,
         ),
         if (n_actual_groups >= 1) list(AG_var1 = AG_var1),
         if (n_actual_groups >= 2) list(AG_var2 = AG_var2),
-        if (n_actual_groups >= 3) list(AG_var3 = AG_var3)
+        if (n_actual_groups >= 3) list(AG_var3 = AG_var3),
+        # Pre-defined group values of the second (inner) grouping, resolved
+        # lazily: only when the method's template actually uses the token, so
+        # analyses whose grouping 2 is data-driven don't warn needlessly.
+        if (n_actual_groups >= 2) {
+          list(AG_var2_group_values = function() {
+            .ag_group_values(AnalysisGroupings, groupids[2])
+          })
+        }
       )
 
       analysis_method_result <- .generate_analysis_method_section(
@@ -559,4 +567,59 @@ readARS <- function(ARS_path,
   } else {
     0L
   }
+}
+
+# Resolve the AG_var2_group_values valueSource: a quoted, comma-separated list
+# of a pre-defined grouping's group condition values, in group order (e.g.
+# "'SEVERE', 'MODERATE', 'MILD'"), for templates that must honour the defined
+# groups of an inner grouping rather than loop observed data values (#171).
+#
+# Only single-value EQ conditions are supported: after the parser unnests
+# condition.value, an EQ group contributes exactly one row, whereas IN/NOTIN
+# groups repeat their group_id across rows and a mapped loop over bare values
+# would split one defined group into several output categories. Non-EQ groups
+# are skipped with a warning; a grouping with no usable groups (e.g. a
+# data-driven grouping, whose groups list is empty) resolves to "" so the
+# template's empty-list branch applies.
+.ag_group_values <- function(analysis_groupings, grouping_id) {
+  gid <- grouping_id
+
+  # When no grouping in the metadata defines groups (all data-driven), the
+  # parser emits no group_* columns at all.
+  needed <- c("group_id", "group_order",
+              "group_condition_comparator", "group_condition_value")
+  if (!all(needed %in% names(analysis_groupings))) {
+    cli::cli_warn(c(
+      "AG_var2_group_values: grouping {.val {gid}} defines no groups.",
+      "i" = "Pre-defined group values require a non-data-driven grouping with group conditions."
+    ))
+    return("")
+  }
+
+  groups <- analysis_groupings |>
+    dplyr::filter(id == gid, !is.na(group_id))
+
+  if (nrow(groups) == 0) {
+    cli::cli_warn(c(
+      "AG_var2_group_values: grouping {.val {gid}} defines no groups.",
+      "i" = "Pre-defined group values require a non-data-driven grouping with group conditions."
+    ))
+    return("")
+  }
+
+  is_eq <- !is.na(groups$group_condition_comparator) &
+    groups$group_condition_comparator == "EQ"
+  if (any(!is_eq)) {
+    skipped <- unique(groups$group_id[!is_eq])
+    cli::cli_warn(c(
+      "AG_var2_group_values: skipping non-EQ group(s) {.val {skipped}} of grouping {.val {gid}}.",
+      "i" = "Only single-value EQ group conditions are supported."
+    ))
+    groups <- groups[is_eq, ]
+    if (nrow(groups) == 0) return("")
+  }
+
+  groups <- groups[order(as.numeric(groups$group_order)), ]
+  values <- gsub("'", "\\\\'", as.character(groups$group_condition_value))
+  paste0("'", values, "'", collapse = ", ")
 }
