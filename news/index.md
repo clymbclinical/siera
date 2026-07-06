@@ -51,6 +51,24 @@ CRAN release: 2026-06-17
   within each, instead of collapsing the analysis to a single overall
   risk difference
   ([\#157](https://github.com/clymbclinical/siera/issues/157)).
+- Added per-category risk differences for **pre-defined**
+  (non-data-driven) inner groupings. A new method template,
+  `risk_difference_per_predefined_group`, honours the groups declared in
+  the ARS metadata instead of looping observed data values: every
+  defined group is emitted - a group whose condition matches no events
+  yields a risk difference of `0` with a `[0, 0]` confidence interval -
+  and data values matching no defined group are excluded. It is driven
+  by a new `AG_var2_group_values` valueSource that resolves the second
+  grouping’s group condition values, in group order (single-value `EQ`
+  conditions; other comparators are skipped with a warning). Validated
+  on the eTFL “Overview of Adverse Events” table (one risk difference
+  per action taken and per severity) against an independent
+  [`stats::prop.test()`](https://rdrr.io/r/stats/prop.test.html)
+  recomputation; the published reference matches on category shape and
+  empty groups, but its non-zero values were found to be computed from
+  only the first adverse-event record per subject rather than from all
+  qualifying events, so they are not used as the value oracle
+  ([\#171](https://github.com/clymbclinical/siera/issues/171)).
 - Fixed zero-event risk-difference analyses returning `NA` instead of
   `0`. Methods that compute over the full population (templates
   referencing `df_poptot`, e.g. risk differences) now bypass the

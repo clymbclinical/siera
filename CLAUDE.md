@@ -587,12 +587,11 @@ after the xlsx templates are updated, then
   to avoid row-parsing failures. `fda-ds-t04` derives `DISCONFL` from
   `DCTREAS` via the `adsl_transform` hook. The
   `.cmp_pergroup_rd()`/`.etfl_pergroup_rd_truth()` helpers assert
-  per-category RD (#157, see below). Remaining known-limitation analyses
-  exercised but not asserted: per-(SOC × PT) RD (fda-ae-t36 An_57, a
-  3-grouping case `Mth_03_1a` doesn’t cover) and fda-ae-t06’s
-  per-action/per-severity RD (still on single-RD `Mth_03_1`). The raw
-  XPT/JSON is ~28 MB in the working tree but git-packs and tarball-gzips
-  to ~2 MB, so it ships fine for CRAN.
+  per-category RD (#157/#171, see below). The one remaining
+  known-limitation analysis exercised but not asserted: per-(SOC × PT)
+  RD (fda-ae-t36 An_57, a 3-grouping case `Mth_03_1a` doesn’t cover,
+  \#172). The raw XPT/JSON is ~28 MB in the working tree but git-packs
+  and tarball-gzips to ~2 MB, so it ships fine for CRAN.
   - **\#158 — fda-ae-t13 An_80 arm × PT counts (resolved: reference
     defect, not a siera bug).** The published reference ARD for An_80
     was generated **without** the treatment-emergent filter
@@ -638,10 +637,9 @@ after the xlsx templates are updated, then
     distinct-subject counts (`.etfl_pergroup_rd_truth()` /
     `.cmp_pergroup_rd()`), full-join matching every category × statistic
     — siera (cardx) matched it exactly on all 180/187 PTs and 22 SOCs.
-    Remaining gaps tracked as follow-ups: fda-ae-t06 per-action/severity
-    RD (just a repoint to `Mth_03_1a`, \#171) and fda-ae-t36 An_57
-    per-(SOC × PT) RD (needs a 3-grouping variant `Mth_03_1b`, \#172).
-    The owner master code-template library is git-tracked at
+    Remaining gap tracked as a follow-up: fda-ae-t36 An_57 per-(SOC ×
+    PT) RD (needs a 3-grouping variant `Mth_03_1b`, \#172). The owner
+    master code-template library is git-tracked at
     `inst/extdata/R_siera_codes.xlsx` (one sheet per method,
     e.g. `Risk Difference (per grp)`, plus a `Constructs` registry) —
     add new methods there too. It is **excluded from the CRAN tarball**
@@ -649,6 +647,45 @@ after the xlsx templates are updated, then
     ships; edit it with `openpyxl` (load → `create_sheet` → save) to
     preserve the other sheets. To author further methods see the
     `siera-author-method` skill.
+  - **\#171 — per-category RD for PRE-DEFINED inner groupings (resolved
+    via new method `Mth_03_1p` / library
+    `risk_difference_per_predefined_group`; second reference-defect
+    finding).** t06’s inner groupings are `dataDriven: false` with
+    explicit `AEACN EQ`/`AESEV EQ` group conditions (the issue text
+    wrongly called them data-driven; PR \#176’s plain repoint to
+    `Mth_03_1a` was closed for ignoring them). The new method loops the
+    groups DEFINED in the metadata rather than observed values: every
+    defined group is emitted (a 0-event group yields RD 0 / CI \[0,0\]
+    via base
+    [`stats::prop.test`](https://rdrr.io/r/stats/prop.test.html) — base,
+    not cardx, because a fully degenerate 2x2 is involved, same
+    rationale as method 04), and data values matching no defined group
+    (DRUG WITHDRAWN; the `NOT APPLICALE` ADAE typo that survives
+    `Dss_68/69`’s correctly-spelt NOTIN) are excluded. Driven by a new
+    valueSource **`AG_var2_group_values`** (quoted list of Group2’s
+    group condition values in group order; single-value EQ only, non-EQ
+    groups skipped with a warning; resolver `.ag_group_values()` in
+    `R/readARS.R`). Because resolution can warn, `value_sources` entries
+    may now be **zero-argument functions resolved lazily** in
+    [`.generate_analysis_method_section()`](https://clymbclinical.github.io/siera/reference/dot-generate_analysis_method_section.md)
+    — only methods whose parameter table references the valueSource
+    trigger evaluation. An_48_2/3 (per action taken) + An_50_2/3 (per
+    severity) repointed to `Mth_03_1p`; shape now matches the reference
+    exactly (12/12/9/9 rows). **Reference-defect finding:** the t06
+    reference’s non-zero per-category RD values are reproduced exactly
+    by collapsing ADAE to ONE row per subject (the first row, file
+    order) BEFORE applying subset/group conditions (proof: brute-forced
+    the unique prop.test (x1,x2) behind every reference estimate/CI
+    triple; e.g. An_50_2 arm-1 partition 45 MILD/30 MODERATE/2 SEVERE =
+    the first-row severity split, summing to the 77 any-AE subjects; INT
+    26/15/15, RED 18/19/11). Event-level ARS conditions cannot yield
+    first-row-only counting, so values are asserted against the
+    independent all-events ground truth
+    (`.cmp_pergroup_rd(..., cats = <defined groups>)`) — all 22 non-zero
+    and 12 zero cells match; the zero groups coincide with the
+    reference. Tests: `test-ag-group-values.R` (resolver branches + lazy
+    function units), t06 block in `test-etfl-regression.R` (shape
+    parity + value assertions).
   - **\#173 — method-template library formalised as plain text
     (supersedes the xlsx as source of truth).** The owner xlsx workbooks
     (`inst/extdata/R_siera_codes.xlsx`, `cards_constructs.xlsx`) are
