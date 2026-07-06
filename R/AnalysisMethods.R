@@ -9,7 +9,10 @@
 #' @param output_id OutputId to which current Analysis belongs
 #' @param value_sources Named list of string values that ARS code-template
 #'   parameters can reference via their valueSource key (e.g. by_vars, ana_var,
-#'   AG_var1). Operation IDs (operation_1, operation_2, …) are derived from the
+#'   AG_var1). An entry may also be a zero-argument function returning the
+#'   string; it is called lazily, only when a parameter of the method actually
+#'   references that valueSource (e.g. AG_var2_group_values, whose resolution
+#'   can warn). Operation IDs (operation_1, operation_2, …) are derived from the
 #'   method itself and do not need to be supplied here.
 
 #' @return Character vector with formatted numbers.
@@ -119,6 +122,12 @@
     }
 
     rep <- all_value_sources[[value_source]]
+    # Function entries are resolved lazily: only methods whose parameter table
+    # references the valueSource pay the cost (and any validation warnings) of
+    # computing it (e.g. AG_var2_group_values on a data-driven grouping).
+    if (is.function(rep)) {
+      rep <- rep()
+    }
     if (!is.null(rep) && !is.na(rep)) {
       anmetcode_temp <- gsub(
         parameter_name,

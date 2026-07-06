@@ -35,7 +35,8 @@
     "AG_denom_var1",
     "AG_var1",
     "AG_var2",
-    "AG_var3"
+    "AG_var3",
+    "AG_var2_group_values"
   )
 }
 

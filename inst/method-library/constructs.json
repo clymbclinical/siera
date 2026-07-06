@@ -51,6 +51,13 @@
       "assumed_parameter_name": "isdatadrivenhere"
     },
     {
+      "valueSource": "AG_var2_group_values",
+      "type": "simple",
+      "details": "Quoted, comma-separated condition values of Group2's PRE-DEFINED groups, in group order (to be wrapped in c(...)), e.g. \"'SEVERE', 'MODERATE', 'MILD'\". For methods that must honour a non-data-driven inner grouping's defined groups rather than loop observed data values. Only single-value EQ group conditions are supported; non-EQ groups are skipped with a warning, and a grouping with no usable groups (e.g. data-driven) resolves to an empty string.",
+      "ars_location": "Analyses$groupingId2 -> AnalysisGroupings groups: group_condition_value in group_order (EQ only)",
+      "assumed_parameter_name": "group2valueshere"
+    },
+    {
       "valueSource": "distinct_list",
       "type": "complex",
       "details": "All active grouping variables plus the analysis variable, comma separated, unquoted (for dplyr::distinct)",

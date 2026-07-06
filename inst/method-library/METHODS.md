@@ -20,6 +20,7 @@ reference.
 | `fishers_exact` | Fisher's exact (odds ratio + 95% CI) | corrected-unvalidated | estimate, conf.low, conf.high | - |
 | `chisq` | Chi-square p-value | verified | p.value | Common_Safety_Displays_cards.xlsx Mth03_CatVar_Comp_PChiSq |
 | `anova` | ANOVA p-value | verified | p.value | Common_Safety_Displays_cards.xlsx Mth04_ContVar_Comp_Anova |
+| `risk_difference_per_predefined_group` | Risk difference + 95% CI (per pre-defined group) | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03_1p |
 
 ## Supported valueSources
 
@@ -32,6 +33,7 @@ reference.
 | `DEN_analysisid` | simple | `denomanaidhere` | Analysis ID of the referenced denominator analysis |
 | `AG_denom_var1` | simple | `denom_anagroupvarshere` | First grouping variable of the referenced denominator analysis |
 | `AG_max_dataDriven` | simple | `isdatadrivenhere` | TRUE/FALSE: whether the highest resultsByGroup grouping is data-driven |
+| `AG_var2_group_values` | simple | `group2valueshere` | Quoted, comma-separated condition values of Group2's PRE-DEFINED groups, in group order (to be wrapped in c(...)), e.g. "'SEVERE', 'MODERATE', 'MILD'". For methods that must honour a non-data-driven inner grouping's defined groups rather than loop observed data values. Only single-value EQ group conditions are supported; non-EQ groups are skipped with a warning, and a grouping with no usable groups (e.g. data-driven) resolves to an empty string. |
 | `distinct_list` | complex | `distinctlisthere` | All active grouping variables plus the analysis variable, comma separated, unquoted (for dplyr::distinct) |
 | `by_listc` | complex | `byvarshere` | All grouping variables as a quoted, comma-separated list (to be wrapped in c(...)). Stamps CDISC group metadata. Preferred for grouped tabulations. |
 | `by_list` | complex | `bylisthere` | All grouping variables as an UNQUOTED, comma-separated list. Same vars as by_listc but without quotes. |
@@ -429,4 +431,72 @@ df3_analysisidhere <-
     cardx::ard_stats_aov(anavarhere ~ groupvar1here, data = df2_analysisidhere) |>
   dplyr::filter(stat_name == 'p.value') |>
   dplyr::mutate(operationid = 'opid1here')
+```
+
+---
+
+## `risk_difference_per_predefined_group` - Risk difference per pre-defined inner category
+
+One risk difference (%) + 95% CI per PRE-DEFINED group of Group2 (dataDriven: false), comparing the two arms present in the subset. Unlike risk_difference_per_group (which loops observed data values and suits data-driven groupings), this loops the groups DEFINED in the ARS metadata via the AG_var2_group_values valueSource: every defined group is emitted - a group with no qualifying events yields RD = 0 / CI = [0, 0] - and data values matching no defined group are excluded. Only single-value EQ group conditions are supported (non-EQ groups are skipped with a warning at generation time). Uses base stats::prop.test rather than cardx because empty defined groups produce a fully degenerate (0-event in both arms) 2x2 table, which cardx::ard_stats_prop_test does not handle. The ARD identifies each category via group2_level (the group condition value; no group[n] metadata columns are stamped since the template uses no by_listc/by_vars/strata_vars token). References df_poptot (population_based). Verified against fda-ae-t06 Mth_03_1p (An_48_2/3 per action taken, An_50_2/3 per severity) using an independent stats::prop.test(correct = FALSE) recomputation over the defined groups; the published t06 reference matches on category shape and zero-groups but its non-zero values derive from only the first ADAE record per subject (a documented reference defect, #171).
+
+**Status:** verified &nbsp; **Verified against:** tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03_1p
+
+**Operations**
+
+| order | stat_name | label | resultPattern |
+|-------|-----------|-------|---------------|
+| 1 | `Risk_Difference_%` | Risk Difference % | `xx.x` |
+| 2 | `95%_CI_Low` | 95% CI Low | `xx.x` |
+| 3 | `95%_CI_High` | 95% CI High | `xx.x` |
+
+**Parameters**
+
+| token | valueSource | label | description |
+|-------|-------------|-------|-------------|
+| `groupvar1here` | `AG_var1` | grp var 1 | Grouping variable from Group1 (treatment arm) |
+| `groupvar2here` | `AG_var2` | grp var 2 | Grouping variable from Group2 (pre-defined inner category) |
+| `group2valueshere` | `AG_var2_group_values` | grp 2 values | Quoted, comma-separated condition values of Group2's pre-defined groups, in group order |
+| `anavarhere` | `ana_var` | ana var | Analysis variable (subject ID) |
+
+**Template**
+
+```r
+.groupvals_analysisidhere <- c(group2valueshere)
+.arms_analysisidhere <- utils::head(sort(unique(df2_analysisidhere$groupvar1here)), 2)
+full_analysisidhere <- df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)
+
+.rd_one_analysisidhere <- function(.val) {
+  success <- df2_analysisidhere |>
+      dplyr::filter(as.character(groupvar2here) == .val) |>
+      dplyr::distinct(anavarhere) |>
+      dplyr::mutate(FL = 1L)
+  ana <- full_analysisidhere |>
+      dplyr::left_join(dplyr::select(success, anavarhere, FL), by = "anavarhere") |>
+      dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))
+  x1 <- sum(ana$FL[ana$groupvar1here == .arms_analysisidhere[[1]]])
+  x2 <- sum(ana$FL[ana$groupvar1here == .arms_analysisidhere[[2]]])
+  n1 <- sum(ana$groupvar1here == .arms_analysisidhere[[1]])
+  n2 <- sum(ana$groupvar1here == .arms_analysisidhere[[2]])
+  pt <- suppressWarnings(stats::prop.test(x = c(x1, x2), n = c(n1, n2), correct = FALSE))
+  tibble::tibble(
+      variable = "FL",
+      variable_level = list(NULL, NULL, NULL),
+      stat_name = c("estimate", "conf.low", "conf.high"),
+      stat = list(
+          (pt$estimate[[1]] - pt$estimate[[2]]) * 100,
+          pt$conf.int[[1]] * 100,
+          pt$conf.int[[2]] * 100
+      ),
+      group2_level = .val,
+      operationid = c('opid1here', 'opid2here', 'opid3here')
+  )
+}
+
+df3_analysisidhere <- if (length(.arms_analysisidhere) >= 2 && length(.groupvals_analysisidhere) > 0) {
+  dplyr::bind_rows(lapply(.groupvals_analysisidhere, .rd_one_analysisidhere))
+} else {
+  tibble::tibble(variable = character(0), group2_level = character(0),
+                 stat_name = character(0), stat = list(),
+                 operationid = character(0))
+}
 ```
