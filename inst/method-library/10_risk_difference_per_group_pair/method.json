@@ -1,0 +1,55 @@
+{
+  "id": "risk_difference_per_group_pair",
+  "name": "Risk difference per (Group2 x Group3) combination",
+  "label": "Risk difference + 95% CI (per group pair)",
+  "description": "One risk difference (%) + 95% CI per observed (Group2, Group3) combination (e.g. SOC x PT), comparing the two arms present in the subset. The 3-grouping analogue of risk_difference_per_group: Group1 is the treatment arm (self-derived from the data), and the template loops the distinct combinations of the two data-driven inner grouping variables observed in the subset, stamping both group2_level and group3_level (no group[n] metadata columns are stamped since the template uses no by_listc/by_vars/strata_vars token). Uses cardx::ard_stats_prop_test(correct = FALSE); safe because every observed combination has at least one event, so the 2x2 table is never fully degenerate. References df_poptot (population_based). Verified against fda-ae-t36 Mth_03_1b (An_57/An_57_1, per SOC x PT on first-occurrence-of-PT records) using an independent stats::prop.test(correct = FALSE) recomputation over every combination; the published t36 reference rounds component percentages before differencing, so it is not used as the value oracle.",
+  "context": "R (siera)",
+  "status": "verified",
+  "verified_against": "tests/testthat/testdata/etfl/metadata/fda-ae-t36-siera.json Mth_03_1b",
+  "operations": [
+    {
+      "order": 1,
+      "name": "Risk_Difference_%",
+      "label": "Risk Difference %",
+      "resultPattern": "xx.x"
+    },
+    {
+      "order": 2,
+      "name": "95%_CI_Low",
+      "label": "95% CI Low",
+      "resultPattern": "xx.x"
+    },
+    {
+      "order": 3,
+      "name": "95%_CI_High",
+      "label": "95% CI High",
+      "resultPattern": "xx.x"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "groupvar1here",
+      "valueSource": "AG_var1",
+      "label": "grp var 1",
+      "description": "Grouping variable from Group1 (treatment arm)"
+    },
+    {
+      "name": "groupvar2here",
+      "valueSource": "AG_var2",
+      "label": "grp var 2",
+      "description": "Grouping variable from Group2 (data-driven outer category, e.g. SOC)"
+    },
+    {
+      "name": "groupvar3here",
+      "valueSource": "AG_var3",
+      "label": "grp var 3",
+      "description": "Grouping variable from Group3 (data-driven inner category, e.g. PT)"
+    },
+    {
+      "name": "anavarhere",
+      "valueSource": "ana_var",
+      "label": "ana var",
+      "description": "Analysis variable (subject ID)"
+    }
+  ]
+}

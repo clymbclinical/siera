@@ -21,6 +21,7 @@ reference.
 | `chisq` | Chi-square p-value | verified | p.value | Common_Safety_Displays_cards.xlsx Mth03_CatVar_Comp_PChiSq |
 | `anova` | ANOVA p-value | verified | p.value | Common_Safety_Displays_cards.xlsx Mth04_ContVar_Comp_Anova |
 | `risk_difference_per_predefined_group` | Risk difference + 95% CI (per pre-defined group) | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03_1p |
+| `risk_difference_per_group_pair` | Risk difference + 95% CI (per group pair) | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t36-siera.json Mth_03_1b |
 
 ## Supported valueSources
 
@@ -498,5 +499,76 @@ df3_analysisidhere <- if (length(.arms_analysisidhere) >= 2 && length(.groupvals
   tibble::tibble(variable = character(0), group2_level = character(0),
                  stat_name = character(0), stat = list(),
                  operationid = character(0))
+}
+```
+
+---
+
+## `risk_difference_per_group_pair` - Risk difference per (Group2 x Group3) combination
+
+One risk difference (%) + 95% CI per observed (Group2, Group3) combination (e.g. SOC x PT), comparing the two arms present in the subset. The 3-grouping analogue of risk_difference_per_group: Group1 is the treatment arm (self-derived from the data), and the template loops the distinct combinations of the two data-driven inner grouping variables observed in the subset, stamping both group2_level and group3_level (no group[n] metadata columns are stamped since the template uses no by_listc/by_vars/strata_vars token). Uses cardx::ard_stats_prop_test(correct = FALSE); safe because every observed combination has at least one event, so the 2x2 table is never fully degenerate. References df_poptot (population_based). Verified against fda-ae-t36 Mth_03_1b (An_57/An_57_1, per SOC x PT on first-occurrence-of-PT records) using an independent stats::prop.test(correct = FALSE) recomputation over every combination; the published t36 reference rounds component percentages before differencing, so it is not used as the value oracle.
+
+**Status:** verified &nbsp; **Verified against:** tests/testthat/testdata/etfl/metadata/fda-ae-t36-siera.json Mth_03_1b
+
+**Operations**
+
+| order | stat_name | label | resultPattern |
+|-------|-----------|-------|---------------|
+| 1 | `Risk_Difference_%` | Risk Difference % | `xx.x` |
+| 2 | `95%_CI_Low` | 95% CI Low | `xx.x` |
+| 3 | `95%_CI_High` | 95% CI High | `xx.x` |
+
+**Parameters**
+
+| token | valueSource | label | description |
+|-------|-------------|-------|-------------|
+| `groupvar1here` | `AG_var1` | grp var 1 | Grouping variable from Group1 (treatment arm) |
+| `groupvar2here` | `AG_var2` | grp var 2 | Grouping variable from Group2 (data-driven outer category, e.g. SOC) |
+| `groupvar3here` | `AG_var3` | grp var 3 | Grouping variable from Group3 (data-driven inner category, e.g. PT) |
+| `anavarhere` | `ana_var` | ana var | Analysis variable (subject ID) |
+
+**Template**
+
+```r
+.arms_analysisidhere <- utils::head(sort(unique(df2_analysisidhere$groupvar1here)), 2)
+full_analysisidhere <- df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)
+
+.pairs_analysisidhere <- df2_analysisidhere |>
+  dplyr::distinct(groupvar2here, groupvar3here) |>
+  dplyr::arrange(groupvar2here, groupvar3here)
+
+.rd_one_analysisidhere <- function(.g2, .g3) {
+  success <- df2_analysisidhere |>
+      dplyr::filter(as.character(groupvar2here) == .g2,
+                    as.character(groupvar3here) == .g3) |>
+      dplyr::distinct(anavarhere) |>
+      dplyr::mutate(FL = 1L)
+  ana <- full_analysisidhere |>
+      dplyr::left_join(dplyr::select(success, anavarhere, FL), by = "anavarhere") |>
+      dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))
+  cardx::ard_stats_prop_test(data = ana, by = groupvar1here, variables = FL, correct = FALSE) |>
+      dplyr::filter(stat_name %in% c("estimate", "conf.low", "conf.high")) |>
+      dplyr::mutate(
+          stat = lapply(stat, function(.v) .v * 100),
+          group2_level = .g2,
+          group3_level = .g3,
+          operationid = dplyr::case_when(
+              stat_name == "estimate"  ~ "opid1here",
+              stat_name == "conf.low"  ~ "opid2here",
+              stat_name == "conf.high" ~ "opid3here"
+          )
+      )
+}
+
+df3_analysisidhere <- if (length(.arms_analysisidhere) >= 2 && nrow(.pairs_analysisidhere) > 0) {
+  dplyr::bind_rows(Map(
+      .rd_one_analysisidhere,
+      as.character(.pairs_analysisidhere$groupvar2here),
+      as.character(.pairs_analysisidhere$groupvar3here)
+  ))
+} else {
+  tibble::tibble(variable = character(0), group2_level = character(0),
+                 group3_level = character(0), stat_name = character(0),
+                 stat = list(), operationid = character(0))
 }
 ```

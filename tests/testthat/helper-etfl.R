@@ -259,6 +259,66 @@
   list(n_matched = sum(comp$match, na.rm = TRUE), n_total = nrow(comp), data = comp)
 }
 
+# Independent ground truth for a per-(group2 x group3) PAIR risk difference
+# (#172, Mth_03_1b) -- the two-inner-grouping analogue of
+# .etfl_pergroup_rd_truth(). Loops the distinct (cat_var2, cat_var3)
+# combinations OBSERVED in the subset (both groupings are data-driven, so the
+# category basis is the analysis's own data context) and recomputes each RD
+# with stats::prop.test(correct = FALSE) on distinct-subject counts over the
+# full arm denominators.
+.etfl_perpair_rd_truth <- function(table, subset_fun, cat_var2, cat_var3, arms) {
+  paths <- .etfl_paths(table)
+  adsl <- haven::read_xpt(file.path(paths$adam_dir, "adsl.xpt"))
+  adae <- haven::read_xpt(file.path(paths$adam_dir, "adae.xpt"))
+  saf <- adsl |> dplyr::filter(SAFFL == "Y")
+  overlap <- setdiff(intersect(names(adsl), names(adae)), "USUBJID")
+  df_pop <- merge(saf, dplyr::select(adae, -dplyr::all_of(overlap)),
+                  by = "USUBJID", all = FALSE)
+  df2 <- subset_fun(df_pop)
+  N <- saf |> dplyr::filter(TRT01AN %in% arms) |> dplyr::count(TRT01AN, name = "N")
+  pairs <- df2 |>
+    dplyr::distinct(.data[[cat_var2]], .data[[cat_var3]]) |>
+    dplyr::arrange(.data[[cat_var2]], .data[[cat_var3]])
+  dplyr::bind_rows(Map(function(.c2, .c3) {
+    x <- df2 |>
+      dplyr::filter(as.character(.data[[cat_var2]]) == .c2,
+                    as.character(.data[[cat_var3]]) == .c3) |>
+      dplyr::distinct(TRT01AN, USUBJID) |>
+      dplyr::count(TRT01AN, name = "x")
+    tt <- N |> dplyr::left_join(x, by = "TRT01AN") |>
+      dplyr::mutate(x = ifelse(is.na(x), 0, x))
+    pp <- suppressWarnings(stats::prop.test(
+      x = c(tt$x[tt$TRT01AN == arms[1]], tt$x[tt$TRT01AN == arms[2]]),
+      n = c(tt$N[tt$TRT01AN == arms[1]], tt$N[tt$TRT01AN == arms[2]]),
+      correct = FALSE))
+    data.frame(cat2 = .c2, cat3 = .c3,
+               estimate  = (pp$estimate[[1]] - pp$estimate[[2]]) * 100,
+               conf.low  = pp$conf.int[[1]] * 100,
+               conf.high = pp$conf.int[[2]] * 100,
+               stringsAsFactors = FALSE)
+  }, as.character(pairs[[cat_var2]]), as.character(pairs[[cat_var3]])))
+}
+
+# Compare siera's per-pair RD against the ground truth, keyed on the
+# (group2_level, group3_level) pair. The full join asserts EVERY combination on
+# both sides, so siera dropping or inventing a combination fails the test.
+.cmp_perpair_rd <- function(siera_ard, table, ana_id, subset_fun,
+                            cat_var2, cat_var3, arms) {
+  truth <- .etfl_perpair_rd_truth(table, subset_fun, cat_var2, cat_var3, arms)
+  s <- siera_ard |>
+    dplyr::filter(AnalysisId == ana_id) |>
+    dplyr::mutate(val = .etfl_safe_stat(stat),
+                  cat2 = as.character(group2_level),
+                  cat3 = as.character(group3_level)) |>
+    dplyr::select(cat2, cat3, stat_name, val) |>
+    tidyr::pivot_wider(names_from = stat_name, values_from = val)
+  comp <- dplyr::full_join(s, truth, by = c("cat2", "cat3"), suffix = c(".s", ".t"))
+  comp$match <- abs(comp$estimate.s  - comp$estimate.t)  < 0.01 &
+                abs(comp$conf.low.s  - comp$conf.low.t)  < 0.01 &
+                abs(comp$conf.high.s - comp$conf.high.t) < 0.01
+  list(n_matched = sum(comp$match, na.rm = TRUE), n_total = nrow(comp), data = comp)
+}
+
 # Compare a continuous summary (n, Mean, SD, Median, Min, Max). ----------------
 .cmp_continuous <- function(siera_ard, ref_ard, ana_id) {
   ops <- c("Mth_06_01_n", "Mth_06_02_Mean", "Mth_06_03_SD",

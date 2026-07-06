@@ -12,13 +12,13 @@
 # fda-ae-t13 An_80 (arm x PT) is asserted against an independent treatment-
 # emergent ground truth, since the published reference ARD omits the TRTEMFL
 # filter its own ARS metadata mandates (#158, reference defect).
-# Per-category risk difference (#157/#171) is asserted against an independent
-# prop.test ground truth: data-driven inner groupings use Mth_03_1a (fda-ae-t13
-# An_81/An_81_1 per PT; fda-ae-t36 An_55/An_55_1 per SOC), and PRE-DEFINED
-# inner groupings use Mth_03_1p, which loops the metadata-defined groups
-# (fda-ae-t06 An_48_2/An_48_3 per action taken, An_50_2/An_50_3 per severity).
-# The one remaining limitation exercised but not asserted: per-(SOC x PT) RD
-# (fda-ae-t36 An_57, a 3-grouping case neither variant covers -- #172).
+# Per-category risk difference (#157/#171/#172) is asserted against an
+# independent prop.test ground truth: data-driven inner groupings use Mth_03_1a
+# (fda-ae-t13 An_81/An_81_1 per PT; fda-ae-t36 An_55/An_55_1 per SOC),
+# PRE-DEFINED inner groupings use Mth_03_1p, which loops the metadata-defined
+# groups (fda-ae-t06 An_48_2/An_48_3 per action taken, An_50_2/An_50_3 per
+# severity), and the 3-grouping per-(SOC x PT) case uses Mth_03_1b, which loops
+# the observed (group2, group3) combinations (fda-ae-t36 An_57/An_57_1).
 
 # -- Demographics / disposition / exposure (ADSL-only, fast) -------------------
 
@@ -202,7 +202,7 @@ test_that("fda-ae-t13 AE by PT: bigN and two-level arm x PT n match spec (#158)"
     cat_var = "AEDECOD", arms = c(2, 3)))
 })
 
-test_that("fda-ae-t36 AE by severity: bigN, n%, and two-level n% match reference", {
+test_that("fda-ae-t36 AE by severity: bigN, n%, two-level n%, and per-(SOC x PT) RD match spec", {
   skip_on_cran()
   tmp <- withr::local_tempdir()
   ard <- .run_etfl_pipeline("fda-ae-t36", tmp)
@@ -226,6 +226,31 @@ test_that("fda-ae-t36 AE by severity: bigN, n%, and two-level n% match reference
     ard, "fda-ae-t36", "An_55_1",
     subset_fun = function(d) dplyr::filter(d, AOCCSFL == "Y", TRTAN %in% c(2, 3)),
     cat_var = "AEBODSYS", arms = c(2, 3)))
+
+  # An_57 / An_57_1 (per-(SOC x PT) risk difference, #172, method Mth_03_1b):
+  # one RD + 95% CI per (AEBODSYS, AEDECOD) combination observed in the
+  # first-occurrence-of-PT subset (Dss_77 / Dss_78), asserted against the
+  # independent prop.test ground truth over every observed combination
+  # (180 pairs for arms 1 vs 3; 187 for arms 2 vs 3).
+  #
+  # The reference ARD is NOT used as the oracle here, on two grounds. (1) It
+  # rounds component percentages before differencing (the same defect as
+  # An_55). (2) Its row set is the table-wide union of all 230 combinations,
+  # padding combinations absent from the comparison arms; those filler rows
+  # are internally inconsistent -- An_57 pads with zeros (correct: no events
+  # in either arm means RD = 0), but 43 of An_57_1's filler rows carry
+  # An_57's Low-vs-Placebo estimates verbatim (e.g. 1.2 = 1/84, a value
+  # impossible in a High-vs-Placebo comparison whose true RD is 0). siera
+  # emits only observed combinations, so it omits nothing but all-zero or
+  # corrupted filler rows.
+  .expect_all_match(.cmp_perpair_rd(
+    ard, "fda-ae-t36", "An_57",
+    subset_fun = function(d) dplyr::filter(d, AOCCPFL == "Y", TRTAN %in% c(1, 3)),
+    cat_var2 = "AEBODSYS", cat_var3 = "AEDECOD", arms = c(1, 3)))
+  .expect_all_match(.cmp_perpair_rd(
+    ard, "fda-ae-t36", "An_57_1",
+    subset_fun = function(d) dplyr::filter(d, AOCCPFL == "Y", TRTAN %in% c(2, 3)),
+    cat_var2 = "AEBODSYS", cat_var3 = "AEDECOD", arms = c(2, 3)))
 })
 
 # -- Vital signs / labs (large ADVS / ADLB, continuous) ------------------------
