@@ -587,11 +587,10 @@ after the xlsx templates are updated, then
   to avoid row-parsing failures. `fda-ds-t04` derives `DISCONFL` from
   `DCTREAS` via the `adsl_transform` hook. The
   `.cmp_pergroup_rd()`/`.etfl_pergroup_rd_truth()` helpers assert
-  per-category RD (#157/#171, see below). The one remaining
-  known-limitation analysis exercised but not asserted: per-(SOC × PT)
-  RD (fda-ae-t36 An_57, a 3-grouping case `Mth_03_1a` doesn’t cover,
-  \#172). The raw XPT/JSON is ~28 MB in the working tree but git-packs
-  and tarball-gzips to ~2 MB, so it ships fine for CRAN.
+  per-category RD (#157/#171, see below). The per-(SOC × PT) RD
+  (fda-ae-t36 An_57/An_57_1) is asserted via `.cmp_perpair_rd()` (#172).
+  The raw XPT/JSON is ~28 MB in the working tree but git-packs and
+  tarball-gzips to ~2 MB, so it ships fine for CRAN.
   - **\#158 — fda-ae-t13 An_80 arm × PT counts (resolved: reference
     defect, not a siera bug).** The published reference ARD for An_80
     was generated **without** the treatment-emergent filter
@@ -637,9 +636,9 @@ after the xlsx templates are updated, then
     distinct-subject counts (`.etfl_pergroup_rd_truth()` /
     `.cmp_pergroup_rd()`), full-join matching every category × statistic
     — siera (cardx) matched it exactly on all 180/187 PTs and 22 SOCs.
-    Remaining gap tracked as a follow-up: fda-ae-t36 An_57 per-(SOC ×
-    PT) RD (needs a 3-grouping variant `Mth_03_1b`, \#172). The owner
-    master code-template library is git-tracked at
+    The last gap in this family — fda-ae-t36 An_57 per-(SOC × PT) RD —
+    was closed by the 3-grouping variant `Mth_03_1b` (#172, see below).
+    The owner master code-template library is git-tracked at
     `inst/extdata/R_siera_codes.xlsx` (one sheet per method,
     e.g. `Risk Difference (per grp)`, plus a `Constructs` registry) —
     add new methods there too. It is **excluded from the CRAN tarball**
@@ -686,6 +685,32 @@ after the xlsx templates are updated, then
     reference. Tests: `test-ag-group-values.R` (resolver branches + lazy
     function units), t06 block in `test-etfl-regression.R` (shape
     parity + value assertions).
+  - **\#172 — per-(SOC × PT) RD (resolved via 3-grouping method
+    `Mth_03_1b` / library `10_risk_difference_per_group_pair`; third t36
+    reference inconsistency found).** fda-ae-t36 An_57/An_57_1 carry arm
+    (resultsByGroup=false) + two data-driven inner groupings (AEBODSYS,
+    AEDECOD) on the first-occurrence-of-PT subset (`AOCCPFL EQ 'Y'` +
+    arm pair, Dss_77/78). `Mth_03_1b` loops
+    `dplyr::distinct(df2, AG_var2, AG_var3)` via
+    [`Map()`](https://rdrr.io/r/base/funprog.html), builds the 0/1 `FL`
+    per combination on `df_poptot`, calls
+    `cardx::ard_stats_prop_test(correct = FALSE)` (safe: observed combos
+    are never 0-event in both arms), and stamps `group2_level` +
+    `group3_level`. Reuses existing valueSources (`AG_var1/2/3`,
+    `ana_var`, `operation_1..3`) — **no R/ change**; the method lives
+    only in the library + the t36 `-siera.json`. siera matched an
+    independent per-pair prop.test recomputation on all 180 (arms 1v3) +
+    187 (arms 2v3) observed combinations
+    (`.etfl_perpair_rd_truth()`/`.cmp_perpair_rd()` in helper-etfl.R).
+    **Reference row sets intentionally differ** (siera 540/561 rows vs
+    reference 690/690): the reference pads to the table-wide union of
+    230 combos, and its filler rows are internally inconsistent — An_57
+    pads with zeros (correct) but 43 of An_57_1’s fillers carry
+    **An_57’s Low-vs-Placebo estimates verbatim** (e.g. 1.2 = 1/84 for
+    PTs with zero events in arms 2/3, whose true RD is 0). So the
+    reference is unusable as oracle on values (rounds before
+    differencing, like An_55) AND on shape; siera omits only
+    all-zero/corrupted filler rows.
   - **\#173 — method-template library formalised as plain text
     (supersedes the xlsx as source of truth).** The owner xlsx workbooks
     (`inst/extdata/R_siera_codes.xlsx`, `cards_constructs.xlsx`) are

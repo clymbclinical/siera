@@ -69,6 +69,21 @@ CRAN release: 2026-06-17
   only the first adverse-event record per subject rather than from all
   qualifying events, so they are not used as the value oracle
   ([\#171](https://github.com/clymbclinical/siera/issues/171)).
+- Added per-(category x category) risk differences for analyses with two
+  data-driven inner groupings, such as one risk difference per system
+  organ class and preferred term combination. A new method template,
+  `risk_difference_per_group_pair`, loops the distinct combinations of
+  the second and third grouping variables observed in the analysis
+  subset, computes each risk difference with
+  [`cardx::ard_stats_prop_test()`](https://insightsengineering.github.io/cardx/latest-tag/reference/ard_stats_prop_test.html),
+  and stamps both category levels onto the ARD rows. It reuses the
+  existing `AG_var3` valueSource, so no change to
+  [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+  was required. Validated on the eTFL “Adverse Events by System Organ
+  Class and Preferred Term” table against an independent
+  [`stats::prop.test()`](https://rdrr.io/r/stats/prop.test.html)
+  recomputation over every observed combination
+  ([\#172](https://github.com/clymbclinical/siera/issues/172)).
 - Fixed zero-event risk-difference analyses returning `NA` instead of
   `0`. Methods that compute over the full population (templates
   referencing `df_poptot`, e.g. risk differences) now bypass the
