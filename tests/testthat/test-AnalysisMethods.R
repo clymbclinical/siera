@@ -234,6 +234,83 @@ test_that("parameter name containing a regex metacharacter is matched literally"
   expect_true(grepl("OP_DOT", result$code, fixed = TRUE))
 })
 
+test_that("opidNhere tokens are substituted from operations without declared parameters", {
+  # Method-library manifests deliberately declare no operation_N parameters;
+  # the opidNhere token family must be substituted by pattern from the
+  # method's own operations (#183).
+  analysis_methods <- tibble(
+    id = c("MTH_OPS", "MTH_OPS"),
+    name = c("Ops test", "Ops test"),
+    description = c("opid pattern substitution", "opid pattern substitution"),
+    label = c("ops", "ops"),
+    operation_id = c("MTH_OPS_01_n", "MTH_OPS_02_pct")
+  )
+
+  template <- tibble(
+    method_id = "MTH_OPS",
+    context = "R (siera)",
+    specifiedAs = "Code",
+    templateCode = paste0(
+      "df3_analysisidhere <- df |> dplyr::mutate(operationid = dplyr::case_when(",
+      "stat_name == 'n' ~ 'opid1here', stat_name == 'p' ~ 'opid2here'))"
+    )
+  )
+
+  # No parameters declared at all - the tokens must still resolve.
+  parameters <- tibble(
+    method_id = character(),
+    parameter_name = character(),
+    parameter_valueSource = character()
+  )
+
+  result <- siera:::`.generate_analysis_method_section`(
+    analysis_methods = analysis_methods,
+    analysis_method_code_template = template,
+    analysis_method_code_parameters = parameters,
+    method_id = "MTH_OPS",
+    analysis_id = "AN_OPS",
+    output_id = "OUT_OPS"
+  )
+
+  expect_false(grepl("opid[0-9]+here", result$code))
+  expect_match(result$code, "'MTH_OPS_01_n'", fixed = TRUE)
+  expect_match(result$code, "'MTH_OPS_02_pct'", fixed = TRUE)
+})
+
+test_that("an NA operation id leaves its opid token untouched", {
+  analysis_methods <- tibble(
+    id = "MTH_NAOP",
+    name = "NA op",
+    description = "NA operation ids are skipped by the pattern substitution",
+    label = "naop",
+    operation_id = NA_character_
+  )
+
+  template <- tibble(
+    method_id = "MTH_NAOP",
+    context = "R (siera)",
+    specifiedAs = "Code",
+    templateCode = "df3_analysisidhere <- df |> dplyr::mutate(operationid = 'opid1here')"
+  )
+
+  parameters <- tibble(
+    method_id = character(),
+    parameter_name = character(),
+    parameter_valueSource = character()
+  )
+
+  result <- siera:::`.generate_analysis_method_section`(
+    analysis_methods = analysis_methods,
+    analysis_method_code_template = template,
+    analysis_method_code_parameters = parameters,
+    method_id = "MTH_NAOP",
+    analysis_id = "AN_NAOP",
+    output_id = "OUT_NAOP"
+  )
+
+  expect_match(result$code, "opid1here", fixed = TRUE)
+})
+
 test_that(".generate_analysis_method_section warns when no template exists", {
   analysis_methods <- tibble(
     id = "MTH200",

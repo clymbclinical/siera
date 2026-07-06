@@ -138,6 +138,19 @@
     }
   }
 
+  # Operation-ID tokens (opid1here, opid2here, ...) pair with the operation_N
+  # valueSource family, which is derived from the method's own operations
+  # rather than declared as parameters (method-library manifests deliberately
+  # omit them). Substitute them by pattern so documentRef-resolved methods
+  # emit real operation IDs (#183). Declared parameters were substituted
+  # above, so this is a no-op for templates that map the tokens explicitly.
+  for (op_name in names(operations_named)) {
+    op_id <- operations_named[[op_name]]
+    if (is.null(op_id) || is.na(op_id)) next
+    op_token <- paste0("opid", sub("operation_", "", op_name, fixed = TRUE), "here")
+    anmetcode_temp <- gsub(op_token, op_id, anmetcode_temp, fixed = TRUE)
+  }
+
   anmetcode_final <- gsub("methodidhere", methodid, anmetcode_temp, fixed = TRUE)
   anmetcode_final <- gsub("analysisidhere", analysis_id, anmetcode_final, fixed = TRUE)
 
