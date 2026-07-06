@@ -411,6 +411,60 @@
         }
       ],
       "templateCode": ".groupvals_analysisidhere <- c(group2valueshere)\n.arms_analysisidhere <- utils::head(sort(unique(df2_analysisidhere$groupvar1here)), 2)\nfull_analysisidhere <- df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n\n.rd_one_analysisidhere <- function(.val) {\n  success <- df2_analysisidhere |>\n      dplyr::filter(as.character(groupvar2here) == .val) |>\n      dplyr::distinct(anavarhere) |>\n      dplyr::mutate(FL = 1L)\n  ana <- full_analysisidhere |>\n      dplyr::left_join(dplyr::select(success, anavarhere, FL), by = \"anavarhere\") |>\n      dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n  x1 <- sum(ana$FL[ana$groupvar1here == .arms_analysisidhere[[1]]])\n  x2 <- sum(ana$FL[ana$groupvar1here == .arms_analysisidhere[[2]]])\n  n1 <- sum(ana$groupvar1here == .arms_analysisidhere[[1]])\n  n2 <- sum(ana$groupvar1here == .arms_analysisidhere[[2]])\n  pt <- suppressWarnings(stats::prop.test(x = c(x1, x2), n = c(n1, n2), correct = FALSE))\n  tibble::tibble(\n      variable = \"FL\",\n      variable_level = list(NULL, NULL, NULL),\n      stat_name = c(\"estimate\", \"conf.low\", \"conf.high\"),\n      stat = list(\n          (pt$estimate[[1]] - pt$estimate[[2]]) * 100,\n          pt$conf.int[[1]] * 100,\n          pt$conf.int[[2]] * 100\n      ),\n      group2_level = .val,\n      operationid = c('opid1here', 'opid2here', 'opid3here')\n  )\n}\n\ndf3_analysisidhere <- if (length(.arms_analysisidhere) >= 2 && length(.groupvals_analysisidhere) > 0) {\n  dplyr::bind_rows(lapply(.groupvals_analysisidhere, .rd_one_analysisidhere))\n} else {\n  tibble::tibble(variable = character(0), group2_level = character(0),\n                 stat_name = character(0), stat = list(),\n                 operationid = character(0))\n}"
+    },
+    {
+      "id": "risk_difference_per_group_pair",
+      "name": "Risk difference per (Group2 x Group3) combination",
+      "label": "Risk difference + 95% CI (per group pair)",
+      "description": "One risk difference (%) + 95% CI per observed (Group2, Group3) combination (e.g. SOC x PT), comparing the two arms present in the subset. The 3-grouping analogue of risk_difference_per_group: Group1 is the treatment arm (self-derived from the data), and the template loops the distinct combinations of the two data-driven inner grouping variables observed in the subset, stamping both group2_level and group3_level (no group[n] metadata columns are stamped since the template uses no by_listc/by_vars/strata_vars token). Uses cardx::ard_stats_prop_test(correct = FALSE); safe because every observed combination has at least one event, so the 2x2 table is never fully degenerate. References df_poptot (population_based). Verified against fda-ae-t36 Mth_03_1b (An_57/An_57_1, per SOC x PT on first-occurrence-of-PT records) using an independent stats::prop.test(correct = FALSE) recomputation over every combination; the published t36 reference rounds component percentages before differencing, so it is not used as the value oracle.",
+      "status": "verified",
+      "operations": [
+        {
+          "order": 1,
+          "name": "Risk_Difference_%",
+          "label": "Risk Difference %",
+          "resultPattern": "xx.x"
+        },
+        {
+          "order": 2,
+          "name": "95%_CI_Low",
+          "label": "95% CI Low",
+          "resultPattern": "xx.x"
+        },
+        {
+          "order": 3,
+          "name": "95%_CI_High",
+          "label": "95% CI High",
+          "resultPattern": "xx.x"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "groupvar1here",
+          "valueSource": "AG_var1",
+          "label": "grp var 1",
+          "description": "Grouping variable from Group1 (treatment arm)"
+        },
+        {
+          "name": "groupvar2here",
+          "valueSource": "AG_var2",
+          "label": "grp var 2",
+          "description": "Grouping variable from Group2 (data-driven outer category, e.g. SOC)"
+        },
+        {
+          "name": "groupvar3here",
+          "valueSource": "AG_var3",
+          "label": "grp var 3",
+          "description": "Grouping variable from Group3 (data-driven inner category, e.g. PT)"
+        },
+        {
+          "name": "anavarhere",
+          "valueSource": "ana_var",
+          "label": "ana var",
+          "description": "Analysis variable (subject ID)"
+        }
+      ],
+      "templateCode": ".arms_analysisidhere <- utils::head(sort(unique(df2_analysisidhere$groupvar1here)), 2)\nfull_analysisidhere <- df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n\n.pairs_analysisidhere <- df2_analysisidhere |>\n  dplyr::distinct(groupvar2here, groupvar3here) |>\n  dplyr::arrange(groupvar2here, groupvar3here)\n\n.rd_one_analysisidhere <- function(.g2, .g3) {\n  success <- df2_analysisidhere |>\n      dplyr::filter(as.character(groupvar2here) == .g2,\n                    as.character(groupvar3here) == .g3) |>\n      dplyr::distinct(anavarhere) |>\n      dplyr::mutate(FL = 1L)\n  ana <- full_analysisidhere |>\n      dplyr::left_join(dplyr::select(success, anavarhere, FL), by = \"anavarhere\") |>\n      dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n  cardx::ard_stats_prop_test(data = ana, by = groupvar1here, variables = FL, correct = FALSE) |>\n      dplyr::filter(stat_name %in% c(\"estimate\", \"conf.low\", \"conf.high\")) |>\n      dplyr::mutate(\n          stat = lapply(stat, function(.v) .v * 100),\n          group2_level = .g2,\n          group3_level = .g3,\n          operationid = dplyr::case_when(\n              stat_name == \"estimate\"  ~ \"opid1here\",\n              stat_name == \"conf.low\"  ~ \"opid2here\",\n              stat_name == \"conf.high\" ~ \"opid3here\"\n          )\n      )\n}\n\ndf3_analysisidhere <- if (length(.arms_analysisidhere) >= 2 && nrow(.pairs_analysisidhere) > 0) {\n  dplyr::bind_rows(Map(\n      .rd_one_analysisidhere,\n      as.character(.pairs_analysisidhere$groupvar2here),\n      as.character(.pairs_analysisidhere$groupvar3here)\n  ))\n} else {\n  tibble::tibble(variable = character(0), group2_level = character(0),\n                 group3_level = character(0), stat_name = character(0),\n                 stat = list(), operationid = character(0))\n}"
     }
   ]
 }
