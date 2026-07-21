@@ -339,11 +339,12 @@ test_that("methods mix inline code and documentRef; empty refIds are skipped", {
 })
 
 test_that("bundled library methods resolved via documentRef emit real operation ids", {
-  # The bundled method-library.json deliberately declares no operation_N
-  # parameters (they are derived from each ARS method's own operations), so
-  # the opidNhere tokens must be substituted by pattern, not via declared
-  # parameters (#183). Note the shipped exampleARS_5_documentref.json does NOT
-  # cover this: its manifest declares the opid parameters explicitly.
+  # The bundled method-library.json declares every opidNhere token explicitly
+  # as an operation_N parameter (#183), and operation_N resolves to each ARS
+  # method's own operation ids. This test proves a documentRef-resolved library
+  # method emits real operation ids (no literal opidNhere leaks) end to end.
+  # (The shipped exampleARS_5_documentref.json uses a different manifest, so it
+  # does not exercise the bundled catalog specifically.)
   src <- jsonlite::fromJSON(ARS_example("exampleARS_5.json"),
                             simplifyVector = FALSE, simplifyDataFrame = FALSE)
   lib <- system.file("method-library", "method-library.json", package = "siera")

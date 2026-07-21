@@ -68,6 +68,54 @@
       "valueSource": "ana_var",
       "label": "ana var",
       "description": "Continuous analysis variable to summarise"
+    },
+    {
+      "name": "opid1here",
+      "valueSource": "operation_1",
+      "label": "op id 1",
+      "description": "Operation id for the 'N' statistic (order 1)"
+    },
+    {
+      "name": "opid2here",
+      "valueSource": "operation_2",
+      "label": "op id 2",
+      "description": "Operation id for the 'mean' statistic (order 2)"
+    },
+    {
+      "name": "opid3here",
+      "valueSource": "operation_3",
+      "label": "op id 3",
+      "description": "Operation id for the 'sd' statistic (order 3)"
+    },
+    {
+      "name": "opid4here",
+      "valueSource": "operation_4",
+      "label": "op id 4",
+      "description": "Operation id for the 'median' statistic (order 4)"
+    },
+    {
+      "name": "opid5here",
+      "valueSource": "operation_5",
+      "label": "op id 5",
+      "description": "Operation id for the 'p25' statistic (order 5)"
+    },
+    {
+      "name": "opid6here",
+      "valueSource": "operation_6",
+      "label": "op id 6",
+      "description": "Operation id for the 'p75' statistic (order 6)"
+    },
+    {
+      "name": "opid7here",
+      "valueSource": "operation_7",
+      "label": "op id 7",
+      "description": "Operation id for the 'min' statistic (order 7)"
+    },
+    {
+      "name": "opid8here",
+      "valueSource": "operation_8",
+      "label": "op id 8",
+      "description": "Operation id for the 'max' statistic (order 8)"
     }
   ]
 }

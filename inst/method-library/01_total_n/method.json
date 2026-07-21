@@ -32,6 +32,12 @@
       "valueSource": "by_vars",
       "label": "by stmt",
       "description": "by/variables argument string for the grouping(s)"
+    },
+    {
+      "name": "opid1here",
+      "valueSource": "operation_1",
+      "label": "op id 1",
+      "description": "Operation id for the 'n' statistic (order 1)"
     }
   ]
 }

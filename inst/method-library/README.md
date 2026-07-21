@@ -84,9 +84,13 @@ The cards/cardx recipe using placeholder tokens. Tokens come in two kinds:
 
 - **Parameters** (declared in `method.json`): `anavarhere`, `groupvar1here`,
   `byvarshere`, `distinctlisthere`, … — resolved per analysis from ARS metadata.
+  This includes each `opidNhere` operation-ID token: it must be declared as a
+  parameter mapping `opidNhere → operation_N` (`operation_N` resolves to the
+  method's own operation id in `order`). Declaring them keeps the library
+  standalone/explicit (#183).
 - **Internal** (substituted automatically by siera, never declared): any token
   containing `analysisidhere` (e.g. `df2_analysisidhere`, `df3_analysisidhere`),
-  `methodidhere`, `outputidhere`, and `opidNhere` (the operation IDs).
+  `methodidhere`, `outputidhere`.
 
 Each template must assign `df3_analysisidhere <- …`. Some valueSources (`by_vars`,
 `strata_vars`, `by_stmt`) inject a **leading comma**, so a raw template is not valid
@@ -103,7 +107,9 @@ R until substituted — the contract test parses a substituted copy, not the raw
    `…here` placeholder tokens;
 4. no duplicated `stat_name == '…'` left-hand side in a `case_when` (the class of bug
    that mapped `conf.low` twice and dropped `conf.high` in the legacy sheets);
-5. operation IDs referenced (`opidN`) do not exceed the declared `operations`;
+5. operation IDs referenced (`opidN`) do not exceed the declared `operations`, and
+   every `opidNhere` token is declared as an `operation_N` parameter (so an added
+   operation cannot leak an unresolved `opidNhere`);
 6. the committed `METHODS.md` equals the freshly rendered catalog (no drift);
 7. the committed `method-library.json` manifest equals the freshly rendered
    catalog, and every method resolves out of it via the documentRef resolver.

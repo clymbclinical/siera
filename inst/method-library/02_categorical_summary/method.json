@@ -50,6 +50,18 @@
       "valueSource": "by_listc",
       "label": "by vars (list)",
       "description": "Grouping variables as a quoted, comma-separated list"
+    },
+    {
+      "name": "opid1here",
+      "valueSource": "operation_1",
+      "label": "op id 1",
+      "description": "Operation id for the 'n' statistic (order 1)"
+    },
+    {
+      "name": "opid2here",
+      "valueSource": "operation_2",
+      "label": "op id 2",
+      "description": "Operation id for the 'p' statistic (order 2)"
     }
   ]
 }
