@@ -47,7 +47,7 @@ CRAN release: 2026-06-17
   computes one risk difference and 95% confidence interval for each
   data-driven inner category (e.g. one per preferred term or system
   organ class) by looping over the second grouping and calling
-  [`cardx::ard_stats_prop_test()`](https://insightsengineering.github.io/cardx/latest-tag/reference/ard_stats_prop_test.html)
+  [`cardx::ard_stats_prop_test()`](https://rdrr.io/pkg/cardx/man/ard_stats_prop_test.html)
   within each, instead of collapsing the analysis to a single overall
   risk difference
   ([\#157](https://github.com/clymbclinical/siera/issues/157)).
@@ -75,7 +75,7 @@ CRAN release: 2026-06-17
   `risk_difference_per_group_pair`, loops the distinct combinations of
   the second and third grouping variables observed in the analysis
   subset, computes each risk difference with
-  [`cardx::ard_stats_prop_test()`](https://insightsengineering.github.io/cardx/latest-tag/reference/ard_stats_prop_test.html),
+  [`cardx::ard_stats_prop_test()`](https://rdrr.io/pkg/cardx/man/ard_stats_prop_test.html),
   and stamps both category levels onto the ARD rows. It reuses the
   existing `AG_var3` valueSource, so no change to
   [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)

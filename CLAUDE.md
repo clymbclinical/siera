@@ -282,6 +282,38 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
   JSON-only — that is \#179.** NEWS entry deferred to next version bump
   (0.5.6 is on CRAN / mid-submission).
+- **`opidNhere` tokens are declared as `operation_N` parameters in every
+  method-library method (issue \#183)** — the `opidNhere` token family
+  (which stamps the ARD `operationid` column) is resolved only by the
+  declared-parameter loop in
+  [`.generate_analysis_method_section()`](https://clymbclinical.github.io/siera/reference/dot-generate_analysis_method_section.md);
+  there is no pattern/fallback substitution. Originally the bundled
+  `method-library.json` methods declared no `operation_N` parameters
+  (the family was meant to be derived implicitly from each method’s
+  `operations`), so documentRef-resolved library methods leaked literal
+  `opid1here`… into generated scripts/ARDs. **Fix (owner decision: keep
+  the library standalone/explicit rather than add an implicit
+  derivation):** every source `inst/method-library/<NN_key>/method.json`
+  now declares one parameter per `opidNhere` token used in its
+  `template.R`, mapping `opidNhere → operation_N` (label `op id N`,
+  description referencing the operation). `operation_N` resolves to the
+  method’s own operation ids (in `order`) via
+  `all_value_sources <- c(operations_named, value_sources)`, so the
+  existing declared loop substitutes real ids. The generated catalog
+  (`method-library.json`) and `METHODS.md` carry the params (renderer
+  copies `m$parameters` verbatim — regenerate both after editing any
+  `method.json`). **Drift guard:** `test-method-library.R` asserts (a)
+  every `opidNhere` token in a template has a matching declared param
+  (via the “no unknown tokens” test — `opidNhere` is no longer treated
+  as an internal token) and (b) the declared opid params are exactly the
+  tokens present, each mapping `opidNhere → operation_N` (dedicated
+  “every opidNhere token is declared” test). So adding an operation/opid
+  token without its parameter fails CI. Manifest valueSource validation
+  accepts the `operation_N` family via
+  [`.operation_value_source_pattern()`](https://clymbclinical.github.io/siera/reference/dot-operation_value_source_pattern.md)
+  (`R/value_sources.R`). eTFL-style metadata and `exampleARS_5`’s
+  manifest already declared these params, so they were unaffected all
+  along.
 
 ## Coding standards (pharmaverse / admiral style)
 
