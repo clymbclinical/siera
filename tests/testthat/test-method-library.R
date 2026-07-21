@@ -37,6 +37,10 @@
 }
 
 .mlib_substitute <- function(code, params) {
+  # opidNhere params map to the operation_N family (resolved from a method's own
+  # operations, not a construct); the dedicated opid gsub below handles their
+  # tokens, so skip them here rather than teach .mlib_dummy an operation dummy.
+  params <- params[!grepl("^opid[0-9]+here$", params$name), , drop = FALSE]
   for (i in seq_len(nrow(params))) {
     code <- gsub(params$name[i], .mlib_dummy(params$valueSource[i]), code, fixed = TRUE)
   }
@@ -170,12 +174,13 @@ test_that("templates assign df3 and have no orphan params or unknown placeholder
     }
 
     # No unknown `...here` placeholder tokens. A token is known if it carries an
-    # internal marker (analysisidhere/methodidhere/outputidhere/opidNhere) or
-    # contains a declared parameter name (covers prefixed forms like
-    # df2_denomanaidhere where the param is a suffix siera substitutes).
+    # internal marker (analysisidhere/methodidhere/outputidhere) or contains a
+    # declared parameter name (covers prefixed forms like df2_denomanaidhere
+    # where the param is a suffix siera substitutes). opidNhere tokens are NOT
+    # internal: the library declares them explicitly as operation_N parameters
+    # (#183), so they must resolve via is_param like any other token.
     toks <- unique(unlist(regmatches(code, gregexpr("[A-Za-z_][A-Za-z0-9_.]*here", code))))
-    is_internal <- grepl("analysisidhere|methodidhere|outputidhere", toks) |
-                   grepl("^opid[0-9]+here$", toks)
+    is_internal <- grepl("analysisidhere|methodidhere|outputidhere", toks)
     is_param <- vapply(toks, function(tk) {
       any(vapply(meta$parameters$name, function(p) grepl(p, tk, fixed = TRUE), logical(1)))
     }, logical(1))
@@ -206,6 +211,30 @@ test_that("operation IDs referenced do not exceed declared operations", {
       expect_true(max(refs) <= nrow(meta$operations),
         info = sprintf("%s: references opid%d but only %d operations declared",
                        meta$id, max(refs), nrow(meta$operations)))
+    }
+  }
+})
+
+test_that("every opidNhere token is declared as an operation_N parameter", {
+  # #183: opid tokens are resolved through the declared-parameter loop, not a
+  # pattern fallback, so each opidNhere used in a template MUST be declared as a
+  # parameter mapping opidNhere -> operation_N. This test is the guard that a
+  # newly added operation/opid token is not left without its parameter (the
+  # exact drift that would leak literal opidNhere into generated scripts).
+  for (d in .mlib_methods()) {
+    meta <- jsonlite::fromJSON(file.path(d, "method.json"), simplifyVector = TRUE)
+    code <- paste(readLines(file.path(d, "template.R"), warn = FALSE), collapse = "\n")
+    tok_n <- sort(unique(as.integer(unlist(regmatches(
+      code, gregexpr("(?<=opid)[0-9]+(?=here)", code, perl = TRUE))))))
+    opid_params <- meta$parameters[grepl("^opid[0-9]+here$", meta$parameters$name), , drop = FALSE]
+    # Exactly the tokens present are declared - no missing, no orphan opid param.
+    expect_setequal(opid_params$name, paste0("opid", tok_n, "here"))
+    # Each opidNhere maps to operation_N.
+    for (i in seq_len(nrow(opid_params))) {
+      n <- sub("^opid([0-9]+)here$", "\\1", opid_params$name[i])
+      expect_identical(opid_params$valueSource[i], paste0("operation_", n),
+        info = sprintf("%s: %s must map to operation_%s",
+                       meta$id, opid_params$name[i], n))
     }
   }
 })

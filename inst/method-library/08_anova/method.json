@@ -26,6 +26,12 @@
       "valueSource": "AG_var1",
       "label": "grp var 1",
       "description": "Grouping variable (treatment arm), the RHS of the formula"
+    },
+    {
+      "name": "opid1here",
+      "valueSource": "operation_1",
+      "label": "op id 1",
+      "description": "Operation id for the 'p.value' statistic (order 1)"
     }
   ]
 }

@@ -64,6 +64,7 @@ Distinct count of the analysis variable (typically USUBJID) per treatment group.
 | `anavarhere` | `ana_var` | ana var | Analysis variable (e.g. USUBJID) |
 | `groupvar1here` | `AG_var1` | grp var 1 | First grouping variable (treatment arm) |
 | `bystmthere` | `by_vars` | by stmt | by/variables argument string for the grouping(s) |
+| `opid1here` | `operation_1` | op id 1 | Operation id for the 'n' statistic (order 1) |
 
 **Template**
 
@@ -104,6 +105,8 @@ n and percentage of a categorical analysis variable per group, with a referenced
 | `denom_anagroupvarshere` | `AG_denom_var1` | denom grp var | Grouping variable(s) of the denominator analysis |
 | `isdatadrivenhere` | `AG_max_dataDriven` | is dataDriven | TRUE/FALSE: highest grouping is data-driven |
 | `byvarshere` | `by_listc` | by vars (list) | Grouping variables as a quoted, comma-separated list |
+| `opid1here` | `operation_1` | op id 1 | Operation id for the 'n' statistic (order 1) |
+| `opid2here` | `operation_2` | op id 2 | Operation id for the 'p' statistic (order 2) |
 
 **Template**
 
@@ -164,6 +167,14 @@ Descriptive statistics of a continuous analysis variable per group. Verified aga
 |-------|-------------|-------|-------------|
 | `byvarshere` | `by_listc` | by vars (list) | Grouping variables as a quoted, comma-separated list |
 | `anavarhere` | `ana_var` | ana var | Continuous analysis variable to summarise |
+| `opid1here` | `operation_1` | op id 1 | Operation id for the 'N' statistic (order 1) |
+| `opid2here` | `operation_2` | op id 2 | Operation id for the 'mean' statistic (order 2) |
+| `opid3here` | `operation_3` | op id 3 | Operation id for the 'sd' statistic (order 3) |
+| `opid4here` | `operation_4` | op id 4 | Operation id for the 'median' statistic (order 4) |
+| `opid5here` | `operation_5` | op id 5 | Operation id for the 'p25' statistic (order 5) |
+| `opid6here` | `operation_6` | op id 6 | Operation id for the 'p75' statistic (order 6) |
+| `opid7here` | `operation_7` | op id 7 | Operation id for the 'min' statistic (order 7) |
+| `opid8here` | `operation_8` | op id 8 | Operation id for the 'max' statistic (order 8) |
 
 **Template**
 
@@ -206,6 +217,9 @@ One overall risk difference (%) and 95% CI between the two treatment arms presen
 |-------|-------------|-------|-------------|
 | `groupvar1here` | `AG_var1` | grp var 1 | Grouping variable (treatment arm) |
 | `anavarhere` | `ana_var` | ana var | Analysis variable (subject ID) |
+| `opid1here` | `operation_1` | op id 1 | Operation id for the 'Risk_Difference_%' statistic (order 1) |
+| `opid2here` | `operation_2` | op id 2 | Operation id for the '95%_CI_Low' statistic (order 2) |
+| `opid3here` | `operation_3` | op id 3 | Operation id for the '95%_CI_High' statistic (order 3) |
 
 **Template**
 
@@ -286,6 +300,9 @@ One risk difference (%) + 95% CI per data-driven inner category (e.g. PT or SOC)
 | `groupvar1here` | `AG_var1` | grp var 1 | Grouping variable from Group1 (treatment arm) |
 | `groupvar2here` | `AG_var2` | grp var 2 | Grouping variable from Group2 (data-driven inner category) |
 | `anavarhere` | `ana_var` | ana var | Analysis variable (subject ID) |
+| `opid1here` | `operation_1` | op id 1 | Operation id for the 'Risk_Difference_%' statistic (order 1) |
+| `opid2here` | `operation_2` | op id 2 | Operation id for the '95%_CI_Low' statistic (order 2) |
+| `opid3here` | `operation_3` | op id 3 | Operation id for the '95%_CI_High' statistic (order 3) |
 
 **Template**
 
@@ -347,6 +364,9 @@ Fisher's exact odds-ratio estimate and 95% CI between the two arms present in th
 |-------|-------------|-------|-------------|
 | `groupvar1here` | `AG_var1` | grp var 1 | Grouping variable (treatment arm) |
 | `anavarhere` | `ana_var` | ana var | Analysis variable (subject ID) |
+| `opid1here` | `operation_1` | op id 1 | Operation id for the 'estimate' statistic (order 1) |
+| `opid2here` | `operation_2` | op id 2 | Operation id for the 'conf.low' statistic (order 2) |
+| `opid3here` | `operation_3` | op id 3 | Operation id for the 'conf.high' statistic (order 3) |
 
 **Template**
 
@@ -394,6 +414,7 @@ Chi-square test p-value of a categorical variable across treatment arms. Verifie
 |-------|-------------|-------|-------------|
 | `groupvar1here` | `AG_var1` | grp var 1 | Grouping variable (treatment arm), the by-variable |
 | `groupvar2here` | `AG_var2` | grp var 2 | Categorical variable being tested |
+| `opid1here` | `operation_1` | op id 1 | Operation id for the 'p.value' statistic (order 1) |
 
 **Template**
 
@@ -424,6 +445,7 @@ One-way ANOVA p-value of a continuous variable across treatment arms. Verified a
 |-------|-------------|-------|-------------|
 | `anavarhere` | `ana_var` | ana var | Continuous analysis variable (LHS of the formula) |
 | `groupvar1here` | `AG_var1` | grp var 1 | Grouping variable (treatment arm), the RHS of the formula |
+| `opid1here` | `operation_1` | op id 1 | Operation id for the 'p.value' statistic (order 1) |
 
 **Template**
 
@@ -458,6 +480,9 @@ One risk difference (%) + 95% CI per PRE-DEFINED group of Group2 (dataDriven: fa
 | `groupvar2here` | `AG_var2` | grp var 2 | Grouping variable from Group2 (pre-defined inner category) |
 | `group2valueshere` | `AG_var2_group_values` | grp 2 values | Quoted, comma-separated condition values of Group2's pre-defined groups, in group order |
 | `anavarhere` | `ana_var` | ana var | Analysis variable (subject ID) |
+| `opid1here` | `operation_1` | op id 1 | Operation id for the 'Risk_Difference_%' statistic (order 1) |
+| `opid2here` | `operation_2` | op id 2 | Operation id for the '95%_CI_Low' statistic (order 2) |
+| `opid3here` | `operation_3` | op id 3 | Operation id for the '95%_CI_High' statistic (order 3) |
 
 **Template**
 
@@ -526,6 +551,9 @@ One risk difference (%) + 95% CI per observed (Group2, Group3) combination (e.g.
 | `groupvar2here` | `AG_var2` | grp var 2 | Grouping variable from Group2 (data-driven outer category, e.g. SOC) |
 | `groupvar3here` | `AG_var3` | grp var 3 | Grouping variable from Group3 (data-driven inner category, e.g. PT) |
 | `anavarhere` | `ana_var` | ana var | Analysis variable (subject ID) |
+| `opid1here` | `operation_1` | op id 1 | Operation id for the 'Risk_Difference_%' statistic (order 1) |
+| `opid2here` | `operation_2` | op id 2 | Operation id for the '95%_CI_Low' statistic (order 2) |
+| `opid3here` | `operation_3` | op id 3 | Operation id for the '95%_CI_High' statistic (order 3) |
 
 **Template**
 

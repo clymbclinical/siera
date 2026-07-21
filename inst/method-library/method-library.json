@@ -36,6 +36,12 @@
           "valueSource": "by_vars",
           "label": "by stmt",
           "description": "by/variables argument string for the grouping(s)"
+        },
+        {
+          "name": "opid1here",
+          "valueSource": "operation_1",
+          "label": "op id 1",
+          "description": "Operation id for the 'n' statistic (order 1)"
         }
       ],
       "templateCode": "in_data = df2_analysisidhere |>\n    dplyr::select(anavarhere, groupvar1here) |>\n    unique()\ndf3_analysisidhere <-\n  cards::ard_tabulate(\n    data = in_data\n    bystmthere\n  ) |>\n  dplyr::filter(stat_name == 'n') |>\n  dplyr::mutate(operationid = 'opid1here')"
@@ -90,6 +96,18 @@
           "valueSource": "by_listc",
           "label": "by vars (list)",
           "description": "Grouping variables as a quoted, comma-separated list"
+        },
+        {
+          "name": "opid1here",
+          "valueSource": "operation_1",
+          "label": "op id 1",
+          "description": "Operation id for the 'n' statistic (order 1)"
+        },
+        {
+          "name": "opid2here",
+          "valueSource": "operation_2",
+          "label": "op id 2",
+          "description": "Operation id for the 'p' statistic (order 2)"
         }
       ],
       "templateCode": "denom_dataset = df2_denomanaidhere |>\n  dplyr::select(denom_anagroupvarshere)\n\nin_data = df2_analysisidhere |>\n    dplyr::distinct(distinctlisthere) |>\n    dplyr::mutate(dummy = 'dummyvar')\n\ndataDriven = isdatadrivenhere\nif(dataDriven == TRUE){\ndf3_analysisidhere <-\n  cards::ard_tabulate(\n    data = in_data,\n    strata = c(byvarshere),\n    variables = 'dummy',\n    denominator = denom_dataset\n  ) } else {\ndf3_analysisidhere <-\n cards::ard_tabulate(\n    data = in_data,\n    by = c(byvarshere),\n    variables = 'dummy',\n    denominator = denom_dataset\n  ) }\ndf3_analysisidhere <- df3_analysisidhere|>\n  dplyr::filter(stat_name %in% c('n', 'p')) |>\n  dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'opid1here',\n                                               stat_name == 'p' ~ 'opid2here'))"
@@ -162,6 +180,54 @@
           "valueSource": "ana_var",
           "label": "ana var",
           "description": "Continuous analysis variable to summarise"
+        },
+        {
+          "name": "opid1here",
+          "valueSource": "operation_1",
+          "label": "op id 1",
+          "description": "Operation id for the 'N' statistic (order 1)"
+        },
+        {
+          "name": "opid2here",
+          "valueSource": "operation_2",
+          "label": "op id 2",
+          "description": "Operation id for the 'mean' statistic (order 2)"
+        },
+        {
+          "name": "opid3here",
+          "valueSource": "operation_3",
+          "label": "op id 3",
+          "description": "Operation id for the 'sd' statistic (order 3)"
+        },
+        {
+          "name": "opid4here",
+          "valueSource": "operation_4",
+          "label": "op id 4",
+          "description": "Operation id for the 'median' statistic (order 4)"
+        },
+        {
+          "name": "opid5here",
+          "valueSource": "operation_5",
+          "label": "op id 5",
+          "description": "Operation id for the 'p25' statistic (order 5)"
+        },
+        {
+          "name": "opid6here",
+          "valueSource": "operation_6",
+          "label": "op id 6",
+          "description": "Operation id for the 'p75' statistic (order 6)"
+        },
+        {
+          "name": "opid7here",
+          "valueSource": "operation_7",
+          "label": "op id 7",
+          "description": "Operation id for the 'min' statistic (order 7)"
+        },
+        {
+          "name": "opid8here",
+          "valueSource": "operation_8",
+          "label": "op id 8",
+          "description": "Operation id for the 'max' statistic (order 8)"
         }
       ],
       "templateCode": "df3_analysisidhere <-\n  cards::ard_summary(\n    data = df2_analysisidhere,\n    by = c(byvarshere),\n    variables = anavarhere\n  ) |>\n  dplyr::mutate(operationid = dplyr::case_when(stat_name == 'N'      ~ 'opid1here',\n                                               stat_name == 'mean'   ~ 'opid2here',\n                                               stat_name == 'sd'     ~ 'opid3here',\n                                               stat_name == 'median' ~ 'opid4here',\n                                               stat_name == 'p25'    ~ 'opid5here',\n                                               stat_name == 'p75'    ~ 'opid6here',\n                                               stat_name == 'min'    ~ 'opid7here',\n                                               stat_name == 'max'    ~ 'opid8here'))"
@@ -204,6 +270,24 @@
           "valueSource": "ana_var",
           "label": "ana var",
           "description": "Analysis variable (subject ID)"
+        },
+        {
+          "name": "opid1here",
+          "valueSource": "operation_1",
+          "label": "op id 1",
+          "description": "Operation id for the 'Risk_Difference_%' statistic (order 1)"
+        },
+        {
+          "name": "opid2here",
+          "valueSource": "operation_2",
+          "label": "op id 2",
+          "description": "Operation id for the '95%_CI_Low' statistic (order 2)"
+        },
+        {
+          "name": "opid3here",
+          "valueSource": "operation_3",
+          "label": "op id 3",
+          "description": "Operation id for the '95%_CI_High' statistic (order 3)"
         }
       ],
       "templateCode": ".arms_analysisidhere <- unique(df2_analysisidhere$groupvar1here)\nfull_analysisidhere <- if (length(.arms_analysisidhere) >= 2) {\n  df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n} else {\n  df_poptot\n}\n\nsuccess_analysisidhere = df2_analysisidhere |>\n    dplyr::distinct(anavarhere) |>\n    dplyr::mutate(FL = 1L)\n\nana_analysisidhere = full_analysisidhere |>\n    dplyr::left_join(\n        success_analysisidhere |> dplyr::select(anavarhere, FL),\n        by = \"anavarhere\"\n    ) |>\n    dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n\ngrp_analysisidhere <- sort(unique(ana_analysisidhere$groupvar1here))\n\nif (length(grp_analysisidhere) >= 2) {\nn1_analysisidhere <- sum(ana_analysisidhere$groupvar1here == grp_analysisidhere[[1]])\nn2_analysisidhere <- sum(ana_analysisidhere$groupvar1here == grp_analysisidhere[[2]])\nx1_analysisidhere <- sum(ana_analysisidhere$FL[ana_analysisidhere$groupvar1here == grp_analysisidhere[[1]]])\nx2_analysisidhere <- sum(ana_analysisidhere$FL[ana_analysisidhere$groupvar1here == grp_analysisidhere[[2]]])\npt_analysisidhere <- stats::prop.test(\n    x = c(x1_analysisidhere, x2_analysisidhere),\n    n = c(n1_analysisidhere, n2_analysisidhere),\n    correct = FALSE\n)\n\ndf3_analysisidhere <- tibble::tibble(\n    variable = \"FL\",\n    variable_level = list(NULL, NULL, NULL),\n    stat_name = c(\"estimate\", \"conf.low\", \"conf.high\"),\n    stat = list(\n        (pt_analysisidhere$estimate[[1]] - pt_analysisidhere$estimate[[2]]) * 100,\n        pt_analysisidhere$conf.int[[1]] * 100,\n        pt_analysisidhere$conf.int[[2]] * 100\n    ),\n    operationid = c('opid1here', 'opid2here', 'opid3here')\n)\n} else {\ndf3_analysisidhere <- tibble::tibble(\n    variable = \"FL\",\n    variable_level = list(NULL, NULL, NULL),\n    stat_name = c(\"estimate\", \"conf.low\", \"conf.high\"),\n    stat = list(NA_real_, NA_real_, NA_real_),\n    operationid = c('opid1here', 'opid2here', 'opid3here')\n)\n}"
@@ -252,6 +336,24 @@
           "valueSource": "ana_var",
           "label": "ana var",
           "description": "Analysis variable (subject ID)"
+        },
+        {
+          "name": "opid1here",
+          "valueSource": "operation_1",
+          "label": "op id 1",
+          "description": "Operation id for the 'Risk_Difference_%' statistic (order 1)"
+        },
+        {
+          "name": "opid2here",
+          "valueSource": "operation_2",
+          "label": "op id 2",
+          "description": "Operation id for the '95%_CI_Low' statistic (order 2)"
+        },
+        {
+          "name": "opid3here",
+          "valueSource": "operation_3",
+          "label": "op id 3",
+          "description": "Operation id for the '95%_CI_High' statistic (order 3)"
         }
       ],
       "templateCode": ".arms_analysisidhere <- utils::head(sort(unique(df2_analysisidhere$groupvar1here)), 2)\nfull_analysisidhere <- df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n\n.cats_analysisidhere <- sort(unique(as.character(df2_analysisidhere$groupvar2here)))\n\n.rd_one_analysisidhere <- function(.cat) {\n  success <- df2_analysisidhere |>\n      dplyr::filter(as.character(groupvar2here) == .cat) |>\n      dplyr::distinct(anavarhere) |>\n      dplyr::mutate(FL = 1L)\n  ana <- full_analysisidhere |>\n      dplyr::left_join(dplyr::select(success, anavarhere, FL), by = \"anavarhere\") |>\n      dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n  cardx::ard_stats_prop_test(data = ana, by = groupvar1here, variables = FL, correct = FALSE) |>\n      dplyr::filter(stat_name %in% c(\"estimate\", \"conf.low\", \"conf.high\")) |>\n      dplyr::mutate(\n          stat = lapply(stat, function(.v) .v * 100),\n          group2_level = .cat,\n          operationid = dplyr::case_when(\n              stat_name == \"estimate\"  ~ \"opid1here\",\n              stat_name == \"conf.low\"  ~ \"opid2here\",\n              stat_name == \"conf.high\" ~ \"opid3here\"\n          )\n      )\n}\n\ndf3_analysisidhere <- if (length(.arms_analysisidhere) >= 2 && length(.cats_analysisidhere) > 0) {\n  dplyr::bind_rows(lapply(.cats_analysisidhere, .rd_one_analysisidhere))\n} else {\n  tibble::tibble(variable = character(0), group2_level = character(0),\n                 stat_name = character(0), stat = list(),\n                 operationid = character(0))\n}"
@@ -294,6 +396,24 @@
           "valueSource": "ana_var",
           "label": "ana var",
           "description": "Analysis variable (subject ID)"
+        },
+        {
+          "name": "opid1here",
+          "valueSource": "operation_1",
+          "label": "op id 1",
+          "description": "Operation id for the 'estimate' statistic (order 1)"
+        },
+        {
+          "name": "opid2here",
+          "valueSource": "operation_2",
+          "label": "op id 2",
+          "description": "Operation id for the 'conf.low' statistic (order 2)"
+        },
+        {
+          "name": "opid3here",
+          "valueSource": "operation_3",
+          "label": "op id 3",
+          "description": "Operation id for the 'conf.high' statistic (order 3)"
         }
       ],
       "templateCode": ".arms_analysisidhere <- utils::head(sort(unique(df2_analysisidhere$groupvar1here)), 2)\nfull_analysisidhere <- df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n\nsuccess_analysisidhere = df2_analysisidhere |>\n    dplyr::distinct(anavarhere) |>\n    dplyr::mutate(FL = 1L)\n\nana_analysisidhere = full_analysisidhere |>\n    dplyr::left_join(dplyr::select(success_analysisidhere, anavarhere, FL), by = \"anavarhere\") |>\n    dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n\ndf3_analysisidhere = if (length(.arms_analysisidhere) >= 2) {\n  cardx::ard_stats_fisher_test(data = ana_analysisidhere, by = groupvar1here, variables = FL) |>\n   dplyr::filter(stat_name %in% c('estimate', 'conf.low', 'conf.high')) |>\n   dplyr::mutate(operationid = dplyr::case_when(stat_name == 'estimate'  ~ 'opid1here',\n                                                stat_name == 'conf.low'  ~ 'opid2here',\n                                                stat_name == 'conf.high' ~ 'opid3here'))\n} else {\n  tibble::tibble(variable = character(0), stat_name = character(0),\n                 stat = list(), operationid = character(0))\n}"
@@ -324,6 +444,12 @@
           "valueSource": "AG_var2",
           "label": "grp var 2",
           "description": "Categorical variable being tested"
+        },
+        {
+          "name": "opid1here",
+          "valueSource": "operation_1",
+          "label": "op id 1",
+          "description": "Operation id for the 'p.value' statistic (order 1)"
         }
       ],
       "templateCode": "df3_analysisidhere <-\n    cardx::ard_stats_chisq_test(by = groupvar1here, data = df2_analysisidhere, variables = groupvar2here) |>\n  dplyr::filter(stat_name == 'p.value') |>\n  dplyr::mutate(operationid = 'opid1here')"
@@ -354,6 +480,12 @@
           "valueSource": "AG_var1",
           "label": "grp var 1",
           "description": "Grouping variable (treatment arm), the RHS of the formula"
+        },
+        {
+          "name": "opid1here",
+          "valueSource": "operation_1",
+          "label": "op id 1",
+          "description": "Operation id for the 'p.value' statistic (order 1)"
         }
       ],
       "templateCode": "df3_analysisidhere <-\n    cardx::ard_stats_aov(anavarhere ~ groupvar1here, data = df2_analysisidhere) |>\n  dplyr::filter(stat_name == 'p.value') |>\n  dplyr::mutate(operationid = 'opid1here')"
@@ -408,6 +540,24 @@
           "valueSource": "ana_var",
           "label": "ana var",
           "description": "Analysis variable (subject ID)"
+        },
+        {
+          "name": "opid1here",
+          "valueSource": "operation_1",
+          "label": "op id 1",
+          "description": "Operation id for the 'Risk_Difference_%' statistic (order 1)"
+        },
+        {
+          "name": "opid2here",
+          "valueSource": "operation_2",
+          "label": "op id 2",
+          "description": "Operation id for the '95%_CI_Low' statistic (order 2)"
+        },
+        {
+          "name": "opid3here",
+          "valueSource": "operation_3",
+          "label": "op id 3",
+          "description": "Operation id for the '95%_CI_High' statistic (order 3)"
         }
       ],
       "templateCode": ".groupvals_analysisidhere <- c(group2valueshere)\n.arms_analysisidhere <- utils::head(sort(unique(df2_analysisidhere$groupvar1here)), 2)\nfull_analysisidhere <- df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n\n.rd_one_analysisidhere <- function(.val) {\n  success <- df2_analysisidhere |>\n      dplyr::filter(as.character(groupvar2here) == .val) |>\n      dplyr::distinct(anavarhere) |>\n      dplyr::mutate(FL = 1L)\n  ana <- full_analysisidhere |>\n      dplyr::left_join(dplyr::select(success, anavarhere, FL), by = \"anavarhere\") |>\n      dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n  x1 <- sum(ana$FL[ana$groupvar1here == .arms_analysisidhere[[1]]])\n  x2 <- sum(ana$FL[ana$groupvar1here == .arms_analysisidhere[[2]]])\n  n1 <- sum(ana$groupvar1here == .arms_analysisidhere[[1]])\n  n2 <- sum(ana$groupvar1here == .arms_analysisidhere[[2]])\n  pt <- suppressWarnings(stats::prop.test(x = c(x1, x2), n = c(n1, n2), correct = FALSE))\n  tibble::tibble(\n      variable = \"FL\",\n      variable_level = list(NULL, NULL, NULL),\n      stat_name = c(\"estimate\", \"conf.low\", \"conf.high\"),\n      stat = list(\n          (pt$estimate[[1]] - pt$estimate[[2]]) * 100,\n          pt$conf.int[[1]] * 100,\n          pt$conf.int[[2]] * 100\n      ),\n      group2_level = .val,\n      operationid = c('opid1here', 'opid2here', 'opid3here')\n  )\n}\n\ndf3_analysisidhere <- if (length(.arms_analysisidhere) >= 2 && length(.groupvals_analysisidhere) > 0) {\n  dplyr::bind_rows(lapply(.groupvals_analysisidhere, .rd_one_analysisidhere))\n} else {\n  tibble::tibble(variable = character(0), group2_level = character(0),\n                 stat_name = character(0), stat = list(),\n                 operationid = character(0))\n}"
@@ -462,6 +612,24 @@
           "valueSource": "ana_var",
           "label": "ana var",
           "description": "Analysis variable (subject ID)"
+        },
+        {
+          "name": "opid1here",
+          "valueSource": "operation_1",
+          "label": "op id 1",
+          "description": "Operation id for the 'Risk_Difference_%' statistic (order 1)"
+        },
+        {
+          "name": "opid2here",
+          "valueSource": "operation_2",
+          "label": "op id 2",
+          "description": "Operation id for the '95%_CI_Low' statistic (order 2)"
+        },
+        {
+          "name": "opid3here",
+          "valueSource": "operation_3",
+          "label": "op id 3",
+          "description": "Operation id for the '95%_CI_High' statistic (order 3)"
         }
       ],
       "templateCode": ".arms_analysisidhere <- utils::head(sort(unique(df2_analysisidhere$groupvar1here)), 2)\nfull_analysisidhere <- df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n\n.pairs_analysisidhere <- df2_analysisidhere |>\n  dplyr::distinct(groupvar2here, groupvar3here) |>\n  dplyr::arrange(groupvar2here, groupvar3here)\n\n.rd_one_analysisidhere <- function(.g2, .g3) {\n  success <- df2_analysisidhere |>\n      dplyr::filter(as.character(groupvar2here) == .g2,\n                    as.character(groupvar3here) == .g3) |>\n      dplyr::distinct(anavarhere) |>\n      dplyr::mutate(FL = 1L)\n  ana <- full_analysisidhere |>\n      dplyr::left_join(dplyr::select(success, anavarhere, FL), by = \"anavarhere\") |>\n      dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n  cardx::ard_stats_prop_test(data = ana, by = groupvar1here, variables = FL, correct = FALSE) |>\n      dplyr::filter(stat_name %in% c(\"estimate\", \"conf.low\", \"conf.high\")) |>\n      dplyr::mutate(\n          stat = lapply(stat, function(.v) .v * 100),\n          group2_level = .g2,\n          group3_level = .g3,\n          operationid = dplyr::case_when(\n              stat_name == \"estimate\"  ~ \"opid1here\",\n              stat_name == \"conf.low\"  ~ \"opid2here\",\n              stat_name == \"conf.high\" ~ \"opid3here\"\n          )\n      )\n}\n\ndf3_analysisidhere <- if (length(.arms_analysisidhere) >= 2 && nrow(.pairs_analysisidhere) > 0) {\n  dplyr::bind_rows(Map(\n      .rd_one_analysisidhere,\n      as.character(.pairs_analysisidhere$groupvar2here),\n      as.character(.pairs_analysisidhere$groupvar3here)\n  ))\n} else {\n  tibble::tibble(variable = character(0), group2_level = character(0),\n                 group3_level = character(0), stat_name = character(0),\n                 stat = list(), operationid = character(0))\n}"

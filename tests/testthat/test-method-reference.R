@@ -338,6 +338,57 @@ test_that("methods mix inline code and documentRef; empty refIds are skipped", {
   expect_identical(tc$context[tc$method_id == m2], "R (siera)")
 })
 
+test_that("bundled library methods resolved via documentRef emit real operation ids", {
+  # The bundled method-library.json declares every opidNhere token explicitly
+  # as an operation_N parameter (#183), and operation_N resolves to each ARS
+  # method's own operation ids. This test proves a documentRef-resolved library
+  # method emits real operation ids (no literal opidNhere leaks) end to end.
+  # (The shipped exampleARS_5_documentref.json uses a different manifest, so it
+  # does not exercise the bundled catalog specifically.)
+  src <- jsonlite::fromJSON(ARS_example("exampleARS_5.json"),
+                            simplifyVector = FALSE, simplifyDataFrame = FALSE)
+  lib <- system.file("method-library", "method-library.json", package = "siera")
+  src$referenceDocuments <- list(list(
+    id = "RD_lib", name = "siera method library",
+    location = normalizePath(lib, winslash = "/")
+  ))
+  point_at_library <- function(method, page) {
+    method$codeTemplate <- list(documentRef = list(
+      referenceDocumentId = "RD_lib",
+      pageRefs = list(list(refType = "NamedDestination", pageNames = list(page)))
+    ))
+    method
+  }
+  # Mth_01 (1 operation) -> total_n; Mth_03 (8 operations) -> continuous_summary;
+  # Mth_02 keeps its inline template (which declares opid params explicitly).
+  src$methods[[1]] <- point_at_library(src$methods[[1]], "total_n")
+  src$methods[[3]] <- point_at_library(src$methods[[3]], "continuous_summary")
+
+  d <- withr::local_tempdir()
+  ars <- file.path(d, "library_ref.json")
+  writeLines(jsonlite::toJSON(src, auto_unbox = TRUE, null = "null"), ars)
+
+  out <- withr::local_tempdir()
+  suppressWarnings(suppressMessages(readARS(ars, out, withr::local_tempdir())))
+  code <- paste(
+    unlist(lapply(list.files(out, pattern = "\\.R$", full.names = TRUE),
+                  readLines, warn = FALSE)),
+    collapse = "\n"
+  )
+
+  # No unsubstituted operation-ID tokens anywhere in the generated scripts
+  expect_false(grepl("opid[0-9]+here", code))
+  # The single-operation method stamps its real operation id ...
+  expect_match(code, "operationid = 'Mth_01_01_n'", fixed = TRUE)
+  # ... and the 8-operation method maps each statistic to its own id.
+  ops_mth03 <- c("Mth_03_01_n", "Mth_03_02_Mean", "Mth_03_03_SD",
+                 "Mth_03_04_Median", "Mth_03_05_Q1", "Mth_03_06_Q3",
+                 "Mth_03_07_Min", "Mth_03_08_Max")
+  for (op in ops_mth03) {
+    expect_match(code, paste0("'", op, "'"), fixed = TRUE)
+  }
+})
+
 test_that("the shipped documentRef example carries no inline templateCode", {
   # Proves resolution (not a leftover inline copy) produced the script above.
   meta <- siera:::.read_ars_metadata(ARS_example("exampleARS_5_documentref.json"))

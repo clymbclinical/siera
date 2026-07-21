@@ -44,6 +44,24 @@
       "valueSource": "ana_var",
       "label": "ana var",
       "description": "Analysis variable (subject ID)"
+    },
+    {
+      "name": "opid1here",
+      "valueSource": "operation_1",
+      "label": "op id 1",
+      "description": "Operation id for the 'Risk_Difference_%' statistic (order 1)"
+    },
+    {
+      "name": "opid2here",
+      "valueSource": "operation_2",
+      "label": "op id 2",
+      "description": "Operation id for the '95%_CI_Low' statistic (order 2)"
+    },
+    {
+      "name": "opid3here",
+      "valueSource": "operation_3",
+      "label": "op id 3",
+      "description": "Operation id for the '95%_CI_High' statistic (order 3)"
     }
   ]
 }
