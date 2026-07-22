@@ -29,6 +29,8 @@ An Analysis Results Dataset (ARD) has multiple uses.  Consisting of machine-read
 
 (The [Concepts and conventions](concepts.html) vignette discusses _why_ an ARD makes these use cases easier.)
 
+For rendering, each ARD row already carries a display-ready result: the `disp` column holds the raw statistic (`res`) formatted according to the ARS `resultPattern` for its operation (e.g. `(N=86)`, `75.2`, `( 12.5)`), so values can be placed directly into an RTF/PDF table without re-deriving decimal places or percentage scaling. See the [ARD script structure](ARD_script_structure.html) vignette for how these columns are built.
+
 ### Downstream R packages for table creation
 
 Two reputable R packages, part of the [pharmaverse](https://pharmaverse.org/) have an ARD-first approach to creating tables:

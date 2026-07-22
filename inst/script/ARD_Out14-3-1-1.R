@@ -1,7 +1,7 @@
 
 # Programme:    Generate code to produce ARD for Out14-3-1-1
 # Output:       Overall Summary of Treatment-Emergent Adverse Events
-# Date created: 2026-06-22 18:01:34
+# Date created: 2026-07-22 09:04:59
 
   # load libraries ----
     library(dplyr)
@@ -637,3 +637,102 @@ df3_An07_05_TEAELd2Dth_Summ_ByTrt,
 df3_An07_06_RelTEAELd2Dth_Summ_ByTrt, 
 df3_An07_07_TEAELd2DoseMod_Summ_ByTrt, 
 df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt) 
+
+# Format results per ARS resultPattern (res / pattern / disp) ----
+.format_ars_result <- function (value, pattern) 
+{
+    if (is.null(pattern) || length(pattern) != 1L || is.na(pattern) || 
+        !nzchar(pattern)) {
+        return(NA_character_)
+    }
+    if (!is.numeric(value)) {
+        value <- suppressWarnings(as.numeric(value))
+    }
+    if (is.null(value) || length(value) != 1L || is.na(value) || 
+        !is.finite(value)) {
+        return(NA_character_)
+    }
+    dec <- 0L
+    dec_match <- regmatches(pattern, regexpr("\\.X+", pattern))
+    if (length(dec_match) == 1L) {
+        dec <- nchar(dec_match) - 1L
+    }
+    num <- formatC(round(value, dec), format = "f", digits = dec)
+    x_pos <- gregexpr("X", pattern, fixed = TRUE)[[1L]]
+    if (x_pos[1L] != -1L) {
+        prefix <- substr(pattern, 1L, x_pos[1L] - 1L)
+        suffix <- substr(pattern, x_pos[length(x_pos)] + 1L, 
+            nchar(pattern))
+        return(paste0(prefix, num, suffix))
+    }
+    if (endsWith(pattern, ")")) {
+        return(paste0(substr(pattern, 1L, nchar(pattern) - 1L), 
+            num, ")"))
+    }
+    paste0(pattern, num)
+}
+
+.op_patterns <- data.frame(
+  operationid = c(
+    "Mth01_CatVar_Count_ByGrp_1_n",
+    "Mth01_CatVar_Summ_ByGrp_1_n",
+    "Mth01_CatVar_Summ_ByGrp_2_pct",
+    "Mth02_ContVar_Summ_ByGrp_1_n",
+    "Mth02_ContVar_Summ_ByGrp_2_Mean",
+    "Mth02_ContVar_Summ_ByGrp_3_SD",
+    "Mth02_ContVar_Summ_ByGrp_4_Median",
+    "Mth02_ContVar_Summ_ByGrp_5_Q1",
+    "Mth02_ContVar_Summ_ByGrp_6_Q3",
+    "Mth02_ContVar_Summ_ByGrp_7_Min",
+    "Mth02_ContVar_Summ_ByGrp_8_Max",
+    "Mth03_CatVar_Comp_PChiSq_1_pval",
+    "Mth04_ContVar_Comp_Anova_1_pval"
+  ),
+  pattern = c(
+    "(N=XX)",
+    "XXX",
+    "( XX.X)",
+    "XX",
+    "XX.X",
+    "(XX.XX)",
+    "XX.X",
+    "XX.X",
+    "XX.X",
+    "XX",
+    "XX",
+    "X.XXXX",
+    "X.XXXX"
+  ),
+  stringsAsFactors = FALSE
+)
+
+if ("stat" %in% names(ARD)) {
+  ARD$res <- if (is.list(ARD$stat)) {
+    vapply(ARD$stat, function(v)
+      if (is.null(v) || length(v) == 0) NA_real_
+      else suppressWarnings(as.numeric(v[[1]])),
+      numeric(1))
+  } else {
+    suppressWarnings(as.numeric(ARD$stat))
+  }
+} else {
+  ARD$res <- NA_real_
+}
+if ("operationid" %in% names(ARD)) {
+  ARD <- dplyr::left_join(ARD, .op_patterns, by = "operationid")
+} else {
+  ARD$pattern <- NA_character_
+}
+
+# {cards} proportions (stat_name == 'p') are 0-1; patterns expect percent.
+.fmt_val <- ARD$res
+if ("stat_name" %in% names(ARD)) {
+  .is_prop <- !is.na(ARD$stat_name) & ARD$stat_name == "p"
+  .fmt_val[.is_prop] <- ARD$res[.is_prop] * 100
+}
+ARD$disp <- vapply(seq_len(nrow(ARD)), function(.i)
+  .format_ars_result(.fmt_val[.i], ARD$pattern[.i]), character(1))
+
+# Drop {cards}' internal format-function list-columns (not printable).
+ARD <- dplyr::select(ARD, -dplyr::any_of(c("fmt_fun", "fmt_fn")))
+

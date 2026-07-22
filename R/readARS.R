@@ -399,29 +399,7 @@ readARS <- function(ARS_path,
       }
     } # end of analysis
 
-    # add pattern formatting
-
-
-    code_pattern <- paste0("ARD <- df4 |>
-      dplyr::mutate(dec = ifelse(grepl('X.X',
-                                df4$pattern, ),
-                          stringr::str_count(substr(df4$pattern,
-                                          stringr::str_locate(df4$pattern,
-                                                    'X.X')[, 1]+2,
-                                          nchar(df4$pattern)), 'X'),
-                          0)) |>
-      dplyr::rowwise() |>
-      dplyr::mutate(rnd = round(res, dec)) |>
-      tibble::as_tibble() |>
-      dplyr::mutate(disp = ifelse(grepl('\\\\(N=', df4$pattern),
-                           paste0('(N=', rnd, ')'),
-                           ifelse(grepl('\\\\(', df4$pattern),
-                                  paste0('(', rnd, ')'),
-                                  as.character(rnd)))) |>
-                         dplyr::select(-rnd, -dec)")
-
-
-    # add all code, combine analyses ARDs and apply pattern
+    # add all code, combine analyses ARDs and apply result formatting
     code_output <- paste0(
       code_header,
       code_libraries,
@@ -430,7 +408,8 @@ readARS <- function(ARS_path,
       "\n\n# combine analyses to create ARD ----\n",
       "ARD <- dplyr::bind_rows(",
       combine_analysis_code,
-      ") "
+      ") ",
+      .generate_formatted_result_code(AnalysisMethods)
     )
 
     # Optionally append CDISC Dataset-JSON export code ----
