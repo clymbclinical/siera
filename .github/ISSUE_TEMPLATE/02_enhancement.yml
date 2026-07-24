@@ -1,0 +1,79 @@
+name: Enhancement
+description: New capability, wider ARS coverage, or a change in generated-code behaviour
+labels: ["enhancement"]
+# assignees:
+#   - <your-github-handle>
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > **Do not paste patient-level data, sponsor-identifiable study
+        > information, or unpublished study metadata into this issue.**
+        > This repository is public. Reduce ARS metadata and ADaM examples to
+        > the smallest anonymised fragment that shows the problem.
+
+        Title convention: prefix with the component, e.g.
+        `readARS(): ...`, `method library: ...`, `Dataset-JSON export: ...`.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      multiple: true
+      options:
+        - readARS() inputs and options
+        - Analysis sets / data subsets
+        - Analysis groupings
+        - Method library / analysis methods
+        - Display formatting / result patterns
+        - Dataset-JSON support
+        - ARS version coverage
+        - Documentation / vignettes
+        - Packaging, CI, or CRAN checks
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What can't be done today?
+      description: The ARS construct, method, or workflow that siera doesn't handle, and what happens instead (silent skip, wrong value, error).
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+      description: What siera should do instead. If it changes the generated script, show the code you'd expect it to emit.
+      render: r
+    validations:
+      required: true
+
+  - type: textarea
+    id: spec
+    attributes:
+      label: Standard reference
+      description: Link to the relevant part of the CDISC ARS model or implementation guide, if this is about conformance.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: breaking
+    attributes:
+      label: Does this change output for existing ARS metadata?
+      description: Anything that alters generated scripts or ARD values for inputs that work today needs a NEWS entry and a look at the reverse dependency checks.
+      options:
+        - "No — additive only"
+        - "Yes — generated scripts change"
+        - "Yes — ARD values change"
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Workarounds or related issues
+    validations:
+      required: false

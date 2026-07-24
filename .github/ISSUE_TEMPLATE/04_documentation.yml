@@ -1,0 +1,59 @@
+name: Documentation
+description: Docs out of date, an example that needs reworking, or an idea for a new article
+labels: ["documentation"]
+# assignees:
+#   - <your-github-handle>
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > **Do not paste patient-level data, sponsor-identifiable study
+        > information, or unpublished study metadata into this issue.**
+        > This repository is public.
+
+        Title convention: prefix with `docs:` or the article name.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: What kind of documentation?
+      multiple: true
+      options:
+        - Function reference (roxygen)
+        - Getting Started vignette
+        - Other vignettes / articles
+        - README
+        - pkgdown site structure or navigation
+        - Developer / contributor guidance
+        - New article idea
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Where
+      description: Page URL, vignette name, or `.R` file the roxygen block sits in.
+    validations:
+      required: false
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's out of date, missing, or unclear?
+      description: Screenshots paste directly into this box.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: cause
+    attributes:
+      label: Is this documentation drift or a behaviour question?
+      description: If the docs describe what siera used to do, the code change that caused the drift may also need a NEWS entry.
+      options:
+        - Docs never covered this
+        - Docs describe older behaviour (drift)
+        - Docs are correct but hard to follow
+        - Not sure
+    validations:
+      required: false

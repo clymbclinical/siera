@@ -1,0 +1,74 @@
+name: Refactor / tech debt
+description: Internal cleanup with no intended change in behaviour — dead code, duplication, unclear structure
+labels: ["refactor"]
+# assignees:
+#   - <your-github-handle>
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > **Do not paste patient-level data, sponsor-identifiable study
+        > information, or unpublished study metadata into this issue.**
+        > This repository is public. Reduce ARS metadata and ADaM examples to
+        > the smallest anonymised fragment that shows the problem.
+
+        Title convention: prefix with the component, e.g.
+        `readARS(): ...`, `method library: ...`, `Dataset-JSON export: ...`.
+
+  - type: input
+    id: location
+    attributes:
+      label: Where
+      description: File and function, e.g. `R/readARS.R`, the code_pattern block.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - Dead or unreachable code
+        - Duplication
+        - Unclear or overgrown function
+        - Deprecated path to remove
+        - Performance
+        - Test coverage gap
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: What's there now
+      description: What the code currently does, and how you established it (e.g. never reached for any ARS input, covered by no test).
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+    validations:
+      required: true
+
+  - type: dropdown
+    id: behaviour-change
+    attributes:
+      label: Could this change generated output?
+      description: If yes, it isn't purely a refactor — say what would change and consider an enhancement issue instead.
+      options:
+        - "No — behaviour identical"
+        - "Possibly — needs checking against existing outputs"
+        - "Yes — output changes"
+    validations:
+      required: true
+
+  - type: textarea
+    id: safety-net
+    attributes:
+      label: What proves it's safe?
+      description: Existing tests that cover this path, or tests that would need adding first.
+    validations:
+      required: false
