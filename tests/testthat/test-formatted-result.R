@@ -12,6 +12,11 @@ test_that(".format_ars_result renders every observed pattern shape", {
   expect_equal(.format_ars_result(3.14159, "(XX.XX)"), "(3.14)")
   expect_equal(.format_ars_result(0.04321, "X.XXXX"), "0.0432")
 
+  # values are ROUNDED, not truncated: 1.369 -> 1.4 (not 1.3)
+  expect_equal(.format_ars_result(1.369, "X.X"), "1.4")
+  expect_equal(.format_ars_result(2.649, "X.XX"), "2.65")
+  expect_equal(.format_ars_result(85.6, "(N=)"), "(N=86)")
+
   # prefix/suffix around the X-run is preserved (incl. leading space)
   expect_equal(.format_ars_result(75.58, "( XX.X)"), "( 75.6)")
 
