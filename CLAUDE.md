@@ -73,7 +73,7 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
 | `R/AnalysisSet.R` | Generates analysis set (population) filter code |
 | `R/DataSubsets.R` | Generates data subset filter code |
 | `R/AnalysisMethods.R` | Resolves method code templates and valueSource parameters |
-| `R/loadADaM.R` | Generates ADaM dataset loading code (CSV via [`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html) or XPT via [`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html), chosen per dataset by file extension) |
+| `R/loadADaM.R` | Generates ADaM dataset loading code (CSV via [`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html), XPT via [`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html), or Dataset-JSON via [`datasetjson::read_dataset_json()`](https://atorus-research.github.io/datasetjson/reference/read_dataset_json.html), chosen per dataset by file extension) |
 | `R/DatasetJSON.R` | Generates the optional CDISC Dataset-JSON export block appended to ARD scripts (`output_format = "datasetjson"`) |
 | `R/libraries.R` | Generates [`library()`](https://rdrr.io/r/base/library.html) calls for generated scripts |
 | `R/program_header.R` | Generates programme header comments |
@@ -258,29 +258,37 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   `select(-any_of(...))`. Tests: `test-formatted-result.R` (formatter
   units, generator branches, runtime eval on stub ARDs, sourced-script
   integration, JSON/XLSX block parity).
-- **ADaM input format (CSV or XPT, issue \#161)** — `adam_path` may hold
-  CSV (`.csv`) or SAS transport (`.xpt`) ADaM files; siera picks the
-  reader **per dataset at generation time** from the extension found on
-  disk (no
+- **ADaM input format (CSV, XPT or Dataset-JSON; issues \#161, \#192)**
+  — `adam_path` may hold CSV (`.csv`), SAS transport (`.xpt`) or CDISC
+  Dataset-JSON (`.json`) ADaM files; siera picks the reader **per
+  dataset at generation time** from the extension found on disk (no
   [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
   argument, mirroring `.json`/`.xlsx` ARS dispatch).
   [`.generate_one_adam_read()`](https://clymbclinical.github.io/siera/reference/dot-generate_one_adam_read.md)
   in `R/loadADaM.R` resolves the file: it prefers an exact-case match,
   else does a **case-insensitive**
   [`list.files()`](https://rdrr.io/r/base/list.files.html) lookup (real
-  submission XPTs are lower-case like `adsl.xpt` while ARS names
+  submission files are lower-case like `adsl.xpt` while ARS names
   datasets upper-case `ADSL`), and emits the real on-disk path.
   `.csv`→[`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html),
-  `.xpt`→[`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html);
-  **CSV wins when both exist**; when neither exists it falls back to the
-  conventional `<dataset>.csv` path (so example/placeholder
+  `.xpt`→[`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html),
+  `.json`→[`datasetjson::read_dataset_json()`](https://atorus-research.github.io/datasetjson/reference/read_dataset_json.html);
+  **precedence is CSV \> XPT \> JSON when several exist**; when none
+  exists it falls back to the conventional `<dataset>.csv` path (so
+  example/placeholder
   [`tempdir()`](https://rdrr.io/r/base/tempfile.html) folders still
-  generate csv code, keeping old tests/examples green). `haven` is in
-  Suggests (was added for the eTFL suite) and the emitted call is
+  generate csv code, keeping old tests/examples green). `haven` and
+  `datasetjson` are in Suggests and the emitted calls are
   namespace-qualified — no
-  [`library(haven)`](https://haven.tidyverse.org) is generated, so
-  xpt-free scripts don’t require haven. The object on the LHS is always
-  the metadata dataset name regardless of the file’s case.
+  [`library()`](https://rdrr.io/r/base/library.html) call is generated
+  for either, so scripts that don’t use those formats don’t require the
+  packages. Dataset-JSON content is validated by
+  [`datasetjson::read_dataset_json()`](https://atorus-research.github.io/datasetjson/reference/read_dataset_json.html)
+  when the generated script runs, not at generation time. The object on
+  the LHS is always the metadata dataset name regardless of the file’s
+  case. No collision with the `output_format = "datasetjson"` ARD
+  export: resolution only looks for `<dataset>.json`, while exports are
+  named `ARD_<OutputId>.json`.
 - **Internal functions** are prefixed with `.`
   (e.g. `.read_ars_metadata`). Only six symbols are exported: `readARS`,
   `ARS_example`, `ARD_script_example`, `ars_xlsx_to_json`,

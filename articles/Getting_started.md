@@ -122,9 +122,10 @@ ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
 # to a more suitable local path)
 output_folder <- tempdir()
 
-# Path to the folder containing ADaM datasets, in CSV (.csv) or SAS transport
-# (.xpt) format - siera detects the format from each file's extension, so the
-# folder can hold either (.xpt requires the {haven} package). We will use the
+# Path to the folder containing ADaM datasets, in CSV (.csv), SAS transport
+# (.xpt) or CDISC Dataset-JSON (.json) format - siera detects the format from
+# each file's extension, so the folder can hold any mix (.xpt requires the
+# {haven} package, .json the {datasetjson} package). We will use the
 # temporary directory tempdir() to make the code run in this vignette, but it's
 # recommended to
 # 1. download the ADaMs required (csv ADSL and ADAE available using e.g. ARS_example("ADSL.csv"))

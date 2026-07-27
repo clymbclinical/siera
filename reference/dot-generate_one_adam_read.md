@@ -2,11 +2,17 @@
 
 Internal helper that emits the code to read one ADaM dataset, choosing
 the reader from the file extension present on disk. SAS transport files
-(\`.xpt\`) are read with \[haven::read_xpt()\]; everything else (and the
-default when no matching file is found) is read with
-\[readr::read_csv()\]. To remain backward compatible, CSV takes
-precedence when both a \`.csv\` and a \`.xpt\` exist for the same
-dataset.
+(\`.xpt\`) are read with \[haven::read_xpt()\], CDISC Dataset-JSON files
+(\`.json\`) with \[datasetjson::read_dataset_json()\]; everything else
+(and the default when no matching file is found) is read with
+\[readr::read_csv()\]. To remain backward compatible, the precedence
+when several formats exist for the same dataset is CSV, then XPT, then
+Dataset-JSON. Reading \`.xpt\` requires the haven package and \`.json\`
+the datasetjson package in the environment that runs the generated
+script; the emitted calls are namespace-qualified so neither is needed
+to generate the script itself. Dataset-JSON files are validated by
+\[datasetjson::read_dataset_json()\] at script runtime, not at
+generation time.
 
 ## Usage
 

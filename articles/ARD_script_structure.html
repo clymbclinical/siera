@@ -108,20 +108,23 @@ ARS metadata. This can be visualized as follows:</p>
 <span></span>
 <span><span class="co"># Section 6: Format results per ARS resultPattern</span></span></code></pre></div>
 <p>Section 3 (“Load ADaM datasets”) reads each ADaM dataset referenced
-by the output. siera supports two on-disk formats and chooses the reader
-from each file’s extension: CSV (<code>.csv</code>) files are read with
-<code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_csv()</a></code>, and SAS transport (<code>.xpt</code>)
-files with <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code>. This mirrors how the ARS
+by the output. siera supports three on-disk formats and chooses the
+reader from each file’s extension: CSV (<code>.csv</code>) files are
+read with <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_csv()</a></code>, SAS transport
+(<code>.xpt</code>) files with <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code>, and CDISC
+Dataset-JSON (<code>.json</code>) files with
+<code><a href="https://atorus-research.github.io/datasetjson/reference/read_dataset_json.html" class="external-link">datasetjson::read_dataset_json()</a></code>. This mirrors how the ARS
 input format is inferred from <code>.json</code> vs <code>.xlsx</code>,
 so no extra argument is needed - just point <code><a href="../reference/readARS.html">readARS()</a></code> at a
-folder of <code>.csv</code> or <code>.xpt</code> ADaMs. Reading
-<code>.xpt</code> datasets requires the <code>haven</code> package to be
-installed. The file lookup is case-insensitive, so the lower-case file
-names typical of regulatory submissions (e.g. <code>adsl.xpt</code>) are
-matched to the upper-case dataset names in the ARS metadata
-(<code>ADSL</code>). When both a <code>.csv</code> and a
-<code>.xpt</code> exist for the same dataset, the <code>.csv</code> is
-used.</p>
+folder of <code>.csv</code>, <code>.xpt</code> or <code>.json</code>
+ADaMs. Reading <code>.xpt</code> datasets requires the
+<code>haven</code> package, and <code>.json</code> datasets the
+<code>datasetjson</code> package, to be installed. The file lookup is
+case-insensitive, so the lower-case file names typical of regulatory
+submissions (e.g. <code>adsl.xpt</code>) are matched to the upper-case
+dataset names in the ARS metadata (<code>ADSL</code>). When several
+formats exist for the same dataset, precedence is <code>.csv</code>,
+then <code>.xpt</code>, then <code>.json</code>.</p>
 <div class="section level3">
 <h3 id="analysis-level-code-to-calculate-ards">Analysis-level code to calculate ARDs<a class="anchor" aria-label="anchor" href="#analysis-level-code-to-calculate-ards"></a>
 </h3>

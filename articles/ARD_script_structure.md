@@ -35,20 +35,23 @@ metadata. This can be visualized as follows:
 ```
 
 Section 3 (“Load ADaM datasets”) reads each ADaM dataset referenced by
-the output. siera supports two on-disk formats and chooses the reader
+the output. siera supports three on-disk formats and chooses the reader
 from each file’s extension: CSV (`.csv`) files are read with
 [`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html),
-and SAS transport (`.xpt`) files with
-[`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html).
+SAS transport (`.xpt`) files with
+[`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html),
+and CDISC Dataset-JSON (`.json`) files with
+[`datasetjson::read_dataset_json()`](https://atorus-research.github.io/datasetjson/reference/read_dataset_json.html).
 This mirrors how the ARS input format is inferred from `.json` vs
 `.xlsx`, so no extra argument is needed - just point
 [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
-at a folder of `.csv` or `.xpt` ADaMs. Reading `.xpt` datasets requires
-the `haven` package to be installed. The file lookup is
-case-insensitive, so the lower-case file names typical of regulatory
-submissions (e.g. `adsl.xpt`) are matched to the upper-case dataset
-names in the ARS metadata (`ADSL`). When both a `.csv` and a `.xpt`
-exist for the same dataset, the `.csv` is used.
+at a folder of `.csv`, `.xpt` or `.json` ADaMs. Reading `.xpt` datasets
+requires the `haven` package, and `.json` datasets the `datasetjson`
+package, to be installed. The file lookup is case-insensitive, so the
+lower-case file names typical of regulatory submissions
+(e.g. `adsl.xpt`) are matched to the upper-case dataset names in the ARS
+metadata (`ADSL`). When several formats exist for the same dataset,
+precedence is `.csv`, then `.xpt`, then `.json`.
 
 ### Analysis-level code to calculate ARDs
 

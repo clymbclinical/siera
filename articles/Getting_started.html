@@ -196,9 +196,10 @@ writes a <code>.json</code> file that can then be passed to
 <span><span class="co"># to a more suitable local path)</span></span>
 <span><span class="va">output_folder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Path to the folder containing ADaM datasets, in CSV (.csv) or SAS transport</span></span>
-<span><span class="co"># (.xpt) format - siera detects the format from each file's extension, so the</span></span>
-<span><span class="co"># folder can hold either (.xpt requires the {haven} package). We will use the</span></span>
+<span><span class="co"># Path to the folder containing ADaM datasets, in CSV (.csv), SAS transport</span></span>
+<span><span class="co"># (.xpt) or CDISC Dataset-JSON (.json) format - siera detects the format from</span></span>
+<span><span class="co"># each file's extension, so the folder can hold any mix (.xpt requires the</span></span>
+<span><span class="co"># {haven} package, .json the {datasetjson} package). We will use the</span></span>
 <span><span class="co"># temporary directory tempdir() to make the code run in this vignette, but it's</span></span>
 <span><span class="co"># recommended to</span></span>
 <span><span class="co"># 1. download the ADaMs required (csv ADSL and ADAE available using e.g. ARS_example("ADSL.csv"))</span></span>

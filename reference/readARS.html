@@ -81,14 +81,17 @@ datasets</p>
 
 <dt id="arg-adam-path">adam_path<a class="anchor" aria-label="anchor" href="#arg-adam-path"></a></dt>
 <dd><p>Path to folder containing ADaM datasets, to be run in
-ARD program. Datasets may be supplied as CSV (`.csv`) or SAS transport
-(`.xpt`) files. siera chooses the reader for each dataset from the file
-extension found in this folder — `.csv` files are read with
-<code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_csv()</a></code> and `.xpt` files with <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> —
-so no extra argument is required (mirroring how the ARS input format is
-inferred from `.json` vs `.xlsx`). Reading `.xpt` datasets in the generated
-script requires the <span class="pkg">haven</span> package. When both a `.csv` and a `.xpt`
-exist for the same dataset, the `.csv` is used.</p></dd>
+ARD program. Datasets may be supplied as CSV (`.csv`), SAS transport
+(`.xpt`) or CDISC Dataset-JSON (`.json`) files. siera chooses the reader
+for each dataset from the file extension found in this folder — `.csv`
+files are read with <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_csv()</a></code>, `.xpt` files with
+<code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> and `.json` files with
+<code><a href="https://atorus-research.github.io/datasetjson/reference/read_dataset_json.html" class="external-link">datasetjson::read_dataset_json()</a></code> — so no extra argument is required
+(mirroring how the ARS input format is inferred from `.json` vs `.xlsx`).
+Reading `.xpt` datasets in the generated script requires the <span class="pkg">haven</span>
+package, and `.json` datasets the <span class="pkg">datasetjson</span> package. When several
+formats exist for the same dataset, precedence is `.csv`, then `.xpt`,
+then `.json`.</p></dd>
 
 
 <dt id="arg-spec-output">spec_output<a class="anchor" aria-label="anchor" href="#arg-spec-output"></a></dt>

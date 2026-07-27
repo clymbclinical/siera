@@ -29,16 +29,20 @@ readARS(
 - adam_path:
 
   Path to folder containing ADaM datasets, to be run in ARD program.
-  Datasets may be supplied as CSV (\`.csv\`) or SAS transport (\`.xpt\`)
-  files. siera chooses the reader for each dataset from the file
-  extension found in this folder — \`.csv\` files are read with
-  [`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html)
-  and \`.xpt\` files with
+  Datasets may be supplied as CSV (\`.csv\`), SAS transport (\`.xpt\`)
+  or CDISC Dataset-JSON (\`.json\`) files. siera chooses the reader for
+  each dataset from the file extension found in this folder — \`.csv\`
+  files are read with
+  [`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html),
+  \`.xpt\` files with
   [`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html)
+  and \`.json\` files with
+  [`datasetjson::read_dataset_json()`](https://atorus-research.github.io/datasetjson/reference/read_dataset_json.html)
   — so no extra argument is required (mirroring how the ARS input format
   is inferred from \`.json\` vs \`.xlsx\`). Reading \`.xpt\` datasets in
-  the generated script requires the haven package. When both a \`.csv\`
-  and a \`.xpt\` exist for the same dataset, the \`.csv\` is used.
+  the generated script requires the haven package, and \`.json\`
+  datasets the datasetjson package. When several formats exist for the
+  same dataset, precedence is \`.csv\`, then \`.xpt\`, then \`.json\`.
 
 - spec_output:
 
