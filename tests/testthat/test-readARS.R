@@ -144,6 +144,66 @@ test_that("ARD values are identical when ADaM datasets are supplied as XPT", {
   expect_equal(round(test1[[2]], digits = 3), 0.437)
 })
 
+test_that("ARD values are identical when ADaM datasets are supplied as Dataset-JSON", {
+  skip_on_cran()
+  skip_if_not_installed("datasetjson")
+  skip_if_not_installed("cards")
+
+  ARS_path <- ARS_example("exampleARS_4.json")
+
+  # Build an ADaM folder holding the example datasets as CDISC Dataset-JSON
+  # (.json) files instead of CSV, by round-tripping the bundled CSVs through
+  # the datasetjson package.
+  csv_dir <- system.file("extdata", package = "siera")
+  json_dir <- withr::local_tempdir()
+  for (csv in list.files(csv_dir, pattern = "\\.csv$", full.names = TRUE)) {
+    nm <- tools::file_path_sans_ext(basename(csv))
+    ds <- as.data.frame(readr::read_csv(csv, show_col_types = FALSE, progress = FALSE))
+    cols <- data.frame(
+      itemOID  = paste0("IT.", nm, ".", names(ds)),
+      name     = names(ds),
+      label    = names(ds),
+      dataType = vapply(ds, function(x)
+        if (is.integer(x)) "integer" else if (is.numeric(x)) "float" else "string",
+        character(1)),
+      stringsAsFactors = FALSE
+    )
+    obj <- datasetjson::dataset_json(
+      .data         = ds,
+      item_oid      = paste0("IG.", nm),
+      name          = nm,
+      dataset_label = nm,
+      columns       = cols
+    )
+    datasetjson::write_dataset_json(obj, file = file.path(json_dir, paste0(nm, ".json")))
+  }
+
+  output_dir <- withr::local_tempdir()
+  readARS(ARS_path, output_dir, json_dir, spec_output = "Out_01")
+
+  f <- file.path(output_dir, "ARD_Out_01.R")
+  expect_true(file.exists(f))
+
+  # The generated script must read via datasetjson, not readr or haven.
+  script <- readLines(f)
+  expect_true(any(grepl("datasetjson::read_dataset_json", script, fixed = TRUE)))
+  expect_false(any(grepl("read_csv", script, fixed = TRUE)))
+  expect_false(any(grepl("read_xpt", script, fixed = TRUE)))
+
+  e <- new.env(parent = baseenv())
+  suppressWarnings(suppressPackageStartupMessages(source(f, local = e, chdir = TRUE)))
+  expect_true(exists("ARD", envir = e))
+  ARD <- get("ARD", envir = e)
+
+  # Same expected values as the CSV-driven test above.
+  test1 <- ARD %>%
+    filter(AnalysisId == "An_04", operationid == "Mth_02_02_%") %>%
+    select(stat) %>%
+    unlist()
+  expect_equal(round(test1[[1]], digits = 3), 0.563)
+  expect_equal(round(test1[[2]], digits = 3), 0.437)
+})
+
 test_that("Analysis created with OrderedGroupings row 1", {
   # path to file containing ARS metadata
   ARS_path <- ARS_example("exampleARS_4.json")

@@ -9,9 +9,9 @@
 #' @param AnalysisSets AnalysisSets metadata for the reporting event.
 #' @param DataSubsets DataSubsets metadata for the reporting event.
 #' @param adam_path Directory containing the ADaM datasets on disk. ADaM
-#'  datasets may be supplied as CSV (`.csv`) or SAS transport (`.xpt`) files;
-#'  the reader emitted for each dataset is chosen from the file extension found
-#'  on disk (see [.generate_one_adam_read()]).
+#'  datasets may be supplied as CSV (`.csv`), SAS transport (`.xpt`) or CDISC
+#'  Dataset-JSON (`.json`) files; the reader emitted for each dataset is chosen
+#'  from the file extension found on disk (see [.generate_one_adam_read()]).
 #'
 #' @return Character string containing the code used to load ADaM datasets.
 #' @keywords internal
@@ -47,9 +47,9 @@
   }
 
   # Build one read call per dataset, standardising character NA handling to
-  # avoid downstream joins failing on missing text values. CSV and XPT inputs
-  # are both supported; the reader is chosen per dataset from the extension of
-  # the file found on disk.
+  # avoid downstream joins failing on missing text values. CSV, XPT and
+  # Dataset-JSON inputs are all supported; the reader is chosen per dataset
+  # from the extension of the file found on disk.
   adam_dir <- gsub("\\\\", "/", adam_path)
   lines <- vapply(unique_datasets, function(ad) {
     .generate_one_adam_read(ad, adam_dir)
@@ -62,10 +62,16 @@
 #'
 #' Internal helper that emits the code to read one ADaM dataset, choosing the
 #' reader from the file extension present on disk. SAS transport files
-#' (`.xpt`) are read with [haven::read_xpt()]; everything else (and the default
-#' when no matching file is found) is read with [readr::read_csv()]. To remain
-#' backward compatible, CSV takes precedence when both a `.csv` and a `.xpt`
-#' exist for the same dataset.
+#' (`.xpt`) are read with [haven::read_xpt()], CDISC Dataset-JSON files
+#' (`.json`) with [datasetjson::read_dataset_json()]; everything else (and the
+#' default when no matching file is found) is read with [readr::read_csv()].
+#' To remain backward compatible, the precedence when several formats exist
+#' for the same dataset is CSV, then XPT, then Dataset-JSON. Reading `.xpt`
+#' requires the \pkg{haven} package and `.json` the \pkg{datasetjson} package
+#' in the environment that runs the generated script; the emitted calls are
+#' namespace-qualified so neither is needed to generate the script itself.
+#' Dataset-JSON files are validated by [datasetjson::read_dataset_json()] at
+#' script runtime, not at generation time.
 #'
 #' The lookup is case-insensitive on the file name, because real-world CDISC
 #' SAS transport files are commonly lower-case (e.g. `adsl.xpt`) while the ARS
@@ -96,14 +102,21 @@
     NA_character_
   }
 
-  csv_file <- resolve("csv")
-  xpt_file <- resolve("xpt")
+  csv_file  <- resolve("csv")
+  xpt_file  <- resolve("xpt")
+  json_file <- resolve("json")
 
-  # Use the XPT reader only when a .xpt exists and a .csv does not, so existing
-  # CSV-based workflows are never altered.
+  # Use the XPT / Dataset-JSON readers only when no .csv exists, so existing
+  # CSV-based workflows are never altered; XPT keeps precedence over JSON so
+  # existing XPT-based workflows are equally untouched.
   if (is.na(csv_file) && !is.na(xpt_file)) {
     paste0(
       ad, " <- haven::read_xpt('", xpt_file, "') |>\n",
+      "  dplyr::mutate(dplyr::across(dplyr::where(is.character), ~ tidyr::replace_na(.x, '')))\n"
+    )
+  } else if (is.na(csv_file) && !is.na(json_file)) {
+    paste0(
+      ad, " <- datasetjson::read_dataset_json('", json_file, "') |>\n",
       "  dplyr::mutate(dplyr::across(dplyr::where(is.character), ~ tidyr::replace_na(.x, '')))\n"
     )
   } else {
