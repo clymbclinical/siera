@@ -243,12 +243,21 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   inserted before the trailing `)`;
   [cards](https://github.com/insightsengineering/cards) proportions
   (`stat_name == "p"`, 0–1 scale) are ×100 before formatting (p-values
-  `"p.value"` are not); `res` itself stays the raw stat. Stub rows /
-  ARDs without `stat`/`operationid`/`stat_name` columns are guarded (NA
-  results). `fmt_fun`/`fmt_fn` are dropped via `select(-any_of(...))`.
-  Tests: `test-formatted-result.R` (formatter units, generator branches,
-  runtime eval on stub ARDs, sourced-script integration, JSON/XLSX block
-  parity).
+  `"p.value"` are not); `res` itself stays the raw stat. **Rounding =
+  half-away-from-zero (SAS `ROUND()` convention), NOT R’s default
+  round-half-to-even** —
+  `sign(v) * trunc(abs(v)*10^dec + 0.5 + sqrt(.Machine$double.eps)) / 10^dec`
+  (the `+ sqrt(eps)` fuzz fixes unrepresentable exact halves like
+  `1.005`→`1.01`). Owner-mandated (post-merge direct-to-main) so `disp`
+  matches the SAS-generated reference tables siera is validated against;
+  `res` (raw numeric) is untouched. Changing `.format_ars_result` means
+  **regenerating the two `inst/script/` examples** (the function is
+  [`deparse()`](https://rdrr.io/r/base/deparse.html)’d into each
+  script). Stub rows / ARDs without `stat`/`operationid`/`stat_name`
+  columns are guarded (NA results). `fmt_fun`/`fmt_fn` are dropped via
+  `select(-any_of(...))`. Tests: `test-formatted-result.R` (formatter
+  units, generator branches, runtime eval on stub ARDs, sourced-script
+  integration, JSON/XLSX block parity).
 - **ADaM input format (CSV or XPT, issue \#161)** — `adam_path` may hold
   CSV (`.csv`) or SAS transport (`.xpt`) ADaM files; siera picks the
   reader **per dataset at generation time** from the extension found on
@@ -620,7 +629,17 @@ after the xlsx templates are updated, then
   ADaM data) are guarded with `skip_on_cran()`.
 - Temp directories use
   [`withr::local_tempdir()`](https://withr.r-lib.org/reference/with_tempfile.html)
-  for automatic cleanup.
+  for automatic cleanup. **Never use bare
+  [`tempdir()`](https://rdrr.io/r/base/tempfile.html) for an output
+  dir** — it is one shared, session-wide directory, so `.R`/`.json`
+  files written by other tests accumulate in it. A test that asserts on
+  the *contents* of an output dir
+  (e.g. `expect_equal(length(list.files(..., "\\.R$")), 1)`) will then
+  pass in isolation but fail under the full suite from cross-file
+  pollution (this bit `test-readARS.R` “spec_output generates only
+  specified script”; fixed to
+  [`withr::local_tempdir()`](https://withr.r-lib.org/reference/with_tempfile.html)
+  in \#167).
 - Example ARS files live in `inst/extdata/` (`exampleARS_1` –
   `exampleARS_6`, both `.json` and `.xlsx`). Retrieve them in tests via
   `ARS_example("exampleARS_6.json")`.

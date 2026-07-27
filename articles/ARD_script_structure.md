@@ -225,8 +225,17 @@ applies these patterns and adds three columns to the ARD:
   `75.2`, `(8.59)`), honouring the pattern’s decimal count and any
   prefix/suffix such as parentheses.
 
-One convention to be aware of: `cards` reports proportions on the 0-1
-scale (under `stat_name == "p"`), while result patterns express
+Rounding follows the clinical-reporting norm - **round half away from
+zero**, the same rule SAS’s `ROUND()` uses - rather than R’s default
+round-half-to-even. So a raw `1.369` with pattern `X.X` becomes `1.4`
+(not `1.3`), and an exact tie such as `2.5` with pattern `XX` becomes
+`3` (base R’s [`round()`](https://rdrr.io/r/base/Round.html) would give
+`2`). This keeps `disp` values aligned with SAS-generated reference
+tables. The raw `res` value is left untouched, so any downstream
+re-rounding is still your call.
+
+One more convention to be aware of: `cards` reports proportions on the
+0-1 scale (under `stat_name == "p"`), while result patterns express
 percentages - so those rows are multiplied by 100 before formatting (a
 raw `0.756` with pattern `( XX.X)` becomes `( 75.6)`). p-values
 (`stat_name == "p.value"`) are left as-is.

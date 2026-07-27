@@ -10,9 +10,14 @@ CRAN release: 2026-06-17
   table-ready formatted value, e.g. `(N=86)`, honouring the pattern’s
   decimal count and prefix/suffix). `cards` proportions
   (`stat_name == "p"`) are multiplied by 100 before formatting, matching
-  the percentage semantics of result patterns. The `cards`-internal
-  `fmt_fun`/`fmt_fn` format-function list-columns, which previously
-  surfaced as unprintable values, are dropped from the final ARD
+  the percentage semantics of result patterns. Rounding follows the
+  clinical-reporting norm of rounding halves away from zero (the SAS
+  `ROUND()` convention, e.g. `1.369` becomes `1.4` and `2.5` becomes
+  `3`) rather than R’s default round-half-to-even, so `disp` aligns with
+  SAS-generated reference tables; the raw `res` value is left unrounded.
+  The `cards`-internal `fmt_fun`/`fmt_fn` format-function list-columns,
+  which previously surfaced as unprintable values, are dropped from the
+  final ARD
   ([\#167](https://github.com/clymbclinical/siera/issues/167)).
 - Added support for resolving a method’s code template from an
   **external reference** instead of inline ARS metadata. When a method’s

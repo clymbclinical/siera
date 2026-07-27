@@ -300,10 +300,20 @@ row’s operation;</li>
 honouring the pattern’s decimal count and any prefix/suffix such as
 parentheses.</li>
 </ul>
-<p>One convention to be aware of: <code>cards</code> reports proportions
-on the 0-1 scale (under <code>stat_name == "p"</code>), while result
-patterns express percentages - so those rows are multiplied by 100
-before formatting (a raw <code>0.756</code> with pattern
+<p>Rounding follows the clinical-reporting norm - <strong>round half
+away from zero</strong>, the same rule SAS’s <code>ROUND()</code> uses -
+rather than R’s default round-half-to-even. So a raw <code>1.369</code>
+with pattern <code>X.X</code> becomes <code>1.4</code> (not
+<code>1.3</code>), and an exact tie such as <code>2.5</code> with
+pattern <code>XX</code> becomes <code>3</code> (base R’s
+<code><a href="https://rdrr.io/r/base/Round.html" class="external-link">round()</a></code> would give <code>2</code>). This keeps
+<code>disp</code> values aligned with SAS-generated reference tables.
+The raw <code>res</code> value is left untouched, so any downstream
+re-rounding is still your call.</p>
+<p>One more convention to be aware of: <code>cards</code> reports
+proportions on the 0-1 scale (under <code>stat_name == "p"</code>),
+while result patterns express percentages - so those rows are multiplied
+by 100 before formatting (a raw <code>0.756</code> with pattern
 <code>( XX.X)</code> becomes <code>( 75.6)</code>). p-values
 (<code>stat_name == "p.value"</code>) are left as-is.</p>
 <p>The <code>cards</code>-internal
