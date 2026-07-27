@@ -85,13 +85,14 @@ arguments:
     Event (JSON or xlsx)
 2.  An output directory where the R scripts will be placed
 3.  A folder containing the related ADaM datasets for the ARDs to be
-    generated, supplied as either CSV (`.csv`) or SAS transport (`.xpt`)
-    files
+    generated, supplied as CSV (`.csv`), SAS transport (`.xpt`) or CDISC
+    Dataset-JSON (`.json`) files
 
 siera picks the reader for each ADaM dataset from its file extension —
-`.csv` files are read with `readr::read_csv()` and `.xpt` files with
-`haven::read_xpt()` — just as the ARS input format is inferred from
-`.json` vs `.xlsx`. No extra argument is needed.
+`.csv` files are read with `readr::read_csv()`, `.xpt` files with
+`haven::read_xpt()` and `.json` files with
+`datasetjson::read_dataset_json()` — just as the ARS input format is
+inferred from `.json` vs `.xlsx`. No extra argument is needed.
 
 JSON is the recommended ARS representation. If you have an ARS Excel
 workbook, `ars_xlsx_to_json()` converts it to a faithful ARS JSON file (an

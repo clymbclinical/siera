@@ -230,6 +230,118 @@ test_that("mixed CSV and XPT datasets each get the matching reader", {
   expect_true(grepl("ADAE <- haven::read_xpt(", code, fixed = TRUE))
 })
 
+test_that("Dataset-JSON datasets emit read_dataset_json when only a .json exists", {
+  adam_dir <- withr::local_tempdir()
+  file.create(file.path(adam_dir, "ADSL.json"))
+
+  Anas <- make_anas(listItem_analysisId = "AN1")
+  Analyses <- make_analyses(
+    id = "AN1",
+    dataset = "ADSL",
+    analysisSetId = NA_character_,
+    dataSubsetId = NA_character_
+  )
+  AnalysisSets <- make_analysis_sets(id = character(), condition_dataset = character())
+  DataSubsets  <- make_data_subsets(id = character(), condition_dataset = character())
+
+  code <- get_adam_loading_code(Anas, Analyses, AnalysisSets, DataSubsets, adam_path = adam_dir)
+
+  expect_true(grepl("ADSL <- datasetjson::read_dataset_json(", code, fixed = TRUE))
+  expect_true(grepl("ADSL.json", code, fixed = TRUE))
+  expect_false(grepl("read_csv", code, fixed = TRUE))
+  expect_false(grepl("read_xpt", code, fixed = TRUE))
+  # NA-handling mutate is still applied for Dataset-JSON inputs
+  expect_true(grepl("tidyr::replace_na", code, fixed = TRUE))
+})
+
+test_that("lower-case Dataset-JSON file names match upper-case dataset names", {
+  adam_dir <- withr::local_tempdir()
+  file.create(file.path(adam_dir, "adsl.json"))
+
+  Anas <- make_anas(listItem_analysisId = "AN1")
+  Analyses <- make_analyses(
+    id = "AN1",
+    dataset = "ADSL",
+    analysisSetId = NA_character_,
+    dataSubsetId = NA_character_
+  )
+  AnalysisSets <- make_analysis_sets(id = character(), condition_dataset = character())
+  DataSubsets  <- make_data_subsets(id = character(), condition_dataset = character())
+
+  code <- get_adam_loading_code(Anas, Analyses, AnalysisSets, DataSubsets, adam_path = adam_dir)
+
+  # Object name stays the metadata name; the path points at the dataset's
+  # .json file. On case-insensitive filesystems (Windows) the exact-case probe
+  # already matches, so the emitted path may carry either case - both resolve.
+  expect_true(grepl("ADSL <- datasetjson::read_dataset_json(", code, fixed = TRUE))
+  expect_true(grepl("adsl\\.json", code, ignore.case = TRUE))
+})
+
+test_that("CSV takes precedence when both .csv and .json exist", {
+  adam_dir <- withr::local_tempdir()
+  file.create(file.path(adam_dir, "ADSL.csv"))
+  file.create(file.path(adam_dir, "ADSL.json"))
+
+  Anas <- make_anas(listItem_analysisId = "AN1")
+  Analyses <- make_analyses(
+    id = "AN1",
+    dataset = "ADSL",
+    analysisSetId = NA_character_,
+    dataSubsetId = NA_character_
+  )
+  AnalysisSets <- make_analysis_sets(id = character(), condition_dataset = character())
+  DataSubsets  <- make_data_subsets(id = character(), condition_dataset = character())
+
+  code <- get_adam_loading_code(Anas, Analyses, AnalysisSets, DataSubsets, adam_path = adam_dir)
+
+  expect_true(grepl("readr::read_csv", code, fixed = TRUE))
+  expect_false(grepl("read_dataset_json", code, fixed = TRUE))
+})
+
+test_that("XPT takes precedence when both .xpt and .json exist", {
+  adam_dir <- withr::local_tempdir()
+  file.create(file.path(adam_dir, "ADSL.xpt"))
+  file.create(file.path(adam_dir, "ADSL.json"))
+
+  Anas <- make_anas(listItem_analysisId = "AN1")
+  Analyses <- make_analyses(
+    id = "AN1",
+    dataset = "ADSL",
+    analysisSetId = NA_character_,
+    dataSubsetId = NA_character_
+  )
+  AnalysisSets <- make_analysis_sets(id = character(), condition_dataset = character())
+  DataSubsets  <- make_data_subsets(id = character(), condition_dataset = character())
+
+  code <- get_adam_loading_code(Anas, Analyses, AnalysisSets, DataSubsets, adam_path = adam_dir)
+
+  expect_true(grepl("haven::read_xpt", code, fixed = TRUE))
+  expect_false(grepl("read_dataset_json", code, fixed = TRUE))
+})
+
+test_that("mixed CSV, XPT and Dataset-JSON datasets each get the matching reader", {
+  adam_dir <- withr::local_tempdir()
+  file.create(file.path(adam_dir, "ADSL.csv"))
+  file.create(file.path(adam_dir, "ADAE.xpt"))
+  file.create(file.path(adam_dir, "ADVS.json"))
+
+  Anas <- make_anas(listItem_analysisId = c("AN1", "AN2", "AN3"))
+  Analyses <- make_analyses(
+    id = c("AN1", "AN2", "AN3"),
+    dataset = c("ADSL", "ADAE", "ADVS"),
+    analysisSetId = rep(NA_character_, 3),
+    dataSubsetId = rep(NA_character_, 3)
+  )
+  AnalysisSets <- make_analysis_sets(id = character(), condition_dataset = character())
+  DataSubsets  <- make_data_subsets(id = character(), condition_dataset = character())
+
+  code <- get_adam_loading_code(Anas, Analyses, AnalysisSets, DataSubsets, adam_path = adam_dir)
+
+  expect_true(grepl("ADSL <- readr::read_csv(", code, fixed = TRUE))
+  expect_true(grepl("ADAE <- haven::read_xpt(", code, fixed = TRUE))
+  expect_true(grepl("ADVS <- datasetjson::read_dataset_json(", code, fixed = TRUE))
+})
+
 test_that("header-only code is returned when no datasets are referenced", {
   Anas <- make_anas(listItem_analysisId = character())
 
