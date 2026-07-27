@@ -21,7 +21,8 @@
 # The X-run marks where the number goes; any prefix/suffix around it (parens,
 # "N=", leading spaces) is preserved. Decimals = number of X after the ".".
 # A pattern with no X at all (e.g. "(N=)") gets the number inserted before a
-# trailing ")" if present, else appended.
+# trailing ")" if present, else appended. Rounding is half-away-from-zero (the
+# SAS convention), so displayed values match SAS-generated reference tables.
 .format_ars_result <- function(value, pattern) {
   if (is.null(pattern) || length(pattern) != 1L || is.na(pattern) ||
       !nzchar(pattern)) {
@@ -39,7 +40,15 @@
   if (length(dec_match) == 1L) {
     dec <- nchar(dec_match) - 1L
   }
-  num <- formatC(round(value, dec), format = "f", digits = dec)
+  # Round half away from zero (the SAS ROUND convention used across clinical
+  # reporting), NOT R's default round-half-to-even, so displayed results match
+  # the SAS-generated tables siera outputs are validated against. The small
+  # epsilon nudges values whose exact half is unrepresentable in floating point
+  # (e.g. 1.005) up to the intended tie. `res` (the raw statistic) is untouched.
+  scale <- 10^dec
+  rounded <- sign(value) * trunc(abs(value) * scale + 0.5 +
+    sqrt(.Machine$double.eps)) / scale
+  num <- formatC(rounded, format = "f", digits = dec)
   x_pos <- gregexpr("X", pattern, fixed = TRUE)[[1L]]
   if (x_pos[1L] != -1L) {
     prefix <- substr(pattern, 1L, x_pos[1L] - 1L)

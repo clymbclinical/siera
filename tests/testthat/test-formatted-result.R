@@ -17,6 +17,17 @@ test_that(".format_ars_result renders every observed pattern shape", {
   expect_equal(.format_ars_result(2.649, "X.XX"), "2.65")
   expect_equal(.format_ars_result(85.6, "(N=)"), "(N=86)")
 
+  # exact .5 ties round HALF AWAY FROM ZERO (SAS convention), NOT R's default
+  # round-half-to-even: 2.5 -> 3 (base round() would give 2), 0.5 -> 1
+  expect_equal(.format_ars_result(2.5, "XX"), "3")
+  expect_equal(.format_ars_result(0.5, "XX"), "1")
+  expect_equal(.format_ars_result(3.5, "XX"), "4")
+  expect_equal(.format_ars_result(-2.5, "XX"), "-3")
+  expect_equal(.format_ars_result(1.35, "X.X"), "1.4")
+  # value whose exact half is unrepresentable in floating point still rounds up
+  expect_equal(.format_ars_result(1.005, "X.XX"), "1.01")
+  expect_equal(.format_ars_result(0.045, "X.XX"), "0.05")
+
   # prefix/suffix around the X-run is preserved (incl. leading space)
   expect_equal(.format_ars_result(75.58, "( XX.X)"), "( 75.6)")
 

@@ -1,7 +1,7 @@
 
 # Programme:    Generate code to produce ARD for Out14-1-1
 # Output:       Summary of Demographics
-# Date created: 2026-07-22 09:04:59
+# Date created: 2026-07-27 09:10:08
 
   # load libraries ----
     library(dplyr)
@@ -722,7 +722,10 @@ df3_An03_06_Height_Comp_ByTrt)
     if (length(dec_match) == 1L) {
         dec <- nchar(dec_match) - 1L
     }
-    num <- formatC(round(value, dec), format = "f", digits = dec)
+    scale <- 10^dec
+    rounded <- sign(value) * trunc(abs(value) * scale + 0.5 + 
+        sqrt(.Machine$double.eps))/scale
+    num <- formatC(rounded, format = "f", digits = dec)
     x_pos <- gregexpr("X", pattern, fixed = TRUE)[[1L]]
     if (x_pos[1L] != -1L) {
         prefix <- substr(pattern, 1L, x_pos[1L] - 1L)
