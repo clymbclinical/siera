@@ -1,0 +1,10 @@
+# Blank issues stay on: the templates are a scaffold for triage, not a gate.
+# Set to false if you'd rather every issue carry a label from the start.
+blank_issues_enabled: true
+contact_links:
+  - name: Getting started with siera
+    url: https://clymbclinical.github.io/siera/articles/Getting_started.html
+    about: Check the vignette first — usage questions are often answered there.
+  - name: CDISC Analysis Results Standard
+    url: https://www.cdisc.org/standards/foundational/analysis-results-standard
+    about: Questions about the standard itself belong with CDISC, not with siera.

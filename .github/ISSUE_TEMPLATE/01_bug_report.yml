@@ -1,0 +1,140 @@
+name: Bug report
+description: Something in siera errors, warns, or produces the wrong ARD
+labels: ["bug"]
+# assignees:
+#   - <your-github-handle>
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > **Do not paste patient-level data, sponsor-identifiable study
+        > information, or unpublished study metadata into this issue.**
+        > This repository is public. Reduce ARS metadata and ADaM examples to
+        > the smallest anonymised fragment that shows the problem.
+
+        Title convention: prefix with the component, e.g.
+        `readARS(): ...`, `method library: ...`, `Dataset-JSON export: ...`.
+
+  - type: markdown
+    attributes:
+      value: |
+        A bug in `siera` can sit at three different points: reading the ARS
+        metadata, generating the R script, or running the generated script
+        against the ADaM data. Telling us which one saves a lot of time.
+
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Where does it go wrong?
+      options:
+        - Reading ARS metadata (readARS fails or misreads)
+        - Script generation (script is produced but is wrong)
+        - Running the generated script (errors at runtime)
+        - ARD values are wrong (script runs, numbers are incorrect)
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      multiple: true
+      options:
+        - readARS()
+        - Analysis sets / data subsets
+        - Analysis groupings
+        - Method library / analysis methods
+        - Display formatting / result patterns
+        - Dataset-JSON export
+        - Documentation / vignettes
+        - Packaging, CI, or CRAN checks
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened, and what did you expect instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: call
+    attributes:
+      label: The readARS() call
+      render: r
+      placeholder: |
+        library(siera)
+        readARS(
+          ARS_path    = "path/to/ars.json",
+          output_path = "out/",
+          adam_path   = "adam/"
+        )
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ars-format
+    attributes:
+      label: ARS metadata format
+      options:
+        - JSON
+        - xlsx
+    validations:
+      required: true
+
+  - type: textarea
+    id: ars-snippet
+    attributes:
+      label: Minimal ARS fragment
+      description: The smallest piece of ARS metadata that triggers the problem — the analysis, method, or grouping in question. Redact anything sponsor-specific.
+      render: json
+    validations:
+      required: false
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Console output, warning, or generated code
+      description: The error or warning text, and the relevant lines of the generated script if the problem is in the output.
+      render: text
+    validations:
+      required: true
+
+  - type: input
+    id: adam
+    attributes:
+      label: ADaM data used
+      description: e.g. CDISC pilot data, internal study data, or the package's example data.
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: siera version
+      description: Output of `packageVersion("siera")`, or the commit SHA if on the development version.
+      placeholder: "0.5.5"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-source
+    attributes:
+      label: Installed from
+      options:
+        - CRAN
+        - GitHub (development version)
+        - Internal / validated repository
+    validations:
+      required: true
+
+  - type: textarea
+    id: session-info
+    attributes:
+      label: Session info
+      description: Output of `sessioninfo::session_info()`. Useful when the problem looks environment- or dependency-related.
+      render: r
+    validations:
+      required: false
