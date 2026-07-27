@@ -952,8 +952,11 @@ test_that("warns when ARS file is not JSON or xlsx", {
 
 test_that("spec_output generates only specified script", {
   ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
-  output_dir <- tempdir()
-  adam_folder <- tempdir()
+  # Use an isolated output dir: this test asserts the *count* of generated
+  # scripts, so it must not see .R files written by other tests into the
+  # session-wide tempdir().
+  output_dir <- withr::local_tempdir()
+  adam_folder <- withr::local_tempdir()
   readARS(ARS_path, output_dir, adam_folder, spec_output = "Out14-1-1")
   r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
   expect_equal(length(r_files), 1)
