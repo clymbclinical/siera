@@ -104,7 +104,9 @@ ARS metadata. This can be visualized as follows:</p>
 <span></span>
 <span><span class="co"># Section 4b (subsequent Analyses): Code to calculate results as an ARD</span></span>
 <span></span>
-<span><span class="co"># Section 5: Append Analysis-level ARDs</span></span></code></pre></div>
+<span><span class="co"># Section 5: Append Analysis-level ARDs</span></span>
+<span></span>
+<span><span class="co"># Section 6: Format results per ARS resultPattern</span></span></code></pre></div>
 <p>Section 3 (“Load ADaM datasets”) reads each ADaM dataset referenced
 by the output. siera supports two on-disk formats and chooses the reader
 from each file’s extension: CSV (<code>.csv</code>) files are read with
@@ -272,6 +274,42 @@ are all appened to create output-level ARD. See example below:</p>
 <span>  <span class="va">df3_An03_06_Height_Summ_ByTrt</span>,</span>
 <span>  <span class="va">df3_An03_06_Height_Comp_ByTrt</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="result-formatting-res-pattern-and-disp">Result formatting: <code>res</code>, <code>pattern</code> and
+<code>disp</code><a class="anchor" aria-label="anchor" href="#result-formatting-res-pattern-and-disp"></a>
+</h3>
+<p>After the analysis-level ARDs are combined, a final block formats
+each result for display. The ARS metadata attaches a
+<code>resultPattern</code> to every method operation
+(e.g. <code>(N=XX)</code>, <code>XX.X</code>, <code>(XX.XX)</code>),
+describing how the raw statistic should look in the final table. The
+generated script applies these patterns and adds three columns to the
+ARD:</p>
+<ul>
+<li>
+<code>res</code> - the raw statistic as a plain numeric value
+(flattened from the <code>stat</code> list-column produced by
+<code>cards</code>);</li>
+<li>
+<code>pattern</code> - the ARS <code>resultPattern</code> for the
+row’s operation;</li>
+<li>
+<code>disp</code> - the printable, table-ready formatted string
+(e.g. <code>(N=86)</code>, <code>75.2</code>, <code>(8.59)</code>),
+honouring the pattern’s decimal count and any prefix/suffix such as
+parentheses.</li>
+</ul>
+<p>One convention to be aware of: <code>cards</code> reports proportions
+on the 0-1 scale (under <code>stat_name == "p"</code>), while result
+patterns express percentages - so those rows are multiplied by 100
+before formatting (a raw <code>0.756</code> with pattern
+<code>( XX.X)</code> becomes <code>( 75.6)</code>). p-values
+(<code>stat_name == "p.value"</code>) are left as-is.</p>
+<p>The <code>cards</code>-internal
+<code>fmt_fun</code>/<code>fmt_fn</code> columns (which hold R
+formatting <em>functions</em>, not printable values) are dropped from
+the final ARD.</p>
 </div>
 <div class="section level3">
 <h3 id="deeper-tables-and-more-groupings">Deeper tables and more groupings<a class="anchor" aria-label="anchor" href="#deeper-tables-and-more-groupings"></a>

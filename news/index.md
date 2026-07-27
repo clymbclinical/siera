@@ -4,6 +4,16 @@
 
 CRAN release: 2026-06-17
 
+- Added formatted results to generated ARDs. Each ARD row now carries
+  `res` (the raw statistic flattened to numeric), `pattern` (the ARS
+  `resultPattern` for the row’s operation) and `disp` (the printable,
+  table-ready formatted value, e.g. `(N=86)`, honouring the pattern’s
+  decimal count and prefix/suffix). `cards` proportions
+  (`stat_name == "p"`) are multiplied by 100 before formatting, matching
+  the percentage semantics of result patterns. The `cards`-internal
+  `fmt_fun`/`fmt_fn` format-function list-columns, which previously
+  surfaced as unprintable values, are dropped from the final ARD
+  ([\#167](https://github.com/clymbclinical/siera/issues/167)).
 - Added support for resolving a method’s code template from an
   **external reference** instead of inline ARS metadata. When a method’s
   `codeTemplate` carries a `documentRef` (rather than inline `code`),

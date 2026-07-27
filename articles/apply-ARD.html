@@ -95,6 +95,14 @@ examples of ARD use cases are:</p>
 </ul>
 <p>(The <a href="concepts.html">Concepts and conventions</a> vignette
 discusses <em>why</em> an ARD makes these use cases easier.)</p>
+<p>For rendering, each ARD row already carries a display-ready result:
+the <code>disp</code> column holds the raw statistic (<code>res</code>)
+formatted according to the ARS <code>resultPattern</code> for its
+operation (e.g. <code>(N=86)</code>, <code>75.2</code>,
+<code>( 12.5)</code>), so values can be placed directly into an RTF/PDF
+table without re-deriving decimal places or percentage scaling. See the
+<a href="ARD_script_structure.html">ARD script structure</a> vignette
+for how these columns are built.</p>
 <div class="section level3">
 <h3 id="downstream-r-packages-for-table-creation">Downstream R packages for table creation<a class="anchor" aria-label="anchor" href="#downstream-r-packages-for-table-creation"></a>
 </h3>

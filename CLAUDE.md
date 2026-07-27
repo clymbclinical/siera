@@ -220,9 +220,35 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   use a built-in dictionary for siera +
   [cards](https://github.com/insightsengineering/cards) vocabulary plus
   a `group[n]_(groupingId|groupId|groupValue|level)` regex, falling back
-  to the raw name for data-driven ADaM columns. NB: the `code_pattern`
-  block in `readARS.R` is dead code — `pattern`/`res`/`disp` are never
-  produced; the numeric result lives in the `stat` list-column.
+  to the raw name for data-driven ADaM columns
+  (incl. `res`/`pattern`/`disp` from the formatted-result block, which
+  runs *before* this one so `fmt_fun`/`fmt_fn` never reach the JSON).
+- **Formatted results (`res`/`pattern`/`disp`, issue \#167)** — every
+  generated script ends with a self-contained “Format results per ARS
+  resultPattern” block built by `.generate_formatted_result_code()` in
+  `R/FormattedResult.R` (appended in `readARS.R` right after the
+  `bind_rows` combine, *before* the optional Dataset-JSON block; this
+  replaced the old dead `code_pattern` block, \#191). At runtime it adds
+  `res` (the `stat` list-column flattened to numeric — also handles a
+  plain numeric `stat`), `pattern` (via `left_join` on an `.op_patterns`
+  lookup embedded at generation time from
+  `AnalysisMethods$operation_id`/`operation_resultPattern` — deduped,
+  NA/blank patterns dropped) and `disp` (formatted by
+  `.format_ars_result(value, pattern)`, which is
+  [`deparse()`](https://rdrr.io/r/base/deparse.html)’d into the script
+  so the package function stays the single source of truth and scripts
+  need no siera at runtime). Formatting rules: decimals = count of `X`
+  after the `.`; the X-run is replaced preserving prefix/suffix
+  (`(N=XX)`, `( XX.X)`); a no-X pattern like `(N=)` gets the number
+  inserted before the trailing `)`;
+  [cards](https://github.com/insightsengineering/cards) proportions
+  (`stat_name == "p"`, 0–1 scale) are ×100 before formatting (p-values
+  `"p.value"` are not); `res` itself stays the raw stat. Stub rows /
+  ARDs without `stat`/`operationid`/`stat_name` columns are guarded (NA
+  results). `fmt_fun`/`fmt_fn` are dropped via `select(-any_of(...))`.
+  Tests: `test-formatted-result.R` (formatter units, generator branches,
+  runtime eval on stub ARDs, sourced-script integration, JSON/XLSX block
+  parity).
 - **ADaM input format (CSV or XPT, issue \#161)** — `adam_path` may hold
   CSV (`.csv`) or SAS transport (`.xpt`) ADaM files; siera picks the
   reader **per dataset at generation time** from the extension found on

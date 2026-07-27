@@ -30,6 +30,8 @@ metadata. This can be visualized as follows:
 # Section 4b (subsequent Analyses): Code to calculate results as an ARD
 
 # Section 5: Append Analysis-level ARDs
+
+# Section 6: Format results per ARS resultPattern
 ```
 
 Section 3 (“Load ADaM datasets”) reads each ADaM dataset referenced by
@@ -207,6 +209,30 @@ ARD <- dplyr::bind_rows(
   df3_An03_06_Height_Comp_ByTrt
 )
 ```
+
+### Result formatting: `res`, `pattern` and `disp`
+
+After the analysis-level ARDs are combined, a final block formats each
+result for display. The ARS metadata attaches a `resultPattern` to every
+method operation (e.g. `(N=XX)`, `XX.X`, `(XX.XX)`), describing how the
+raw statistic should look in the final table. The generated script
+applies these patterns and adds three columns to the ARD:
+
+- `res` - the raw statistic as a plain numeric value (flattened from the
+  `stat` list-column produced by `cards`);
+- `pattern` - the ARS `resultPattern` for the row’s operation;
+- `disp` - the printable, table-ready formatted string (e.g. `(N=86)`,
+  `75.2`, `(8.59)`), honouring the pattern’s decimal count and any
+  prefix/suffix such as parentheses.
+
+One convention to be aware of: `cards` reports proportions on the 0-1
+scale (under `stat_name == "p"`), while result patterns express
+percentages - so those rows are multiplied by 100 before formatting (a
+raw `0.756` with pattern `( XX.X)` becomes `( 75.6)`). p-values
+(`stat_name == "p.value"`) are left as-is.
+
+The `cards`-internal `fmt_fun`/`fmt_fn` columns (which hold R formatting
+*functions*, not printable values) are dropped from the final ARD.
 
 ### Deeper tables and more groupings
 

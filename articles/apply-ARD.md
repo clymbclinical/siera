@@ -20,6 +20,15 @@ examples of ARD use cases are:
 conventions](https://clymbclinical.github.io/siera/articles/concepts.md)
 vignette discusses *why* an ARD makes these use cases easier.)
 
+For rendering, each ARD row already carries a display-ready result: the
+`disp` column holds the raw statistic (`res`) formatted according to the
+ARS `resultPattern` for its operation (e.g. `(N=86)`, `75.2`,
+`( 12.5)`), so values can be placed directly into an RTF/PDF table
+without re-deriving decimal places or percentage scaling. See the [ARD
+script
+structure](https://clymbclinical.github.io/siera/articles/ARD_script_structure.md)
+vignette for how these columns are built.
+
 ### Downstream R packages for table creation
 
 Two reputable R packages, part of the
