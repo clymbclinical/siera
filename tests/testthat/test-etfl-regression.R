@@ -127,6 +127,35 @@ test_that("fda-ae-t06 AE summary: bigN, n%, and per-category RD match spec (#171
     ard, "fda-ae-t06", "An_50_3",
     subset_fun = function(d) dplyr::filter(d, !is.na(AESEV), AESEV != "", TRTAN %in% c(2, 3)),
     cat_var = "AESEV", arms = c(2, 3), cats = aesev_groups))
+
+  # An_47_1 (n% by arm x action taken) uses Mth_03p, the categorical
+  # counterpart of Mth_03_1p (#187): it aggregates per DEFINED group condition
+  # instead of tabulating raw data values and stamping group ids afterwards.
+  # So all four defined groups appear for all three arms -- DOSE DELAY and
+  # OTHER as n = 0 / % = 0.0 rather than being dropped -- while DRUG WITHDRAWN
+  # and the "NOT APPLICALE" data typo (which survives Dss_67's correctly-spelt
+  # NOTIN) no longer appear as rows with NA group ids. That is exactly the
+  # reference's 4 x 3 x 2 shape, asserted below.
+  expect_identical(sum(ard$AnalysisId == "An_47_1"),
+                   sum(ref$analysisId == "An_47_1"))
+
+  # Values, like the RD ones above, go against the independent ground truth:
+  # the reference's An_47_1 counts are the same first-record-per-subject
+  # artefact (DRUG INTERRUPTED 26/15/15, DOSE REDUCED 18/19/11).
+  .expect_all_match(.cmp_predefined_npct(
+    ard, "fda-ae-t06", "An_47_1",
+    subset_fun = function(d) dplyr::filter(d, !(AEACN %in% c("NOT APPLICABLE", "DOSE NOT CHANGED"))),
+    cat_var = "AEACN", arms = c(1, 2, 3), cats = aeacn_groups))
+
+  # The defined-but-absent groups really are zero-filled, and every row carries
+  # CDISC group metadata for BOTH groupings (n_group_cols = num_grp).
+  an47_1 <- ard |> dplyr::filter(AnalysisId == "An_47_1")
+  expect_equal(
+    sum(.etfl_safe_stat(an47_1$stat)[an47_1$group2_level %in% c("DOSE DELAY", "OTHER")]),
+    0
+  )
+  expect_true(all(an47_1$group2_groupingId == "AnlsGrouping_24_Aeacn"))
+  expect_false(any(is.na(an47_1$group1_groupId) | is.na(an47_1$group2_groupId)))
 })
 
 test_that("fda-ae-t07 AE by cause: bigN and one- and two-level n% match reference", {
