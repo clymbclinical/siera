@@ -633,6 +633,78 @@
         }
       ],
       "templateCode": ".arms_analysisidhere <- utils::head(sort(unique(df2_analysisidhere$groupvar1here)), 2)\nfull_analysisidhere <- df_poptot |> dplyr::filter(groupvar1here %in% .arms_analysisidhere)\n\n.pairs_analysisidhere <- df2_analysisidhere |>\n  dplyr::distinct(groupvar2here, groupvar3here) |>\n  dplyr::arrange(groupvar2here, groupvar3here)\n\n.rd_one_analysisidhere <- function(.g2, .g3) {\n  success <- df2_analysisidhere |>\n      dplyr::filter(as.character(groupvar2here) == .g2,\n                    as.character(groupvar3here) == .g3) |>\n      dplyr::distinct(anavarhere) |>\n      dplyr::mutate(FL = 1L)\n  ana <- full_analysisidhere |>\n      dplyr::left_join(dplyr::select(success, anavarhere, FL), by = \"anavarhere\") |>\n      dplyr::mutate(FL = dplyr::if_else(is.na(FL), 0L, FL))\n  cardx::ard_stats_prop_test(data = ana, by = groupvar1here, variables = FL, correct = FALSE) |>\n      dplyr::filter(stat_name %in% c(\"estimate\", \"conf.low\", \"conf.high\")) |>\n      dplyr::mutate(\n          stat = lapply(stat, function(.v) .v * 100),\n          group2_level = .g2,\n          group3_level = .g3,\n          operationid = dplyr::case_when(\n              stat_name == \"estimate\"  ~ \"opid1here\",\n              stat_name == \"conf.low\"  ~ \"opid2here\",\n              stat_name == \"conf.high\" ~ \"opid3here\"\n          )\n      )\n}\n\ndf3_analysisidhere <- if (length(.arms_analysisidhere) >= 2 && nrow(.pairs_analysisidhere) > 0) {\n  dplyr::bind_rows(Map(\n      .rd_one_analysisidhere,\n      as.character(.pairs_analysisidhere$groupvar2here),\n      as.character(.pairs_analysisidhere$groupvar3here)\n  ))\n} else {\n  tibble::tibble(variable = character(0), group2_level = character(0),\n                 group3_level = character(0), stat_name = character(0),\n                 stat = list(), operationid = character(0))\n}"
+    },
+    {
+      "id": "categorical_summary_per_predefined_group",
+      "name": "Summary of a pre-defined inner grouping (n and %)",
+      "label": "Categorical n (%) (per pre-defined group)",
+      "description": "n and percentage per Group1 level x PRE-DEFINED group of Group2 (dataDriven: false), with a referenced denominator analysis. Where categorical_summary tabulates the raw data values of the analysis variable and then stamps group ids by matching them, this aggregates per group CONDITION: the AG_var2_group_conditions valueSource supplies a case_when body that maps each data value onto the group whose condition it satisfies, and AG_var2_group_levels supplies the defined groups as factor levels so cards emits a zero row for every defined group the data does not reach. Consequently (a) defined-but-absent groups are reported as n = 0 / % = 0.0 instead of being dropped (#187, and the pre-defined half of #100), (b) data values satisfying no defined group are excluded instead of appearing as rows with NA group ids, and (c) a group defined by a multi-value IN condition is one group rather than being unrepresentable. Group1's levels are taken from the denominator, so an arm in which no subject qualifies is zero-filled too. Only EQ and IN group conditions are supported (they alone define a group as a set of data values); other comparators are skipped with a warning at generation time. Use categorical_summary instead when the inner grouping is dataDriven: true - there the data IS the group list. Verified against fda-ae-t06 An_47_1 (AEs by action taken, AnlsGrouping_24_Aeacn) using an independent distinct-subject recomputation; the published reference matches on category shape (all four defined groups x three arms, zeros included) but its counts derive from only the first ADAE record per subject (the documented t06 reference defect, #171).",
+      "status": "verified",
+      "operations": [
+        {
+          "order": 1,
+          "name": "n",
+          "label": "Count",
+          "resultPattern": "xx"
+        },
+        {
+          "order": 2,
+          "name": "p",
+          "label": "Percentage",
+          "resultPattern": "(xx.x)"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "denomanaidhere",
+          "valueSource": "DEN_analysisid",
+          "label": "denom ana id",
+          "description": "Analysis ID supplying the denominator"
+        },
+        {
+          "name": "denom_anagroupvarshere",
+          "valueSource": "AG_denom_var1",
+          "label": "denom grp var",
+          "description": "Grouping variable(s) of the denominator analysis"
+        },
+        {
+          "name": "groupvar1here",
+          "valueSource": "AG_var1",
+          "label": "grp var 1",
+          "description": "Grouping variable from Group1 (treatment arm)"
+        },
+        {
+          "name": "group2conditionshere",
+          "valueSource": "AG_var2_group_conditions",
+          "label": "grp 2 conditions",
+          "description": "case_when body mapping data values onto Group2's pre-defined groups, in group order"
+        },
+        {
+          "name": "group2levelshere",
+          "valueSource": "AG_var2_group_levels",
+          "label": "grp 2 levels",
+          "description": "Quoted, comma-separated levels of Group2's pre-defined groups, in group order, used as factor levels to zero-fill absent groups"
+        },
+        {
+          "name": "anavarhere",
+          "valueSource": "ana_var",
+          "label": "ana var",
+          "description": "Analysis variable (subject ID) counted distinctly"
+        },
+        {
+          "name": "opid1here",
+          "valueSource": "operation_1",
+          "label": "op id 1",
+          "description": "Operation id for the 'n' statistic (order 1)"
+        },
+        {
+          "name": "opid2here",
+          "valueSource": "operation_2",
+          "label": "op id 2",
+          "description": "Operation id for the 'p' statistic (order 2)"
+        }
+      ],
+      "templateCode": "# Denominator: the referenced analysis's population count per Group1 level.\ndenom_analysisidhere <- df2_denomanaidhere |>\n    dplyr::count(denom_anagroupvarshere) |>\n    dplyr::rename(`...ard_N...` = n) |>\n    dplyr::mutate(dplyr::across(-`...ard_N...`, as.character))\n\n# Group1's levels come from the denominator, so an arm in which no subject\n# qualifies still gets a zero row; Group2's levels are the ones the ARS\n# metadata DEFINES, not the ones the data happens to contain.\n.arms_analysisidhere <- as.character(denom_analysisidhere$groupvar1here)\n.levels_analysisidhere <- c(group2levelshere)\n\ndenom_analysisidhere <- denom_analysisidhere |>\n    dplyr::mutate(groupvar1here = factor(groupvar1here, levels = .arms_analysisidhere))\n\nin_data_analysisidhere <- df2_analysisidhere |>\n    dplyr::mutate(ars_group = dplyr::case_when(\n      group2conditionshere,\n      TRUE ~ NA_character_\n    )) |>\n    # A data value satisfying none of the defined group conditions was never\n    # asked for by the ARS, so it is excluded rather than tabulated.\n    dplyr::filter(!is.na(ars_group)) |>\n    dplyr::distinct(groupvar1here, ars_group, anavarhere) |>\n    dplyr::mutate(\n      groupvar1here = factor(as.character(groupvar1here), levels = .arms_analysisidhere),\n      ars_group     = factor(ars_group, levels = .levels_analysisidhere)\n    ) |>\n    dplyr::select(groupvar1here, ars_group)\n\ndf3_analysisidhere <- if (length(.levels_analysisidhere) > 0) {\n  cards::ard_tabulate(\n      data = in_data_analysisidhere,\n      by = 'groupvar1here',\n      variables = 'ars_group',\n      denominator = denom_analysisidhere\n    ) |>\n  dplyr::filter(stat_name %in% c('n', 'p')) |>\n  dplyr::rename(group2_level = variable_level) |>\n  # cards returns the levels as list-columns of factors, whose as.character()\n  # is the integer code - flatten to the labels before siera stamps group ids.\n  dplyr::mutate(dplyr::across(\n      dplyr::matches('_level$'),\n      ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))\n    )) |>\n  dplyr::mutate(operationid = dplyr::case_when(\n      stat_name == 'n' ~ 'opid1here',\n      stat_name == 'p' ~ 'opid2here'\n    ))\n} else {\n  tibble::tibble(group1_level = character(0), group2_level = character(0),\n                 stat_name = character(0), stat = list(),\n                 operationid = character(0))\n}"
     }
   ]
 }

@@ -1918,6 +1918,100 @@
           }
         ]
       }
+    },
+    {
+      "id": "Mth_03p",
+      "name": "Categorical n% per pre-defined inner group (zero-filled)",
+      "description": "Categorical n% aggregated per PRE-DEFINED group condition of the inner grouping: every defined group is emitted (absent ones as n = 0 / % = 0.0) and data values satisfying no defined group are excluded (#187). Method-library id categorical_summary_per_predefined_group.",
+      "label": "Categorical n (%) (per pre-defined group)",
+      "operations": [
+        {
+          "id": "Mth_03p_01_n",
+          "name": "n",
+          "label": "n",
+          "order": 1,
+          "resultPattern": "XX"
+        },
+        {
+          "id": "Mth_03p_02_%",
+          "name": "%",
+          "label": "%",
+          "order": 2,
+          "resultPattern": "(XX.X)",
+          "referencedOperationRelationships": [
+            {
+              "id": "Mth_03p_pct_NUM",
+              "description": "Numerator for percentage.",
+              "referencedOperationRole": {
+                "controlledTerm": "NUMERATOR"
+              },
+              "operationId": "Mth_03p_01_n"
+            },
+            {
+              "id": "Mth_03p_pct_DEN",
+              "description": "Denominator for percentage.",
+              "referencedOperationRole": {
+                "controlledTerm": "DENOMINATOR"
+              },
+              "operationId": "Mth_00_1_01_n"
+            }
+          ]
+        }
+      ],
+      "codeTemplate": {
+        "context": "R (siera)",
+        "code": "# Denominator: the referenced analysis's population count per Group1 level.\ndenom_analysisidhere <- df2_denomanaidhere |>\n    dplyr::count(denom_anagroupvarshere) |>\n    dplyr::rename(`...ard_N...` = n) |>\n    dplyr::mutate(dplyr::across(-`...ard_N...`, as.character))\n\n# Group1's levels come from the denominator, so an arm in which no subject\n# qualifies still gets a zero row; Group2's levels are the ones the ARS\n# metadata DEFINES, not the ones the data happens to contain.\n.arms_analysisidhere <- as.character(denom_analysisidhere$groupvar1here)\n.levels_analysisidhere <- c(group2levelshere)\n\ndenom_analysisidhere <- denom_analysisidhere |>\n    dplyr::mutate(groupvar1here = factor(groupvar1here, levels = .arms_analysisidhere))\n\nin_data_analysisidhere <- df2_analysisidhere |>\n    dplyr::mutate(ars_group = dplyr::case_when(\n      group2conditionshere,\n      TRUE ~ NA_character_\n    )) |>\n    # A data value satisfying none of the defined group conditions was never\n    # asked for by the ARS, so it is excluded rather than tabulated.\n    dplyr::filter(!is.na(ars_group)) |>\n    dplyr::distinct(groupvar1here, ars_group, anavarhere) |>\n    dplyr::mutate(\n      groupvar1here = factor(as.character(groupvar1here), levels = .arms_analysisidhere),\n      ars_group     = factor(ars_group, levels = .levels_analysisidhere)\n    ) |>\n    dplyr::select(groupvar1here, ars_group)\n\ndf3_analysisidhere <- if (length(.levels_analysisidhere) > 0) {\n  cards::ard_tabulate(\n      data = in_data_analysisidhere,\n      by = 'groupvar1here',\n      variables = 'ars_group',\n      denominator = denom_analysisidhere\n    ) |>\n  dplyr::filter(stat_name %in% c('n', 'p')) |>\n  dplyr::rename(group2_level = variable_level) |>\n  # cards returns the levels as list-columns of factors, whose as.character()\n  # is the integer code - flatten to the labels before siera stamps group ids.\n  dplyr::mutate(dplyr::across(\n      dplyr::matches('_level$'),\n      ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))\n    )) |>\n  dplyr::mutate(operationid = dplyr::case_when(\n      stat_name == 'n' ~ 'opid1here',\n      stat_name == 'p' ~ 'opid2here'\n    ))\n} else {\n  tibble::tibble(group1_level = character(0), group2_level = character(0),\n                 stat_name = character(0), stat = list(),\n                 operationid = character(0))\n}\n",
+        "parameters": [
+          {
+            "name": "denomanaidhere",
+            "label": "denom ana id",
+            "description": "Analysis ID supplying the denominator",
+            "valueSource": "DEN_analysisid"
+          },
+          {
+            "name": "denom_anagroupvarshere",
+            "label": "denom grp var",
+            "description": "Grouping variable(s) of the denominator analysis",
+            "valueSource": "AG_denom_var1"
+          },
+          {
+            "name": "groupvar1here",
+            "label": "grp var 1",
+            "description": "Grouping variable from Group1 (treatment arm)",
+            "valueSource": "AG_var1"
+          },
+          {
+            "name": "group2conditionshere",
+            "label": "grp 2 conditions",
+            "description": "case_when body mapping data values onto Group2's pre-defined groups, in group order",
+            "valueSource": "AG_var2_group_conditions"
+          },
+          {
+            "name": "group2levelshere",
+            "label": "grp 2 levels",
+            "description": "Quoted, comma-separated levels of Group2's pre-defined groups, in group order, used as factor levels to zero-fill absent groups",
+            "valueSource": "AG_var2_group_levels"
+          },
+          {
+            "name": "anavarhere",
+            "label": "ana var",
+            "description": "Analysis variable (subject ID) counted distinctly",
+            "valueSource": "ana_var"
+          },
+          {
+            "name": "opid1here",
+            "label": "op id 1",
+            "description": "Operation id for the 'n' statistic (order 1)",
+            "valueSource": "operation_1"
+          },
+          {
+            "name": "opid2here",
+            "label": "op id 2",
+            "description": "Operation id for the 'p' statistic (order 2)",
+            "valueSource": "operation_2"
+          }
+        ]
+      }
     }
   ],
   "analyses": [
@@ -3995,7 +4089,7 @@
       "purpose": {
         "controlledTerm": "PRIMARY OUTCOME MEASURE"
       },
-      "methodId": "Mth_03a",
+      "methodId": "Mth_03p",
       "version": 1,
       "categoryIds": [
         "ANSET_01",

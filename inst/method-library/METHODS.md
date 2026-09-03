@@ -22,6 +22,7 @@ reference.
 | `anova` | ANOVA p-value | verified | p.value | Common_Safety_Displays_cards.xlsx Mth04_ContVar_Comp_Anova |
 | `risk_difference_per_predefined_group` | Risk difference + 95% CI (per pre-defined group) | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03_1p |
 | `risk_difference_per_group_pair` | Risk difference + 95% CI (per group pair) | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t36-siera.json Mth_03_1b |
+| `categorical_summary_per_predefined_group` | Categorical n (%) (per pre-defined group) | verified | n, p | tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03p |
 
 ## Supported valueSources
 
@@ -35,6 +36,8 @@ reference.
 | `AG_denom_var1` | simple | `denom_anagroupvarshere` | First grouping variable of the referenced denominator analysis |
 | `AG_max_dataDriven` | simple | `isdatadrivenhere` | TRUE/FALSE: whether the highest resultsByGroup grouping is data-driven |
 | `AG_var2_group_values` | simple | `group2valueshere` | Quoted, comma-separated condition values of Group2's PRE-DEFINED groups, in group order (to be wrapped in c(...)), e.g. "'SEVERE', 'MODERATE', 'MILD'". For methods that must honour a non-data-driven inner grouping's defined groups rather than loop observed data values. Only single-value EQ group conditions are supported; non-EQ groups are skipped with a warning, and a grouping with no usable groups (e.g. data-driven) resolves to an empty string. |
+| `AG_var2_group_conditions` | complex | `group2conditionshere` | A dplyr::case_when() body mapping data values onto Group2's PRE-DEFINED groups, one arm per group in group order, e.g. "AEACN == 'DRUG INTERRUPTED' ~ 'DRUG INTERRUPTED', AESEV %in% c('SEVERE', 'MODERATE') ~ 'SEVERE'". Each group's level is its FIRST condition value, so it stays a real data value that siera's group-id stamping maps back to the correct group[n]_groupId. Only EQ and IN conditions are supported (they alone define a group as a set of data values); other comparators are skipped with a warning, and a grouping with no usable groups (e.g. data-driven) resolves to an empty string. Pairs with AG_var2_group_levels, and makes siera stamp a full set of group[n] metadata columns (n_group_cols = num_grp). |
+| `AG_var2_group_levels` | complex | `group2levelshere` | The levels used by AG_var2_group_conditions, as a quoted, comma-separated list in group order (to be wrapped in c(...)), e.g. "'DRUG INTERRUPTED', 'DOSE REDUCED', 'DOSE DELAY', 'OTHER'". Supplied as factor levels, this is what makes cards emit a zero row for every defined group no data value satisfies. Same EQ/IN support and empty-string fallback as AG_var2_group_conditions; unlike AG_var2_group_values it keeps IN groups (as their first value). |
 | `distinct_list` | complex | `distinctlisthere` | All active grouping variables plus the analysis variable, comma separated, unquoted (for dplyr::distinct) |
 | `by_listc` | complex | `byvarshere` | All grouping variables as a quoted, comma-separated list (to be wrapped in c(...)). Stamps CDISC group metadata. Preferred for grouped tabulations. |
 | `by_list` | complex | `bylisthere` | All grouping variables as an UNQUOTED, comma-separated list. Same vars as by_listc but without quotes. |
@@ -598,5 +601,92 @@ df3_analysisidhere <- if (length(.arms_analysisidhere) >= 2 && nrow(.pairs_analy
   tibble::tibble(variable = character(0), group2_level = character(0),
                  group3_level = character(0), stat_name = character(0),
                  stat = list(), operationid = character(0))
+}
+```
+
+---
+
+## `categorical_summary_per_predefined_group` - Summary of a pre-defined inner grouping (n and %)
+
+n and percentage per Group1 level x PRE-DEFINED group of Group2 (dataDriven: false), with a referenced denominator analysis. Where categorical_summary tabulates the raw data values of the analysis variable and then stamps group ids by matching them, this aggregates per group CONDITION: the AG_var2_group_conditions valueSource supplies a case_when body that maps each data value onto the group whose condition it satisfies, and AG_var2_group_levels supplies the defined groups as factor levels so cards emits a zero row for every defined group the data does not reach. Consequently (a) defined-but-absent groups are reported as n = 0 / % = 0.0 instead of being dropped (#187, and the pre-defined half of #100), (b) data values satisfying no defined group are excluded instead of appearing as rows with NA group ids, and (c) a group defined by a multi-value IN condition is one group rather than being unrepresentable. Group1's levels are taken from the denominator, so an arm in which no subject qualifies is zero-filled too. Only EQ and IN group conditions are supported (they alone define a group as a set of data values); other comparators are skipped with a warning at generation time. Use categorical_summary instead when the inner grouping is dataDriven: true - there the data IS the group list. Verified against fda-ae-t06 An_47_1 (AEs by action taken, AnlsGrouping_24_Aeacn) using an independent distinct-subject recomputation; the published reference matches on category shape (all four defined groups x three arms, zeros included) but its counts derive from only the first ADAE record per subject (the documented t06 reference defect, #171).
+
+**Status:** verified &nbsp; **Verified against:** tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03p
+
+**Operations**
+
+| order | stat_name | label | resultPattern |
+|-------|-----------|-------|---------------|
+| 1 | `n` | Count | `xx` |
+| 2 | `p` | Percentage | `(xx.x)` |
+
+**Parameters**
+
+| token | valueSource | label | description |
+|-------|-------------|-------|-------------|
+| `denomanaidhere` | `DEN_analysisid` | denom ana id | Analysis ID supplying the denominator |
+| `denom_anagroupvarshere` | `AG_denom_var1` | denom grp var | Grouping variable(s) of the denominator analysis |
+| `groupvar1here` | `AG_var1` | grp var 1 | Grouping variable from Group1 (treatment arm) |
+| `group2conditionshere` | `AG_var2_group_conditions` | grp 2 conditions | case_when body mapping data values onto Group2's pre-defined groups, in group order |
+| `group2levelshere` | `AG_var2_group_levels` | grp 2 levels | Quoted, comma-separated levels of Group2's pre-defined groups, in group order, used as factor levels to zero-fill absent groups |
+| `anavarhere` | `ana_var` | ana var | Analysis variable (subject ID) counted distinctly |
+| `opid1here` | `operation_1` | op id 1 | Operation id for the 'n' statistic (order 1) |
+| `opid2here` | `operation_2` | op id 2 | Operation id for the 'p' statistic (order 2) |
+
+**Template**
+
+```r
+# Denominator: the referenced analysis's population count per Group1 level.
+denom_analysisidhere <- df2_denomanaidhere |>
+    dplyr::count(denom_anagroupvarshere) |>
+    dplyr::rename(`...ard_N...` = n) |>
+    dplyr::mutate(dplyr::across(-`...ard_N...`, as.character))
+
+# Group1's levels come from the denominator, so an arm in which no subject
+# qualifies still gets a zero row; Group2's levels are the ones the ARS
+# metadata DEFINES, not the ones the data happens to contain.
+.arms_analysisidhere <- as.character(denom_analysisidhere$groupvar1here)
+.levels_analysisidhere <- c(group2levelshere)
+
+denom_analysisidhere <- denom_analysisidhere |>
+    dplyr::mutate(groupvar1here = factor(groupvar1here, levels = .arms_analysisidhere))
+
+in_data_analysisidhere <- df2_analysisidhere |>
+    dplyr::mutate(ars_group = dplyr::case_when(
+      group2conditionshere,
+      TRUE ~ NA_character_
+    )) |>
+    # A data value satisfying none of the defined group conditions was never
+    # asked for by the ARS, so it is excluded rather than tabulated.
+    dplyr::filter(!is.na(ars_group)) |>
+    dplyr::distinct(groupvar1here, ars_group, anavarhere) |>
+    dplyr::mutate(
+      groupvar1here = factor(as.character(groupvar1here), levels = .arms_analysisidhere),
+      ars_group     = factor(ars_group, levels = .levels_analysisidhere)
+    ) |>
+    dplyr::select(groupvar1here, ars_group)
+
+df3_analysisidhere <- if (length(.levels_analysisidhere) > 0) {
+  cards::ard_tabulate(
+      data = in_data_analysisidhere,
+      by = 'groupvar1here',
+      variables = 'ars_group',
+      denominator = denom_analysisidhere
+    ) |>
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  dplyr::rename(group2_level = variable_level) |>
+  # cards returns the levels as list-columns of factors, whose as.character()
+  # is the integer code - flatten to the labels before siera stamps group ids.
+  dplyr::mutate(dplyr::across(
+      dplyr::matches('_level$'),
+      ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
+    )) |>
+  dplyr::mutate(operationid = dplyr::case_when(
+      stat_name == 'n' ~ 'opid1here',
+      stat_name == 'p' ~ 'opid2here'
+    ))
+} else {
+  tibble::tibble(group1_level = character(0), group2_level = character(0),
+                 stat_name = character(0), stat = list(),
+                 operationid = character(0))
 }
 ```
