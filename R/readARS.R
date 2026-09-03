@@ -27,6 +27,16 @@
 #'  (`ARD_<OutputId>.json`) when the generated script is run. The
 #'  Dataset-JSON export requires the optional \pkg{datasetjson} package to be
 #'  installed in the environment that runs the generated script.
+#' @param blank_rows Logical. When `TRUE`, categorical analyses whose
+#'  grouping is a pre-defined (non-data-driven) set of categories (e.g. an
+#'  age category `< 18`, `18 - < 60`, `>= 60`) will include a row for every
+#'  defined category in the ARD, even when no subjects fall into that
+#'  category (`n` = 0), instead of silently dropping it. Defaults to
+#'  `FALSE`, which preserves the previous behaviour of only reporting
+#'  observed categories. Only applies to groupings with pre-defined groups
+#'  (`dataDriven: false` in the ARS metadata with `EQ` group conditions);
+#'  data-driven groupings are unaffected because their categories are only
+#'  known from the data itself.
 #'
 #' @importFrom readxl read_excel
 #'
@@ -51,7 +61,8 @@ readARS <- function(ARS_path,
                     output_path = tempdir(),
                     adam_path = tempdir(),
                     spec_output = "",
-                    output_format = "none") {
+                    output_format = "none",
+                    blank_rows = FALSE) {
   # Strict validation: no partial matching, omitted/NULL -> "none"
   if (is.null(output_format)) {
     output_format <- "none"
@@ -61,6 +72,12 @@ readARS <- function(ARS_path,
     cli::cli_abort(c(
       "{.arg output_format} must be one of {.val none} or {.val datasetjson}.",
       "x" = "You supplied {.val {output_format}}."
+    ))
+  }
+  if (length(blank_rows) != 1L || !is.logical(blank_rows) || is.na(blank_rows)) {
+    cli::cli_abort(c(
+      "{.arg blank_rows} must be a single, non-missing logical value.",
+      "x" = "You supplied {.val {blank_rows}}."
     ))
   }
   code_libraries <- .generate_library_code()
@@ -284,6 +301,34 @@ readARS <- function(ARS_path,
 
       code_ds <- data_subset_result$code
 
+      # Apply blank-rows (pre-defined category completion) --------------------------
+      # A grouping variable that is also the discriminating variable of this
+      # analysis's data subset (e.g. PARAM restricted to one specific value)
+      # must NOT be factor-completed: its "other" categories are excluded by
+      # design (a different, deliberate analysis slice), not because of
+      # missing subjects, so completing them would fabricate misleading rows.
+      subset_vars <- character(0)
+      if (!is.null(DataSubsets) && !is.na(subsetid) &&
+          "condition_variable" %in% names(DataSubsets)) {
+        subset_vars <- DataSubsets |>
+          dplyr::filter(id == subsetid) |>
+          dplyr::pull(condition_variable) |>
+          stats::na.omit() |>
+          unique() |>
+          as.character()
+      }
+
+      code_blankrows <- .generate_blank_rows_code(
+        analysis_id        = Anas_j,
+        groupids           = groupids,
+        num_grp            = num_grp,
+        AG_vars            = AG_vars,
+        AG_dataDriven      = AG_dataDriven,
+        analysis_groupings = AnalysisGroupings,
+        subset_vars        = subset_vars,
+        blank_rows         = blank_rows
+      )
+
       # Apply AnalysisMethod -------------------------------------------------------------
 
       # Build the explicit lookup table of all computed string values that ARS
@@ -382,6 +427,7 @@ readARS <- function(ARS_path,
         ana_name,
         code_as,
         code_ds,
+        code_blankrows,
         code_method_frag,
         code_groupid,
         code_listcoerce
@@ -454,10 +500,23 @@ readARS <- function(ARS_path,
 
     gpval_col <- paste0("group", k, "_groupValue")
 
+    # group[n]_level comes back from cards::ard_tabulate() as a list column
+    # (list-of-factor when the underlying variable was coerced to a factor
+    # e.g. by the blank_rows feature, list-of-character otherwise, or
+    # list-of-NULL for continuous analyses). Plain as.character() on such a
+    # list column extracts the underlying factor CODE ("1", "2", ...) rather
+    # than its label, silently breaking the case_when() match below and the
+    # data-driven groupValue stamp. Use the same scalar-safe vapply pattern
+    # as the later _level list-coercion step to always get the true label.
+    safe_char_level <- paste0(
+      "vapply(", grp_level_col,
+      ", function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))"
+    )
+
     if (isTRUE(as.logical(AG_dataDriven[k]))) {
       mutate_parts <- c(mutate_parts,
         paste0("      ", gpid_col,  " = NA_character_"),
-        paste0("      ", gpval_col, " = as.character(", grp_level_col, ")")
+        paste0("      ", gpval_col, " = ", safe_char_level)
       )
     } else {
       grp_rows <- analysis_groupings[
@@ -473,7 +532,7 @@ readARS <- function(ARS_path,
         cond_vals <- gsub("'", "\\'", grp_rows$group_condition_value, fixed = TRUE)
         grp_ids   <- grp_rows$group_id
         cases <- paste(
-          paste0("        as.character(", grp_level_col, ") == '",
+          paste0("        ", safe_char_level, " == '",
                  cond_vals, "' ~ '", grp_ids, "'"),
           collapse = ",\n"
         )
@@ -572,7 +631,7 @@ readARS <- function(ARS_path,
               "group_condition_comparator", "group_condition_value")
   if (!all(needed %in% names(analysis_groupings))) {
     cli::cli_warn(c(
-      "AG_var2_group_values: grouping {.val {gid}} defines no groups.",
+      "Grouping {.val {gid}} defines no groups.",
       "i" = "Pre-defined group values require a non-data-driven grouping with group conditions."
     ))
     return("")
@@ -583,7 +642,7 @@ readARS <- function(ARS_path,
 
   if (nrow(groups) == 0) {
     cli::cli_warn(c(
-      "AG_var2_group_values: grouping {.val {gid}} defines no groups.",
+      "Grouping {.val {gid}} defines no groups.",
       "i" = "Pre-defined group values require a non-data-driven grouping with group conditions."
     ))
     return("")
@@ -594,7 +653,7 @@ readARS <- function(ARS_path,
   if (any(!is_eq)) {
     skipped <- unique(groups$group_id[!is_eq])
     cli::cli_warn(c(
-      "AG_var2_group_values: skipping non-EQ group(s) {.val {skipped}} of grouping {.val {gid}}.",
+      "skipping non-EQ group(s) {.val {skipped}} of grouping {.val {gid}}.",
       "i" = "Only single-value EQ group conditions are supported."
     ))
     groups <- groups[is_eq, ]
@@ -604,4 +663,50 @@ readARS <- function(ARS_path,
   groups <- groups[order(as.numeric(groups$group_order)), ]
   values <- gsub("'", "\\\\'", as.character(groups$group_condition_value))
   paste0("'", values, "'", collapse = ", ")
+}
+
+# Generate code that coerces pre-defined (non-data-driven) grouping variables
+# to factors with the full set of defined category levels, so that
+# cards::ard_tabulate() reports a row (n = 0) for every defined category even
+# when no subjects fall into it, instead of silently dropping unobserved
+# categories (#100). Data-driven groupings are left untouched: their
+# categories are only known from the data, so there is no fixed level set to
+# complete against. Groupings whose variable is also the discriminating
+# variable of this analysis's data subset are skipped too: the subset has
+# already deliberately restricted that variable to specific value(s) as a
+# different analysis slice, so completing its "other" categories here would
+# fabricate rows that were never meant to exist for this analysis.
+#
+# Relies on the same .ag_group_values() single-value-EQ resolution used for
+# AG_var2_group_values (#171); groupings with no usable EQ-defined groups
+# resolve to "" and are skipped (with .ag_group_values()'s own warning).
+.generate_blank_rows_code <- function(analysis_id, groupids, num_grp, AG_vars,
+                                      AG_dataDriven, analysis_groupings,
+                                      subset_vars = character(0),
+                                      blank_rows) {
+  if (!isTRUE(blank_rows) || num_grp < 1L) return("")
+
+  mutate_parts <- character(0)
+
+  for (k in seq_len(num_grp)) {
+    if (isTRUE(as.logical(AG_dataDriven[k]))) next
+    if (AG_vars[k] %in% subset_vars) next
+
+    group_values <- .ag_group_values(analysis_groupings, groupids[k])
+    if (identical(group_values, "")) next
+
+    mutate_parts <- c(mutate_parts,
+      paste0("      ", AG_vars[k], " = factor(", AG_vars[k],
+             ", levels = c(", group_values, "))")
+    )
+  }
+
+  if (length(mutate_parts) == 0L) return("")
+
+  paste0(
+    "df2_", analysis_id, " <- df2_", analysis_id, " |>\n",
+    "  dplyr::mutate(\n",
+    paste(mutate_parts, collapse = ",\n"),
+    "\n  )\n"
+  )
 }
