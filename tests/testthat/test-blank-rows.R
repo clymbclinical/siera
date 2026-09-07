@@ -112,6 +112,25 @@ test_that(".generate_blank_rows_code skips data-driven groupings and subset vari
   expect_false(grepl("PARAM = factor(", code, fixed = TRUE))
 })
 
+test_that(".generate_blank_rows_code skips groupings with no usable EQ-defined groups", {
+  # AG_01 is pre-defined and not subset-fixed, but its only group condition
+  # uses a non-EQ comparator, so .ag_group_values() resolves it to "" (with
+  # its own warning) and .generate_blank_rows_code() must skip it too rather
+  # than emitting a `factor(..., levels = c())` with no levels.
+  ag <- tibble::tibble(
+    id = "AG_01", group_id = "AG_01_01", group_order = 1,
+    group_condition_comparator = "GT", group_condition_value = "18"
+  )
+
+  code <- suppressWarnings(siera:::`.generate_blank_rows_code`(
+    analysis_id = "An_01", groupids = "AG_01", num_grp = 1L,
+    AG_vars = "AGEGR1", AG_dataDriven = c(FALSE),
+    analysis_groupings = ag, blank_rows = TRUE
+  ))
+
+  expect_identical(code, "")
+})
+
 test_that(".generate_blank_rows_code skips data-driven groupings entirely", {
   ag <- tibble::tibble(
     id = "AG_01", group_id = NA_character_, group_order = NA_real_,
