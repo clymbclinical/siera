@@ -9,7 +9,8 @@ readARS(
   output_path = tempdir(),
   adam_path = tempdir(),
   spec_output = "",
-  output_format = "none"
+  output_format = "none",
+  blank_rows = FALSE
 )
 }
 \arguments{
@@ -40,6 +41,17 @@ appends code that writes each ARD as a CDISC Dataset-JSON file
 (`ARD_<OutputId>.json`) when the generated script is run. The
 Dataset-JSON export requires the optional \pkg{datasetjson} package to be
 installed in the environment that runs the generated script.}
+
+\item{blank_rows}{Logical. When `TRUE`, categorical analyses whose
+grouping is a pre-defined (non-data-driven) set of categories (e.g. an
+age category `< 18`, `18 - < 60`, `>= 60`) will include a row for every
+defined category in the ARD, even when no subjects fall into that
+category (`n` = 0), instead of silently dropping it. Defaults to
+`FALSE`, which preserves the previous behaviour of only reporting
+observed categories. Only applies to groupings with pre-defined groups
+(`dataDriven: false` in the ARS metadata with `EQ` group conditions);
+data-driven groupings are unaffected because their categories are only
+known from the data itself.}
 }
 \value{
 R programmes generating ARDs - one for each output (or analysis from an output) specified in the ARS metadata

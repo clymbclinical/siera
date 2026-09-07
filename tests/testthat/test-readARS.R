@@ -489,7 +489,7 @@ test_that("group[n]_groupValue stamped for data-driven groupings - json", {
   lines <- readLines(file.path(output_dir, "ARD_Out_01.R"))
   # data-driven grouping: groupId must be NA, groupValue must carry the level
   expect_true(any(grepl("groupId = NA_character_", lines)))
-  expect_true(any(grepl("groupValue = as.character(group", lines, fixed = TRUE)))
+  expect_true(any(grepl("groupValue = vapply(group", lines, fixed = TRUE)))
   # non-data-driven grouping in same script must NOT get groupValue
   expect_false(any(grepl("group1_groupValue", lines)))
 })

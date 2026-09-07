@@ -79,3 +79,16 @@ A core promise of the ARD is _traceability_: every result can be traced back to 
   - **`group[n]_groupValue`** - for **data-driven groupings** (`dataDriven: true`, where the categories are discovered from the ADaM data at run time, e.g. cause of death or AE term), the actual value found in the data.
 
 The distinction matters: a treatment-arm grouping is usually pre-defined, so its rows carry `group1_groupId`; a grouping such as "cause of death" is typically data-driven, so its rows carry `group1_groupValue` with whatever categories appeared in the data. A single ARD can contain both. The [ARD program structure](ARD_script_structure.html) vignette shows where these columns are stamped on in the generated code.
+
+## Including categories with no subjects
+
+By default, a pre-defined categorical grouping only appears in the ARD for categories that at least one subject falls into. For example, an age category grouping of `< 18`, `18 - < 60`, `>= 60` would silently omit `>= 60` from the ARD if no subject in the analysis population happened to be 60 or older - even though the category is defined in the metadata and a reviewer would expect to see it reported as zero.
+
+Passing `blank_rows = TRUE` to `readARS()` switches this on: every pre-defined category defined in the metadata is guaranteed a row in the ARD, with `n = 0` (and the corresponding percentage) when no subjects belong to it. This only applies to pre-defined (`dataDriven: false`) groupings - a data-driven grouping's categories are only known from the data, so there is nothing to "complete" against - and it does not apply to a grouping variable that the analysis's own data subset has already restricted to a single value (that variable's other values are excluded on purpose, not merely absent from the data).
+
+```r
+readARS(ARS_path, output_folder, ADaM_folder, blank_rows = TRUE)
+```
+
+The default remains `blank_rows = FALSE`, preserving the original behaviour of reporting only observed categories.
+
