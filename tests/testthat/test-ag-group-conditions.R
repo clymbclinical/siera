@@ -209,8 +209,10 @@ test_that(".ag_group_conditions aborts when two groups share a level", {
 })
 
 test_that("the per-predefined-group method is population-based (empty subset still zero-fills)", {
-  tmpl <- readLines(testthat::test_path(
-    "../../inst/method-library/11_categorical_summary_per_predefined_group/template.R"
-  ))
+  # Installed package under R CMD check; source tree under devtools::test().
+  rel <- file.path("11_categorical_summary_per_predefined_group", "template.R")
+  f <- system.file("method-library", rel, package = "siera")
+  if (!nzchar(f)) f <- testthat::test_path("..", "..", "inst", "method-library", rel)
+  tmpl <- readLines(f, warn = FALSE)
   expect_true(any(grepl("df_poptot", tmpl, fixed = TRUE)))
 })
