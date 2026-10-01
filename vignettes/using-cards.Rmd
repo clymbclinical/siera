@@ -64,6 +64,8 @@ Analysis_ARD <- ard_summary(
 
 In order to facilitate the use of placeholders and their replacement with actual values from the metadata, several "constructs" have been defined in the _readARS_ function, and are available to the user to call from the _AnalysisMethodCodeTemplate_ and _AnalysisMethodCodeParameters_ classes in the metadata.  These constructs are either simple variables or datasets defined in the metadata, or complex, dynamic constructs from various metadata pieces, to be inserted in specific _cards_ functions, or pre-processing steps.
 
+A template only has to compute the statistics: it assigns the analysis-level ARD to `df3_analysisidhere` (the `cards`/`cardx` result, filtered to the operations of the method and with an `operationid` column).  Linking that ARD back to the ARS metadata (`AnalysisId`, `MethodId`, `OutputId` and the `group[n]_*` identifiers) is done afterwards by _siera_ in a separate step, a call to `ars_stamp()` that _siera_ adds to the generated script - so a template never needs to stamp those columns itself.  See the [ARD program structure](ARD_script_structure.html) vignette.
+
 The authoritative, tested reference for these constructs — together with a catalog of ready-to-use analysis-method templates that use them — ships with the package as a plain-text **method-template library**.  Each template is validated automatically (it parses, references only constructs _siera_ can resolve, and stays in sync with the catalog), so what you read there always reflects what _siera_ actually does.  You can browse it with:
 
 ```{r methodlib, eval=FALSE}
