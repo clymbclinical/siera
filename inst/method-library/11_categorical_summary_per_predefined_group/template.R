@@ -1,3 +1,6 @@
+# Population-based (see df_poptot): the zero-fill below must also run when the
+# data subset is empty, so siera drops its empty-data guard for this method -
+# an empty subset yields n = 0 / 0.0% for every arm x group.
 # Denominator: the referenced analysis's population count per Group1 level.
 denom_analysisidhere <- df2_denomanaidhere |>
     dplyr::count(denom_anagroupvarshere) |>

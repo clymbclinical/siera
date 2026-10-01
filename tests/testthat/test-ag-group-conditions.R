@@ -169,3 +169,48 @@ test_that("AG_var2_group_conditions makes siera stamp a full set of group column
     2L
   )
 })
+
+test_that(".generate_groupid_code maps every value of an xlsx IN cell to its group id", {
+  ag <- tibble::tibble(
+    id = "AG_X", group_id = c("AG_X_01", "AG_X_02"),
+    group_condition_comparator = c("IN", "EQ"),
+    group_condition_value = c("DRUG INTERRUPTED|DOSE REDUCED", "OTHER")
+  )
+  args <- list(analysis_id = "An_1", groupids = "AG_X", n_group_cols = 1L,
+               AG_dataDriven = "FALSE", analysis_groupings = ag)
+
+  code_xlsx <- do.call(siera:::.generate_groupid_code, c(args, file_ext = "xlsx"))
+  expect_match(code_xlsx, "== 'DRUG INTERRUPTED' ~ 'AG_X_01'", fixed = TRUE)
+  expect_match(code_xlsx, "== 'DOSE REDUCED' ~ 'AG_X_01'", fixed = TRUE)
+  expect_match(code_xlsx, "== 'OTHER' ~ 'AG_X_02'", fixed = TRUE)
+
+  # Without the xlsx flag (and so without a comparator column) the cell is
+  # left as-is, as the JSON reader has already unnested it.
+  code_json <- do.call(siera:::.generate_groupid_code, args)
+  expect_no_match(code_json, "== 'DOSE REDUCED'", fixed = TRUE)
+
+  # An xlsx grouping table lacking the comparator column is also left as-is.
+  args$analysis_groupings <- ag[, setdiff(names(ag), "group_condition_comparator")]
+  code_nocomp <- do.call(siera:::.generate_groupid_code, c(args, file_ext = "xlsx"))
+  expect_no_match(code_nocomp, "== 'DOSE REDUCED'", fixed = TRUE)
+})
+
+test_that(".ag_group_conditions aborts when two groups share a level", {
+  ag <- tibble::tibble(
+    id = "AG_X", group_id = c("AG_X_01", "AG_X_02"), group_order = 1:2,
+    group_condition_variable = "AESEV",
+    group_condition_comparator = c("IN", "EQ"),
+    group_condition_value = c("SEVERE|MODERATE", "SEVERE")
+  )
+  expect_error(
+    siera:::.ag_group_conditions(ag, "AG_X", file_ext = "xlsx"),
+    "share the level"
+  )
+})
+
+test_that("the per-predefined-group method is population-based (empty subset still zero-fills)", {
+  tmpl <- readLines(testthat::test_path(
+    "../../inst/method-library/11_categorical_summary_per_predefined_group/template.R"
+  ))
+  expect_true(any(grepl("df_poptot", tmpl, fixed = TRUE)))
+})

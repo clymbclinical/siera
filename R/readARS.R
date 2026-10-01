@@ -373,7 +373,8 @@ readARS <- function(ARS_path,
         n_group_cols       = n_group_cols,
         AG_dataDriven      = AG_dataDriven,
         analysis_groupings = AnalysisGroupings,
-        population_based   = population_based
+        population_based   = population_based,
+        file_ext           = file_ext
       )
 
       # Generate code for analysis ----------------------------------------------
@@ -452,7 +453,7 @@ readARS <- function(ARS_path,
 # and dataDriven columns.
 .generate_groupid_code <- function(analysis_id, groupids, n_group_cols,
                                    AG_dataDriven, analysis_groupings,
-                                   population_based = FALSE) {
+                                   population_based = FALSE, file_ext = "json") {
   if (n_group_cols < 1L) return("")
 
   mutate_parts <- character(0)
@@ -485,8 +486,26 @@ readARS <- function(ARS_path,
           paste0("      ", gpid_col, " = NA_character_")
         )
       } else {
-        cond_vals <- gsub("'", "\\'", grp_rows$group_condition_value, fixed = TRUE)
+        cond_vals <- as.character(grp_rows$group_condition_value)
         grp_ids   <- grp_rows$group_id
+
+        # The xlsx reader keeps a multi-value IN condition in one delimited
+        # cell (the JSON reader unnests it), so split it to one row per value
+        # or the level of an IN group would never match its group id.
+        if (identical(file_ext, "xlsx") &&
+            "group_condition_comparator" %in% names(grp_rows)) {
+          is_in <- grp_rows$group_condition_comparator %in% "IN"
+          split_vals <- lapply(seq_along(cond_vals), function(i) {
+            if (is_in[i]) {
+              strsplit(gsub("\\|", ",", cond_vals[i]), ",\\s*")[[1]]
+            } else {
+              cond_vals[i]
+            }
+          })
+          grp_ids   <- rep(grp_ids, lengths(split_vals))
+          cond_vals <- unlist(split_vals)
+        }
+        cond_vals <- gsub("'", "\\'", cond_vals, fixed = TRUE)
         cases <- paste(
           paste0("        as.character(", grp_level_col, ") == '",
                  cond_vals, "' ~ '", grp_ids, "'"),
@@ -715,6 +734,14 @@ readARS <- function(ARS_path,
     }
 
     level <- gsub("'", "\\'", values[1], fixed = TRUE)
+    # Sibling groups must be disjoint; two groups sharing a first value would
+    # otherwise fail inside factor() at script runtime with a cryptic message.
+    if (paste0("'", level, "'") %in% group_levels) {
+      cli::cli_abort(c(
+        "AG_var2_group_conditions: groups of grouping {.val {gid}} share the level {.val {level}}.",
+        "i" = "Groups within a grouping must be mutually exclusive; check the group conditions."
+      ))
+    }
     conditions <- c(conditions, paste0(condition, " ~ '", level, "'"))
     group_levels <- c(group_levels, paste0("'", level, "'"))
   }
