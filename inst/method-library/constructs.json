@@ -58,6 +58,20 @@
       "assumed_parameter_name": "group2valueshere"
     },
     {
+      "valueSource": "AG_var2_group_conditions",
+      "type": "complex",
+      "details": "A dplyr::case_when() body mapping data values onto Group2's PRE-DEFINED groups, one arm per group in group order, e.g. \"AEACN == 'DRUG INTERRUPTED' ~ 'DRUG INTERRUPTED', AESEV %in% c('SEVERE', 'MODERATE') ~ 'SEVERE'\". Each group's level is its FIRST condition value, so it stays a real data value that siera's group-id stamping maps back to the correct group[n]_groupId. Only EQ and IN conditions are supported (they alone define a group as a set of data values); other comparators are skipped with a warning, and a grouping with no usable groups (e.g. data-driven) resolves to an empty string. Pairs with AG_var2_group_levels, and makes siera stamp a full set of group[n] metadata columns (n_group_cols = num_grp).",
+      "ars_location": "Analyses$groupingId2 -> AnalysisGroupings groups: group_condition_variable/comparator/value in group_order (EQ, IN)",
+      "assumed_parameter_name": "group2conditionshere"
+    },
+    {
+      "valueSource": "AG_var2_group_levels",
+      "type": "complex",
+      "details": "The levels used by AG_var2_group_conditions, as a quoted, comma-separated list in group order (to be wrapped in c(...)), e.g. \"'DRUG INTERRUPTED', 'DOSE REDUCED', 'DOSE DELAY', 'OTHER'\". Supplied as factor levels, this is what makes cards emit a zero row for every defined group no data value satisfies. Same EQ/IN support and empty-string fallback as AG_var2_group_conditions; unlike AG_var2_group_values it keeps IN groups (as their first value).",
+      "ars_location": "Analyses$groupingId2 -> AnalysisGroupings groups: first group_condition_value per group in group_order (EQ, IN)",
+      "assumed_parameter_name": "group2levelshere"
+    },
+    {
       "valueSource": "distinct_list",
       "type": "complex",
       "details": "All active grouping variables plus the analysis variable, comma separated, unquoted (for dplyr::distinct)",

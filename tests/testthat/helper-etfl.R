@@ -377,3 +377,61 @@
   testthat::expect_gt(cmp$n_total, 0)
   testthat::expect_equal(cmp$n_matched, cmp$n_total, info = info)
 }
+
+# Independent ground truth for a per-PRE-DEFINED-group n and % (#187). ---------
+# The counterpart of .etfl_pergroup_rd_truth() for the categorical method
+# categorical_summary_per_predefined_group (Mth_03p): distinct-subject counts
+# over the FULL arm x defined-group grid, so a defined group the data never
+# reaches is truth n = 0 / p = 0 rather than a missing row, and data values
+# satisfying no defined group are excluded. Computed straight from the raw
+# ADaM, NOT from the reference ARD: the published fda-ae-t06 reference matches
+# on category shape but its counts derive from only the first ADAE record per
+# subject (the documented t06 reference defect, #171).
+# subset_fun applies the analysis's data subset to the merged ADSL x ADAE;
+# cat_var is the inner grouping variable and cats its DEFINED groups, in group
+# order; arms are the defined Group1 levels (TRT01AN), which also supply the
+# denominators from the Safety population.
+.etfl_predefined_npct_truth <- function(table, subset_fun, cat_var, arms, cats) {
+  paths <- .etfl_paths(table)
+  adsl <- haven::read_xpt(file.path(paths$adam_dir, "adsl.xpt"))
+  adae <- haven::read_xpt(file.path(paths$adam_dir, "adae.xpt"))
+  saf <- adsl |> dplyr::filter(SAFFL == "Y")
+  overlap <- setdiff(intersect(names(adsl), names(adae)), "USUBJID")
+  df_pop <- merge(saf, dplyr::select(adae, -dplyr::all_of(overlap)),
+                  by = "USUBJID", all = FALSE)
+  df2 <- subset_fun(df_pop)
+  N <- saf |>
+    dplyr::filter(TRT01AN %in% arms) |>
+    dplyr::count(TRT01AN, name = "N") |>
+    dplyr::mutate(arm = as.character(TRT01AN))
+  counts <- df2 |>
+    dplyr::filter(as.character(.data[[cat_var]]) %in% cats) |>
+    dplyr::distinct(TRT01AN, .data[[cat_var]], USUBJID) |>
+    dplyr::count(TRT01AN, .data[[cat_var]], name = "n") |>
+    dplyr::mutate(arm = as.character(TRT01AN), cat = as.character(.data[[cat_var]]))
+  expand.grid(arm = as.character(arms), cat = cats,
+              stringsAsFactors = FALSE) |>
+    dplyr::left_join(dplyr::select(counts, arm, cat, n), by = c("arm", "cat")) |>
+    dplyr::left_join(dplyr::select(N, arm, N), by = "arm") |>
+    dplyr::mutate(n = ifelse(is.na(n), 0, n), p = n / N) |>
+    dplyr::select(arm, cat, n, p)
+}
+
+# Compare siera's per-pre-defined-group n and % against that ground truth.
+# A full join asserts EVERY arm x defined group on both sides, so siera
+# dropping a zero group, or inventing a row for an undefined data value, fails
+# the test rather than passing silently.
+.cmp_predefined_npct <- function(siera_ard, table, ana_id, subset_fun,
+                                 cat_var, arms, cats) {
+  truth <- .etfl_predefined_npct_truth(table, subset_fun, cat_var, arms, cats)
+  s <- siera_ard |>
+    dplyr::filter(AnalysisId == ana_id) |>
+    dplyr::mutate(val = .etfl_safe_stat(stat),
+                  arm = as.character(group1_level),
+                  cat = as.character(group2_level)) |>
+    dplyr::select(arm, cat, stat_name, val) |>
+    tidyr::pivot_wider(names_from = stat_name, values_from = val)
+  comp <- dplyr::full_join(s, truth, by = c("arm", "cat"), suffix = c(".s", ".t"))
+  comp$match <- comp$n.s == comp$n.t & abs(comp$p.s - comp$p.t) < 1e-8
+  list(n_matched = sum(comp$match, na.rm = TRUE), n_total = nrow(comp), data = comp)
+}

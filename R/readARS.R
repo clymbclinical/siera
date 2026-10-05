@@ -315,6 +315,21 @@ readARS <- function(ARS_path,
           list(AG_var2_group_values = function() {
             .ag_group_values(AnalysisGroupings, groupids[2])
           })
+        },
+        # Group 2's pre-defined group DEFINITIONS (#187): the case_when body
+        # that maps data values onto the defined groups, and the matching
+        # factor levels that make cards zero-fill the groups no data value
+        # satisfies. Both come from one resolver, and both are lazy for the
+        # same reason as AG_var2_group_values.
+        if (n_actual_groups >= 2) {
+          list(
+            AG_var2_group_conditions = function() {
+              .ag_group_conditions(AnalysisGroupings, groupids[2], file_ext)$conditions
+            },
+            AG_var2_group_levels = function() {
+              .ag_group_conditions(AnalysisGroupings, groupids[2], file_ext)$levels
+            }
+          )
         }
       )
 
@@ -358,7 +373,8 @@ readARS <- function(ARS_path,
         n_group_cols       = n_group_cols,
         AG_dataDriven      = AG_dataDriven,
         analysis_groupings = AnalysisGroupings,
-        population_based   = population_based
+        population_based   = population_based,
+        file_ext           = file_ext
       )
 
       # Generate code for analysis ----------------------------------------------
@@ -437,7 +453,7 @@ readARS <- function(ARS_path,
 # and dataDriven columns.
 .generate_groupid_code <- function(analysis_id, groupids, n_group_cols,
                                    AG_dataDriven, analysis_groupings,
-                                   population_based = FALSE) {
+                                   population_based = FALSE, file_ext = "json") {
   if (n_group_cols < 1L) return("")
 
   mutate_parts <- character(0)
@@ -470,8 +486,26 @@ readARS <- function(ARS_path,
           paste0("      ", gpid_col, " = NA_character_")
         )
       } else {
-        cond_vals <- gsub("'", "\\'", grp_rows$group_condition_value, fixed = TRUE)
+        cond_vals <- as.character(grp_rows$group_condition_value)
         grp_ids   <- grp_rows$group_id
+
+        # The xlsx reader keeps a multi-value IN condition in one delimited
+        # cell (the JSON reader unnests it), so split it to one row per value
+        # or the level of an IN group would never match its group id.
+        if (identical(file_ext, "xlsx") &&
+            "group_condition_comparator" %in% names(grp_rows)) {
+          is_in <- grp_rows$group_condition_comparator %in% "IN"
+          split_vals <- lapply(seq_along(cond_vals), function(i) {
+            if (is_in[i]) {
+              strsplit(gsub("\\|", ",", cond_vals[i]), ",\\s*")[[1]]
+            } else {
+              cond_vals[i]
+            }
+          })
+          grp_ids   <- rep(grp_ids, lengths(split_vals))
+          cond_vals <- unlist(split_vals)
+        }
+        cond_vals <- gsub("'", "\\'", cond_vals, fixed = TRUE)
         cases <- paste(
           paste0("        as.character(", grp_level_col, ") == '",
                  cond_vals, "' ~ '", grp_ids, "'"),
@@ -542,7 +576,13 @@ readARS <- function(ARS_path,
   )
   active_sources <- params$parameter_valueSource[in_template]
 
-  if (any(active_sources %in% c("by_vars", "strata_vars"))) {
+  # A template driven by pre-defined group conditions (#187) puts the inner
+  # grouping into variables= like by_vars does, but then renames the resulting
+  # variable_level to group[n]_level itself, so it does produce a full set of
+  # group columns.
+  if (any(active_sources == "AG_var2_group_conditions")) {
+    num_grp
+  } else if (any(active_sources %in% c("by_vars", "strata_vars"))) {
     max(0L, num_grp - 1L)
   } else if (any(active_sources == "by_listc")) {
     num_grp
@@ -604,4 +644,121 @@ readARS <- function(ARS_path,
   groups <- groups[order(as.numeric(groups$group_order)), ]
   values <- gsub("'", "\\\\'", as.character(groups$group_condition_value))
   paste0("'", values, "'", collapse = ", ")
+}
+
+# Resolve the AG_var2_group_conditions / AG_var2_group_levels valueSources for a
+# pre-defined (dataDriven: false) inner grouping (#187).
+#
+# Where AG_var2_group_values (#171) yields a bare list of EQ condition values,
+# these two carry the group DEFINITIONS themselves so a template can aggregate
+# per group condition rather than per observed data value:
+#
+#   $conditions  a dplyr::case_when() body mapping each group's condition to its
+#                level, e.g. "AEACN == 'DRUG INTERRUPTED' ~ 'DRUG INTERRUPTED',
+#                AESEV %in% c('SEVERE', 'MODERATE') ~ 'SEVERE'"
+#   $levels      the same levels as a quoted, comma-separated list, in group
+#                order, for use as factor levels (this is what makes cards
+#                zero-fill the groups that no data value satisfies)
+#
+# The level of a group is its FIRST condition value, which keeps it a real data
+# value: siera's own group-id stamping (.generate_groupid_code) maps every
+# condition value of a group to that group's id, so the level resolves back to
+# the correct group[n]_groupId. Only EQ and IN conditions define a group as a
+# set of data values that way, so other comparators are skipped with a warning,
+# as they are for AG_var2_group_values.
+.ag_group_conditions <- function(analysis_groupings, grouping_id, file_ext = "json") {
+  gid <- grouping_id
+  # The empty conditions fallback is a case_when arm that matches nothing, so a
+  # template embedding it still parses; the empty levels fallback resolves to
+  # c() so the template's own "no defined groups" branch takes over.
+  empty <- list(conditions = "FALSE ~ NA_character_", levels = "")
+
+  # A reporting event whose groupings are all data-driven has no group_* columns.
+  needed <- c("group_id", "group_order", "group_condition_variable",
+              "group_condition_comparator", "group_condition_value")
+  if (!all(needed %in% names(analysis_groupings))) {
+    cli::cli_warn(c(
+      "AG_var2_group_conditions: grouping {.val {gid}} defines no groups.",
+      "i" = "Pre-defined group conditions require a non-data-driven grouping."
+    ))
+    return(empty)
+  }
+
+  groups <- analysis_groupings |>
+    dplyr::filter(id == gid, !is.na(group_id))
+
+  if (nrow(groups) == 0) {
+    cli::cli_warn(c(
+      "AG_var2_group_conditions: grouping {.val {gid}} defines no groups.",
+      "i" = "Pre-defined group conditions require a non-data-driven grouping."
+    ))
+    return(empty)
+  }
+
+  groups <- groups[order(as.numeric(groups$group_order)), , drop = FALSE]
+
+  supported <- c("EQ", "IN")
+  conditions <- character(0)
+  group_levels <- character(0)
+  skipped <- character(0)
+
+  # One entry per group; an IN group contributes several rows (the JSON reader
+  # unnests condition.value), so collect the values back up per group_id.
+  for (gpid in unique(groups$group_id)) {
+    rows <- groups[groups$group_id == gpid, , drop = FALSE]
+    comparator <- as.character(rows$group_condition_comparator[1])
+    values <- as.character(rows$group_condition_value)
+
+    if (is.na(comparator) || !comparator %in% supported) {
+      skipped <- c(skipped, gpid)
+      next
+    }
+
+    condition <- .generate_data_subset_condition(
+      variable   = as.character(rows$group_condition_variable[1]),
+      comparator = comparator,
+      value      = values,
+      file_ext   = file_ext
+    )
+
+    if (!nzchar(condition)) {
+      skipped <- c(skipped, gpid)
+      next
+    }
+
+    # The xlsx reader keeps a multi-value IN condition in one delimited cell,
+    # so take the level from the same split .generate_data_subset_condition()
+    # applies rather than from the raw cell.
+    if (identical(comparator, "IN") && identical(file_ext, "xlsx")) {
+      values <- strsplit(gsub("\\|", ",", values[1]), ",\\s*")[[1]]
+    }
+
+    level <- gsub("'", "\\'", values[1], fixed = TRUE)
+    # Sibling groups must be disjoint; two groups sharing a first value would
+    # otherwise fail inside factor() at script runtime with a cryptic message.
+    if (paste0("'", level, "'") %in% group_levels) {
+      cli::cli_abort(c(
+        "AG_var2_group_conditions: groups of grouping {.val {gid}} share the level {.val {level}}.",
+        "i" = "Groups within a grouping must be mutually exclusive; check the group conditions."
+      ))
+    }
+    conditions <- c(conditions, paste0(condition, " ~ '", level, "'"))
+    group_levels <- c(group_levels, paste0("'", level, "'"))
+  }
+
+  if (length(skipped) > 0) {
+    cli::cli_warn(c(
+      "AG_var2_group_conditions: skipping group(s) {.val {skipped}} of grouping {.val {gid}}.",
+      "i" = "Only EQ and IN group conditions define a group as a set of data values."
+    ))
+  }
+
+  if (length(conditions) == 0) {
+    return(empty)
+  }
+
+  list(
+    conditions = paste(conditions, collapse = ",\n      "),
+    levels     = paste(group_levels, collapse = ", ")
+  )
 }
