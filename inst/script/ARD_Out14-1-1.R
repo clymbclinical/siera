@@ -1,7 +1,7 @@
 
 # Programme:    Generate code to produce ARD for Out14-1-1
 # Output:       Summary of Demographics
-# Date created: 2026-10-01 09:56:24
+# Date created: 2026-10-05 15:28:35
 
   # load libraries ----
     library(dplyr)
@@ -186,7 +186,8 @@ df3_An03_02_AgeGrp_Summ_ByTrt <- siera::ars_stamp(
       'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose')),
     siera::ars_grouping('AnlsGrouping_03_AgeGp', groups = c(
       'AnlsGrouping_03_AgeGp_1' = '<65',
-      'AnlsGrouping_03_AgeGp_2' = '65-80 | >80'))
+      'AnlsGrouping_03_AgeGp_2' = '65-80',
+      'AnlsGrouping_03_AgeGp_2' = '>80'))
   )
 )
 

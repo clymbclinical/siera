@@ -23,6 +23,8 @@
     AG_var2           = "AESOC",
     AG_var3           = "GRP3",
     AG_var2_group_values = "'SEVERE', 'MODERATE', 'MILD'",
+    AG_var2_group_conditions = "AESEV == 'SEVERE' ~ 'SEVERE', AESEV %in% c('MODERATE', 'MILD') ~ 'MODERATE'",
+    AG_var2_group_levels = "'SEVERE', 'MODERATE'",
     DEN_analysisid    = "An_99",
     AG_denom_var1     = "TRT01A",
     AG_max_dataDriven = "FALSE",

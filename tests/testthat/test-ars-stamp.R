@@ -327,6 +327,46 @@ test_that(".generate_stamp_code() covers data-driven, group-less and quoted valu
   expect_match(code, "siera::ars_grouping('AG_NONE')", fixed = TRUE)
 })
 
+test_that(".generate_stamp_code() splits an xlsx IN cell like the expanded style", {
+  # The xlsx reader keeps a multi-value IN condition in one delimited cell;
+  # both styles must stamp every one of its values with the group id (#187).
+  groupings_tbl <- tibble::tibble(
+    id = "AG_X", group_id = c("AG_X_01", "AG_X_02"),
+    group_condition_comparator = c("IN", "EQ"),
+    # Spaces around the pipe, as in the bundled example's "65-80 | >80".
+    group_condition_value = c("DRUG INTERRUPTED | DOSE REDUCED", "OTHER")
+  )
+  code <- .generate_stamp_code(
+    analysis_id = "An_1", method_id = "Mth_1", output_id = "Out_1",
+    groupids = "AG_X", n_group_cols = 1L, AG_dataDriven = "FALSE",
+    analysis_groupings = groupings_tbl, file_ext = "xlsx"
+  )
+  expect_match(code, "'AG_X_01' = 'DRUG INTERRUPTED'", fixed = TRUE)
+  expect_match(code, "'AG_X_01' = 'DOSE REDUCED'", fixed = TRUE)
+  expect_match(code, "'AG_X_02' = 'OTHER'", fixed = TRUE)
+
+  ard <- tibble::tibble(
+    group1_level = list("DOSE REDUCED", "OTHER", "DRUG WITHDRAWN"),
+    stat_name = "n",
+    stat = list(1, 2, 3)
+  )
+  env <- new.env(parent = asNamespace("siera"))
+  env$df3_An_1 <- ard
+  eval(parse(text = code), envir = env)
+  expect_identical(env$df3_An_1$group1_groupId, c("AG_X_01", "AG_X_02", NA))
+
+  # The expanded style resolves the same group ids.
+  expanded <- .generate_groupid_code(
+    analysis_id = "An_1", groupids = "AG_X", n_group_cols = 1L,
+    AG_dataDriven = "FALSE", analysis_groupings = groupings_tbl,
+    population_based = TRUE, file_ext = "xlsx"
+  )
+  env2 <- new.env(parent = baseenv())
+  env2$df3_An_1 <- dplyr::mutate(ard, group1_level = unlist(group1_level))
+  eval(parse(text = expanded), envir = env2)
+  expect_identical(env2$df3_An_1$group1_groupId, c("AG_X_01", "AG_X_02", NA))
+})
+
 # Wrapped method section --------------------------------------------------
 
 .wrapped_method_fixture <- function(template_code) {
