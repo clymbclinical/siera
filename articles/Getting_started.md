@@ -32,20 +32,20 @@ toward:
 # Run a ready-made example script shipped with siera; the result is the object `ARD`
 source(ARD_script_example("ARD_Out14-1-1.R"))
 head(ARD)
-#>   group1 group1_level group2 group2_level variable variable_level stat_name
-#> 1   <NA>           NA   <NA>           NA   TRT01A        Placebo         n
-#> 2   <NA>           NA   <NA>           NA   TRT01A      Xanomeli…         n
-#> 3   <NA>           NA   <NA>           NA   TRT01A      Xanomeli…         n
-#> 4 TRT01A      Placebo   <NA>           NA      AGE             NA         N
-#> 5 TRT01A      Placebo   <NA>           NA      AGE             NA      mean
-#> 6 TRT01A      Placebo   <NA>           NA      AGE             NA        sd
-#>   stat_label   stat
-#> 1          n     86
-#> 2          n     84
-#> 3          n     84
-#> 4          N     86
-#> 5       Mean 75.209
-#> 6         SD   8.59
+#> # An ARD data frame: 6 × 23
+#>   variable variable_level       stat_name   stat operationid AnalysisId MethodId
+#>   <chr>    <chr>                <chr>     <name> <chr>       <chr>      <chr>   
+#> 1 TRT01A   Placebo              n          86    Mth01_CatV… An01_05_S… Mth01_C…
+#> 2 TRT01A   Xanomeline High Dose n          84    Mth01_CatV… An01_05_S… Mth01_C…
+#> 3 TRT01A   Xanomeline Low Dose  n          84    Mth01_CatV… An01_05_S… Mth01_C…
+#> 4 AGE      NA                   N          86    Mth02_Cont… An03_01_A… Mth02_C…
+#> 5 AGE      NA                   mean       75.2  Mth02_Cont… An03_01_A… Mth02_C…
+#> 6 AGE      NA                   sd          8.59 Mth02_Cont… An03_01_A… Mth02_C…
+#> # ℹ 16 more variables: context <chr>, stat_label <chr>, warning <named list>,
+#> #   error <named list>, OutputId <chr>, group1 <chr>, group1_level <chr>,
+#> #   group1_groupingId <chr>, group1_groupId <chr>, group2 <chr>,
+#> #   group2_level <chr>, group2_groupingId <chr>, group2_groupId <chr>,
+#> #   res <dbl>, pattern <chr>, disp <chr>
 ```
 
 Each row carries the statistic together with metadata (such as

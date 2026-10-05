@@ -214,12 +214,12 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   [`requireNamespace()`](https://rdrr.io/r/base/ns-load.html) in the
   emitted code — absent package → message, not error). Two runtime
   gotchas it handles: (a) the ARD carries **four
-  [cards](https://github.com/insightsengineering/cards) list-columns**
-  (`stat`, `fmt_fun`, `warning`, `error`) that must be flattened to
-  atomic — `stat`→numeric, the rest→character; (b) variable **labels**
-  use a built-in dictionary for siera +
-  [cards](https://github.com/insightsengineering/cards) vocabulary plus
-  a `group[n]_(groupingId|groupId|groupValue|level)` regex, falling back
+  [cards](https://github.com/pharmaverse/cards) list-columns** (`stat`,
+  `fmt_fun`, `warning`, `error`) that must be flattened to atomic —
+  `stat`→numeric, the rest→character; (b) variable **labels** use a
+  built-in dictionary for siera +
+  [cards](https://github.com/pharmaverse/cards) vocabulary plus a
+  `group[n]_(groupingId|groupId|groupValue|level)` regex, falling back
   to the raw name for data-driven ADaM columns
   (incl. `res`/`pattern`/`disp` from the formatted-result block, which
   runs *before* this one so `fmt_fun`/`fmt_fn` never reach the JSON).
@@ -241,7 +241,7 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   after the `.`; the X-run is replaced preserving prefix/suffix
   (`(N=XX)`, `( XX.X)`); a no-X pattern like `(N=)` gets the number
   inserted before the trailing `)`;
-  [cards](https://github.com/insightsengineering/cards) proportions
+  [cards](https://github.com/pharmaverse/cards) proportions
   (`stat_name == "p"`, 0–1 scale) are ×100 before formatting (p-values
   `"p.value"` are not); `res` itself stays the raw stat. **Rounding =
   half-away-from-zero (SAS `ROUND()` convention), NOT R’s default
@@ -424,13 +424,13 @@ runtime.
 | Package | Role |
 |----|----|
 | [admiral](https://pharmaverse.github.io/admiral/) | ADaM dataset creation (upstream of siera) |
-| [cards](https://github.com/insightsengineering/cards) | ARD computation (`ard_tabulate()`, `ard_summary()`, etc.) |
+| [cards](https://github.com/pharmaverse/cards) | ARD computation (`ard_tabulate()`, `ard_summary()`, etc.) |
 | [cardx](https://github.com/insightsengineering/cardx) | Extended ARD statistics (models, tests) |
 | [gtsummary](https://github.com/ddsjoberg/gtsummary) | TFL rendering from ARDs |
 | [admiraldev](https://pharmaverse.github.io/admiraldev/) | Development utilities for pharmaverse packages |
 
 siera sits between ARS metadata and
-[cards](https://github.com/insightsengineering/cards) — it generates the
+[cards](https://github.com/pharmaverse/cards) — it generates the
 `cards`-based R code a statistician would otherwise write by hand.
 
 ## GitHub API access
@@ -796,6 +796,54 @@ after the xlsx templates are updated, then
     reference is unusable as oracle on values (rounds before
     differencing, like An_55) AND on shape; siera omits only
     all-zero/corrupted filler rows.
+  - **\#187 — categorical n(%) per PRE-DEFINED group condition (resolved
+    via new method `Mth_03p` / library
+    `11_categorical_summary_per_predefined_group`; two new
+    valueSources).** `categorical_summary` (and the eTFL `Mth_03a`)
+    tabulates the raw data values of the analysis variable and then
+    stamps group ids by matching them, which on a `dataDriven: false`
+    inner grouping (fda-ae-t06 An_47_1, `AnlsGrouping_24_Aeacn`) (a)
+    emits rows with NA group ids for values outside the defined groups
+    (`DRUG WITHDRAWN`, the `NOT APPLICALE` typo), (b) drops
+    defined-but-absent groups instead of zero-filling them
+    (`DOSE DELAY`, `OTHER`), and (c) cannot represent a multi-value `IN`
+    group at all. The new method aggregates **per group condition**
+    instead: **`AG_var2_group_conditions`** resolves to a
+    [`dplyr::case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
+    body mapping data values onto the defined groups (built by reusing
+    [`.generate_data_subset_condition()`](https://clymbclinical.github.io/siera/reference/dot-generate_data_subset_condition.md),
+    so comparator/xlsx handling is shared) and
+    **`AG_var2_group_levels`** to the same levels as factor levels —
+    handing those to
+    `cards::ard_tabulate(by = arm, variables = <cat>, denominator = <count>)`
+    makes cards zero-fill **both** dimensions (verified: an entirely
+    absent `by` level is zero-filled too, as long as BOTH data and
+    denominator carry the factor). A group’s level is its **first
+    condition value**, which keeps it a real data value so
+    `.generate_groupid_code()`’s case_when maps it back to the right
+    `group[n]_groupId`; only `EQ`/`IN` define a group as a value set
+    that way, so other comparators are skipped with a warning (same
+    posture as \#171). Both sources come from one resolver
+    `.ag_group_conditions()` (R/readARS.R) via two lazy wrappers; its
+    empty fallback is `conditions = "FALSE ~ NA_character_"` (a
+    case_when arm that still **parses** where the template embeds it) +
+    `levels = ""`, and the template branches on `length(levels) > 0`.
+    **`.n_group_cols_from_template()` gained a branch**:
+    `AG_var2_group_conditions` → `num_grp` (the template puts the inner
+    grouping in `variables=` like `by_vars` but renames `variable_level`
+    → `group2_level` itself, so it does produce a full set of group
+    columns) — this is why An_47_1 now carries
+    `group2_groupingId`/`group2_groupId`, which `Mth_03a` did not.
+    **Gotcha:** cards returns the levels as list-columns of **factors**,
+    and `as.character(list(factor))` yields the integer CODE — the
+    template must flatten `_level` columns to labels itself (siera’s own
+    `code_listcoerce` runs AFTER `code_groupid`, too late). Values
+    asserted against an independent distinct-subject recomputation
+    (`.etfl_predefined_npct_truth()`/`.cmp_predefined_npct()`): 45/36,
+    46/38, 23/23 over denominators 84/84/86 — the t06 reference matches
+    on row set (24 rows) but its counts are the same
+    first-record-per-subject artefact as \#171 (26/15/15, 18/19/11), so
+    shape is asserted against the reference and values are not.
   - **\#173 — method-template library formalised as plain text
     (supersedes the xlsx as source of truth).** The owner xlsx workbooks
     (`inst/extdata/R_siera_codes.xlsx`, `cards_constructs.xlsx`) are

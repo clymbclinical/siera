@@ -104,20 +104,20 @@ what we are building toward:</p>
 <code class="sourceCode R"><span><span class="co"># Run a ready-made example script shipped with siera; the result is the object `ARD`</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="../reference/ARD_script_example.html">ARD_script_example</a></span><span class="op">(</span><span class="st">"ARD_Out14-1-1.R"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ARD</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   group1 group1_level group2 group2_level variable variable_level stat_name</span></span>
-<span><span class="co">#&gt; 1   &lt;NA&gt;           NA   &lt;NA&gt;           NA   TRT01A        Placebo         n</span></span>
-<span><span class="co">#&gt; 2   &lt;NA&gt;           NA   &lt;NA&gt;           NA   TRT01A      Xanomeli…         n</span></span>
-<span><span class="co">#&gt; 3   &lt;NA&gt;           NA   &lt;NA&gt;           NA   TRT01A      Xanomeli…         n</span></span>
-<span><span class="co">#&gt; 4 TRT01A      Placebo   &lt;NA&gt;           NA      AGE             NA         N</span></span>
-<span><span class="co">#&gt; 5 TRT01A      Placebo   &lt;NA&gt;           NA      AGE             NA      mean</span></span>
-<span><span class="co">#&gt; 6 TRT01A      Placebo   &lt;NA&gt;           NA      AGE             NA        sd</span></span>
-<span><span class="co">#&gt;   stat_label   stat</span></span>
-<span><span class="co">#&gt; 1          n     86</span></span>
-<span><span class="co">#&gt; 2          n     84</span></span>
-<span><span class="co">#&gt; 3          n     84</span></span>
-<span><span class="co">#&gt; 4          N     86</span></span>
-<span><span class="co">#&gt; 5       Mean 75.209</span></span>
-<span><span class="co">#&gt; 6         SD   8.59</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># An ARD data frame: 6 × 23</span></span></span>
+<span><span class="co">#&gt;   variable variable_level       stat_name   stat operationid AnalysisId MethodId</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;name&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> TRT01A   Placebo              n          86    Mth01_CatV… An01_05_S… Mth01_C…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> TRT01A   Xanomeline High Dose n          84    Mth01_CatV… An01_05_S… Mth01_C…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> TRT01A   Xanomeline Low Dose  n          84    Mth01_CatV… An01_05_S… Mth01_C…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> AGE      <span style="color: #BB0000;">NA</span>                   N          86    Mth02_Cont… An03_01_A… Mth02_C…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> AGE      <span style="color: #BB0000;">NA</span>                   mean       75.2  Mth02_Cont… An03_01_A… Mth02_C…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> AGE      <span style="color: #BB0000;">NA</span>                   sd          8.59 Mth02_Cont… An03_01_A… Mth02_C…</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 16 more variables: context &lt;chr&gt;, stat_label &lt;chr&gt;, warning &lt;named list&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   error &lt;named list&gt;, OutputId &lt;chr&gt;, group1 &lt;chr&gt;, group1_level &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   group1_groupingId &lt;chr&gt;, group1_groupId &lt;chr&gt;, group2 &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   group2_level &lt;chr&gt;, group2_groupingId &lt;chr&gt;, group2_groupId &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   res &lt;dbl&gt;, pattern &lt;chr&gt;, disp &lt;chr&gt;</span></span></span></code></pre></div>
 <p>Each row carries the statistic together with metadata (such as
 <code>AnalysisId</code> and the grouping columns) that traces it back to
 the ARS definition. The <a href="concepts.html">Concepts and

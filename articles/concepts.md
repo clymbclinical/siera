@@ -133,3 +133,40 @@ pre-defined, so its rows carry `group1_groupId`; a grouping such as
 single ARD can contain both. The [ARD program
 structure](https://clymbclinical.github.io/siera/articles/ARD_script_structure.md)
 vignette shows where these columns are stamped on in the generated code.
+
+### Which rows should exist? Pre-defined vs. data-driven categories
+
+The two kinds of grouping also answer a question every table shell
+raises: *which rows belong in the output?*
+
+For a **data-driven** grouping the data *is* the row list. If no subject
+reported a given preferred term, that term simply has no row - there was
+nothing to discover.
+
+For a **pre-defined** grouping the metadata is the row list, and it is
+fixed before any data is seen. Your shell says “Action taken:
+interrupted / reduced / delayed / other”, so the table needs all four
+rows for every treatment arm, whether or not the study produced any of
+them - a category with no subjects is the clinically meaningful result
+`0 (0.0)`, not a missing line. Equally, a value that appears in the data
+but matches none of the defined groups (a stray `DRUG WITHDRAWN`, or a
+mis-spelled term) was never asked for, and does not belong in the output
+at all.
+
+*siera* supports both readings, and the choice lives in the method
+template rather than in
+[`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md).
+A method built on a pre-defined grouping
+(`categorical_summary_per_predefined_group` in the bundled
+[method-template
+library](https://clymbclinical.github.io/siera/articles/using-cards.md),
+and its risk-difference counterpart
+`risk_difference_per_predefined_group`) aggregates **per group
+condition**: it reports every group the metadata defines, zero-filled
+where the data is silent, and excludes values that satisfy no group
+condition. Because a group is defined by a condition rather than by a
+single value, a group covering several values at once (an `IN`
+condition, e.g. “Other” spanning three coded terms) is reported as one
+row. The data-driven methods (`categorical_summary`) keep tabulating
+what the data contains. Pick the variant that matches your grouping’s
+`dataDriven` flag.

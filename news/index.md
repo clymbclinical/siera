@@ -84,6 +84,28 @@ CRAN release: 2026-06-17
   only the first adverse-event record per subject rather than from all
   qualifying events, so they are not used as the value oracle
   ([\#171](https://github.com/clymbclinical/siera/issues/171)).
+- Added categorical `n (%)` summaries that aggregate per **pre-defined**
+  group condition. A new method template,
+  `categorical_summary_per_predefined_group`, reports the groups an ARS
+  `analysisGrouping` declares rather than the values the data happens to
+  contain: every defined group is emitted for every treatment arm - a
+  group no subject reaches is reported as `0 (0.0)` instead of being
+  dropped - and data values satisfying no defined group are excluded
+  instead of appearing as rows with missing group identifiers. Because
+  it matches on the group’s *condition*, a group defined by a
+  multi-value `IN` condition is now one row rather than being
+  unrepresentable. It is driven by two new valueSources,
+  `AG_var2_group_conditions` and `AG_var2_group_levels` (`EQ` and `IN`
+  conditions; other comparators are skipped with a warning). Use it
+  where the inner grouping is `dataDriven: false`; `categorical_summary`
+  remains correct for data-driven groupings, where the data is the
+  category list. Validated on the eTFL “Overview of Adverse Events”
+  table (subjects by treatment and action taken) against an independent
+  distinct-subject recomputation, matching the published reference’s row
+  set exactly
+  ([\#187](https://github.com/clymbclinical/siera/issues/187), and the
+  pre-defined half of
+  [\#100](https://github.com/clymbclinical/siera/issues/100)).
 - Added per-(category x category) risk differences for analyses with two
   data-driven inner groupings, such as one risk difference per system
   organ class and preferred term combination. A new method template,

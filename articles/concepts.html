@@ -258,6 +258,39 @@ such as “cause of death” is typically data-driven, so its rows carry
 <code>group1_groupValue</code> with whatever categories appeared in the
 data. A single ARD can contain both. The <a href="ARD_script_structure.html">ARD program structure</a> vignette
 shows where these columns are stamped on in the generated code.</p>
+<div class="section level3">
+<h3 id="which-rows-should-exist-pre-defined-vs--data-driven-categories">Which rows should exist? Pre-defined vs. data-driven categories<a class="anchor" aria-label="anchor" href="#which-rows-should-exist-pre-defined-vs--data-driven-categories"></a>
+</h3>
+<p>The two kinds of grouping also answer a question every table shell
+raises: <em>which rows belong in the output?</em></p>
+<p>For a <strong>data-driven</strong> grouping the data <em>is</em> the
+row list. If no subject reported a given preferred term, that term
+simply has no row - there was nothing to discover.</p>
+<p>For a <strong>pre-defined</strong> grouping the metadata is the row
+list, and it is fixed before any data is seen. Your shell says “Action
+taken: interrupted / reduced / delayed / other”, so the table needs all
+four rows for every treatment arm, whether or not the study produced any
+of them - a category with no subjects is the clinically meaningful
+result <code>0 (0.0)</code>, not a missing line. Equally, a value that
+appears in the data but matches none of the defined groups (a stray
+<code>DRUG WITHDRAWN</code>, or a mis-spelled term) was never asked for,
+and does not belong in the output at all.</p>
+<p><em>siera</em> supports both readings, and the choice lives in the
+method template rather than in <code><a href="../reference/readARS.html">readARS()</a></code>. A method built on
+a pre-defined grouping
+(<code>categorical_summary_per_predefined_group</code> in the bundled <a href="using-cards.html">method-template library</a>, and its
+risk-difference counterpart
+<code>risk_difference_per_predefined_group</code>) aggregates
+<strong>per group condition</strong>: it reports every group the
+metadata defines, zero-filled where the data is silent, and excludes
+values that satisfy no group condition. Because a group is defined by a
+condition rather than by a single value, a group covering several values
+at once (an <code>IN</code> condition, e.g. “Other” spanning three coded
+terms) is reported as one row. The data-driven methods
+(<code>categorical_summary</code>) keep tabulating what the data
+contains. Pick the variant that matches your grouping’s
+<code>dataDriven</code> flag.</p>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
