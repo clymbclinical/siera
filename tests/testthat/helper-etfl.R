@@ -25,7 +25,11 @@
 # Run the full siera pipeline for one table and return the combined ARD. -------
 # adsl_transform: optional function(adsl) -> adsl applied before ADSL.csv is
 #   written (fda-ds-t04 uses it to derive DISCONFL, which is absent from ADSL).
-.run_etfl_pipeline <- function(table, tmp_dir, adsl_transform = NULL) {
+# code_style: passed to readARS(); "wrapped" (default) is what users get, so the
+#   whole regression suite validates it. "expanded" is used by the
+#   wrapped-vs-expanded parity tests (test-code-style-parity.R).
+.run_etfl_pipeline <- function(table, tmp_dir, adsl_transform = NULL,
+                               code_style = "wrapped") {
   # The generated script reads XPT (haven), writes/reads CSV (readr) and loads
   # cards/cardx/broom/parameters at the top, so all must be present to source it.
   for (pkg in c("haven", "readr", "cards", "cardx", "broom", "parameters")) {
@@ -48,7 +52,8 @@
   script_dir <- file.path(tmp_dir, "scripts")
   dir.create(script_dir)
   suppressWarnings(
-    readARS(ARS_path = paths$metadata, output_path = script_dir, adam_path = adam_dir)
+    readARS(ARS_path = paths$metadata, output_path = script_dir, adam_path = adam_dir,
+            code_style = code_style)
   )
 
   scripts <- list.files(script_dir, pattern = "^ARD_.*\\.R$", full.names = TRUE)
