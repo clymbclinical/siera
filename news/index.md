@@ -123,6 +123,19 @@ CRAN release: 2026-06-17
   ([\#187](https://github.com/clymbclinical/siera/issues/187), and the
   pre-defined half of
   [\#100](https://github.com/clymbclinical/siera/issues/100)).
+- Added a chi-square test over **pre-defined** group conditions. A new
+  method template, `chisq_per_predefined_group`, compares treatment arms
+  over the groups an ARS `analysisGrouping` defines rather than over the
+  raw values of the variable, so the p-value belongs to the same
+  categories the `n (%)` rows of
+  `categorical_summary_per_predefined_group` report. A group defined by
+  a multi-value `IN` condition is one category - e.g. age `< 65` vs
+  `>= 65` (AGEGR1 `IN ("65-80", ">80")`) gives p = 0.4239, where testing
+  the three AGEGR1 values gives 0.1439 - and values satisfying no
+  defined group are excluded. It reuses the `AG_var2_group_conditions`
+  valueSource; for groupings whose groups are one-to-one with data
+  values it equals `chisq`
+  ([\#215](https://github.com/clymbclinical/siera/issues/215)).
 - Added per-(category x category) risk differences for analyses with two
   data-driven inner groupings, such as one risk difference per system
   organ class and preferred term combination. A new method template,

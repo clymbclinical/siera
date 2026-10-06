@@ -948,6 +948,25 @@ after the xlsx templates are updated, then
     on row set (24 rows) but its counts are the same
     first-record-per-subject artefact as \#171 (26/15/15, 18/19/11), so
     shape is asserted against the reference and values are not.
+  - **\#215 — chi-square per PRE-DEFINED group (library
+    `12_chisq_per_predefined_group`, id `chisq_per_predefined_group`; no
+    R change).** `07_chisq` tests the raw values of the analysis
+    variable, which on a pre-defined grouping with merged values
+    (Common_Safety_Displays `AnlsGrouping_03_AgeGp`: `<65` /
+    `IN (65-80, >80)`) gives the wrong p (0.1439 vs 0.4239). The new
+    template maps values onto the defined groups with
+    `case_when(<AG_var2_group_conditions>)` (shared with \#187’s method
+    11), drops values in no group, then
+    `cardx::ard_stats_chisq_test(by = AG_var1, variables = ars_group)`.
+    Empty defined groups simply drop out (chi-square over an all-zero
+    column is undefined). `n_group_cols` already maps
+    `AG_var2_group_conditions` to `num_grp`, which is 0 for the usual
+    `resultsByGroup: false` test analyses, so no group stamping. Tests
+    in `test-chisq-predefined-group.R` render the template the way
+    readARS() substitutes it and run it on ADSL against
+    [`stats::chisq.test()`](https://rdrr.io/r/stats/chisq.test.html)
+    (helpers `.render_library_template()`/`.run_template()` — reusable
+    for other library-method runtime tests).
   - **\#173 — method-template library formalised as plain text
     (supersedes the xlsx as source of truth).** The owner xlsx workbooks
     (`inst/extdata/R_siera_codes.xlsx`, `cards_constructs.xlsx`) are

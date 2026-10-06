@@ -288,17 +288,21 @@ and does not belong in the output at all.</p>
 <p><em>siera</em> supports both readings, and the choice lives in the
 method template rather than in <code><a href="../reference/readARS.html">readARS()</a></code>. A method built on
 a pre-defined grouping
-(<code>categorical_summary_per_predefined_group</code> in the bundled <a href="using-cards.html">method-template library</a>, and its
-risk-difference counterpart
-<code>risk_difference_per_predefined_group</code>) aggregates
-<strong>per group condition</strong>: it reports every group the
-metadata defines, zero-filled where the data is silent, and excludes
-values that satisfy no group condition. Because a group is defined by a
-condition rather than by a single value, a group covering several values
-at once (an <code>IN</code> condition, e.g. “Other” spanning three coded
-terms) is reported as one row. The data-driven methods
-(<code>categorical_summary</code>) keep tabulating what the data
-contains. Pick the variant that matches your grouping’s
+(<code>categorical_summary_per_predefined_group</code> in the bundled <a href="using-cards.html">method-template library</a>, with its
+risk-difference and chi-square counterparts
+<code>risk_difference_per_predefined_group</code> and
+<code>chisq_per_predefined_group</code>) aggregates <strong>per group
+condition</strong>: it reports every group the metadata defines,
+zero-filled where the data is silent, and excludes values that satisfy
+no group condition. Because a group is defined by a condition rather
+than by a single value, a group covering several values at once (an
+<code>IN</code> condition, e.g. “Other” spanning three coded terms) is
+reported as one row. The data-driven methods
+(<code>categorical_summary</code>, <code>chisq</code>) keep tabulating
+what the data contains, so use the pre-defined variant for the p-value
+too: testing the raw values of a variable whose groups merge several
+values gives a different p-value from the one that belongs to the
+reported rows. Pick the variant that matches your grouping’s
 <code>dataDriven</code> flag.</p>
 </div>
 </div>

@@ -169,13 +169,16 @@ A method built on a pre-defined grouping
 (`categorical_summary_per_predefined_group` in the bundled
 [method-template
 library](https://clymbclinical.github.io/siera/articles/using-cards.md),
-and its risk-difference counterpart
-`risk_difference_per_predefined_group`) aggregates **per group
-condition**: it reports every group the metadata defines, zero-filled
-where the data is silent, and excludes values that satisfy no group
-condition. Because a group is defined by a condition rather than by a
-single value, a group covering several values at once (an `IN`
-condition, e.g. “Other” spanning three coded terms) is reported as one
-row. The data-driven methods (`categorical_summary`) keep tabulating
-what the data contains. Pick the variant that matches your grouping’s
+with its risk-difference and chi-square counterparts
+`risk_difference_per_predefined_group` and `chisq_per_predefined_group`)
+aggregates **per group condition**: it reports every group the metadata
+defines, zero-filled where the data is silent, and excludes values that
+satisfy no group condition. Because a group is defined by a condition
+rather than by a single value, a group covering several values at once
+(an `IN` condition, e.g. “Other” spanning three coded terms) is reported
+as one row. The data-driven methods (`categorical_summary`, `chisq`)
+keep tabulating what the data contains, so use the pre-defined variant
+for the p-value too: testing the raw values of a variable whose groups
+merge several values gives a different p-value from the one that belongs
+to the reported rows. Pick the variant that matches your grouping’s
 `dataDriven` flag.
