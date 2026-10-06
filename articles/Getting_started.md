@@ -187,7 +187,10 @@ The `ARD` object is the result of appending all analysis-level ARD
 be used (and re-used) downstream for various applications. See [this
 vignette](https://clymbclinical.github.io/siera/articles/apply-ARD.md)
 for next step in utilising the ARD - like creating Tables, or using it
-for QC.
+for QC. If you need to hand the ARD to someone outside R,
+`readARS(..., output_format = "datasetjson")` makes each script also
+write its ARD as a CDISC Dataset-JSON file - see [Exporting ARDs as
+Dataset-JSON](https://clymbclinical.github.io/siera/articles/datasetjson-export.md).
 
 ### A note on example code used in AnalysisMethodCodeTemplate: using `cards` package
 

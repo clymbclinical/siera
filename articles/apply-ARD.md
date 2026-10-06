@@ -20,6 +20,11 @@ examples of ARD use cases are:
 conventions](https://clymbclinical.github.io/siera/articles/concepts.md)
 vignette discusses *why* an ARD makes these use cases easier.)
 
+If any of these uses happen outside R (a SAS QC programmer, a results
+repository), you can have *siera* write each ARD as a CDISC Dataset-JSON
+file as well - see [Exporting ARDs as
+Dataset-JSON](https://clymbclinical.github.io/siera/articles/datasetjson-export.md).
+
 For rendering, each ARD row already carries a display-ready result: the
 `disp` column holds the raw statistic (`res`) formatted according to the
 ARS `resultPattern` for its operation (e.g. `(N=86)`, `75.2`,

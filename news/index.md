@@ -4,6 +4,23 @@
 
 CRAN release: 2026-06-17
 
+- Added CDISC Dataset-JSON (v1.1) export of generated ARDs.
+  `readARS(..., output_format = "datasetjson")` appends a section to
+  each generated `ARD_<OutputId>.R` script that, when the script runs,
+  writes the ARD to `ARD_<OutputId>.json` beside the script. `cards`
+  list-columns are flattened (`stat` to numeric, `warning`/`error` to
+  text) and each column gets a variable label from a built-in dictionary
+  of siera and `cards` columns, falling back to the column name. The
+  optional `datasetjson` package must be installed where the script
+  runs; without it the export is skipped with a message
+  ([\#160](https://github.com/clymbclinical/siera/issues/160)). A new
+  `column_labels` argument lets you supply your own labels as a named
+  character vector, e.g. `c(TRT01A = "Actual Treatment")`; these take
+  precedence over the built-in labels, and a name that matches no ARD
+  column triggers a warning when the script runs
+  ([\#165](https://github.com/clymbclinical/siera/issues/165)). A new
+  vignette, “Exporting ARDs as Dataset-JSON”, walks through the feature
+  ([\#164](https://github.com/clymbclinical/siera/issues/164)).
 - Added formatted results to generated ARDs. Each ARD row now carries
   `res` (the raw statistic flattened to numeric), `pattern` (the ARS
   `resultPattern` for the row’s operation) and `disp` (the printable,

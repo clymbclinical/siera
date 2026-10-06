@@ -49,6 +49,7 @@
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Next steps</h6></li>
     <li><a class="dropdown-item" href="../articles/apply-ARD.html">What do I do with my ARD?</a></li>
+    <li><a class="dropdown-item" href="../articles/datasetjson-export.html">Exporting ARDs as Dataset-JSON</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -95,6 +96,9 @@ examples of ARD use cases are:</p>
 </ul>
 <p>(The <a href="concepts.html">Concepts and conventions</a> vignette
 discusses <em>why</em> an ARD makes these use cases easier.)</p>
+<p>If any of these uses happen outside R (a SAS QC programmer, a results
+repository), you can have <em>siera</em> write each ARD as a CDISC
+Dataset-JSON file as well - see <a href="datasetjson-export.html">Exporting ARDs as Dataset-JSON</a>.</p>
 <p>For rendering, each ARD row already carries a display-ready result:
 the <code>disp</code> column holds the raw statistic (<code>res</code>)
 formatted according to the ARS <code>resultPattern</code> for its

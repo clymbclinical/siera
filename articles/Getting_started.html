@@ -49,6 +49,7 @@
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Next steps</h6></li>
     <li><a class="dropdown-item" href="../articles/apply-ARD.html">What do I do with my ARD?</a></li>
+    <li><a class="dropdown-item" href="../articles/datasetjson-export.html">Exporting ARDs as Dataset-JSON</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -253,7 +254,10 @@ like this:</p>
 analysis-level ARD (created from the <code>cards</code> and
 <code>cardx</code> functions) for the output. It can be used (and
 re-used) downstream for various applications. See <a href="apply-ARD.html">this vignette</a> for next step in utilising the
-ARD - like creating Tables, or using it for QC.</p>
+ARD - like creating Tables, or using it for QC. If you need to hand the
+ARD to someone outside R,
+<code>readARS(..., output_format = "datasetjson")</code> makes each
+script also write its ARD as a CDISC Dataset-JSON file - see <a href="datasetjson-export.html">Exporting ARDs as Dataset-JSON</a>.</p>
 </div>
 </div>
 <div class="section level3">

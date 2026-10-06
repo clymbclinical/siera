@@ -33,6 +33,7 @@ datasets"><meta property="og:image" content="https://clymbclinical.github.io/sie
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Next steps</h6></li>
     <li><a class="dropdown-item" href="../articles/apply-ARD.html">What do I do with my ARD?</a></li>
+    <li><a class="dropdown-item" href="../articles/datasetjson-export.html">Exporting ARDs as Dataset-JSON</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -64,7 +65,8 @@ datasets</p>
 <span>  adam_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  spec_output <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  output_format <span class="op">=</span> <span class="st">"none"</span>,</span>
-<span>  code_style <span class="op">=</span> <span class="st">"wrapped"</span></span>
+<span>  code_style <span class="op">=</span> <span class="st">"wrapped"</span>,</span>
+<span>  column_labels <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -120,6 +122,18 @@ data subset, method, identifier linking. `"expanded"` writes all of that
 linking out as plain <span class="pkg">dplyr</span> code in the script, so the generated
 script does not call siera functions for the linking step. Both styles
 produce an identical ARD.</p></dd>
+
+
+<dt id="arg-column-labels">column_labels<a class="anchor" aria-label="anchor" href="#arg-column-labels"></a></dt>
+<dd><p>Optional named character vector of Dataset-JSON
+variable labels, e.g.
+`c(AGEGR1 = "Pooled Age Group 1", TRT01A = "Actual Treatment")`. Names are
+ARD column names and values are the labels to write. Overrides take
+precedence over siera's built-in label dictionary, so they can also reword
+built-in labels. Because the ARD's columns are only known once the
+generated script runs, a name that matches no ARD column triggers a warning
+at script runtime (likely a typo) rather than an error. Only used when
+`output_format = "datasetjson"`; otherwise it is ignored with a warning.</p></dd>
 
 </dl></div>
     <div class="section level2">

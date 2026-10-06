@@ -21,3 +21,5 @@
 
 - [What do I do with my
   ARD?](https://clymbclinical.github.io/siera/articles/apply-ARD.md):
+- [Exporting ARDs as
+  Dataset-JSON](https://clymbclinical.github.io/siera/articles/datasetjson-export.md):

@@ -257,6 +257,22 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   to the raw name for data-driven ADaM columns
   (incl. `res`/`pattern`/`disp` from the formatted-result block, which
   runs *before* this one so `fmt_fun`/`fmt_fn` never reach the JSON).
+  **Label overrides (#165):**
+  `readARS(column_labels = c(<col> = "<label>"))` is shape-validated at
+  generation time by `.check_column_labels()` (named, non-empty, unique
+  names, no NA → `cli_abort`; supplied without
+  `output_format = "datasetjson"` → `cli_warn` + ignored), then
+  [`deparse()`](https://rdrr.io/r/base/deparse.html)’d into the block as
+  `.ds_label_overrides`, consulted *first* in `.ds_label_for()` (before
+  the dictionary, so built-in labels can be reworded). Whether a name is
+  a real ARD column can only be known at runtime, so the emitted block
+  issues a base [`warning()`](https://rdrr.io/r/base/warning.html) for
+  unmatched names and still writes the file. With no overrides nothing
+  extra is emitted, so the default block is byte-identical to pre-#165.
+  User guide: vignette `datasetjson-export.Rmd` (#164). **Gotcha:** in
+  this environment, Bash heredocs (`cat <<'EOF'`, even quoted) collapse
+  `\\` to `\`, so R test code with regex escapes like `"\\.R$"` gets
+  corrupted — write/edit such code with the Write/Edit tools.
 - **Formatted results (`res`/`pattern`/`disp`, issue \#167)** — every
   generated script ends with a self-contained “Format results per ARS
   resultPattern” block built by `.generate_formatted_result_code()` in
@@ -1050,11 +1066,16 @@ after the xlsx templates are updated, then
   about whether a change is user-visible, assume it is and update the
   docs. The `siera-docs-refresh` skill automates a full documentation
   pass.
-- Five vignettes, ordered via the number prefix in
+- Six vignettes, ordered via the number prefix in
   `%\VignetteIndexEntry{}`: 1. `Getting_started`, 2. `concepts`
   (Concepts and conventions), 3. `using-cards`, 4.
-  `ARD_script_structure`, 5. `apply-ARD`. Keep the prefixes in sync with
-  `_pkgdown.yml` if reordering.
+  `ARD_script_structure`, 5. `apply-ARD`, 6. `datasetjson-export`
+  (Exporting ARDs as Dataset-JSON; its chunks that source the generated
+  script are guarded with `eval = has_deps` =
+  [cards](https://github.com/pharmaverse/cards) +
+  [datasetjson](https://atorus-research.github.io/datasetjson/)
+  installed). Keep the prefixes in sync with `_pkgdown.yml` if
+  reordering.
 - `_pkgdown.yml` groups the Articles navbar (Get started / Concepts /
   Guides / Next steps). The reference index is intentionally left
   ungrouped.
