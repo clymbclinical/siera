@@ -163,7 +163,20 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   `tmp_AG` to expand IN/NOTIN multi-value conditions (one row per value,
   `group_id` repeated) and collapse single-value list elements to plain
   character. Use a quoted string in `cols=` to avoid R CMD check “no
-  visible binding” NOTE.
+  visible binding” NOTE. The same holds for
+  **`DataSubsets$condition_value`** (not unnested): any code that
+  touches it must work per element —
+  [`unlist()`](https://rdrr.io/r/base/unlist.html) it before string ops.
+  Calling
+  [`stringr::str_trim()`](https://stringr.tidyverse.org/reference/str_trim.html)
+  (or
+  [`as.character()`](https://rdrr.io/r/base/character.html)/[`paste()`](https://rdrr.io/r/base/paste.html))
+  on the list element deparses a multi-value IN/NOTIN into one
+  `'c("A", "B")'` string, so the filter silently matches nothing (#211:
+  the single-row branch of
+  [`.generate_data_subset_code()`](https://clymbclinical.github.io/siera/reference/dot-generate_data_subset_code.md);
+  live in eTFL t06 `Dss_67`/An_47, now asserted against an independent
+  recount — its reference is the first-record-per-subject defect).
 - **`_level` columns and `bind_rows` type conflicts** — cards returns
   `variable_level` as a list-of-NULLs for continuous analyses and as
   character for categorical ones. When combined with `bind_rows`, this

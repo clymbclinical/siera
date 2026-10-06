@@ -121,6 +121,15 @@ CRAN release: 2026-06-17
   [`stats::prop.test()`](https://rdrr.io/r/stats/prop.test.html)
   recomputation over every observed combination
   ([\#172](https://github.com/clymbclinical/siera/issues/172)).
+- Fixed data subsets whose single top-level condition is a multi-value
+  `IN` or `NOTIN` silently filtering on the wrong values when read from
+  JSON. The value list was collapsed into one string, so an `IN` subset
+  selected no records and a `NOTIN` subset excluded none (e.g. “AEs
+  leading to dose modification”,
+  `AEACN NOTIN ["NOT APPLICABLE", "DOSE NOT CHANGED"]`, counted every
+  subject with any AE). The JSON path now matches the XLSX path, which
+  was unaffected
+  ([\#211](https://github.com/clymbclinical/siera/issues/211)).
 - Fixed zero-event risk-difference analyses returning `NA` instead of
   `0`. Methods that compute over the full population (templates
   referencing `df_poptot`, e.g. risk differences) now bypass the
