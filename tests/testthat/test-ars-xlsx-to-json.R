@@ -436,11 +436,7 @@ test_that("the bundled Common Safety Displays workbook converts (#217)", {
   from_json <- .gen_scripts(jfile, adam)
   expect_identical(names(from_json), names(from_xlsx))
   for (f in names(from_xlsx)) {
-    # The xlsx reader leaves a blank on all but the last value of a
-    # "A | B" IN cell (#213, "'POSSIBLE ', 'PROBABLE'"); the converter splits
-    # these correctly. Normalise that so the comparison isolates conversion.
-    expect_identical(from_json[[f]], gsub(" ',", "',", from_xlsx[[f]]),
-                     info = f)
+    expect_identical(from_json[[f]], from_xlsx[[f]], info = f)
   }
 })
 
