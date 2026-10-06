@@ -198,7 +198,10 @@
   if (nrow(subsetrule) == 1) {
     variable <- subsetrule$condition_variable
     comparator <- subsetrule$condition_comparator
-    value <- stringr::str_trim(subsetrule$condition_value)
+    # The JSON reader yields condition_value as a list-column; trim the values
+    # inside it rather than coercing the list element itself, which would
+    # collapse a multi-value IN/NOTIN into one deparsed 'c("A", "B")' string.
+    value <- stringr::str_trim(unlist(subsetrule$condition_value))
 
     filter_expression <- .generate_data_subset_condition(
       variable,
