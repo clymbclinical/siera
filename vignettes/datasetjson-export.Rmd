@@ -1,0 +1,168 @@
+---
+title: "Exporting ARDs as Dataset-JSON"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{6. Exporting ARDs as Dataset-JSON}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+# The chunks that run a generated script and read the Dataset-JSON back need
+# the optional {cards} and {datasetjson} packages; skip them when either is
+# missing so the vignette still builds.
+has_deps <- requireNamespace("cards", quietly = TRUE) &&
+  requireNamespace("datasetjson", quietly = TRUE)
+```
+
+```{r setup}
+library(siera)
+```
+
+The ARD that a _siera_ script produces is an R data frame. That is perfect for working in R, but sooner or later you will want to hand your results to someone (or something) else: a QC programmer working in SAS, a results repository, a reviewer. This vignette shows how to have _siera_ write each ARD to a **CDISC Dataset-JSON** file as well, in a form that is ready to exchange.
+
+### What is Dataset-JSON, and why should you care?
+
+[Dataset-JSON](https://www.cdisc.org/standards/data-exchange/dataset-json) is CDISC's JSON-based format for exchanging tabular clinical data. A Dataset-JSON file carries the data rows **together with** the metadata that describes them: each column's name, label and data type, plus a name and label for the dataset itself.
+
+It matters because it is the industry's leading candidate to replace SAS version 5 transport (XPT) files. The FDA, together with CDISC and PHUSE, has piloted Dataset-JSON for regulatory submissions. Compared with XPT it has no 8-character variable name or 200-character value limits, it is an open, text-based format, and it is easy to read from R, SAS, Python or any other language.
+
+_siera_ writes **Dataset-JSON v1.1** files.
+
+### Turning it on
+
+Dataset-JSON export is controlled by one argument to `readARS()`: `output_format`. It defaults to `"none"` (generate the ARD scripts only). Set it to `"datasetjson"` and every generated `ARD_<OutputId>.R` script gets an extra section at the end that writes the ARD to a Dataset-JSON file when you run it.
+
+```{r generate}
+# ARS metadata and the folder of ADaM datasets shipped with siera
+ARS_path  <- ARS_example("exampleARS_4.json")
+adam_path <- dirname(ARS_example("ADSL.csv"))
+
+# a fresh folder for the generated script (and, later, the Dataset-JSON file)
+output_path <- file.path(tempdir(), "siera-datasetjson")
+dir.create(output_path, showWarnings = FALSE)
+
+# generate the ARD script for output Out_01, with Dataset-JSON export switched on
+readARS(
+  ARS_path,
+  output_path,
+  adam_path,
+  spec_output   = "Out_01",
+  output_format = "datasetjson"
+)
+
+list.files(output_path)
+```
+
+The value must be spelled out in full: `output_format = "dataset"` is an error rather than a guess.
+
+#### What the export section looks like
+
+The export runs when **you run the generated script**, not when `readARS()` runs. That is because _siera_ only writes the code: the ARD does not exist until the script has been run against your ADaM data, and its columns depend on what the data contains. So the export section looks at the finished `ARD` object and works out the column metadata from it. Here is how it starts:
+
+```{r peek}
+script <- readLines(file.path(output_path, "ARD_Out_01.R"))
+start  <- grep("Export ARD as CDISC Dataset-JSON", script)
+cat(script[start:(start + 6)], sep = "\n")
+```
+
+### You need the `datasetjson` package where the script runs
+
+The file is written with the [`datasetjson`](https://cran.r-project.org/package=datasetjson) package. _siera_ does not require it, so it must be installed in the R session that **runs** the generated script (which may be a different machine from the one that ran `readARS()`):
+
+```{r install, eval = FALSE}
+install.packages("datasetjson")
+```
+
+If `datasetjson` is not installed, the script still produces the `ARD` object as usual. It simply prints a message that the Dataset-JSON export was skipped, instead of stopping with an error.
+
+### Running the script and finding the file
+
+Run the generated script as you normally would. The Dataset-JSON file is written to the folder you gave `readARS()` as `output_path`, beside the script, and is named after the output: `ARD_<OutputId>.json`.
+
+```{r run, eval = has_deps, message = FALSE, warning = FALSE}
+source(file.path(output_path, "ARD_Out_01.R"))
+
+list.files(output_path)
+```
+
+### Reading it back
+
+Use `datasetjson::read_dataset_json()` to read the file back into R. You get the same rows and columns as the `ARD` object:
+
+```{r read back, eval = has_deps}
+ard_json <- datasetjson::read_dataset_json(
+  file.path(output_path, "ARD_Out_01.json")
+)
+
+dim(ard_json)
+dim(ARD)
+
+head(ard_json[, c("AnalysisId", "operationid", "group1_level", "res", "disp")])
+```
+
+The column metadata travels with the data. Read the file with `jsonlite` and look at its `columns` section to see each column's name, label and data type:
+
+```{r column metadata, eval = has_deps}
+meta <- jsonlite::fromJSON(file.path(output_path, "ARD_Out_01.json"))$columns
+head(meta[, c("name", "label", "dataType")], 10)
+```
+
+### How columns are prepared
+
+Two things happen to the ARD on its way into Dataset-JSON. Neither changes the `ARD` object in your R session; only the exported copy is affected.
+
+**List-columns are flattened.** Every Dataset-JSON column must hold a single value per row. A few columns produced by `cards` are *list-columns*, where each cell can hold an R object. These are converted:
+
+- `stat` (the statistic) becomes a numeric column, written with data type `float`.
+- `warning` and `error` become text columns; when a cell holds more than one message, they are joined with `"; "`.
+
+**Variable labels are filled in.** Each column needs a label. _siera_ chooses one as follows:
+
+1. A label you supplied yourself through `column_labels` (see below).
+2. A built-in label for _siera_'s and `cards`' standard columns, e.g. `AnalysisId` is "Analysis Identifier", `stat` is "Statistic Value" and `disp` is "Formatted Result".
+3. A generated label for the grouping columns, e.g. `group1_groupingId` is "Group 1 Grouping Identifier" and `group2_level` is "Group 2 Value".
+4. Otherwise, the column name itself. This is what happens to columns named after ADaM variables, which _siera_ cannot know in advance.
+
+### Using your own labels
+
+Your submission conventions may call for different wording, or you may want proper labels for ADaM-named columns. Pass a named character vector to `column_labels`: the names are ARD column names and the values are the labels you want. Your labels take priority over the built-in ones, so you can reword those too.
+
+```{r own labels}
+readARS(
+  ARS_path,
+  output_path,
+  adam_path,
+  spec_output   = "Out_01",
+  output_format = "datasetjson",
+  column_labels = c(
+    group1_level = "Actual Treatment",
+    AnalysisId   = "Analysis ID"
+  )
+)
+```
+
+```{r own labels result, eval = has_deps, message = FALSE, warning = FALSE}
+source(file.path(output_path, "ARD_Out_01.R"))
+
+meta <- jsonlite::fromJSON(file.path(output_path, "ARD_Out_01.json"))$columns
+meta[meta$name %in% c("group1_level", "AnalysisId", "group1_groupingId"),
+     c("name", "label")]
+```
+
+A few things to know about `column_labels`:
+
+- `readARS()` checks the vector straight away. It must be a character vector where every element has a name, no name appears twice, and no label is missing; otherwise you get an error.
+- Whether each name is a real ARD column can only be checked once the script runs, because that is when the ARD's columns are known. If a name does not match any column (for example a typo such as `TRT01AA`), the script warns you and carries on writing the file. Look out for that warning.
+- `column_labels` only affects the Dataset-JSON export. If you supply it without `output_format = "datasetjson"`, `readARS()` warns you that it is being ignored.
+- It works the same whether your ARS metadata is a `.json` or an `.xlsx` file.
+
+### Where next?
+
+- The [ARD program structure](ARD_script_structure.html) vignette walks through the rest of a generated script, including the `res`, `pattern` and `disp` columns that come with every ARD.
+- [What do I do with my ARD?](apply-ARD.html) covers turning an ARD into tables or using it for QC.

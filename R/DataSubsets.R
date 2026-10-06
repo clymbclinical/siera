@@ -1,3 +1,19 @@
+#' Split an xlsx multi-value condition cell into its values
+#'
+#' The ARS xlsx representation keeps a multi-value `IN` / `NOTIN` condition in
+#' one cell, separated by `" | "` (the TFL Designer / `excel2ars.py`
+#' convention; some exports use commas). Each value is trimmed so the blanks
+#' around the separator never become part of a value: `"A | B"` must give
+#' `c("A", "B")`, not `c("A ", "B")`, which would silently match nothing (#213).
+#'
+#' @param x A scalar condition-value cell.
+#'
+#' @return Character vector of the individual values.
+#' @keywords internal
+.split_xlsx_values <- function(x) {
+  trimws(strsplit(gsub("\\|", ",", x), ",")[[1]])
+}
+
 #' Build a data subset condition
 #'
 #' Internal helper that translates ARS data-subset metadata into a filter
@@ -29,7 +45,7 @@
 
   if (identical(comparator, "IN")) {
     if (identical(file_ext, "xlsx")) {
-      value_vector <- strsplit(value_vector[1], ",\\s*")[[1]]
+      value_vector <- .split_xlsx_values(value_vector[1])
     }
 
     if (length(value_vector) == 0) {
@@ -58,7 +74,7 @@
 
   if (identical(comparator, "NOTIN")) {
     if (identical(file_ext, "xlsx")) {
-      value_vector <- strsplit(value_vector[1], ",\\s*")[[1]]
+      value_vector <- .split_xlsx_values(value_vector[1])
     }
 
     if (length(value_vector) == 0) {
