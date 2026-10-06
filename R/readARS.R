@@ -578,15 +578,14 @@ readARS <- function(ARS_path,
 
     # The xlsx reader keeps a multi-value IN condition in one delimited
     # cell (the JSON reader unnests it), so split it to one row per value
-    # or the level of an IN group would never match its group id. Trim, as
-    # cells are often written "65-80 | >80" and a kept trailing space would
-    # never equal the data value.
+    # or the level of an IN group would never match its group id
+    # (.split_xlsx_values() trims each value, #213).
     if (identical(file_ext, "xlsx") &&
         "group_condition_comparator" %in% names(grp_rows)) {
       is_in <- grp_rows$group_condition_comparator %in% "IN"
       split_vals <- lapply(seq_along(values), function(i) {
         if (is_in[i]) {
-          trimws(strsplit(gsub("\\|", ",", values[i]), ",")[[1]])
+          .split_xlsx_values(values[i])
         } else {
           values[i]
         }
@@ -866,7 +865,7 @@ readARS <- function(ARS_path,
     # so take the level from the same split .generate_data_subset_condition()
     # applies rather than from the raw cell.
     if (identical(comparator, "IN") && identical(file_ext, "xlsx")) {
-      values <- strsplit(gsub("\\|", ",", values[1]), ",\\s*")[[1]]
+      values <- .split_xlsx_values(values[1])
     }
 
     level <- gsub("'", "\\'", values[1], fixed = TRUE)
