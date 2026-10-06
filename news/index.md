@@ -130,6 +130,16 @@ CRAN release: 2026-06-17
   subject with any AE). The JSON path now matches the XLSX path, which
   was unaffected
   ([\#211](https://github.com/clymbclinical/siera/issues/211)).
+- Fixed multi-value `IN` and `NOTIN` conditions read from **xlsx** ARS
+  files silently dropping records. A cell such as `POSSIBLE | PROBABLE`
+  (the `" | "` separator used by TFL Designer and CDISC’s
+  `excel2ars.py`) was split into `"POSSIBLE "` (with a trailing blank)
+  and `"PROBABLE"`, so every value but the last matched nothing. This
+  affected data subsets and pre-defined group conditions: in the bundled
+  Common Safety Displays example, subjects with a drug-related
+  treatment-emergent adverse event were counted as 23/50/49 instead of
+  43/70/72. Each value is now trimmed; JSON input was not affected
+  ([\#213](https://github.com/clymbclinical/siera/issues/213)).
 - Fixed
   [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
   aborting on **xlsx** ARS files whose methods carry documentation

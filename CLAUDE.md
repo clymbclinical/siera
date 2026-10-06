@@ -163,6 +163,20 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   (no group stamping, no `group1_groupingId` etc. in the ARD). Any
   method that must emit CDISC-compliant group metadata columns must use
   `by_listc` (or `by_vars`/`strata_vars`) — not `by_stmt`.
+- **xlsx multi-value cells (#213)** — the xlsx representation keeps an
+  `IN`/`NOTIN` value list in ONE cell separated by `" | "` (TFL Designer
+  / `excel2ars.py`;
+  [`ars_xlsx_to_json()`](https://clymbclinical.github.io/siera/reference/ars_xlsx_to_json.md)
+  splits on `" | "` too). Always split with
+  [`.split_xlsx_values()`](https://clymbclinical.github.io/siera/reference/dot-split_xlsx_values.md)
+  (`R/DataSubsets.R`), which trims each value; a hand-rolled
+  `strsplit(gsub("\|", ",", x), ",\s*")` keeps the blank BEFORE the
+  separator (`"POSSIBLE "`) and silently matches nothing (shipped
+  `ARD_Out14-3-1-1.R` under-counted related TEAEs 23/50/49 vs 43/70/72).
+  Used by the data-subset IN/NOTIN branches, `.generate_groupid_code()`
+  and `.ag_group_conditions()`. Tests must use the real `" | "`
+  convention, not `"A|B"` (the old tests did, which is why it slipped
+  through).
 - **`group_condition_value` in JSON is a list-column** — jsonlite always
   returns `condition.value` as a list, even for single-element EQ
   arrays. The JSON parser must call
