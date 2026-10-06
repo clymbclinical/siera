@@ -1,7 +1,7 @@
 
 # Programme:    Generate code to produce ARD for Out14-3-1-1
 # Output:       Overall Summary of Treatment-Emergent Adverse Events
-# Date created: 2026-07-27 09:10:09
+# Date created: 2026-10-01 09:56:25
 
   # load libraries ----
     library(dplyr)
@@ -41,14 +41,14 @@ df_poptot = dplyr::filter(ADSL,
 df2_An01_05_SAF_Summ_ByTrt <- df_poptot
 
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Count_ByGrp
 # Method name:            Count by group for a categorical variable
 # Method description:     Count across groups for a categorical variable, based on subject occurrence
 
-if(nrow(df2_An01_05_SAF_Summ_ByTrt) != 0) {
-                              in_data = df2_An01_05_SAF_Summ_ByTrt |>
+df3_An01_05_SAF_Summ_ByTrt <- NULL
+if (nrow(df2_An01_05_SAF_Summ_ByTrt) != 0) {
+in_data = df2_An01_05_SAF_Summ_ByTrt |>
     dplyr::select(USUBJID, TRT01A) |>
     unique()
 df3_An01_05_SAF_Summ_ByTrt <-
@@ -57,22 +57,16 @@ df3_An01_05_SAF_Summ_ByTrt <-
     , variables = 'TRT01A'
   ) |>
 dplyr::filter(stat_name == 'n') |>
- dplyr::mutate(operationid = 'Mth01_CatVar_Count_ByGrp_1_n')}
-if(nrow(df2_An01_05_SAF_Summ_ByTrt) != 0){
-df3_An01_05_SAF_Summ_ByTrt <- df3_An01_05_SAF_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An01_05_SAF_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Count_ByGrp',
-               OutputId = 'Out14-3-1-1')
-} else {
-    df3_An01_05_SAF_Summ_ByTrt = data.frame(AnalysisId = 'An01_05_SAF_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Count_ByGrp',
-               OutputId = 'Out14-3-1-1')
+ dplyr::mutate(operationid = 'Mth01_CatVar_Count_ByGrp_1_n')
 }
-    df3_An01_05_SAF_Summ_ByTrt <- df3_An01_05_SAF_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+
+# Link ARS identifiers ---
+df3_An01_05_SAF_Summ_ByTrt <- siera::ars_stamp(
+  df3_An01_05_SAF_Summ_ByTrt,
+  analysis_id = 'An01_05_SAF_Summ_ByTrt',   # analyses[].id
+  method_id   = 'Mth01_CatVar_Count_ByGrp', # analyses[].methodId
+  output_id   = 'Out14-3-1-1'               # mainListOfContents outputId
+)
 
 
 # Analysis An07_01_TEAE_Summ_ByTrt----
@@ -81,14 +75,14 @@ df3_An01_05_SAF_Summ_ByTrt <- df3_An01_05_SAF_Summ_ByTrt |>
 df2_An07_01_TEAE_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y')
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
 # Method name:            Summary by group of a categorical variable
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
-if(nrow(df2_An07_01_TEAE_Summ_ByTrt) != 0) {
-                              denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
+df3_An07_01_TEAE_Summ_ByTrt <- NULL
+if (nrow(df2_An07_01_TEAE_Summ_ByTrt) != 0) {
+denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_01_TEAE_Summ_ByTrt |>
@@ -114,34 +108,22 @@ df3_An07_01_TEAE_Summ_ByTrt <-
 df3_An07_01_TEAE_Summ_ByTrt <- df3_An07_01_TEAE_Summ_ByTrt|>
 dplyr::filter(stat_name %in% c('n', 'p')) |>
 dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))}
-if(nrow(df2_An07_01_TEAE_Summ_ByTrt) != 0){
-df3_An07_01_TEAE_Summ_ByTrt <- df3_An07_01_TEAE_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An07_01_TEAE_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
-} else {
-    df3_An07_01_TEAE_Summ_ByTrt = data.frame(AnalysisId = 'An07_01_TEAE_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
+                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
-    if(nrow(df2_An07_01_TEAE_Summ_ByTrt) != 0){
-df3_An07_01_TEAE_Summ_ByTrt <- df3_An07_01_TEAE_Summ_ByTrt |>
-  dplyr::mutate(
-      group1_groupingId = 'AnlsGrouping_01_Trt',
-      group1_groupId = dplyr::case_when(
-        as.character(group1_level) == 'Placebo' ~ 'AnlsGrouping_01_Trt_1',
-        as.character(group1_level) == 'Xanomeline Low Dose' ~ 'AnlsGrouping_01_Trt_2',
-        as.character(group1_level) == 'Xanomeline High Dose' ~ 'AnlsGrouping_01_Trt_3',
-        TRUE ~ NA_character_
-      )
+
+# Link ARS identifiers ---
+df3_An07_01_TEAE_Summ_ByTrt <- siera::ars_stamp(
+  df3_An07_01_TEAE_Summ_ByTrt,
+  analysis_id = 'An07_01_TEAE_Summ_ByTrt', # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByGrp', # analyses[].methodId
+  output_id   = 'Out14-3-1-1',             # mainListOfContents outputId
+  groupings   = list(                      # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose'))
   )
-}
-df3_An07_01_TEAE_Summ_ByTrt <- df3_An07_01_TEAE_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+)
 
 
 # Analysis An07_02_RelTEAE_Summ_ByTrt----
@@ -150,14 +132,14 @@ df3_An07_01_TEAE_Summ_ByTrt <- df3_An07_01_TEAE_Summ_ByTrt |>
 df2_An07_02_RelTEAE_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y' & AEREL %in% c('POSSIBLE ', 'PROBABLE'))
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
 # Method name:            Summary by group of a categorical variable
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
-if(nrow(df2_An07_02_RelTEAE_Summ_ByTrt) != 0) {
-                              denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
+df3_An07_02_RelTEAE_Summ_ByTrt <- NULL
+if (nrow(df2_An07_02_RelTEAE_Summ_ByTrt) != 0) {
+denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_02_RelTEAE_Summ_ByTrt |>
@@ -183,34 +165,22 @@ df3_An07_02_RelTEAE_Summ_ByTrt <-
 df3_An07_02_RelTEAE_Summ_ByTrt <- df3_An07_02_RelTEAE_Summ_ByTrt|>
 dplyr::filter(stat_name %in% c('n', 'p')) |>
 dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))}
-if(nrow(df2_An07_02_RelTEAE_Summ_ByTrt) != 0){
-df3_An07_02_RelTEAE_Summ_ByTrt <- df3_An07_02_RelTEAE_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An07_02_RelTEAE_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
-} else {
-    df3_An07_02_RelTEAE_Summ_ByTrt = data.frame(AnalysisId = 'An07_02_RelTEAE_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
+                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
-    if(nrow(df2_An07_02_RelTEAE_Summ_ByTrt) != 0){
-df3_An07_02_RelTEAE_Summ_ByTrt <- df3_An07_02_RelTEAE_Summ_ByTrt |>
-  dplyr::mutate(
-      group1_groupingId = 'AnlsGrouping_01_Trt',
-      group1_groupId = dplyr::case_when(
-        as.character(group1_level) == 'Placebo' ~ 'AnlsGrouping_01_Trt_1',
-        as.character(group1_level) == 'Xanomeline Low Dose' ~ 'AnlsGrouping_01_Trt_2',
-        as.character(group1_level) == 'Xanomeline High Dose' ~ 'AnlsGrouping_01_Trt_3',
-        TRUE ~ NA_character_
-      )
+
+# Link ARS identifiers ---
+df3_An07_02_RelTEAE_Summ_ByTrt <- siera::ars_stamp(
+  df3_An07_02_RelTEAE_Summ_ByTrt,
+  analysis_id = 'An07_02_RelTEAE_Summ_ByTrt', # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByGrp',    # analyses[].methodId
+  output_id   = 'Out14-3-1-1',                # mainListOfContents outputId
+  groupings   = list(                         # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose'))
   )
-}
-df3_An07_02_RelTEAE_Summ_ByTrt <- df3_An07_02_RelTEAE_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+)
 
 
 # Analysis An07_03_SerTEAE_Summ_ByTrt----
@@ -219,14 +189,14 @@ df3_An07_02_RelTEAE_Summ_ByTrt <- df3_An07_02_RelTEAE_Summ_ByTrt |>
 df2_An07_03_SerTEAE_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y' & AESER == 'Y')
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
 # Method name:            Summary by group of a categorical variable
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
-if(nrow(df2_An07_03_SerTEAE_Summ_ByTrt) != 0) {
-                              denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
+df3_An07_03_SerTEAE_Summ_ByTrt <- NULL
+if (nrow(df2_An07_03_SerTEAE_Summ_ByTrt) != 0) {
+denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_03_SerTEAE_Summ_ByTrt |>
@@ -252,34 +222,22 @@ df3_An07_03_SerTEAE_Summ_ByTrt <-
 df3_An07_03_SerTEAE_Summ_ByTrt <- df3_An07_03_SerTEAE_Summ_ByTrt|>
 dplyr::filter(stat_name %in% c('n', 'p')) |>
 dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))}
-if(nrow(df2_An07_03_SerTEAE_Summ_ByTrt) != 0){
-df3_An07_03_SerTEAE_Summ_ByTrt <- df3_An07_03_SerTEAE_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An07_03_SerTEAE_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
-} else {
-    df3_An07_03_SerTEAE_Summ_ByTrt = data.frame(AnalysisId = 'An07_03_SerTEAE_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
+                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
-    if(nrow(df2_An07_03_SerTEAE_Summ_ByTrt) != 0){
-df3_An07_03_SerTEAE_Summ_ByTrt <- df3_An07_03_SerTEAE_Summ_ByTrt |>
-  dplyr::mutate(
-      group1_groupingId = 'AnlsGrouping_01_Trt',
-      group1_groupId = dplyr::case_when(
-        as.character(group1_level) == 'Placebo' ~ 'AnlsGrouping_01_Trt_1',
-        as.character(group1_level) == 'Xanomeline Low Dose' ~ 'AnlsGrouping_01_Trt_2',
-        as.character(group1_level) == 'Xanomeline High Dose' ~ 'AnlsGrouping_01_Trt_3',
-        TRUE ~ NA_character_
-      )
+
+# Link ARS identifiers ---
+df3_An07_03_SerTEAE_Summ_ByTrt <- siera::ars_stamp(
+  df3_An07_03_SerTEAE_Summ_ByTrt,
+  analysis_id = 'An07_03_SerTEAE_Summ_ByTrt', # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByGrp',    # analyses[].methodId
+  output_id   = 'Out14-3-1-1',                # mainListOfContents outputId
+  groupings   = list(                         # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose'))
   )
-}
-df3_An07_03_SerTEAE_Summ_ByTrt <- df3_An07_03_SerTEAE_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+)
 
 
 # Analysis An07_04_RelSerTEAE_Summ_ByTrt----
@@ -288,14 +246,14 @@ df3_An07_03_SerTEAE_Summ_ByTrt <- df3_An07_03_SerTEAE_Summ_ByTrt |>
 df2_An07_04_RelSerTEAE_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y' & AEREL %in% c('POSSIBLE ', 'PROBABLE') & AESER == 'Y')
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
 # Method name:            Summary by group of a categorical variable
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
-if(nrow(df2_An07_04_RelSerTEAE_Summ_ByTrt) != 0) {
-                              denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
+df3_An07_04_RelSerTEAE_Summ_ByTrt <- NULL
+if (nrow(df2_An07_04_RelSerTEAE_Summ_ByTrt) != 0) {
+denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_04_RelSerTEAE_Summ_ByTrt |>
@@ -321,34 +279,22 @@ df3_An07_04_RelSerTEAE_Summ_ByTrt <-
 df3_An07_04_RelSerTEAE_Summ_ByTrt <- df3_An07_04_RelSerTEAE_Summ_ByTrt|>
 dplyr::filter(stat_name %in% c('n', 'p')) |>
 dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))}
-if(nrow(df2_An07_04_RelSerTEAE_Summ_ByTrt) != 0){
-df3_An07_04_RelSerTEAE_Summ_ByTrt <- df3_An07_04_RelSerTEAE_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An07_04_RelSerTEAE_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
-} else {
-    df3_An07_04_RelSerTEAE_Summ_ByTrt = data.frame(AnalysisId = 'An07_04_RelSerTEAE_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
+                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
-    if(nrow(df2_An07_04_RelSerTEAE_Summ_ByTrt) != 0){
-df3_An07_04_RelSerTEAE_Summ_ByTrt <- df3_An07_04_RelSerTEAE_Summ_ByTrt |>
-  dplyr::mutate(
-      group1_groupingId = 'AnlsGrouping_01_Trt',
-      group1_groupId = dplyr::case_when(
-        as.character(group1_level) == 'Placebo' ~ 'AnlsGrouping_01_Trt_1',
-        as.character(group1_level) == 'Xanomeline Low Dose' ~ 'AnlsGrouping_01_Trt_2',
-        as.character(group1_level) == 'Xanomeline High Dose' ~ 'AnlsGrouping_01_Trt_3',
-        TRUE ~ NA_character_
-      )
+
+# Link ARS identifiers ---
+df3_An07_04_RelSerTEAE_Summ_ByTrt <- siera::ars_stamp(
+  df3_An07_04_RelSerTEAE_Summ_ByTrt,
+  analysis_id = 'An07_04_RelSerTEAE_Summ_ByTrt', # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByGrp',       # analyses[].methodId
+  output_id   = 'Out14-3-1-1',                   # mainListOfContents outputId
+  groupings   = list(                            # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose'))
   )
-}
-df3_An07_04_RelSerTEAE_Summ_ByTrt <- df3_An07_04_RelSerTEAE_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+)
 
 
 # Analysis An07_05_TEAELd2Dth_Summ_ByTrt----
@@ -357,14 +303,14 @@ df3_An07_04_RelSerTEAE_Summ_ByTrt <- df3_An07_04_RelSerTEAE_Summ_ByTrt |>
 df2_An07_05_TEAELd2Dth_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y' & AESDTH == 'Y')
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
 # Method name:            Summary by group of a categorical variable
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
-if(nrow(df2_An07_05_TEAELd2Dth_Summ_ByTrt) != 0) {
-                              denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
+df3_An07_05_TEAELd2Dth_Summ_ByTrt <- NULL
+if (nrow(df2_An07_05_TEAELd2Dth_Summ_ByTrt) != 0) {
+denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_05_TEAELd2Dth_Summ_ByTrt |>
@@ -390,34 +336,22 @@ df3_An07_05_TEAELd2Dth_Summ_ByTrt <-
 df3_An07_05_TEAELd2Dth_Summ_ByTrt <- df3_An07_05_TEAELd2Dth_Summ_ByTrt|>
 dplyr::filter(stat_name %in% c('n', 'p')) |>
 dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))}
-if(nrow(df2_An07_05_TEAELd2Dth_Summ_ByTrt) != 0){
-df3_An07_05_TEAELd2Dth_Summ_ByTrt <- df3_An07_05_TEAELd2Dth_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An07_05_TEAELd2Dth_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
-} else {
-    df3_An07_05_TEAELd2Dth_Summ_ByTrt = data.frame(AnalysisId = 'An07_05_TEAELd2Dth_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
+                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
-    if(nrow(df2_An07_05_TEAELd2Dth_Summ_ByTrt) != 0){
-df3_An07_05_TEAELd2Dth_Summ_ByTrt <- df3_An07_05_TEAELd2Dth_Summ_ByTrt |>
-  dplyr::mutate(
-      group1_groupingId = 'AnlsGrouping_01_Trt',
-      group1_groupId = dplyr::case_when(
-        as.character(group1_level) == 'Placebo' ~ 'AnlsGrouping_01_Trt_1',
-        as.character(group1_level) == 'Xanomeline Low Dose' ~ 'AnlsGrouping_01_Trt_2',
-        as.character(group1_level) == 'Xanomeline High Dose' ~ 'AnlsGrouping_01_Trt_3',
-        TRUE ~ NA_character_
-      )
+
+# Link ARS identifiers ---
+df3_An07_05_TEAELd2Dth_Summ_ByTrt <- siera::ars_stamp(
+  df3_An07_05_TEAELd2Dth_Summ_ByTrt,
+  analysis_id = 'An07_05_TEAELd2Dth_Summ_ByTrt', # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByGrp',       # analyses[].methodId
+  output_id   = 'Out14-3-1-1',                   # mainListOfContents outputId
+  groupings   = list(                            # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose'))
   )
-}
-df3_An07_05_TEAELd2Dth_Summ_ByTrt <- df3_An07_05_TEAELd2Dth_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+)
 
 
 # Analysis An07_06_RelTEAELd2Dth_Summ_ByTrt----
@@ -426,14 +360,14 @@ df3_An07_05_TEAELd2Dth_Summ_ByTrt <- df3_An07_05_TEAELd2Dth_Summ_ByTrt |>
 df2_An07_06_RelTEAELd2Dth_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y' & AESDTH == 'Y', AEREL == 'POSSIBLE' | AEREL == 'PROBABLE')
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
 # Method name:            Summary by group of a categorical variable
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
-if(nrow(df2_An07_06_RelTEAELd2Dth_Summ_ByTrt) != 0) {
-                              denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
+df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- NULL
+if (nrow(df2_An07_06_RelTEAELd2Dth_Summ_ByTrt) != 0) {
+denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_06_RelTEAELd2Dth_Summ_ByTrt |>
@@ -459,34 +393,22 @@ df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <-
 df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- df3_An07_06_RelTEAELd2Dth_Summ_ByTrt|>
 dplyr::filter(stat_name %in% c('n', 'p')) |>
 dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))}
-if(nrow(df2_An07_06_RelTEAELd2Dth_Summ_ByTrt) != 0){
-df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- df3_An07_06_RelTEAELd2Dth_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An07_06_RelTEAELd2Dth_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
-} else {
-    df3_An07_06_RelTEAELd2Dth_Summ_ByTrt = data.frame(AnalysisId = 'An07_06_RelTEAELd2Dth_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
+                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
-    if(nrow(df2_An07_06_RelTEAELd2Dth_Summ_ByTrt) != 0){
-df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- df3_An07_06_RelTEAELd2Dth_Summ_ByTrt |>
-  dplyr::mutate(
-      group1_groupingId = 'AnlsGrouping_01_Trt',
-      group1_groupId = dplyr::case_when(
-        as.character(group1_level) == 'Placebo' ~ 'AnlsGrouping_01_Trt_1',
-        as.character(group1_level) == 'Xanomeline Low Dose' ~ 'AnlsGrouping_01_Trt_2',
-        as.character(group1_level) == 'Xanomeline High Dose' ~ 'AnlsGrouping_01_Trt_3',
-        TRUE ~ NA_character_
-      )
+
+# Link ARS identifiers ---
+df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- siera::ars_stamp(
+  df3_An07_06_RelTEAELd2Dth_Summ_ByTrt,
+  analysis_id = 'An07_06_RelTEAELd2Dth_Summ_ByTrt', # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByGrp',          # analyses[].methodId
+  output_id   = 'Out14-3-1-1',                      # mainListOfContents outputId
+  groupings   = list(                               # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose'))
   )
-}
-df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- df3_An07_06_RelTEAELd2Dth_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+)
 
 
 # Analysis An07_07_TEAELd2DoseMod_Summ_ByTrt----
@@ -495,14 +417,14 @@ df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- df3_An07_06_RelTEAELd2Dth_Summ_ByTrt |>
 df2_An07_07_TEAELd2DoseMod_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y' & AEACN %in% c('DOSE REDUCED ', 'DRUG INTERRUPTED'))
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
 # Method name:            Summary by group of a categorical variable
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
-if(nrow(df2_An07_07_TEAELd2DoseMod_Summ_ByTrt) != 0) {
-                              denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
+df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <- NULL
+if (nrow(df2_An07_07_TEAELd2DoseMod_Summ_ByTrt) != 0) {
+denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_07_TEAELd2DoseMod_Summ_ByTrt |>
@@ -528,34 +450,22 @@ df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <-
 df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <- df3_An07_07_TEAELd2DoseMod_Summ_ByTrt|>
 dplyr::filter(stat_name %in% c('n', 'p')) |>
 dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))}
-if(nrow(df2_An07_07_TEAELd2DoseMod_Summ_ByTrt) != 0){
-df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <- df3_An07_07_TEAELd2DoseMod_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An07_07_TEAELd2DoseMod_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
-} else {
-    df3_An07_07_TEAELd2DoseMod_Summ_ByTrt = data.frame(AnalysisId = 'An07_07_TEAELd2DoseMod_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
+                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
-    if(nrow(df2_An07_07_TEAELd2DoseMod_Summ_ByTrt) != 0){
-df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <- df3_An07_07_TEAELd2DoseMod_Summ_ByTrt |>
-  dplyr::mutate(
-      group1_groupingId = 'AnlsGrouping_01_Trt',
-      group1_groupId = dplyr::case_when(
-        as.character(group1_level) == 'Placebo' ~ 'AnlsGrouping_01_Trt_1',
-        as.character(group1_level) == 'Xanomeline Low Dose' ~ 'AnlsGrouping_01_Trt_2',
-        as.character(group1_level) == 'Xanomeline High Dose' ~ 'AnlsGrouping_01_Trt_3',
-        TRUE ~ NA_character_
-      )
+
+# Link ARS identifiers ---
+df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <- siera::ars_stamp(
+  df3_An07_07_TEAELd2DoseMod_Summ_ByTrt,
+  analysis_id = 'An07_07_TEAELd2DoseMod_Summ_ByTrt', # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByGrp',           # analyses[].methodId
+  output_id   = 'Out14-3-1-1',                       # mainListOfContents outputId
+  groupings   = list(                                # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose'))
   )
-}
-df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <- df3_An07_07_TEAELd2DoseMod_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+)
 
 
 # Analysis An07_08_TEAELd2TrtDsc_Summ_ByTrt----
@@ -564,14 +474,14 @@ df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <- df3_An07_07_TEAELd2DoseMod_Summ_ByTrt |
 df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y' & AEACN == 'DRUG WITHDRAWN')
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
 # Method name:            Summary by group of a categorical variable
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
-if(nrow(df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt) != 0) {
-                              denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
+df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- NULL
+if (nrow(df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt) != 0) {
+denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt |>
@@ -597,34 +507,22 @@ df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt <-
 df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt|>
 dplyr::filter(stat_name %in% c('n', 'p')) |>
 dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))}
-if(nrow(df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt) != 0){
-df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An07_08_TEAELd2TrtDsc_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
-} else {
-    df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt = data.frame(AnalysisId = 'An07_08_TEAELd2TrtDsc_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-3-1-1')
+                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
-    if(nrow(df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt) != 0){
-df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt |>
-  dplyr::mutate(
-      group1_groupingId = 'AnlsGrouping_01_Trt',
-      group1_groupId = dplyr::case_when(
-        as.character(group1_level) == 'Placebo' ~ 'AnlsGrouping_01_Trt_1',
-        as.character(group1_level) == 'Xanomeline Low Dose' ~ 'AnlsGrouping_01_Trt_2',
-        as.character(group1_level) == 'Xanomeline High Dose' ~ 'AnlsGrouping_01_Trt_3',
-        TRUE ~ NA_character_
-      )
+
+# Link ARS identifiers ---
+df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- siera::ars_stamp(
+  df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt,
+  analysis_id = 'An07_08_TEAELd2TrtDsc_Summ_ByTrt', # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByGrp',          # analyses[].methodId
+  output_id   = 'Out14-3-1-1',                      # mainListOfContents outputId
+  groupings   = list(                               # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose'))
   )
-}
-df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+)
 
 
 # combine analyses to create ARD ----

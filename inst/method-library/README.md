@@ -92,7 +92,10 @@ The cards/cardx recipe using placeholder tokens. Tokens come in two kinds:
   containing `analysisidhere` (e.g. `df2_analysisidhere`, `df3_analysisidhere`),
   `methodidhere`, `outputidhere`.
 
-Each template must assign `df3_analysisidhere <- …`. Some valueSources (`by_vars`,
+Each template must assign `df3_analysisidhere <- …`. A template only computes the
+statistics (with an `operationid` column); linking the ARD to the ARS metadata
+(`AnalysisId`, `MethodId`, `OutputId`, `group[n]_*`) is done by siera afterwards
+via `siera::ars_stamp()` (#206), so templates must not stamp those columns. Some valueSources (`by_vars`,
 `strata_vars`, `by_stmt`) inject a **leading comma**, so a raw template is not valid
 R until substituted — the contract test parses a substituted copy, not the raw text.
 
