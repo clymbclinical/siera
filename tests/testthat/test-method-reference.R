@@ -398,3 +398,60 @@ test_that("the shipped documentRef example carries no inline templateCode", {
   has_inline <- vapply(raw$methods, function(m) !is.null(m$codeTemplate$code), logical(1))
   expect_false(any(has_inline))
 })
+
+# ---- documentation references are not code templates (#214) -----------------
+
+# Copy the XLSX documentRef example (and the manifest it references) to a temp
+# dir and add a Documentation reference to a non-existent SAP for Mth_01,
+# placed BEFORE its code reference.
+.docref_xlsx_with_documentation <- function(drop_reference_type = FALSE,
+                                            env = parent.frame()) {
+  d <- withr::local_tempdir(.local_envir = env)
+  file.copy(ARS_example("exampleARS_methods.json"), d)
+  ars <- file.path(d, "ars.xlsx")
+  wb <- openxlsx::loadWorkbook(ARS_example("exampleARS_5_documentref.xlsx"))
+
+  refs <- openxlsx::readWorkbook(wb, "ReferenceDocuments")
+  sap <- refs[1, , drop = FALSE]
+  sap[] <- NA
+  sap$id <- "SAP"
+  sap$name <- "Statistical Analysis Plan"
+  sap$location <- "./sap.pdf"
+  openxlsx::writeData(wb, "ReferenceDocuments", rbind(refs, sap))
+
+  docrefs <- openxlsx::readWorkbook(wb, "AnalysisMethodDocumentRefs")
+  doc <- docrefs[1, , drop = FALSE]
+  doc$referenceType <- "Documentation"
+  doc$refDocumentId <- "SAP"
+  doc$pageRef_refType <- "PhysicalRef"
+  doc$pageRef_pages <- "9"
+  docrefs <- rbind(doc, docrefs)
+  if (drop_reference_type) {
+    docrefs <- docrefs[-1, setdiff(names(docrefs), "referenceType")]
+    openxlsx::removeWorksheet(wb, "AnalysisMethodDocumentRefs")
+    openxlsx::addWorksheet(wb, "AnalysisMethodDocumentRefs")
+  }
+  openxlsx::writeData(wb, "AnalysisMethodDocumentRefs", docrefs)
+  openxlsx::saveWorkbook(wb, ars, overwrite = TRUE)
+  ars
+}
+
+test_that("XLSX Documentation references are not resolved as code (#214)", {
+  skip_if_not_installed("openxlsx")
+  adam   <- withr::local_tempdir()
+  inline <- .gen_script_norm(ARS_example("exampleARS_5.xlsx"), adam)
+  # Without the fix, the SAP row (first) is resolved and readARS() aborts on
+  # the missing ./sap.pdf.
+  docref <- .gen_script_norm(.docref_xlsx_with_documentation(), adam)
+  expect_identical(docref, inline)
+})
+
+test_that("an XLSX docref sheet without referenceType resolves every row", {
+  skip_if_not_installed("openxlsx")
+  adam   <- withr::local_tempdir()
+  inline <- .gen_script_norm(ARS_example("exampleARS_5.xlsx"), adam)
+  docref <- .gen_script_norm(
+    .docref_xlsx_with_documentation(drop_reference_type = TRUE), adam
+  )
+  expect_identical(docref, inline)
+})

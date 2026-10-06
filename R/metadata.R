@@ -555,6 +555,17 @@
   # from the resolved manifest when the method declares none inline.
   if (all(c("ReferenceDocuments", "AnalysisMethodDocumentRefs") %in% ws)) {
     method_doc_refs <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisMethodDocumentRefs")
+    # The sheet also holds the method's documentation references (SAP section,
+    # protocol page, ...), which carry no code; resolving one as a template
+    # would abort on e.g. "./sap.pdf" (#214). The JSON path reads
+    # codeTemplate.documentRef only, so it never sees these.
+    if ("referenceType" %in% names(method_doc_refs)) {
+      method_doc_refs <- method_doc_refs[
+        is.na(method_doc_refs$referenceType) |
+          method_doc_refs$referenceType != "Documentation", ,
+        drop = FALSE
+      ]
+    }
     if (nrow(method_doc_refs) > 0) {
       ars_dir  <- dirname(ARS_path)
       ref_docs <- .extract_reference_documents(
