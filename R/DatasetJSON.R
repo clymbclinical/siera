@@ -10,14 +10,47 @@
 #
 # The variable-label dictionary covers siera's own ARD vocabulary plus the
 # {cards} columns siera builds on; data-driven ADaM columns (e.g. TRT01A) fall
-# back to the raw column name. The {datasetjson} dependency is optional and is
-# guarded with requireNamespace() in the emitted code, so a user without the
-# package gets a message rather than an error.
-.generate_datasetjson_code <- function(output_id, output_path) {
+# back to the raw column name. User-supplied `column_labels` overrides (#165)
+# sit at the front of that precedence chain; they are deparse()'d into the
+# block so the generated script keeps no runtime dependency on siera. The
+# {datasetjson} dependency is optional and is guarded with requireNamespace()
+# in the emitted code, so a user without the package gets a message rather
+# than an error.
+.generate_datasetjson_code <- function(output_id, output_path,
+                                       column_labels = NULL) {
   ds_name <- paste0(output_id, "_ARD")
   # Embed an absolute, forward-slashed path so the JSON lands beside the script
   # regardless of the user's working directory when they source it.
   out_dir <- gsub("\\\\", "/", output_path)
+
+  # Overrides can only be checked against the ARD's columns at script runtime,
+  # so an unmatched name warns there (likely a typo) instead of erroring here.
+  # Without overrides nothing is emitted, keeping the default block unchanged.
+  override_lines <- character(0)
+  override_lookup <- character(0)
+  if (!is.null(column_labels)) {
+    labels <- stats::setNames(as.character(column_labels), names(column_labels))
+    override_lines <- c(
+      "  # User-supplied label overrides (readARS(column_labels = ...)).",
+      paste0(
+        "  .ds_label_overrides <- ",
+        paste(deparse(labels, width.cutoff = 500L), collapse = "")
+      ),
+      "  .ds_unknown <- setdiff(names(.ds_label_overrides), names(.ds_df))",
+      "  if (length(.ds_unknown) > 0) {",
+      "    warning(",
+      '      "column_labels name(s) not found in the ARD and ignored: ",',
+      '      paste(.ds_unknown, collapse = ", "),',
+      "      call. = FALSE",
+      "    )",
+      "  }",
+      ""
+    )
+    override_lookup <- paste0(
+      "    if (nm %in% names(.ds_label_overrides)) ",
+      "return(unname(.ds_label_overrides[nm]))"
+    )
+  }
 
   lines <- c(
     "",
@@ -43,8 +76,10 @@
     "    }",
     "  }",
     "",
+    override_lines,
     "  # Variable labels: siera + {cards} vocabulary; unknown columns keep name.",
     "  .ds_label_for <- function(nm) {",
+    override_lookup,
     "    .dict <- c(",
     '      variable = "Analysis Variable", variable_level = "Analysis Variable Level",',
     '      context = "Statistic Context", stat_name = "Statistic Name",',
@@ -94,4 +129,39 @@
   )
 
   paste(lines, collapse = "\n")
+}
+
+# Validate readARS(column_labels = ...) at generation time (#165). Only the
+# vector's shape can be checked here; whether each name is a real ARD column
+# is checked by the generated export block at runtime.
+.check_column_labels <- function(column_labels) {
+  if (is.null(column_labels)) {
+    return(invisible(NULL))
+  }
+  if (!is.character(column_labels) || length(column_labels) == 0L) {
+    cli::cli_abort(c(
+      "{.arg column_labels} must be a non-empty named character vector.",
+      "i" = "For example {.code c(TRT01A = \"Actual Treatment\")}."
+    ))
+  }
+  nms <- names(column_labels)
+  if (is.null(nms) || anyNA(nms) || any(!nzchar(trimws(nms)))) {
+    cli::cli_abort(c(
+      "Every element of {.arg column_labels} must be named with an ARD column.",
+      "i" = "For example {.code c(TRT01A = \"Actual Treatment\")}."
+    ))
+  }
+  dup <- unique(nms[duplicated(nms)])
+  if (length(dup) > 0L) {
+    cli::cli_abort(
+      "{.arg column_labels} has duplicated name{?s}: {.val {dup}}."
+    )
+  }
+  missing_label <- nms[is.na(column_labels)]
+  if (length(missing_label) > 0L) {
+    cli::cli_abort(
+      "{.arg column_labels} has a missing ({.val {NA}}) label for {.val {missing_label}}."
+    )
+  }
+  invisible(column_labels)
 }

@@ -36,6 +36,15 @@
 #'  linking out as plain \pkg{dplyr} code in the script, so the generated
 #'  script does not call siera functions for the linking step. Both styles
 #'  produce an identical ARD.
+#' @param column_labels Optional named character vector of Dataset-JSON
+#'  variable labels, e.g.
+#'  `c(AGEGR1 = "Pooled Age Group 1", TRT01A = "Actual Treatment")`. Names are
+#'  ARD column names and values are the labels to write. Overrides take
+#'  precedence over siera's built-in label dictionary, so they can also reword
+#'  built-in labels. Because the ARD's columns are only known once the
+#'  generated script runs, a name that matches no ARD column triggers a warning
+#'  at script runtime (likely a typo) rather than an error. Only used when
+#'  `output_format = "datasetjson"`; otherwise it is ignored with a warning.
 #'
 #' @importFrom readxl read_excel
 #'
@@ -61,7 +70,8 @@ readARS <- function(ARS_path,
                     adam_path = tempdir(),
                     spec_output = "",
                     output_format = "none",
-                    code_style = "wrapped") {
+                    code_style = "wrapped",
+                    column_labels = NULL) {
   # Strict validation: no partial matching, omitted/NULL -> "none"
   if (is.null(output_format)) {
     output_format <- "none"
@@ -82,6 +92,13 @@ readARS <- function(ARS_path,
     cli::cli_abort(c(
       "{.arg code_style} must be one of {.val wrapped} or {.val expanded}.",
       "x" = "You supplied {.val {code_style}}."
+    ))
+  }
+  .check_column_labels(column_labels)
+  if (!is.null(column_labels) && output_format != "datasetjson") {
+    cli::cli_warn(c(
+      "{.arg column_labels} is ignored unless {.code output_format = \"datasetjson\"}.",
+      "i" = "Labels are only written to the Dataset-JSON export."
     ))
   }
   code_libraries <- .generate_library_code()
@@ -479,7 +496,7 @@ readARS <- function(ARS_path,
     if (output_format == "datasetjson") {
       code_output <- paste0(
         code_output,
-        .generate_datasetjson_code(Output, output_path)
+        .generate_datasetjson_code(Output, output_path, column_labels)
       )
     }
 
@@ -578,15 +595,14 @@ readARS <- function(ARS_path,
 
     # The xlsx reader keeps a multi-value IN condition in one delimited
     # cell (the JSON reader unnests it), so split it to one row per value
-    # or the level of an IN group would never match its group id. Trim, as
-    # cells are often written "65-80 | >80" and a kept trailing space would
-    # never equal the data value.
+    # or the level of an IN group would never match its group id
+    # (.split_xlsx_values() trims each value, #213).
     if (identical(file_ext, "xlsx") &&
         "group_condition_comparator" %in% names(grp_rows)) {
       is_in <- grp_rows$group_condition_comparator %in% "IN"
       split_vals <- lapply(seq_along(values), function(i) {
         if (is_in[i]) {
-          trimws(strsplit(gsub("\\|", ",", values[i]), ",")[[1]])
+          .split_xlsx_values(values[i])
         } else {
           values[i]
         }
@@ -866,7 +882,7 @@ readARS <- function(ARS_path,
     # so take the level from the same split .generate_data_subset_condition()
     # applies rather than from the raw cell.
     if (identical(comparator, "IN") && identical(file_ext, "xlsx")) {
-      values <- strsplit(gsub("\\|", ",", values[1]), ",\\s*")[[1]]
+      values <- .split_xlsx_values(values[1])
     }
 
     level <- gsub("'", "\\'", values[1], fixed = TRUE)

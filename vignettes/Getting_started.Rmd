@@ -109,7 +109,7 @@ source(example_ARD_script)
 head(ARD)
 ```
 
-The `ARD` object is the result of appending all analysis-level ARD (created from the `cards` and `cardx` functions) for the output.  It can be used (and re-used) downstream for various applications.  See [this vignette](apply-ARD.html) for next step in utilising the ARD - like creating Tables, or using it for QC.
+The `ARD` object is the result of appending all analysis-level ARD (created from the `cards` and `cardx` functions) for the output.  It can be used (and re-used) downstream for various applications.  See [this vignette](apply-ARD.html) for next step in utilising the ARD - like creating Tables, or using it for QC. If you need to hand the ARD to someone outside R, `readARS(..., output_format = "datasetjson")` makes each script also write its ARD as a CDISC Dataset-JSON file - see [Exporting ARDs as Dataset-JSON](datasetjson-export.html).
 
 ### A note on example code used in AnalysisMethodCodeTemplate: using `cards` package
 
