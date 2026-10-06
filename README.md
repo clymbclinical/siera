@@ -101,6 +101,13 @@ R-native equivalent of CDISC's `excel2ars.py`, itself deprecated and due
 to be removed together with `.xlsx` input) and keep the resulting `.json`
 file.
 
+To also write each ARD as a CDISC Dataset-JSON file (`ARD_<OutputId>.json`)
+when its script runs, call `readARS(..., output_format = "datasetjson")`;
+`column_labels` lets you supply your own variable labels. See the [Exporting
+ARDs as
+Dataset-JSON](https://clymbclinical.github.io/siera/articles/datasetjson-export.html)
+vignette.
+
 See the [Getting
 Started](https://clymbclinical.github.io/siera/articles/Getting_started.html)
 vignette for examples and more detail on the process.

@@ -275,13 +275,14 @@ test_that("JSON documentRef example generates the same script as the inline ARS"
   expect_identical(docref, inline)
 })
 
-test_that("deprecated xlsx input resolves a CDISC-convention documentRef", {
-  # The xlsx path converts the workbook to ARS JSON first, so a method whose
-  # template is specifiedAs = "DocumentRef" with a ProgrammingCode document
-  # reference (the CDISC excel2ars.py convention) resolves exactly like JSON,
-  # relative to the workbook's own folder.
-  skip_if_not_installed("openxlsx")
-  d <- withr::local_tempdir()
+# Build a copy of exampleARS_5.xlsx whose method templates are document
+# references in the CDISC excel2ars.py convention: specifiedAs = "DocumentRef"
+# on AnalysisMethodCodeTemplate plus a ProgrammingCode row per method in
+# AnalysisMethodDocumentRefs, pointing at the bundled manifest. With
+# `with_documentation = TRUE` a Documentation reference to a non-existent SAP
+# is added for Mth_01, BEFORE its code reference (#214).
+.cdisc_docref_xlsx <- function(with_documentation = FALSE, env = parent.frame()) {
+  d <- withr::local_tempdir(.local_envir = env)
   file.copy(ARS_example("exampleARS_methods.json"), d)
 
   wb <- openxlsx::loadWorkbook(ARS_example("exampleARS_5.xlsx"))
@@ -289,21 +290,43 @@ test_that("deprecated xlsx input resolves a CDISC-convention documentRef", {
   tmpl$specifiedAs <- "DocumentRef"
   tmpl$templateCode <- NA_character_
   openxlsx::writeData(wb, "AnalysisMethodCodeTemplate", tmpl)
-  openxlsx::writeData(wb, "AnalysisMethodDocumentRefs", data.frame(
-    method_id = tmpl$method_id, referenceType = "ProgrammingCode",
-    refDocumentId = "RefDoc_siera_methods", pageRef_refType = "NamedDestination",
-    pageRef_label = NA_character_, pageRef_pages = tmpl$method_id
-  ))
-  openxlsx::writeData(wb, "ReferenceDocuments", data.frame(
+
+  refs <- data.frame(
     id = "RefDoc_siera_methods", name = "siera example method manifest",
     description = NA_character_, label = NA_character_,
     location = "exampleARS_methods.json"
-  ))
+  )
+  docrefs <- data.frame(
+    method_id = tmpl$method_id, referenceType = "ProgrammingCode",
+    refDocumentId = "RefDoc_siera_methods", pageRef_refType = "NamedDestination",
+    pageRef_label = NA_character_, pageRef_pages = tmpl$method_id
+  )
+  if (with_documentation) {
+    refs <- rbind(refs, data.frame(
+      id = "SAP", name = "Statistical Analysis Plan", description = NA_character_,
+      label = NA_character_, location = "./sap.pdf"
+    ))
+    docrefs <- rbind(data.frame(
+      method_id = "Mth_01", referenceType = "Documentation", refDocumentId = "SAP",
+      pageRef_refType = "PhysicalRef", pageRef_label = NA_character_,
+      pageRef_pages = "9"
+    ), docrefs)
+  }
+  openxlsx::writeData(wb, "ReferenceDocuments", refs)
+  openxlsx::writeData(wb, "AnalysisMethodDocumentRefs", docrefs)
+
   xlsx <- file.path(d, "docref.xlsx")
   openxlsx::saveWorkbook(wb, xlsx)
+  xlsx
+}
 
+test_that("deprecated xlsx input resolves a CDISC-convention documentRef", {
+  # The xlsx path converts the workbook to ARS JSON first, so a method whose
+  # template is a ProgrammingCode document reference resolves exactly like
+  # JSON, relative to the workbook's own folder.
+  skip_if_not_installed("openxlsx")
   adam   <- withr::local_tempdir()
-  docref <- .gen_script_norm(xlsx, adam)
+  docref <- .gen_script_norm(.cdisc_docref_xlsx(), adam)
   inline <- .gen_script_norm(ARS_example("exampleARS_5.json"), adam)
   expect_identical(docref, inline)
 })
@@ -414,4 +437,27 @@ test_that("the shipped documentRef example carries no inline templateCode", {
                             simplifyVector = FALSE, simplifyDataFrame = FALSE)
   has_inline <- vapply(raw$methods, function(m) !is.null(m$codeTemplate$code), logical(1))
   expect_false(any(has_inline))
+})
+
+# ---- documentation references are not code templates (#214) -----------------
+
+test_that("xlsx Documentation references are not resolved as code (#214)", {
+  # The SAP row comes first and points at a file that does not exist; resolving
+  # it as a template would abort. The conversion routes it to the method's
+  # documentRefs instead, leaving only the ProgrammingCode row as the template.
+  skip_if_not_installed("openxlsx")
+  xlsx   <- .cdisc_docref_xlsx(with_documentation = TRUE)
+  adam   <- withr::local_tempdir()
+  docref <- .gen_script_norm(xlsx, adam)
+  inline <- .gen_script_norm(ARS_example("exampleARS_5.json"), adam)
+  expect_identical(docref, inline)
+
+  j <- jsonlite::fromJSON(
+    siera:::.x2a_json_text(siera:::.x2a_build(xlsx)),
+    simplifyVector = FALSE
+  )
+  m1 <- Filter(function(m) identical(m$id, "Mth_01"), j$methods)[[1]]
+  expect_identical(m1$documentRefs[[1]]$referenceDocumentId, "SAP")
+  expect_identical(m1$codeTemplate$documentRef$referenceDocumentId,
+                   "RefDoc_siera_methods")
 })
