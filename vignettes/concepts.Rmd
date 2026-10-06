@@ -39,7 +39,7 @@ knitr::include_graphics("figures/siera-pipeline.svg")
 
 The flow is always the same:
 
-1. You start with **ARS metadata** (the Analysis Results Standard description of your reporting event), in either JSON or Excel format.
+1. You start with **ARS metadata** (the Analysis Results Standard description of your reporting event), as a JSON file.
 2. You pass it to **`readARS()`**, which writes **one R script per Output** defined in the metadata.
 3. You run a generated script against your **ADaM datasets** - supplied as CSV (`.csv`), SAS transport (`.xpt`) or CDISC Dataset-JSON (`.json`) files - and the result is an **ARD** - one row per result, ready for downstream use. siera reads each ADaM dataset according to its file extension (`.csv` with `readr::read_csv()`, `.xpt` with `haven::read_xpt()`, `.json` with `datasetjson::read_dataset_json()`), so no extra argument is needed.
 
@@ -63,9 +63,11 @@ Each generated script is assembled from these pieces, and every result it produc
 
 A method's code template need not be written inline: _siera_ can also resolve it from an external **reference document** (the ARS `codeTemplate.documentRef` mechanism), so an ARS file can point at a shared, tested method library by `id` rather than copy-pasting code. This builds on `referenceDocuments`, which is otherwise outside the seven sections above. See the _Using cards and cardx_ article for how to wire it up.
 
-## JSON and XLSX parity
+## ARS metadata is JSON
 
-ARS metadata officially travels as JSON, but _siera_ also accepts an Excel (XLSX) representation of the same information. **The two are semantically equivalent** - `readARS()` produces the same generated scripts either way, so you can choose whichever format fits your tooling. The examples shipped with the package include both (see `ARS_example()`).
+ARS metadata officially travels as JSON, and JSON is what _siera_ reads. Earlier releases also read an Excel (`.xlsx`) representation of the same information; that is now **deprecated**. `readARS()` still accepts a workbook for now, with a warning, by converting it to JSON in memory first, so you get the same generated scripts as from the equivalent JSON file. A future release will read JSON only.
+
+If your ARS metadata lives in a workbook (for example a TFL Designer export), convert it once with `ars_xlsx_to_json()` and keep the `.json` file from then on. The converter is deprecated as well and will be removed together with `.xlsx` input. After that, CDISC's own `excel2ars.py` utility remains a route from Excel to ARS JSON.
 
 ## Reading an ARD row: CDISC traceability columns
 

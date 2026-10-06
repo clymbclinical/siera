@@ -25,9 +25,8 @@ Standard](https://www.cdisc.org/standards/foundational/analysis-results-standard
 is a foundational standard that facilitates automation, reproducibility,
 reusability and traceability of analysis results data.
 
-ARS metadata is officially represented using JSON format (though there
-is also an Excel representation for easier readability, but the JSON
-format is recommended for official ARS usage). Such a JSON file contains
+ARS metadata is officially represented using JSON format. Such a JSON
+file contains
 all relevant metadata to be able to calculate the Analysis Results for a
 specific Reporting Event. This metadata includes (but is not limited
 to):
@@ -73,7 +72,7 @@ devtools::install_github("clymbclinical/siera")
 ## Usage
 
 The `siera` package has one main function, called `readARS`. This
-function takes ARS metadata as input (either JSON or xlsx format), and
+function takes ARS metadata as input (JSON format), and
 makes use of the various metadata pieces to populate R scripts, which an
 be run as-is to produce ARDs. One R script is created for each output
 (table) as defined in the ARS metadata for the reportingg event.
@@ -82,7 +81,7 @@ In order to make use of this function, the following are required as
 arguments:
 
 1.  A functional ARS file, representing ARS Metadata for a Reporting
-    Event (JSON or xlsx)
+    Event (JSON)
 2.  An output directory where the R scripts will be placed
 3.  A folder containing the related ADaM datasets for the ARDs to be
     generated, supplied as CSV (`.csv`), SAS transport (`.xpt`) or CDISC
@@ -91,15 +90,16 @@ arguments:
 siera picks the reader for each ADaM dataset from its file extension —
 `.csv` files are read with `readr::read_csv()`, `.xpt` files with
 `haven::read_xpt()` and `.json` files with
-`datasetjson::read_dataset_json()` — just as the ARS input format is
-inferred from `.json` vs `.xlsx`. No extra argument is needed.
+`datasetjson::read_dataset_json()` — so no extra argument is needed.
 
 Every analysis in a generated script reads as analysis set, data subset, method, and a final call to `siera::ars_stamp()`, which links the result to the ARS metadata (`AnalysisId`, `MethodId`, `OutputId` and the grouping identifiers).  The generated scripts therefore need the siera package to be installed when run.  Use `readARS(code_style = "expanded")` if you prefer scripts that spell out that linking step in plain `dplyr` code; both styles produce an identical ARD.
 
-JSON is the recommended ARS representation. If you have an ARS Excel
-workbook, `ars_xlsx_to_json()` converts it to a faithful ARS JSON file (an
-R-native equivalent of CDISC's `excel2ars.py`) that can then be passed to
-`readARS()`.
+ARS metadata in Excel (`.xlsx`) format is deprecated: `readARS()` still
+reads a workbook for now, with a warning, but a future release will read
+JSON only. Convert each workbook once with `ars_xlsx_to_json()` (an
+R-native equivalent of CDISC's `excel2ars.py`, itself deprecated and due
+to be removed together with `.xlsx` input) and keep the resulting `.json`
+file.
 
 See the [Getting
 Started](https://clymbclinical.github.io/siera/articles/Getting_started.html)
