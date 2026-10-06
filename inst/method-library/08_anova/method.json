@@ -5,7 +5,7 @@
   "description": "One-way ANOVA p-value of a continuous variable across treatment arms. Verified against Common_Safety_Displays Mth04_ContVar_Comp_Anova.",
   "context": "R (siera)",
   "status": "verified",
-  "verified_against": "Common_Safety_Displays_cards.xlsx Mth04_ContVar_Comp_Anova",
+  "verified_against": "Common_Safety_Displays_cards.json Mth04_ContVar_Comp_Anova",
   "operations": [
     {
       "order": 1,

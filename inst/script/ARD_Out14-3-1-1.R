@@ -1,11 +1,10 @@
 
 # Programme:    Generate code to produce ARD for Out14-3-1-1
 # Output:       Overall Summary of Treatment-Emergent Adverse Events
-# Date created: 2026-10-01 09:56:25
+# Date created: 2026-10-06 14:40:28
 
   # load libraries ----
     library(dplyr)
-    library(readxl)
     library(readr)
     library(cards)
     library(cardx)
@@ -130,7 +129,7 @@ df3_An07_01_TEAE_Summ_ByTrt <- siera::ars_stamp(
 #Summary of Subjects with At Least One Related TEAE, by Treatment# Apply Data Subset ---
 # Data subset: Related Treatment-Emergent Adverse Events
 df2_An07_02_RelTEAE_Summ_ByTrt <- df_pop |>
-        dplyr::filter(TRTEMFL == 'Y' & AEREL %in% c('POSSIBLE ', 'PROBABLE'))
+        dplyr::filter(TRTEMFL == 'Y' & AEREL %in% c('POSSIBLE', 'PROBABLE'))
 #Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
@@ -244,7 +243,7 @@ df3_An07_03_SerTEAE_Summ_ByTrt <- siera::ars_stamp(
 #Summary of Subjects with At Least One Related Serious TEAE, by Treatment# Apply Data Subset ---
 # Data subset: Related Serious Treatment-Emergent Adverse Events
 df2_An07_04_RelSerTEAE_Summ_ByTrt <- df_pop |>
-        dplyr::filter(TRTEMFL == 'Y' & AEREL %in% c('POSSIBLE ', 'PROBABLE') & AESER == 'Y')
+        dplyr::filter(TRTEMFL == 'Y' & AEREL %in% c('POSSIBLE', 'PROBABLE') & AESER == 'Y')
 #Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
@@ -415,7 +414,7 @@ df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- siera::ars_stamp(
 #Summary of Subjects with At Least One TEAE Leading to Dose Modification, by Treatment# Apply Data Subset ---
 # Data subset: Treatment-Emergent Adverse Events Leading to Dose Modification
 df2_An07_07_TEAELd2DoseMod_Summ_ByTrt <- df_pop |>
-        dplyr::filter(TRTEMFL == 'Y' & AEACN %in% c('DOSE REDUCED ', 'DRUG INTERRUPTED'))
+        dplyr::filter(TRTEMFL == 'Y' & AEACN %in% c('DOSE REDUCED', 'DRUG INTERRUPTED'))
 #Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
