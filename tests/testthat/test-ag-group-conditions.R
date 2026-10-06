@@ -216,3 +216,28 @@ test_that("the per-predefined-group method is population-based (empty subset sti
   tmpl <- readLines(f, warn = FALSE)
   expect_true(any(grepl("df_poptot", tmpl, fixed = TRUE)))
 })
+
+test_that("xlsx IN group cells in the ' | ' convention are trimmed (#213)", {
+  ag <- tibble::tibble(
+    id = "AG_A", group_id = c("AG_A_01", "AG_A_02"), group_order = 1:2,
+    group_condition_variable = "AGEGR1",
+    group_condition_comparator = c("EQ", "IN"),
+    group_condition_value = c("<65", "65-80 | >80")
+  )
+
+  res <- siera:::.ag_group_conditions(ag, "AG_A", file_ext = "xlsx")
+  expect_identical(
+    res$conditions,
+    paste0("AGEGR1 == '<65' ~ '<65',",
+           "\n      AGEGR1 %in% c('65-80', '>80') ~ '65-80'")
+  )
+  expect_identical(res$levels, "'<65', '65-80'")
+
+  code <- siera:::.generate_groupid_code(
+    analysis_id = "An_1", groupids = "AG_A", n_group_cols = 1L,
+    AG_dataDriven = "FALSE", analysis_groupings = ag, file_ext = "xlsx"
+  )
+  expect_match(code, "== '65-80' ~ 'AG_A_02'", fixed = TRUE)
+  expect_match(code, "== '>80' ~ 'AG_A_02'", fixed = TRUE)
+  expect_no_match(code, "'65-80 '", fixed = TRUE)
+})

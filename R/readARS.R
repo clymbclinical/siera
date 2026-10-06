@@ -497,7 +497,7 @@ readARS <- function(ARS_path,
           is_in <- grp_rows$group_condition_comparator %in% "IN"
           split_vals <- lapply(seq_along(cond_vals), function(i) {
             if (is_in[i]) {
-              strsplit(gsub("\\|", ",", cond_vals[i]), ",\\s*")[[1]]
+              .split_xlsx_values(cond_vals[i])
             } else {
               cond_vals[i]
             }
@@ -730,7 +730,7 @@ readARS <- function(ARS_path,
     # so take the level from the same split .generate_data_subset_condition()
     # applies rather than from the raw cell.
     if (identical(comparator, "IN") && identical(file_ext, "xlsx")) {
-      values <- strsplit(gsub("\\|", ",", values[1]), ",\\s*")[[1]]
+      values <- .split_xlsx_values(values[1])
     }
 
     level <- gsub("'", "\\'", values[1], fixed = TRUE)

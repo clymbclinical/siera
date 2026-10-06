@@ -1,7 +1,7 @@
 
 # Programme:    Generate code to produce ARD for Out14-1-1
 # Output:       Summary of Demographics
-# Date created: 2026-07-27 09:10:08
+# Date created: 2026-10-06 14:02:51
 
   # load libraries ----
     library(dplyr)
@@ -218,7 +218,8 @@ df3_An03_02_AgeGrp_Summ_ByTrt <- df3_An03_02_AgeGrp_Summ_ByTrt |>
       group2_groupingId = 'AnlsGrouping_03_AgeGp',
       group2_groupId = dplyr::case_when(
         as.character(group2_level) == '<65' ~ 'AnlsGrouping_03_AgeGp_1',
-        as.character(group2_level) == '65-80 | >80' ~ 'AnlsGrouping_03_AgeGp_2',
+        as.character(group2_level) == '65-80' ~ 'AnlsGrouping_03_AgeGp_2',
+        as.character(group2_level) == '>80' ~ 'AnlsGrouping_03_AgeGp_2',
         TRUE ~ NA_character_
       )
   )

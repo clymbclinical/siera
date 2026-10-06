@@ -1358,3 +1358,18 @@ test_that("ARD values - 4 grouping factors work correctly (xlsx)", {
     expect_true(nrow(an04_rows) > 0, info = "An_04 (4 groupings) produced no ARD rows")
   }
 })
+
+test_that("bundled xlsx ' | ' IN subsets keep every value (#213)", {
+  # Dss02_Related_TEAE is AEREL IN "POSSIBLE | PROBABLE"; a trailing blank on
+  # "POSSIBLE" used to drop every POSSIBLE record from the related-TEAE rows.
+  output_dir <- withr::local_tempdir()
+  readARS(ARS_example("Common_Safety_Displays_cards.xlsx"), output_dir,
+          withr::local_tempdir(), spec_output = "Out14-3-1-1")
+  code <- readLines(file.path(output_dir, "ARD_Out14-3-1-1.R"))
+
+  expect_true(any(grepl("AEREL %in% c('POSSIBLE', 'PROBABLE')", code,
+                        fixed = TRUE)))
+  expect_true(any(grepl("AEACN %in% c('DOSE REDUCED', 'DRUG INTERRUPTED')",
+                        code, fixed = TRUE)))
+  expect_false(any(grepl("'POSSIBLE '|'DOSE REDUCED '", code)))
+})

@@ -337,3 +337,25 @@ test_that("generate_data_subset_code handles missing logical operators", {
   expect_equal(res$filter_expression, "AGE >= 65")
   expect_true(grepl("AGE >= 65", res$code))
 })
+
+test_that(".split_xlsx_values trims the blanks around each separator (#213)", {
+  split <- siera:::.split_xlsx_values
+  expect_identical(split("POSSIBLE | PROBABLE"), c("POSSIBLE", "PROBABLE"))
+  expect_identical(split("A | B|C , D"), c("A", "B", "C", "D"))
+  expect_identical(split("A"), "A")
+})
+
+test_that("xlsx IN / NOTIN cells in the ' | ' convention match the data (#213)", {
+  # TFL Designer / excel2ars.py separate multi-value cells with " | "; the
+  # blank before the separator must not stay on the value, or "POSSIBLE "
+  # silently matches no record.
+  expect_equal(
+    condition_fun("AEREL", "IN", "POSSIBLE | PROBABLE", "xlsx"),
+    "AEREL %in% c('POSSIBLE', 'PROBABLE')"
+  )
+  expect_equal(
+    condition_fun("AEREL", "NOTIN", "POSSIBLE | PROBABLE", "xlsx"),
+    "!(AEREL %in% c('POSSIBLE', 'PROBABLE'))"
+  )
+  expect_equal(condition_fun("AGE", "IN", "1 | 2", "xlsx"), "AGE %in% c(1, 2)")
+})
