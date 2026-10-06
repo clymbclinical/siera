@@ -112,7 +112,8 @@ back to the metadata that defines it. To make that possible, each row of
 a *siera*-generated ARD carries identifier columns alongside the
 statistic itself:
 
-- **`AnalysisId`** - which analysis produced the row.
+- **`AnalysisId`**, **`MethodId`** and **`OutputId`** - which analysis,
+  method and output produced the row.
 - **`operationid`** - which operation within the method (e.g. the `n`
   count vs. the `%`).
 - For each grouping applied to the analysis, a set of `group[n]_*`
@@ -130,9 +131,17 @@ The distinction matters: a treatment-arm grouping is usually
 pre-defined, so its rows carry `group1_groupId`; a grouping such as
 “cause of death” is typically data-driven, so its rows carry
 `group1_groupValue` with whatever categories appeared in the data. A
-single ARD can contain both. The [ARD program
+single ARD can contain both.
+
+These columns are added by the last step of each analysis in the
+generated script, a call to
+[`ars_stamp()`](https://clymbclinical.github.io/siera/reference/ars_stamp.md)
+that takes every identifier from the ARS metadata (and says, in a
+comment, which ARS element it came from). The [ARD program
 structure](https://clymbclinical.github.io/siera/articles/ARD_script_structure.md)
-vignette shows where these columns are stamped on in the generated code.
+vignette shows this “ID linking” step in the generated code, and how to
+generate the plain `dplyr` equivalent instead with
+`readARS(code_style = "expanded")`.
 
 ### Which rows should exist? Pre-defined vs. data-driven categories
 

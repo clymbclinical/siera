@@ -73,6 +73,7 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
 | `R/AnalysisSet.R` | Generates analysis set (population) filter code |
 | `R/DataSubsets.R` | Generates data subset filter code |
 | `R/AnalysisMethods.R` | Resolves method code templates and valueSource parameters |
+| `R/ars_stamp.R` | Exported [`ars_stamp()`](https://clymbclinical.github.io/siera/reference/ars_stamp.md) / [`ars_grouping()`](https://clymbclinical.github.io/siera/reference/ars_grouping.md) — the ID-linking step that wrapped-style generated scripts call (#206) |
 | `R/loadADaM.R` | Generates ADaM dataset loading code (CSV via [`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html), XPT via [`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html), or Dataset-JSON via [`datasetjson::read_dataset_json()`](https://atorus-research.github.io/datasetjson/reference/read_dataset_json.html), chosen per dataset by file extension) |
 | `R/DatasetJSON.R` | Generates the optional CDISC Dataset-JSON export block appended to ARD scripts (`output_format = "datasetjson"`) |
 | `R/libraries.R` | Generates [`library()`](https://rdrr.io/r/base/library.html) calls for generated scripts |
@@ -116,6 +117,12 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
       — substitutes parameters into method code templates; uses
       [`assign()`](https://rdrr.io/r/base/assign.html)/[`get()`](https://rdrr.io/r/base/get.html)
       in a caller `envir` to pass operation IDs back
+    - `.generate_stamp_code()` — (default `code_style = "wrapped"`)
+      emits the closing
+      [`siera::ars_stamp()`](https://clymbclinical.github.io/siera/reference/ars_stamp.md)
+      call that links the ARD to the ARS metadata; the `"expanded"`
+      style instead inlines `.generate_groupid_code()` + the `_level`
+      coercion
 3.  **Write script** — fragments are concatenated and written to
     `ARD_<OutputId>.R` in `output_path`.
 
@@ -249,16 +256,18 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   NA/blank patterns dropped) and `disp` (formatted by
   `.format_ars_result(value, pattern)`, which is
   [`deparse()`](https://rdrr.io/r/base/deparse.html)’d into the script
-  so the package function stays the single source of truth and scripts
-  need no siera at runtime). Formatting rules: decimals = count of `X`
-  after the `.`; the X-run is replaced preserving prefix/suffix
-  (`(N=XX)`, `( XX.X)`); a no-X pattern like `(N=)` gets the number
-  inserted before the trailing `)`;
-  [cards](https://github.com/pharmaverse/cards) proportions
-  (`stat_name == "p"`, 0–1 scale) are ×100 before formatting (p-values
-  `"p.value"` are not); `res` itself stays the raw stat. **Rounding =
-  half-away-from-zero (SAS `ROUND()` convention), NOT R’s default
-  round-half-to-even** —
+  so the package function stays the single source of truth and the
+  formatting block itself needs no siera at runtime; note wrapped-style
+  scripts do call
+  [`siera::ars_stamp()`](https://clymbclinical.github.io/siera/reference/ars_stamp.md)
+  elsewhere, \#206). Formatting rules: decimals = count of `X` after the
+  `.`; the X-run is replaced preserving prefix/suffix (`(N=XX)`,
+  `( XX.X)`); a no-X pattern like `(N=)` gets the number inserted before
+  the trailing `)`; [cards](https://github.com/pharmaverse/cards)
+  proportions (`stat_name == "p"`, 0–1 scale) are ×100 before formatting
+  (p-values `"p.value"` are not); `res` itself stays the raw stat.
+  **Rounding = half-away-from-zero (SAS `ROUND()` convention), NOT R’s
+  default round-half-to-even** —
   `sign(v) * trunc(abs(v)*10^dec + 0.5 + sqrt(.Machine$double.eps)) / 10^dec`
   (the `+ sqrt(eps)` fuzz fixes unrepresentable exact halves like
   `1.005`→`1.01`). Owner-mandated (post-merge direct-to-main) so `disp`
@@ -302,11 +311,63 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   case. No collision with the `output_format = "datasetjson"` ARD
   export: resolution only looks for `<dataset>.json`, while exports are
   named `ARD_<OutputId>.json`.
+- **`code_style` /
+  [`ars_stamp()`](https://clymbclinical.github.io/siera/reference/ars_stamp.md)
+  (issue \#206, PR1)** —
+  `readARS(code_style = c("wrapped","expanded"))`, default `"wrapped"`
+  (strict validation like `output_format`: NULL→default, length 1, exact
+  match). In *wrapped* style each analysis ends with one
+  `siera::ars_stamp(df3_<id>, analysis_id=, method_id=, output_id=, groupings = list(siera::ars_grouping(...)))`
+  call (one arg per line, trailing ARS-JSON-path comments) replacing the
+  identifier `mutate`, the per-grouping `case_when` and the `_level`
+  `vapply` coercion; the method body becomes
+  `df3_<id> <- NULL; if (nrow(df2_<id>) != 0) {<template>}`
+  (population-based templates drop the guard) and `ars_stamp(NULL, …)`
+  returns the same `data.frame` stub row the old `else` branch built.
+  *Expanded* style is the previous generator, byte-identical, kept for
+  readers who want plain dplyr / no runtime siera dependency.
+  **Generated wrapped scripts therefore call `siera::` at runtime.**
+  Pieces: `R/ars_stamp.R` (exports + `.stamp_grouping_cols()`),
+  `.grouping_stamp_spec()` + `.escape_single_quote()` in `R/readARS.R`
+  (shared by BOTH generators so group-id lookups agree by construction;
+  it also takes `file_ext` and splits a delimited xlsx `IN` cell into
+  one value per row, **trimming whitespace** —
+  `Common_Safety_Displays_cards.xlsx` writes `"65-80 | >80"`, and the
+  `",\\s*"` split used elsewhere would keep `"65-80 "` and never match.
+  This split moved here from \#204’s `.generate_groupid_code()` when
+  \#209 was merged with main), `.generate_stamp_code()` (uses
+  `n_group_cols` from `.n_group_cols_from_template()` unchanged — so
+  Big-N with one `by_vars` grouping still stamps **no** group columns,
+  in both styles; known gap, candidate follow-up), and a `code_style`
+  arg on
+  [`.generate_analysis_method_section()`](https://clymbclinical.github.io/siera/reference/dot-generate_analysis_method_section.md)
+  (default `"expanded"` so unit tests of the expanded internals stay
+  valid;
+  [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+  passes its value). **Acceptance gate = parity:**
+  `test-code-style-parity.R` generates every runnable `inst/extdata`
+  example in both styles (JSON + xlsx + documentRef variants), sources
+  them and `expect_identical()`s the final `ARD` and each `df3_*` (after
+  dropping the cards `fmt_fun` closure column — closures differ per run,
+  so even two *expanded* runs are not
+  [`identical()`](https://rdrr.io/r/base/identical.html) on it); eTFL
+  t06 + t13 parity via the `code_style` arg of `.run_etfl_pipeline()`
+  (which defaults to wrapped, so the whole 12-table eTFL regression
+  validates wrapped style). An output whose *expanded* script cannot run
+  locally (missing ADaM such as `ADLB.csv`, or the local cards
+  0.8.1/cardx 0.2.4 mismatch breaking `ard_stats_aov` in Out14-1-1) is
+  skipped rather than compared. A method with no R template yields a
+  stub in wrapped style (expanded errors). Regenerating the two
+  `inst/script/` examples after changing the stamp/method layout is
+  required. PR2/PR3 (stat wrappers
+  `ars_count/ars_categorical/ars_summary`, cardx/risk-difference
+  wrappers + library template rewrite) are planned in the same issue.
 - **Internal functions** are prefixed with `.`
-  (e.g. `.read_ars_metadata`). Only six symbols are exported: `readARS`,
-  `ARS_example`, `ARD_script_example`, `ars_xlsx_to_json`,
+  (e.g. `.read_ars_metadata`). Only eight symbols are exported:
+  `readARS`, `ARS_example`, `ARD_script_example`, `ars_xlsx_to_json`,
   `method_library` (accessor for the bundled `inst/method-library`
-  templates), `%>%`.
+  templates), `ars_stamp`, `ars_grouping` (runtime helpers called by
+  generated scripts, \#206), `%>%`.
 - **[`ars_xlsx_to_json()`](https://clymbclinical.github.io/siera/reference/ars_xlsx_to_json.md)
   (issue \#178)** — R-native reimplementation of CDISC’s Python
   `excel2ars.py`; a faithful *whole-workbook* Excel→JSON converter (all

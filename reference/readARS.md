@@ -12,7 +12,8 @@ readARS(
   output_path = tempdir(),
   adam_path = tempdir(),
   spec_output = "",
-  output_format = "none"
+  output_format = "none",
+  code_style = "wrapped"
 )
 ```
 
@@ -57,6 +58,19 @@ readARS(
   file (\`ARD\_\<OutputId\>.json\`) when the generated script is run.
   The Dataset-JSON export requires the optional datasetjson package to
   be installed in the environment that runs the generated script.
+
+- code_style:
+
+  Style of the generated analysis code. Must be exactly one of
+  \`"wrapped"\` or \`"expanded"\` (no partial matching). \`"wrapped"\`
+  (default) ends each analysis with a call to
+  [`siera::ars_stamp()`](https://clymbclinical.github.io/siera/reference/ars_stamp.md),
+  which links the analysis' ARD to the ARS metadata (\`AnalysisId\`,
+  \`MethodId\`, \`OutputId\` and the \`group\[n\]\_\*\` identifiers), so
+  every analysis reads as analysis set, data subset, method, identifier
+  linking. \`"expanded"\` writes all of that linking out as plain dplyr
+  code in the script, so the generated script does not call siera
+  functions for the linking step. Both styles produce an identical ARD.
 
 ## Value
 

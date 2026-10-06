@@ -228,8 +228,10 @@ each row of a <em>siera</em>-generated ARD carries identifier columns
 alongside the statistic itself:</p>
 <ul>
 <li>
-<strong><code>AnalysisId</code></strong> - which analysis produced
-the row.</li>
+<strong><code>AnalysisId</code></strong>,
+<strong><code>MethodId</code></strong> and
+<strong><code>OutputId</code></strong> - which analysis, method and
+output produced the row.</li>
 <li>
 <strong><code>operationid</code></strong> - which operation within
 the method (e.g. the <code>n</code> count vs. the <code>%</code>).</li>
@@ -256,8 +258,15 @@ data.</li>
 pre-defined, so its rows carry <code>group1_groupId</code>; a grouping
 such as “cause of death” is typically data-driven, so its rows carry
 <code>group1_groupValue</code> with whatever categories appeared in the
-data. A single ARD can contain both. The <a href="ARD_script_structure.html">ARD program structure</a> vignette
-shows where these columns are stamped on in the generated code.</p>
+data. A single ARD can contain both.</p>
+<p>These columns are added by the last step of each analysis in the
+generated script, a call to <code><a href="../reference/ars_stamp.html">ars_stamp()</a></code> that takes every
+identifier from the ARS metadata (and says, in a comment, which ARS
+element it came from). The <a href="ARD_script_structure.html">ARD
+program structure</a> vignette shows this “ID linking” step in the
+generated code, and how to generate the plain <code>dplyr</code>
+equivalent instead with
+<code>readARS(code_style = "expanded")</code>.</p>
 <div class="section level3">
 <h3 id="which-rows-should-exist-pre-defined-vs--data-driven-categories">Which rows should exist? Pre-defined vs. data-driven categories<a class="anchor" aria-label="anchor" href="#which-rows-should-exist-pre-defined-vs--data-driven-categories"></a>
 </h3>

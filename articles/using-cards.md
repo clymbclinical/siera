@@ -97,6 +97,18 @@ datasets defined in the metadata, or complex, dynamic constructs from
 various metadata pieces, to be inserted in specific *cards* functions,
 or pre-processing steps.
 
+A template only has to compute the statistics: it assigns the
+analysis-level ARD to `df3_analysisidhere` (the `cards`/`cardx` result,
+filtered to the operations of the method and with an `operationid`
+column). Linking that ARD back to the ARS metadata (`AnalysisId`,
+`MethodId`, `OutputId` and the `group[n]_*` identifiers) is done
+afterwards by *siera* in a separate step, a call to
+[`ars_stamp()`](https://clymbclinical.github.io/siera/reference/ars_stamp.md)
+that *siera* adds to the generated script - so a template never needs to
+stamp those columns itself. See the [ARD program
+structure](https://clymbclinical.github.io/siera/articles/ARD_script_structure.md)
+vignette.
+
 The authoritative, tested reference for these constructs — together with
 a catalog of ready-to-use analysis-method templates that use them —
 ships with the package as a plain-text **method-template library**. Each

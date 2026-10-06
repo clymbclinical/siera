@@ -217,6 +217,16 @@ You can execute any of these 5 R scripts as-is (assuming the ADaM
 required for this script is available in the <em>ADaM_folder</em>), and
 the result will be an ARD (one result per row format) for each of the
 scripts.</p>
+<p>Each analysis in a generated script reads as four steps - analysis
+set, data subset, method, and a final call to
+<code><a href="../reference/ars_stamp.html">siera::ars_stamp()</a></code> that links the result to the ARS
+metadata (<code>AnalysisId</code>, <code>MethodId</code>,
+<code>OutputId</code> and the grouping identifiers). This means the
+<em>siera</em> package must be installed wherever you run the scripts.
+If you prefer scripts that spell out that last step in plain
+<code>dplyr</code> code instead, use
+<code>readARS(..., code_style = "expanded")</code>; both styles produce
+an identical ARD.</p>
 <p>The generated scripts are portable across operating systems: any
 Windows-style backslashes in the ADaM path are normalised to forward
 slashes, so a script generated on Windows runs unchanged on macOS or

@@ -168,6 +168,16 @@ constructs are either simple variables or datasets defined in the
 metadata, or complex, dynamic constructs from various metadata pieces,
 to be inserted in specific <em>cards</em> functions, or pre-processing
 steps.</p>
+<p>A template only has to compute the statistics: it assigns the
+analysis-level ARD to <code>df3_analysisidhere</code> (the
+<code>cards</code>/<code>cardx</code> result, filtered to the operations
+of the method and with an <code>operationid</code> column). Linking that
+ARD back to the ARS metadata (<code>AnalysisId</code>,
+<code>MethodId</code>, <code>OutputId</code> and the
+<code>group[n]_*</code> identifiers) is done afterwards by
+<em>siera</em> in a separate step, a call to <code><a href="../reference/ars_stamp.html">ars_stamp()</a></code>
+that <em>siera</em> adds to the generated script - so a template never
+needs to stamp those columns itself. See the <a href="ARD_script_structure.html">ARD program structure</a> vignette.</p>
 <p>The authoritative, tested reference for these constructs — together
 with a catalog of ready-to-use analysis-method templates that use them —
 ships with the package as a plain-text <strong>method-template
