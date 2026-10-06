@@ -266,21 +266,6 @@
   unlist(lapply(pr, function(x) x$pageNames), use.names = FALSE)
 }
 
-#' Split an XLSX `pageRef_pages` cell into page names
-#'
-#' The CDISC ARS xlsx representation stores `pageRefs.pageNames` in a single
-#' `pageRef_pages` cell; multiple names are separated by a comma or semicolon.
-#'
-#' @param x A scalar `pageRef_pages` cell value.
-#' @return Character vector of page names; `character(0)` when empty.
-#' @keywords internal
-.split_page_names <- function(x) {
-  if (is.null(x) || length(x) == 0 || is.na(x) || !nzchar(as.character(x))) {
-    return(character(0))
-  }
-  trimws(unlist(strsplit(as.character(x), "[,;]")))
-}
-
 #' Is a location a remote URI?
 #'
 #' Any explicit URI scheme followed by `://` (e.g. `http://`, `https://`,

@@ -4,11 +4,10 @@ test_that(".read_ars_metadata rejects unsupported file types", {
   unsupported <- withr::local_tempfile(fileext = ".txt")
   writeLines("{}", unsupported)
 
-  expect_warning(
-    res <- siera:::`.read_ars_metadata`(unsupported),
-    "Input ARS file must be JSON or xlsx"
+  expect_error(
+    siera:::`.read_ars_metadata`(unsupported),
+    "reads ARS metadata from a .*json"
   )
-  expect_null(res)
 })
 
 expected_components <- c(
@@ -28,8 +27,7 @@ test_that(".read_ars_metadata returns harmonised JSON metadata", {
 
   metadata <- siera:::`.read_ars_metadata`(json_path)
 
-  expect_equal(metadata$file_ext, "json")
-  expect_setequal(names(metadata)[-1], expected_components)
+  expect_setequal(names(metadata), expected_components)
   expect_gt(nrow(metadata$Analyses), 0)
   expect_true(all(c("listItem_outputId", "listItem_name") %in% names(metadata$Lopo)))
 })
@@ -125,30 +123,69 @@ test_that(".read_ars_json_metadata handles missing dataSubsets key", {
 })
 
 
-test_that(".read_ars_metadata dispatches to the XLSX reader", {
-  skip_if_not_installed("readxl")
+test_that(".read_ars_metadata routes a deprecated xlsx workbook through the JSON reader", {
+  xlsx_path <- ARS_example("exampleARS_6.xlsx")
 
-  xlsx_path <- ARS_example("exampleARS_2.xlsx")
+  expect_warning(
+    metadata <- siera:::`.read_ars_metadata`(xlsx_path),
+    class = "siera_deprecated_xlsx"
+  )
 
-  metadata <- siera:::`.read_ars_metadata`(xlsx_path)
-
-  expect_equal(metadata$file_ext, "xlsx")
-  expect_setequal(names(metadata)[-1], expected_components)
-})
-
-
-test_that(".read_ars_xlsx_metadata returns the expected tables", {
-  skip_if_not_installed("readxl")
-
-  xlsx_path <- ARS_example("exampleARS_2.xlsx")
-
-  metadata <- siera:::`.read_ars_xlsx_metadata`(xlsx_path)
-
+  # Same harmonised tables, and the same content, as the committed JSON twin.
+  twin <- siera:::`.read_ars_metadata`(ARS_example("exampleARS_6.json"))
   expect_setequal(names(metadata), expected_components)
-  expect_gt(nrow(metadata$Analyses), 0)
-  expect_true(all(c("listItem_analysisId", "listItem_outputId") %in% names(metadata$Lopa)))
+  expect_identical(sort(metadata$Analyses$id), sort(twin$Analyses$id))
+  expect_identical(metadata$Lopa, twin$Lopa)
+  expect_identical(
+    metadata$AnalysisMethodCodeTemplate$templateCode,
+    twin$AnalysisMethodCodeTemplate$templateCode
+  )
 })
 
+test_that(".read_ars_xlsx_via_json warns and returns NULL when sheets are missing", {
+  # exampleARS_2a.xlsx lacks the DataSubsets and AnalysisMethods sheets.
+  expect_warning(
+    res <- .quiet_xlsx_deprecation(
+      siera:::.read_ars_xlsx_via_json(ARS_example("exampleARS_2a.xlsx"))
+    ),
+    "missing required sheets: DataSubsets, AnalysisMethods"
+  )
+  expect_null(res)
+})
+
+test_that(".read_ars_xlsx_via_json aborts when the ReportingEvent sheet is missing", {
+  skip_if_not_installed("openxlsx")
+  # Every sheet the old xlsx reader needed is present, but the converter also
+  # needs the ReportingEvent header sheet.
+  sheets <- c("OtherListsOfContents", "MainListOfContents", "DataSubsets",
+              "AnalysisSets", "AnalysisGroupings", "Analyses", "AnalysisMethods",
+              "AnalysisMethodCodeTemplate", "AnalysisMethodCodeParameters")
+  wb <- withr::local_tempfile(fileext = ".xlsx")
+  openxlsx::write.xlsx(
+    stats::setNames(lapply(sheets, function(x) data.frame(id = "x")), sheets), wb
+  )
+  expect_error(
+    .quiet_xlsx_deprecation(siera:::.read_ars_xlsx_via_json(wb)),
+    "missing required sheet.*ReportingEvent"
+  )
+})
+
+test_that(".read_ars_json_metadata accepts a parsed object and an explicit ars_dir", {
+  # json_from lets a caller hand over an already-parsed ARS; ars_dir is where
+  # relative referenceDocuments locations resolve (here: the manifest beside
+  # the bundled documentRef example, from a file name that does not exist).
+  json_path <- ARS_example("exampleARS_5_documentref.json")
+  parsed <- jsonlite::fromJSON(json_path)
+
+  from_obj <- siera:::.read_ars_json_metadata(
+    "not-a-real-file.json",
+    ars_dir = dirname(json_path),
+    json_from = parsed
+  )
+  from_file <- siera:::.read_ars_json_metadata(json_path)
+  expect_identical(from_obj, from_file)
+  expect_false(anyNA(from_file$AnalysisMethodCodeTemplate$templateCode))
+})
 
 test_that(".extract_lopa_ids returns empty tibble for NULL input", {
   result <- siera:::`.extract_lopa_ids`(NULL, "Out_01")
@@ -229,6 +266,30 @@ test_that("unnesting logic expands IN condition values to one row per value", {
   expect_equal(tmp_AG$group_condition_value[tmp_AG$group_id == "AG_01_2"], "3")
   # Column must be plain character after unnesting (not list)
   expect_type(tmp_AG$group_condition_value, "character")
+})
+
+test_that("JSON parser keeps a group whose condition carries no value", {
+  # e.g. an "Overall" group `TRT01AN NE <blank>` written without a value array.
+  # Unnesting must keep that group (value NA) instead of silently dropping it.
+  ars <- jsonlite::fromJSON(ARS_example("exampleARS_2.json"),
+                            simplifyVector = FALSE)
+  for (g in seq_along(ars$analysisGroupings)) {
+    for (k in seq_along(ars$analysisGroupings[[g]]$groups)) {
+      grp <- ars$analysisGroupings[[g]]$groups[[k]]
+      if (identical(grp$id, "AnlsGrouping_01_Trt01An_04")) {
+        ars$analysisGroupings[[g]]$groups[[k]]$condition$value <- NULL
+      }
+    }
+  }
+  f <- withr::local_tempfile(fileext = ".json")
+  writeLines(jsonlite::toJSON(ars, auto_unbox = TRUE, null = "null"), f)
+
+  ag <- siera:::.read_ars_json_metadata(f)$AnalysisGroupings
+  overall <- ag[!is.na(ag$group_id) & ag$group_id == "AnlsGrouping_01_Trt01An_04", ]
+  expect_equal(nrow(overall), 1L)
+  expect_true(is.na(overall$group_condition_value))
+  # the grouping's other groups are unaffected
+  expect_equal(sum(ag$id == "AnlsGrouping_01_Trt01An", na.rm = TRUE), 4L)
 })
 
 
@@ -338,7 +399,7 @@ test_that(".read_ars_json_metadata handles ARS with no referencedAnalysisOperati
 
 
 test_that("generated script coerces _level columns to character per df3 before bind_rows", {
-  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.json")
   output_dir <- withr::local_tempdir()
   readARS(ARS_path, output_dir, tempdir(), spec_output = "Out14-1-1",
           code_style = "expanded")
@@ -356,7 +417,7 @@ test_that("generated script coerces _level columns to character per df3 before b
 })
 
 test_that("wrapped script delegates the _level coercion to ars_stamp() per analysis", {
-  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.json")
   output_dir <- withr::local_tempdir()
   readARS(ARS_path, output_dir, withr::local_tempdir(), spec_output = "Out14-1-1",
           code_style = "wrapped")

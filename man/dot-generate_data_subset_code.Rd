@@ -8,8 +8,7 @@
   data_subsets,
   subset_id,
   analysis_id,
-  analysis_set_dataset,
-  file_ext
+  analysis_set_dataset
 )
 }
 \arguments{
@@ -20,8 +19,6 @@
 \item{analysis_id}{Identifier of the analysis for which code is generated.}
 
 \item{analysis_set_dataset}{Dataset name produced by the analysis set step.}
-
-\item{file_ext}{Extension of the source ARS metadata file (json or xlsx).}
 }
 \value{
 A list containing the generated code, subset name, and filter

@@ -76,19 +76,15 @@
 }
 
 parity_examples <- c(
-  "Common_Safety_Displays_cards.xlsx",
+  "Common_Safety_Displays_cards.json",
   "exampleARS_1.json",
   "exampleARS_2.json",
-  "exampleARS_2.xlsx",
   "exampleARS_3.json",
-  "exampleARS_3.xlsx",
   "exampleARS_4.json",
   "exampleARS_5.json",
-  "exampleARS_5.xlsx",
   "exampleARS_5_documentref.json",
-  "exampleARS_5_documentref.xlsx",
   "exampleARS_6.json",
-  "exampleARS_6.xlsx"
+  "exampleARS_7.json"
 )
 
 for (ars_name in parity_examples) {

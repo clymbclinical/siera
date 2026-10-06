@@ -1,33 +1,74 @@
 #' Read ARS metadata from disk
 #'
 #' Internal helper that validates the ARS file extension and dispatches to the
-#' JSON or XLSX reader before returning the harmonised metadata list.
-#' @param ARS_path Path to the ARS metadata file (JSON or XLSX).
+#' JSON reader, the single ARS parser in siera. A deprecated `.xlsx` workbook is
+#' converted to ARS JSON in memory first (see `.read_ars_xlsx_via_json()`).
+#' @param ARS_path Path to the ARS metadata file (`.json`, or a deprecated
+#'   `.xlsx` workbook).
 #'
 #' @return A list containing harmonised metadata tables, or `NULL` if the file
-#'   cannot be parsed.
+#'   is missing required sections.
 #' @keywords internal
 .read_ars_metadata <- function(ARS_path) {
   file_ext <- tolower(tools::file_ext(ARS_path))
 
-  if (!file_ext %in% c("json", "xlsx")) {
+  if (identical(file_ext, "json")) {
+    return(.read_ars_json_metadata(ARS_path))
+  }
+  if (identical(file_ext, "xlsx")) {
+    return(.read_ars_xlsx_via_json(ARS_path))
+  }
+
+  cli::cli_abort(c(
+    "siera reads ARS metadata from a {.file .json} file.",
+    "x" = "{.path {ARS_path}} was received."
+  ))
+}
+
+#' Read a deprecated ARS xlsx workbook through the JSON reader
+#'
+#' Converts the workbook to ARS JSON in memory with the same builder that
+#' backs [ars_xlsx_to_json()], then parses it with `.read_ars_json_metadata()`,
+#' so an xlsx workbook and its converted JSON yield identical metadata. The
+#' round trip through JSON text gives the parsed object exactly the shape
+#' `jsonlite::fromJSON()` produces for an ARS JSON file.
+#'
+#' @param ARS_path Path to the ARS Excel workbook.
+#'
+#' @return The harmonised metadata list, or `NULL` (with a warning) when the
+#'   workbook lacks a sheet siera needs.
+#' @keywords internal
+.read_ars_xlsx_via_json <- function(ARS_path) {
+  cli::cli_warn(
+    c(
+      "Reading ARS metadata from {.file .xlsx} is deprecated and will be removed in a future siera release.",
+      "i" = "Convert the workbook once with {.fn ars_xlsx_to_json} and pass the {.file .json} file to {.fn readARS} instead."
+    ),
+    class = "siera_deprecated_xlsx"
+  )
+
+  required_sheets <- c(
+    "OtherListsOfContents",
+    "MainListOfContents",
+    "DataSubsets",
+    "AnalysisSets",
+    "AnalysisGroupings",
+    "Analyses",
+    "AnalysisMethods",
+    "AnalysisMethodCodeTemplate",
+    "AnalysisMethodCodeParameters"
+  )
+  missing_sheets <- setdiff(required_sheets, readxl::excel_sheets(ARS_path))
+
+  if (length(missing_sheets) > 0) {
     cli::cli_warn(
-      "Input ARS file must be JSON or xlsx; {.path {ARS_path}} was received"
+      "Input ARS workbook is missing required sheets: {paste(missing_sheets, collapse = ', ')}"
     )
     return(NULL)
   }
 
-  metadata <- if (file_ext == "json") {
-    .read_ars_json_metadata(ARS_path)
-  } else {
-    .read_ars_xlsx_metadata(ARS_path)
-  }
-
-  if (is.null(metadata)) {
-    return(NULL)
-  }
-
-  c(list(file_ext = file_ext), metadata)
+  json_text <- .x2a_json_text(.x2a_build(ARS_path))
+  .read_ars_json_metadata(ARS_path, json_from = jsonlite::fromJSON(json_text))
 }
 
 #' Recursively extract analysis IDs from a list-of-contents node data frame
@@ -76,12 +117,17 @@
 #' Internal helper that ingests ARS metadata stored as JSON and converts it into
 #' the harmonised list of tibbles used elsewhere in the package.
 #' @param ARS_path Path to the JSON ARS metadata file.
+#' @param ars_dir Directory that relative `referenceDocuments` locations
+#'   resolve against. Defaults to the directory of `ARS_path`.
+#' @param json_from The parsed ARS JSON. Defaults to parsing `ARS_path`; the
+#'   deprecated xlsx path passes an already-converted object instead.
 #'
 #' @return A list of metadata tables extracted from the JSON file, or `NULL`
 #'   when required sections are missing.
 #' @keywords internal
-.read_ars_json_metadata <- function(ARS_path) {
-  json_from <- jsonlite::fromJSON(ARS_path)
+.read_ars_json_metadata <- function(ARS_path,
+                                    ars_dir = dirname(ARS_path),
+                                    json_from = jsonlite::fromJSON(ARS_path)) {
 
   required_json_sections <- c(
     "otherListsOfContents",
@@ -252,9 +298,12 @@
     # Unnesting expands IN/NOTIN groups — one row per value, group_id repeated —
     # and collapses single-value list elements to a plain character column.
     # Guard against data-driven groupings whose groups array is empty (no column).
+    # keep_empty retains a group whose condition carries no value (NA) instead
+    # of silently dropping it.
     if ("group_condition_value" %in% names(tmp_AG) &&
           is.list(tmp_AG$group_condition_value)) {
-      tmp_AG <- tidyr::unnest(tmp_AG, cols = "group_condition_value")
+      tmp_AG <- tidyr::unnest(tmp_AG, cols = "group_condition_value",
+                              keep_empty = TRUE)
     }
 
     JSON_AG <- dplyr::bind_rows(JSON_AG, tmp_AG)
@@ -412,7 +461,6 @@
   reference_documents <- .extract_reference_documents(json_from$referenceDocuments)
   resolved_parameters <- list()
   if (!is.null(ct$documentRef)) {
-    ars_dir <- dirname(ARS_path)
     for (i in seq_len(n_mth)) {
       if (!is.na(templateCode[i]) && nzchar(templateCode[i])) next
       ref_id <- .documentref_reference_id(ct$documentRef, i)
@@ -473,155 +521,6 @@
     )
     AnalysisMethodCodeParameters <- dplyr::bind_rows(AnalysisMethodCodeParameters, tmp_AMCP)
   }
-
-  list(
-    Lopo = Lopo,
-    Lopa = Lopa,
-    DataSubsets = DataSubsets,
-    AnalysisSets = AnalysisSets,
-    AnalysisGroupings = AnalysisGroupings,
-    Analyses = Analyses,
-    AnalysisMethods = AnalysisMethods,
-    AnalysisMethodCodeTemplate = AnalysisMethodCodeTemplate,
-    AnalysisMethodCodeParameters = AnalysisMethodCodeParameters
-  )
-}
-
-#' Read ARS metadata from XLSX
-#'
-#' Internal helper that ingests ARS metadata stored in Excel workbooks and
-#' converts each worksheet into the harmonised metadata list.
-#' @param ARS_path Path to the Excel workbook containing ARS metadata.
-#'
-#' @return A list of metadata tables extracted from the workbook, or `NULL`
-#'   when required sheets are missing.
-#' @keywords internal
-.read_ars_xlsx_metadata <- function(ARS_path) {
-  ws <- readxl::excel_sheets(ARS_path)
-
-  required_sheets <- c(
-    "OtherListsOfContents",
-    "MainListOfContents",
-    "DataSubsets",
-    "AnalysisSets",
-    "AnalysisGroupings",
-    "Analyses",
-    "AnalysisMethods",
-    "AnalysisMethodCodeTemplate",
-    "AnalysisMethodCodeParameters"
-  )
-
-  missing_sheets <- setdiff(required_sheets, ws)
-
-  if (length(missing_sheets) > 0) {
-    cli::cli_warn(
-      "Input ARS workbook is missing required sheets: {paste(missing_sheets, collapse = ', ')}"
-    )
-    return(NULL)
-  }
-
-  ARS_xlsx <- ARS_path
-  mainListOfContents <- readxl::read_excel(ARS_xlsx, sheet = "MainListOfContents")
-  otherListsOfContents <- readxl::read_excel(ARS_xlsx, sheet = "OtherListsOfContents")
-  DataSubsets <- readxl::read_excel(ARS_xlsx, sheet = "DataSubsets")
-
-  # Ensure DataSubsets has the expected column structure even when the sheet is blank.
-  ds_required_cols <- c(
-    "id", "name", "label", "level", "order",
-    "condition_dataset", "condition_variable",
-    "condition_comparator", "condition_value",
-    "compoundExpression_logicalOperator"
-  )
-  ds_missing_cols <- setdiff(ds_required_cols, colnames(DataSubsets))
-  if (length(ds_missing_cols) > 0) {
-    for (col in ds_missing_cols) {
-      DataSubsets[[col]] <- character(0)
-    }
-  }
-
-  AnalysisSets <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisSets")
-  AnalysisGroupings <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisGroupings")
-  Analyses <- readxl::read_excel(ARS_xlsx, sheet = "Analyses") %>%
-    dplyr::filter(!is.na(method_id))
-  AnalysisMethods <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisMethods")
-  AnalysisMethodCodeTemplate <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisMethodCodeTemplate")
-  AnalysisMethodCodeParameters <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisMethodCodeParameters")
-
-  # External method-template references (parity with the JSON documentRef path).
-  # The CDISC ARS xlsx representation carries these in two optional sheets:
-  #   ReferenceDocuments         (id, name, location, ...)
-  #   AnalysisMethodDocumentRefs (method_id, refDocumentId, pageRef_pages, ...)
-  # Resolve only where a method has no inline templateCode; backfill parameters
-  # from the resolved manifest when the method declares none inline.
-  if (all(c("ReferenceDocuments", "AnalysisMethodDocumentRefs") %in% ws)) {
-    method_doc_refs <- readxl::read_excel(ARS_xlsx, sheet = "AnalysisMethodDocumentRefs")
-    if (nrow(method_doc_refs) > 0) {
-      ars_dir  <- dirname(ARS_path)
-      ref_docs <- .extract_reference_documents(
-        readxl::read_excel(ARS_xlsx, sheet = "ReferenceDocuments")
-      )
-      # An all-blank parameters sheet (every param supplied by the manifest)
-      # reads back with logical columns; re-type so bind_rows can combine it.
-      if (nrow(AnalysisMethodCodeParameters) == 0) {
-        AnalysisMethodCodeParameters <- tibble::tibble(
-          method_id             = character(0),
-          parameter_name        = character(0),
-          parameter_description = character(0),
-          parameter_valueSource = character(0)
-        )
-      }
-      for (k in seq_len(nrow(method_doc_refs))) {
-        mid     <- as.character(method_doc_refs$method_id[k])
-        row_idx <- which(AnalysisMethodCodeTemplate$method_id == mid)
-        existing <- if (length(row_idx) > 0) {
-          AnalysisMethodCodeTemplate$templateCode[row_idx[1]]
-        } else {
-          NA_character_
-        }
-        if (!is.na(existing) && nzchar(existing)) next
-
-        resolved <- .resolve_method_documentref(
-          reference_document_id = as.character(method_doc_refs$refDocumentId[k]),
-          page_names            = .split_page_names(method_doc_refs$pageRef_pages[k]),
-          reference_documents   = ref_docs,
-          ars_dir               = ars_dir
-        )
-
-        if (length(row_idx) > 0) {
-          AnalysisMethodCodeTemplate$templateCode[row_idx[1]] <- resolved$templateCode
-        } else {
-          AnalysisMethodCodeTemplate <- dplyr::bind_rows(
-            AnalysisMethodCodeTemplate,
-            tibble::tibble(
-              method_id    = mid,
-              context      = resolved$context,
-              specifiedAs  = "Code",
-              templateCode = resolved$templateCode
-            )
-          )
-        }
-
-        if (!mid %in% AnalysisMethodCodeParameters$method_id && !is.null(resolved$parameters)) {
-          AnalysisMethodCodeParameters <- dplyr::bind_rows(
-            AnalysisMethodCodeParameters,
-            tibble::tibble(
-              method_id             = mid,
-              parameter_name        = resolved$parameters$name,
-              parameter_description = resolved$parameters$description,
-              parameter_valueSource = resolved$parameters$valueSource
-            )
-          )
-        }
-      }
-    }
-  }
-
-  Lopo <- otherListsOfContents
-
-  Lopa <- mainListOfContents %>%
-    tidyr::fill(listItem_outputId) %>%
-    dplyr::filter(!is.na(listItem_analysisId)) %>%
-    dplyr::select(listItem_analysisId, listItem_outputId)
 
   list(
     Lopo = Lopo,

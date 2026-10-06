@@ -53,14 +53,6 @@ test_that(".is_absolute_path recognises POSIX and Windows absolutes", {
   expect_false(siera:::.is_absolute_path("m.json"))
 })
 
-test_that(".split_page_names splits and trims, empty for blank", {
-  expect_identical(siera:::.split_page_names("total_n"), "total_n")
-  expect_identical(siera:::.split_page_names("a, b ; c"), c("a", "b", "c"))
-  expect_identical(siera:::.split_page_names(NA), character(0))
-  expect_identical(siera:::.split_page_names(""), character(0))
-  expect_identical(siera:::.split_page_names(NULL), character(0))
-})
-
 test_that(".extract_reference_documents normalises NULL, data frame and list", {
   expect_identical(nrow(siera:::.extract_reference_documents(NULL)), 0L)
   df <- data.frame(id = "RD", name = "n", location = "x.json", stringsAsFactors = FALSE)
@@ -263,9 +255,8 @@ test_that("an absolute location is used as-is (not joined to ars_dir)", {
 
 # Generated scripts only; no script is sourced, so no ADaM data / cards needed.
 # Both ARS variants must use the SAME adam dir (its path is embedded in the
-# generated read_csv() calls). The inline xlsx path does not strip \r/_x000D_
-# from templateCode, so blank lines can differ cosmetically - compare with blank
-# lines (and the timestamp header) removed, asserting the logic is identical.
+# generated read_csv() calls). Compare with blank lines (and the timestamp
+# header) removed, asserting the logic is identical.
 .gen_script_norm <- function(ars_path, adam, env = parent.frame()) {
   out <- withr::local_tempdir(.local_envir = env)
   suppressWarnings(suppressMessages(readARS(ars_path, out, adam)))
@@ -284,10 +275,36 @@ test_that("JSON documentRef example generates the same script as the inline ARS"
   expect_identical(docref, inline)
 })
 
-test_that("XLSX documentRef example generates the same script as the inline ARS", {
+test_that("deprecated xlsx input resolves a CDISC-convention documentRef", {
+  # The xlsx path converts the workbook to ARS JSON first, so a method whose
+  # template is specifiedAs = "DocumentRef" with a ProgrammingCode document
+  # reference (the CDISC excel2ars.py convention) resolves exactly like JSON,
+  # relative to the workbook's own folder.
+  skip_if_not_installed("openxlsx")
+  d <- withr::local_tempdir()
+  file.copy(ARS_example("exampleARS_methods.json"), d)
+
+  wb <- openxlsx::loadWorkbook(ARS_example("exampleARS_5.xlsx"))
+  tmpl <- openxlsx::readWorkbook(wb, "AnalysisMethodCodeTemplate")
+  tmpl$specifiedAs <- "DocumentRef"
+  tmpl$templateCode <- NA_character_
+  openxlsx::writeData(wb, "AnalysisMethodCodeTemplate", tmpl)
+  openxlsx::writeData(wb, "AnalysisMethodDocumentRefs", data.frame(
+    method_id = tmpl$method_id, referenceType = "ProgrammingCode",
+    refDocumentId = "RefDoc_siera_methods", pageRef_refType = "NamedDestination",
+    pageRef_label = NA_character_, pageRef_pages = tmpl$method_id
+  ))
+  openxlsx::writeData(wb, "ReferenceDocuments", data.frame(
+    id = "RefDoc_siera_methods", name = "siera example method manifest",
+    description = NA_character_, label = NA_character_,
+    location = "exampleARS_methods.json"
+  ))
+  xlsx <- file.path(d, "docref.xlsx")
+  openxlsx::saveWorkbook(wb, xlsx)
+
   adam   <- withr::local_tempdir()
-  inline <- .gen_script_norm(ARS_example("exampleARS_5.xlsx"), adam)
-  docref <- .gen_script_norm(ARS_example("exampleARS_5_documentref.xlsx"), adam)
+  docref <- .gen_script_norm(xlsx, adam)
+  inline <- .gen_script_norm(ARS_example("exampleARS_5.json"), adam)
   expect_identical(docref, inline)
 })
 

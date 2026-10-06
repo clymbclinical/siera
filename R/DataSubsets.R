@@ -2,18 +2,17 @@
 #'
 #' Internal helper that translates ARS data-subset metadata into a filter
 #' expression suitable for inclusion in generated R code. Handles comparator
-#' translation, type coercion, and workbook-specific formatting differences.
+#' translation and type coercion.
 #' @param variable Variable name used in the subset definition.
 #' @param comparator Comparison operator from the metadata.
-#' @param value Value(s) associated with the comparator.
-#' @param file_ext Extension of the source ARS file, used to normalise parsing.
+#' @param value Value(s) associated with the comparator; multi-value `IN` /
+#'   `NOTIN` conditions arrive as one element per value.
 #'
 #' @return Character string representing the filter expression to apply.
 #' @keywords internal
 .generate_data_subset_condition <- function(variable,
                                             comparator,
-                                            value,
-                                            file_ext) {
+                                            value) {
   if (is.null(variable) || is.na(variable)) {
     return("")
   }
@@ -22,16 +21,7 @@
   comparator <- ifelse(is.null(comparator), "", comparator)
   value_vector <- unlist(value)
 
-  if (identical(file_ext, "xlsx")) {
-    # Excel extracts pipe-delimited lists as comma-separated strings.
-    value_vector <- gsub("\\|", ",", as.character(value_vector))
-  }
-
   if (identical(comparator, "IN")) {
-    if (identical(file_ext, "xlsx")) {
-      value_vector <- strsplit(value_vector[1], ",\\s*")[[1]]
-    }
-
     if (length(value_vector) == 0) {
       value_vector <- character()
     }
@@ -57,10 +47,6 @@
   }
 
   if (identical(comparator, "NOTIN")) {
-    if (identical(file_ext, "xlsx")) {
-      value_vector <- strsplit(value_vector[1], ",\\s*")[[1]]
-    }
-
     if (length(value_vector) == 0) {
       value_vector <- character()
     }
@@ -149,7 +135,6 @@
 #' @param subset_id Identifier of the subset tied to the current analysis.
 #' @param analysis_id Identifier of the analysis for which code is generated.
 #' @param analysis_set_dataset Dataset name produced by the analysis set step.
-#' @param file_ext Extension of the source ARS metadata file (json or xlsx).
 #'
 #' @return A list containing the generated code, subset name, and filter
 #'   expression.
@@ -157,8 +142,7 @@
 .generate_data_subset_code <- function(data_subsets,
                                        subset_id,
                                        analysis_id,
-                                       analysis_set_dataset,
-                                       file_ext) {
+                                       analysis_set_dataset) {
   default_code <- paste0(
     "\n#Apply Data Subset ---\n",
     "df2_", analysis_id, " <- ", analysis_set_dataset, "\n\n"
@@ -206,8 +190,7 @@
     filter_expression <- .generate_data_subset_condition(
       variable,
       comparator,
-      value,
-      file_ext
+      value
     )
   } else {
     # Multi-level subsets require stitching compound expressions across levels.
@@ -259,8 +242,7 @@
           .generate_data_subset_condition(
             ord1_$condition_variable,
             ord1_$condition_comparator,
-            ord1_$condition_value,
-            file_ext
+            ord1_$condition_value
           )
         },
         character(1)

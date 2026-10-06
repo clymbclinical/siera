@@ -4,16 +4,15 @@
 \alias{.generate_data_subset_condition}
 \title{Build a data subset condition}
 \usage{
-.generate_data_subset_condition(variable, comparator, value, file_ext)
+.generate_data_subset_condition(variable, comparator, value)
 }
 \arguments{
 \item{variable}{Variable name used in the subset definition.}
 
 \item{comparator}{Comparison operator from the metadata.}
 
-\item{value}{Value(s) associated with the comparator.}
-
-\item{file_ext}{Extension of the source ARS file, used to normalise parsing.}
+\item{value}{Value(s) associated with the comparator; multi-value `IN` /
+`NOTIN` conditions arrive as one element per value.}
 }
 \value{
 Character string representing the filter expression to apply.
@@ -21,6 +20,6 @@ Character string representing the filter expression to apply.
 \description{
 Internal helper that translates ARS data-subset metadata into a filter
 expression suitable for inclusion in generated R code. Handles comparator
-translation, type coercion, and workbook-specific formatting differences.
+translation and type coercion.
 }
 \keyword{internal}
