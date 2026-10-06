@@ -9,7 +9,8 @@ readARS(
   output_path = tempdir(),
   adam_path = tempdir(),
   spec_output = "",
-  output_format = "none"
+  output_format = "none",
+  column_labels = NULL
 )
 }
 \arguments{
@@ -40,6 +41,16 @@ appends code that writes each ARD as a CDISC Dataset-JSON file
 (`ARD_<OutputId>.json`) when the generated script is run. The
 Dataset-JSON export requires the optional \pkg{datasetjson} package to be
 installed in the environment that runs the generated script.}
+
+\item{column_labels}{Optional named character vector of Dataset-JSON
+variable labels, e.g.
+`c(AGEGR1 = "Pooled Age Group 1", TRT01A = "Actual Treatment")`. Names are
+ARD column names and values are the labels to write. Overrides take
+precedence over siera's built-in label dictionary, so they can also reword
+built-in labels. Because the ARD's columns are only known once the
+generated script runs, a name that matches no ARD column triggers a warning
+at script runtime (likely a typo) rather than an error. Only used when
+`output_format = "datasetjson"`; otherwise it is ignored with a warning.}
 }
 \value{
 R programmes generating ARDs - one for each output (or analysis from an output) specified in the ARS metadata

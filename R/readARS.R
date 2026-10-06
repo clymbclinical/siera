@@ -27,6 +27,15 @@
 #'  (`ARD_<OutputId>.json`) when the generated script is run. The
 #'  Dataset-JSON export requires the optional \pkg{datasetjson} package to be
 #'  installed in the environment that runs the generated script.
+#' @param column_labels Optional named character vector of Dataset-JSON
+#'  variable labels, e.g.
+#'  `c(AGEGR1 = "Pooled Age Group 1", TRT01A = "Actual Treatment")`. Names are
+#'  ARD column names and values are the labels to write. Overrides take
+#'  precedence over siera's built-in label dictionary, so they can also reword
+#'  built-in labels. Because the ARD's columns are only known once the
+#'  generated script runs, a name that matches no ARD column triggers a warning
+#'  at script runtime (likely a typo) rather than an error. Only used when
+#'  `output_format = "datasetjson"`; otherwise it is ignored with a warning.
 #'
 #' @importFrom readxl read_excel
 #'
@@ -51,7 +60,8 @@ readARS <- function(ARS_path,
                     output_path = tempdir(),
                     adam_path = tempdir(),
                     spec_output = "",
-                    output_format = "none") {
+                    output_format = "none",
+                    column_labels = NULL) {
   # Strict validation: no partial matching, omitted/NULL -> "none"
   if (is.null(output_format)) {
     output_format <- "none"
@@ -61,6 +71,13 @@ readARS <- function(ARS_path,
     cli::cli_abort(c(
       "{.arg output_format} must be one of {.val none} or {.val datasetjson}.",
       "x" = "You supplied {.val {output_format}}."
+    ))
+  }
+  .check_column_labels(column_labels)
+  if (!is.null(column_labels) && output_format != "datasetjson") {
+    cli::cli_warn(c(
+      "{.arg column_labels} is ignored unless {.code output_format = \"datasetjson\"}.",
+      "i" = "Labels are only written to the Dataset-JSON export."
     ))
   }
   code_libraries <- .generate_library_code()
@@ -435,7 +452,7 @@ readARS <- function(ARS_path,
     if (output_format == "datasetjson") {
       code_output <- paste0(
         code_output,
-        .generate_datasetjson_code(Output, output_path)
+        .generate_datasetjson_code(Output, output_path, column_labels)
       )
     }
 
