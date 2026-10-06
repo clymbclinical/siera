@@ -340,7 +340,8 @@ test_that(".read_ars_json_metadata handles ARS with no referencedAnalysisOperati
 test_that("generated script coerces _level columns to character per df3 before bind_rows", {
   ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
   output_dir <- withr::local_tempdir()
-  readARS(ARS_path, output_dir, tempdir(), spec_output = "Out14-1-1")
+  readARS(ARS_path, output_dir, tempdir(), spec_output = "Out14-1-1",
+          code_style = "expanded")
 
   lines <- readLines(file.path(output_dir, "ARD_Out14-1-1.R"))
   # Every analysis must have a targeted _level$ coercion block (before bind_rows)
@@ -352,4 +353,21 @@ test_that("generated script coerces _level columns to character per df3 before b
   bind_rows_line <- grep("bind_rows", lines)
   expect_true(length(bind_rows_line) > 0)
   expect_true(all(coerce_lines < max(bind_rows_line)))
+})
+
+test_that("wrapped script delegates the _level coercion to ars_stamp() per analysis", {
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+  output_dir <- withr::local_tempdir()
+  readARS(ARS_path, output_dir, withr::local_tempdir(), spec_output = "Out14-1-1",
+          code_style = "wrapped")
+
+  lines <- readLines(file.path(output_dir, "ARD_Out14-1-1.R"))
+  # no inline coercion block ...
+  expect_false(any(grepl("matches('_level$')", lines, fixed = TRUE)))
+  # ... every analysis ends with one ars_stamp() call, before the bind_rows
+  stamp_lines <- grep("<- siera::ars_stamp(", lines, fixed = TRUE)
+  n_analyses <- length(grep("^# Analysis ", lines))
+  expect_gt(n_analyses, 0L)
+  expect_length(stamp_lines, n_analyses)
+  expect_true(all(stamp_lines < max(grep("bind_rows", lines))))
 })

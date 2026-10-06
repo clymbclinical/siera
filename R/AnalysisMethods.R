@@ -14,6 +14,11 @@
 #'   references that valueSource (e.g. AG_var2_group_values, whose resolution
 #'   can warn). Operation IDs (operation_1, operation_2, …) are derived from the
 #'   method itself and do not need to be supplied here.
+#' @param code_style `"expanded"` (default) writes the empty-data guard and the
+#'   identifier stamp out inline; `"wrapped"` emits only the method call inside
+#'   `df3_<id> <- NULL` followed by an `if (nrow(df2_<id>) != 0)` block, and leaves the
+#'   identifier linking to the caller's `siera::ars_stamp()` step (see
+#'   `.generate_stamp_code()`).
 
 #' @return Character vector with formatted numbers.
 #' @keywords internal
@@ -24,7 +29,10 @@
                                               method_id,
                                               analysis_id,
                                               output_id,
-                                              value_sources = list()) {
+                                              value_sources = list(),
+                                              code_style = c("expanded", "wrapped")) {
+  code_style <- match.arg(code_style)
+
   if (is.null(method_id) || length(method_id) == 0 || is.na(method_id) || identical(method_id, "")) {
     cli::cli_abort(
       "Metadata issue in Analyses {analysis_id}: Analysis is missing a MethodId; method-specific code cannot be generated"
@@ -100,7 +108,20 @@
       parameter_valueSource != ""
     )
 
-  anmetcode_temp <- if (population_based) {
+  anmetcode_temp <- if (code_style == "wrapped") {
+    # df3 stays NULL when the data subset is empty; ars_stamp() turns that into
+    # the statistics-free stub row. Population-based methods always compute.
+    if (population_based) {
+      paste0(template_code, "\n")
+    } else {
+      paste0(
+        "df3_analysisidhere <- NULL\n",
+        "if (nrow(df2_analysisidhere) != 0) {\n",
+        template_code,
+        "\n}\n"
+      )
+    }
+  } else if (population_based) {
     template_code
   } else {
     paste0(
@@ -150,6 +171,17 @@
   code_method_tmp_1 <- gsub("methodidhere", methodid, template_intro, fixed = TRUE)
   code_method_tmp_1 <- gsub("methodnamehere", methodname, code_method_tmp_1, fixed = TRUE)
   code_method_tmp_1 <- gsub("methoddeschere", methoddesc, code_method_tmp_1, fixed = TRUE)
+
+  if (code_style == "wrapped") {
+    # The caller adds the "#Apply Method ---" marker; identifiers are stamped
+    # by the caller's ars_stamp() step, so no inline stamp block here.
+    return(list(
+      code = paste0(code_method_tmp_1, "\n", anmetcode_final),
+      operations = operations_named,
+      method = method,
+      population_based = population_based
+    ))
+  }
 
   template <- if (population_based) {
     # df3 is always assigned by a population-based template, so stamp the
