@@ -816,6 +816,14 @@
   for (i in .x2a_nonblank_rows(df)) {
     g <- .x2a_rowget(df)
     owner <- .x2a_str(g("output_id", i))
+    # TFL Designer exports key the owning output as `id` (#217).
+    if (is.null(owner)) owner <- .x2a_str(g("id", i))
+    if (is.null(owner)) {
+      cli::cli_abort(c(
+        "OutputFiles row {i} names no owning output.",
+        "i" = "Expected an {.field output_id} (or {.field id}) value."
+      ))
+    }
     ftype <- .x2a_str(g("fileType", i))
     fs <- .x2a_obj(
       name        = .x2a_str(g("name", i)),

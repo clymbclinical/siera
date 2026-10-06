@@ -419,3 +419,50 @@ test_that("present-but-empty optional sheets convert without error", {
   expect_length(j$otherListsOfContents, 0L)
   expect_length(j$analysisOutputCategorizations, 0L)
 })
+
+test_that("the bundled Common Safety Displays workbook converts (#217)", {
+  skip_on_cran()
+  xlsx  <- ARS_example("Common_Safety_Displays_cards.xlsx")
+  jfile <- withr::local_tempfile(fileext = ".json")
+  expect_message(ars_xlsx_to_json(xlsx, jfile), "Wrote ARS JSON")
+
+  # TFL Designer keys OutputFiles by `id`; the files land on their output.
+  j <- jsonlite::fromJSON(jfile, simplifyVector = FALSE)
+  out <- Filter(function(o) o$id == "Out14-1-1", j$outputs)[[1]]
+  expect_length(out$fileSpecifications, 2L)
+
+  adam <- withr::local_tempdir()
+  from_xlsx <- .gen_scripts(xlsx, adam)
+  from_json <- .gen_scripts(jfile, adam)
+  expect_identical(names(from_json), names(from_xlsx))
+  for (f in names(from_xlsx)) {
+    # The xlsx reader leaves a blank on all but the last value of a
+    # "A | B" IN cell (#213, "'POSSIBLE ', 'PROBABLE'"); the converter splits
+    # these correctly. Normalise that so the comparison isolates conversion.
+    expect_identical(from_json[[f]], gsub(" ',", "',", from_xlsx[[f]]),
+                     info = f)
+  }
+})
+
+test_that(".x2a_output_files reads the owner from id when output_id is absent", {
+  skip_if_not_installed("openxlsx")
+  wb <- withr::local_tempfile(fileext = ".xlsx")
+  openxlsx::write.xlsx(list(OutputFiles = data.frame(
+    id = c("O1", "O1", "O2"), name = c("f1", "f2", "f3"),
+    location = c("f1.rtf", "f1.pdf", "f3.rtf"), fileType = c("rtf", "pdf", "rtf")
+  )), wb)
+  files <- siera:::.x2a_output_files(wb, "OutputFiles")
+  expect_identical(names(files), c("O1", "O2"))
+  expect_length(files$O1, 2L)
+  expect_identical(files$O2[[1]]$location, "f3.rtf")
+})
+
+test_that(".x2a_output_files aborts on a file row with no owning output", {
+  skip_if_not_installed("openxlsx")
+  wb <- withr::local_tempfile(fileext = ".xlsx")
+  openxlsx::write.xlsx(list(OutputFiles = data.frame(
+    name = "f1", location = "f1.rtf", fileType = "rtf"
+  )), wb)
+  expect_error(siera:::.x2a_output_files(wb, "OutputFiles"),
+               "names no owning output")
+})

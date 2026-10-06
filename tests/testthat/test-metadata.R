@@ -371,3 +371,38 @@ test_that("wrapped script delegates the _level coercion to ars_stamp() per analy
   expect_length(stamp_lines, n_analyses)
   expect_true(all(stamp_lines < max(grep("bind_rows", lines))))
 })
+
+test_that(".as_value_list always returns a list-column-ready value (#217)", {
+  expect_identical(siera:::.as_value_list(c("Y", "N")), list("Y", "N"))
+  expect_identical(siera:::.as_value_list(list("A", c("B", "C"))),
+                   list("A", c("B", "C")))
+  expect_null(siera:::.as_value_list(NULL))
+})
+
+test_that("JSON data subsets mixing scalar and array values are read (#217)", {
+  # One subset's where-clauses all carry scalar values (jsonlite simplifies
+  # them to a character column), another's an array (a list column).
+  ars <- jsonlite::fromJSON(ARS_example("exampleARS_6.json"),
+                            simplifyVector = FALSE, simplifyDataFrame = FALSE)
+  clause <- function(var, value, order) list(
+    level = 2L, order = order,
+    condition = list(dataset = "ADAE", variable = var,
+                     comparator = if (length(value) > 1) "IN" else "EQ",
+                     value = value)
+  )
+  ars$dataSubsets <- list(
+    list(id = "Dss_S", name = "scalar", level = 1L, order = 1L,
+         compoundExpression = list(logicalOperator = "AND", whereClauses = list(
+           clause("TRTEMFL", "Y", 1L), clause("AESER", "Y", 2L)))),
+    list(id = "Dss_A", name = "array", level = 1L, order = 2L,
+         compoundExpression = list(logicalOperator = "AND", whereClauses = list(
+           clause("TRTEMFL", "Y", 1L), clause("AEREL", list("POSSIBLE", "PROBABLE"), 2L))))
+  )
+  f <- withr::local_tempfile(fileext = ".json")
+  jsonlite::write_json(ars, f, auto_unbox = TRUE)
+
+  meta <- siera:::.read_ars_json_metadata(f)
+  expect_type(meta$DataSubsets$condition_value, "list")
+  rel <- meta$DataSubsets[meta$DataSubsets$condition_variable %in% "AEREL", ]
+  expect_identical(unlist(rel$condition_value), c("POSSIBLE", "PROBABLE"))
+})
