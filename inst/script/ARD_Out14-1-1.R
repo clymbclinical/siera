@@ -1,7 +1,7 @@
 
 # Programme:    Generate code to produce ARD for Out14-1-1
 # Output:       Summary of Demographics
-# Date created: 2026-10-06 14:02:51
+# Date created: 2026-10-05 15:28:35
 
   # load libraries ----
     library(dplyr)
@@ -31,14 +31,14 @@ df_poptot <- df_pop
 df2_An01_05_SAF_Summ_ByTrt <- df_poptot
 
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Count_ByGrp
 # Method name:            Count by group for a categorical variable
 # Method description:     Count across groups for a categorical variable, based on subject occurrence
 
-if(nrow(df2_An01_05_SAF_Summ_ByTrt) != 0) {
-                              in_data = df2_An01_05_SAF_Summ_ByTrt |>
+df3_An01_05_SAF_Summ_ByTrt <- NULL
+if (nrow(df2_An01_05_SAF_Summ_ByTrt) != 0) {
+in_data = df2_An01_05_SAF_Summ_ByTrt |>
     dplyr::select(USUBJID, TRT01A) |>
     unique()
 df3_An01_05_SAF_Summ_ByTrt <-
@@ -47,22 +47,16 @@ df3_An01_05_SAF_Summ_ByTrt <-
     , variables = 'TRT01A'
   ) |>
 dplyr::filter(stat_name == 'n') |>
- dplyr::mutate(operationid = 'Mth01_CatVar_Count_ByGrp_1_n')}
-if(nrow(df2_An01_05_SAF_Summ_ByTrt) != 0){
-df3_An01_05_SAF_Summ_ByTrt <- df3_An01_05_SAF_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An01_05_SAF_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Count_ByGrp',
-               OutputId = 'Out14-1-1')
-} else {
-    df3_An01_05_SAF_Summ_ByTrt = data.frame(AnalysisId = 'An01_05_SAF_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Count_ByGrp',
-               OutputId = 'Out14-1-1')
+ dplyr::mutate(operationid = 'Mth01_CatVar_Count_ByGrp_1_n')
 }
-    df3_An01_05_SAF_Summ_ByTrt <- df3_An01_05_SAF_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+
+# Link ARS identifiers ---
+df3_An01_05_SAF_Summ_ByTrt <- siera::ars_stamp(
+  df3_An01_05_SAF_Summ_ByTrt,
+  analysis_id = 'An01_05_SAF_Summ_ByTrt',   # analyses[].id
+  method_id   = 'Mth01_CatVar_Count_ByGrp', # analyses[].methodId
+  output_id   = 'Out14-1-1'                 # mainListOfContents outputId
+)
 
 
 # Analysis An03_01_Age_Summ_ByTrt----
@@ -71,14 +65,14 @@ df3_An01_05_SAF_Summ_ByTrt <- df3_An01_05_SAF_Summ_ByTrt |>
 df2_An03_01_Age_Summ_ByTrt <- df_pop
 
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth02_ContVar_Summ_ByGrp
 # Method name:            Summary by group of a continuous variable
 # Method description:     Descriptive summary statistics across groups for a continuous variable
 
-if(nrow(df2_An03_01_Age_Summ_ByTrt) != 0) {
-                              df3_An03_01_Age_Summ_ByTrt <-
+df3_An03_01_Age_Summ_ByTrt <- NULL
+if (nrow(df2_An03_01_Age_Summ_ByTrt) != 0) {
+df3_An03_01_Age_Summ_ByTrt <-
   cards::ard_summary(
     data = df2_An03_01_Age_Summ_ByTrt,
     by = c('TRT01A'),
@@ -91,34 +85,22 @@ dplyr::mutate(operationid = dplyr::case_when(stat_name == 'N' ~ 'Mth02_ContVar_S
                                                                      stat_name == 'p25' ~ 'Mth02_ContVar_Summ_ByGrp_5_Q1',
                                                                      stat_name == 'p75' ~ 'Mth02_ContVar_Summ_ByGrp_6_Q3',
                                                                      stat_name == 'min' ~ 'Mth02_ContVar_Summ_ByGrp_7_Min',
-                                                                     stat_name == 'max' ~ 'Mth02_ContVar_Summ_ByGrp_8_Max'))}
-if(nrow(df2_An03_01_Age_Summ_ByTrt) != 0){
-df3_An03_01_Age_Summ_ByTrt <- df3_An03_01_Age_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An03_01_Age_Summ_ByTrt',
-               MethodId = 'Mth02_ContVar_Summ_ByGrp',
-               OutputId = 'Out14-1-1')
-} else {
-    df3_An03_01_Age_Summ_ByTrt = data.frame(AnalysisId = 'An03_01_Age_Summ_ByTrt',
-               MethodId = 'Mth02_ContVar_Summ_ByGrp',
-               OutputId = 'Out14-1-1')
+                                                                     stat_name == 'max' ~ 'Mth02_ContVar_Summ_ByGrp_8_Max'))
 }
-    if(nrow(df2_An03_01_Age_Summ_ByTrt) != 0){
-df3_An03_01_Age_Summ_ByTrt <- df3_An03_01_Age_Summ_ByTrt |>
-  dplyr::mutate(
-      group1_groupingId = 'AnlsGrouping_01_Trt',
-      group1_groupId = dplyr::case_when(
-        as.character(group1_level) == 'Placebo' ~ 'AnlsGrouping_01_Trt_1',
-        as.character(group1_level) == 'Xanomeline Low Dose' ~ 'AnlsGrouping_01_Trt_2',
-        as.character(group1_level) == 'Xanomeline High Dose' ~ 'AnlsGrouping_01_Trt_3',
-        TRUE ~ NA_character_
-      )
+
+# Link ARS identifiers ---
+df3_An03_01_Age_Summ_ByTrt <- siera::ars_stamp(
+  df3_An03_01_Age_Summ_ByTrt,
+  analysis_id = 'An03_01_Age_Summ_ByTrt',   # analyses[].id
+  method_id   = 'Mth02_ContVar_Summ_ByGrp', # analyses[].methodId
+  output_id   = 'Out14-1-1',                # mainListOfContents outputId
+  groupings   = list(                       # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose'))
   )
-}
-df3_An03_01_Age_Summ_ByTrt <- df3_An03_01_Age_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+)
 
 
 # Analysis An03_01_Age_Comp_ByTrt----
@@ -127,32 +109,26 @@ df3_An03_01_Age_Summ_ByTrt <- df3_An03_01_Age_Summ_ByTrt |>
 df2_An03_01_Age_Comp_ByTrt <- df_pop
 
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth04_ContVar_Comp_Anova
 # Method name:            Analysis of variance group comparison for a continuous variable
 # Method description:     Comparison of groups by analysis of variance (ANOVA) for a continuous variable
 
-if(nrow(df2_An03_01_Age_Comp_ByTrt) != 0) {
-                              df3_An03_01_Age_Comp_ByTrt <- 
+df3_An03_01_Age_Comp_ByTrt <- NULL
+if (nrow(df2_An03_01_Age_Comp_ByTrt) != 0) {
+df3_An03_01_Age_Comp_ByTrt <- 
     cardx::ard_stats_aov(AGE ~ TRT01A, data = df2_An03_01_Age_Comp_ByTrt) |>
 dplyr::filter(stat_name == 'p.value') |>
-dplyr::mutate(operationid = 'Mth04_ContVar_Comp_Anova_1_pval')}
-if(nrow(df2_An03_01_Age_Comp_ByTrt) != 0){
-df3_An03_01_Age_Comp_ByTrt <- df3_An03_01_Age_Comp_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An03_01_Age_Comp_ByTrt',
-               MethodId = 'Mth04_ContVar_Comp_Anova',
-               OutputId = 'Out14-1-1')
-} else {
-    df3_An03_01_Age_Comp_ByTrt = data.frame(AnalysisId = 'An03_01_Age_Comp_ByTrt',
-               MethodId = 'Mth04_ContVar_Comp_Anova',
-               OutputId = 'Out14-1-1')
+dplyr::mutate(operationid = 'Mth04_ContVar_Comp_Anova_1_pval')
 }
-    df3_An03_01_Age_Comp_ByTrt <- df3_An03_01_Age_Comp_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+
+# Link ARS identifiers ---
+df3_An03_01_Age_Comp_ByTrt <- siera::ars_stamp(
+  df3_An03_01_Age_Comp_ByTrt,
+  analysis_id = 'An03_01_Age_Comp_ByTrt',   # analyses[].id
+  method_id   = 'Mth04_ContVar_Comp_Anova', # analyses[].methodId
+  output_id   = 'Out14-1-1'                 # mainListOfContents outputId
+)
 
 
 # Analysis An03_02_AgeGrp_Summ_ByTrt----
@@ -161,14 +137,14 @@ df3_An03_01_Age_Comp_ByTrt <- df3_An03_01_Age_Comp_ByTrt |>
 df2_An03_02_AgeGrp_Summ_ByTrt <- df_pop
 
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
 # Method name:            Summary by group of a categorical variable
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
-if(nrow(df2_An03_02_AgeGrp_Summ_ByTrt) != 0) {
-                              denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
+df3_An03_02_AgeGrp_Summ_ByTrt <- NULL
+if (nrow(df2_An03_02_AgeGrp_Summ_ByTrt) != 0) {
+denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An03_02_AgeGrp_Summ_ByTrt |>
@@ -194,41 +170,26 @@ df3_An03_02_AgeGrp_Summ_ByTrt <-
 df3_An03_02_AgeGrp_Summ_ByTrt <- df3_An03_02_AgeGrp_Summ_ByTrt|>
 dplyr::filter(stat_name %in% c('n', 'p')) |>
 dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))}
-if(nrow(df2_An03_02_AgeGrp_Summ_ByTrt) != 0){
-df3_An03_02_AgeGrp_Summ_ByTrt <- df3_An03_02_AgeGrp_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An03_02_AgeGrp_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-1-1')
-} else {
-    df3_An03_02_AgeGrp_Summ_ByTrt = data.frame(AnalysisId = 'An03_02_AgeGrp_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-1-1')
+                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
-    if(nrow(df2_An03_02_AgeGrp_Summ_ByTrt) != 0){
-df3_An03_02_AgeGrp_Summ_ByTrt <- df3_An03_02_AgeGrp_Summ_ByTrt |>
-  dplyr::mutate(
-      group1_groupingId = 'AnlsGrouping_01_Trt',
-      group1_groupId = dplyr::case_when(
-        as.character(group1_level) == 'Placebo' ~ 'AnlsGrouping_01_Trt_1',
-        as.character(group1_level) == 'Xanomeline Low Dose' ~ 'AnlsGrouping_01_Trt_2',
-        as.character(group1_level) == 'Xanomeline High Dose' ~ 'AnlsGrouping_01_Trt_3',
-        TRUE ~ NA_character_
-      ),
-      group2_groupingId = 'AnlsGrouping_03_AgeGp',
-      group2_groupId = dplyr::case_when(
-        as.character(group2_level) == '<65' ~ 'AnlsGrouping_03_AgeGp_1',
-        as.character(group2_level) == '65-80' ~ 'AnlsGrouping_03_AgeGp_2',
-        as.character(group2_level) == '>80' ~ 'AnlsGrouping_03_AgeGp_2',
-        TRUE ~ NA_character_
-      )
+
+# Link ARS identifiers ---
+df3_An03_02_AgeGrp_Summ_ByTrt <- siera::ars_stamp(
+  df3_An03_02_AgeGrp_Summ_ByTrt,
+  analysis_id = 'An03_02_AgeGrp_Summ_ByTrt', # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByGrp',   # analyses[].methodId
+  output_id   = 'Out14-1-1',                 # mainListOfContents outputId
+  groupings   = list(                        # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose')),
+    siera::ars_grouping('AnlsGrouping_03_AgeGp', groups = c(
+      'AnlsGrouping_03_AgeGp_1' = '<65',
+      'AnlsGrouping_03_AgeGp_2' = '65-80',
+      'AnlsGrouping_03_AgeGp_2' = '>80'))
   )
-}
-df3_An03_02_AgeGrp_Summ_ByTrt <- df3_An03_02_AgeGrp_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+)
 
 
 # Analysis An03_02_AgeGrp_Comp_ByTrt----
@@ -237,32 +198,26 @@ df3_An03_02_AgeGrp_Summ_ByTrt <- df3_An03_02_AgeGrp_Summ_ByTrt |>
 df2_An03_02_AgeGrp_Comp_ByTrt <- df_pop
 
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth03_CatVar_Comp_PChiSq
 # Method name:            Pearson's chi-square test group comparison for a categorical variable
 # Method description:     Comparison of groups by Pearson's chi-square test for a categorical variable
 
-if(nrow(df2_An03_02_AgeGrp_Comp_ByTrt) != 0) {
-                              df3_An03_02_AgeGrp_Comp_ByTrt <- 
+df3_An03_02_AgeGrp_Comp_ByTrt <- NULL
+if (nrow(df2_An03_02_AgeGrp_Comp_ByTrt) != 0) {
+df3_An03_02_AgeGrp_Comp_ByTrt <- 
     cardx::ard_stats_chisq_test(by = TRT01A, data = df2_An03_02_AgeGrp_Comp_ByTrt, variables = AGEGR1)|>
 dplyr::filter(stat_name == 'p.value') |>
-dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')}
-if(nrow(df2_An03_02_AgeGrp_Comp_ByTrt) != 0){
-df3_An03_02_AgeGrp_Comp_ByTrt <- df3_An03_02_AgeGrp_Comp_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An03_02_AgeGrp_Comp_ByTrt',
-               MethodId = 'Mth03_CatVar_Comp_PChiSq',
-               OutputId = 'Out14-1-1')
-} else {
-    df3_An03_02_AgeGrp_Comp_ByTrt = data.frame(AnalysisId = 'An03_02_AgeGrp_Comp_ByTrt',
-               MethodId = 'Mth03_CatVar_Comp_PChiSq',
-               OutputId = 'Out14-1-1')
+dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')
 }
-    df3_An03_02_AgeGrp_Comp_ByTrt <- df3_An03_02_AgeGrp_Comp_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+
+# Link ARS identifiers ---
+df3_An03_02_AgeGrp_Comp_ByTrt <- siera::ars_stamp(
+  df3_An03_02_AgeGrp_Comp_ByTrt,
+  analysis_id = 'An03_02_AgeGrp_Comp_ByTrt', # analyses[].id
+  method_id   = 'Mth03_CatVar_Comp_PChiSq',  # analyses[].methodId
+  output_id   = 'Out14-1-1'                  # mainListOfContents outputId
+)
 
 
 # Analysis An03_03_Sex_Summ_ByTrt----
@@ -271,14 +226,14 @@ df3_An03_02_AgeGrp_Comp_ByTrt <- df3_An03_02_AgeGrp_Comp_ByTrt |>
 df2_An03_03_Sex_Summ_ByTrt <- df_pop
 
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
 # Method name:            Summary by group of a categorical variable
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
-if(nrow(df2_An03_03_Sex_Summ_ByTrt) != 0) {
-                              denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
+df3_An03_03_Sex_Summ_ByTrt <- NULL
+if (nrow(df2_An03_03_Sex_Summ_ByTrt) != 0) {
+denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An03_03_Sex_Summ_ByTrt |>
@@ -304,40 +259,25 @@ df3_An03_03_Sex_Summ_ByTrt <-
 df3_An03_03_Sex_Summ_ByTrt <- df3_An03_03_Sex_Summ_ByTrt|>
 dplyr::filter(stat_name %in% c('n', 'p')) |>
 dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))}
-if(nrow(df2_An03_03_Sex_Summ_ByTrt) != 0){
-df3_An03_03_Sex_Summ_ByTrt <- df3_An03_03_Sex_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An03_03_Sex_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-1-1')
-} else {
-    df3_An03_03_Sex_Summ_ByTrt = data.frame(AnalysisId = 'An03_03_Sex_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-1-1')
+                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
-    if(nrow(df2_An03_03_Sex_Summ_ByTrt) != 0){
-df3_An03_03_Sex_Summ_ByTrt <- df3_An03_03_Sex_Summ_ByTrt |>
-  dplyr::mutate(
-      group1_groupingId = 'AnlsGrouping_01_Trt',
-      group1_groupId = dplyr::case_when(
-        as.character(group1_level) == 'Placebo' ~ 'AnlsGrouping_01_Trt_1',
-        as.character(group1_level) == 'Xanomeline Low Dose' ~ 'AnlsGrouping_01_Trt_2',
-        as.character(group1_level) == 'Xanomeline High Dose' ~ 'AnlsGrouping_01_Trt_3',
-        TRUE ~ NA_character_
-      ),
-      group2_groupingId = 'AnlsGrouping_02_Sex',
-      group2_groupId = dplyr::case_when(
-        as.character(group2_level) == 'M' ~ 'AnlsGrouping_02_Sex_1',
-        as.character(group2_level) == 'F' ~ 'AnlsGrouping_02_Sex_2',
-        TRUE ~ NA_character_
-      )
+
+# Link ARS identifiers ---
+df3_An03_03_Sex_Summ_ByTrt <- siera::ars_stamp(
+  df3_An03_03_Sex_Summ_ByTrt,
+  analysis_id = 'An03_03_Sex_Summ_ByTrt',  # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByGrp', # analyses[].methodId
+  output_id   = 'Out14-1-1',               # mainListOfContents outputId
+  groupings   = list(                      # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose')),
+    siera::ars_grouping('AnlsGrouping_02_Sex', groups = c(
+      'AnlsGrouping_02_Sex_1' = 'M',
+      'AnlsGrouping_02_Sex_2' = 'F'))
   )
-}
-df3_An03_03_Sex_Summ_ByTrt <- df3_An03_03_Sex_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+)
 
 
 # Analysis An03_03_Sex_Comp_ByTrt----
@@ -346,32 +286,26 @@ df3_An03_03_Sex_Summ_ByTrt <- df3_An03_03_Sex_Summ_ByTrt |>
 df2_An03_03_Sex_Comp_ByTrt <- df_pop
 
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth03_CatVar_Comp_PChiSq
 # Method name:            Pearson's chi-square test group comparison for a categorical variable
 # Method description:     Comparison of groups by Pearson's chi-square test for a categorical variable
 
-if(nrow(df2_An03_03_Sex_Comp_ByTrt) != 0) {
-                              df3_An03_03_Sex_Comp_ByTrt <- 
+df3_An03_03_Sex_Comp_ByTrt <- NULL
+if (nrow(df2_An03_03_Sex_Comp_ByTrt) != 0) {
+df3_An03_03_Sex_Comp_ByTrt <- 
     cardx::ard_stats_chisq_test(by = TRT01A, data = df2_An03_03_Sex_Comp_ByTrt, variables = SEX)|>
 dplyr::filter(stat_name == 'p.value') |>
-dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')}
-if(nrow(df2_An03_03_Sex_Comp_ByTrt) != 0){
-df3_An03_03_Sex_Comp_ByTrt <- df3_An03_03_Sex_Comp_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An03_03_Sex_Comp_ByTrt',
-               MethodId = 'Mth03_CatVar_Comp_PChiSq',
-               OutputId = 'Out14-1-1')
-} else {
-    df3_An03_03_Sex_Comp_ByTrt = data.frame(AnalysisId = 'An03_03_Sex_Comp_ByTrt',
-               MethodId = 'Mth03_CatVar_Comp_PChiSq',
-               OutputId = 'Out14-1-1')
+dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')
 }
-    df3_An03_03_Sex_Comp_ByTrt <- df3_An03_03_Sex_Comp_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+
+# Link ARS identifiers ---
+df3_An03_03_Sex_Comp_ByTrt <- siera::ars_stamp(
+  df3_An03_03_Sex_Comp_ByTrt,
+  analysis_id = 'An03_03_Sex_Comp_ByTrt',   # analyses[].id
+  method_id   = 'Mth03_CatVar_Comp_PChiSq', # analyses[].methodId
+  output_id   = 'Out14-1-1'                 # mainListOfContents outputId
+)
 
 
 # Analysis An03_04_Ethnic_Summ_ByTrt----
@@ -380,14 +314,14 @@ df3_An03_03_Sex_Comp_ByTrt <- df3_An03_03_Sex_Comp_ByTrt |>
 df2_An03_04_Ethnic_Summ_ByTrt <- df_pop
 
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
 # Method name:            Summary by group of a categorical variable
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
-if(nrow(df2_An03_04_Ethnic_Summ_ByTrt) != 0) {
-                              denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
+df3_An03_04_Ethnic_Summ_ByTrt <- NULL
+if (nrow(df2_An03_04_Ethnic_Summ_ByTrt) != 0) {
+denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An03_04_Ethnic_Summ_ByTrt |>
@@ -413,40 +347,25 @@ df3_An03_04_Ethnic_Summ_ByTrt <-
 df3_An03_04_Ethnic_Summ_ByTrt <- df3_An03_04_Ethnic_Summ_ByTrt|>
 dplyr::filter(stat_name %in% c('n', 'p')) |>
 dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))}
-if(nrow(df2_An03_04_Ethnic_Summ_ByTrt) != 0){
-df3_An03_04_Ethnic_Summ_ByTrt <- df3_An03_04_Ethnic_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An03_04_Ethnic_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-1-1')
-} else {
-    df3_An03_04_Ethnic_Summ_ByTrt = data.frame(AnalysisId = 'An03_04_Ethnic_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-1-1')
+                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
-    if(nrow(df2_An03_04_Ethnic_Summ_ByTrt) != 0){
-df3_An03_04_Ethnic_Summ_ByTrt <- df3_An03_04_Ethnic_Summ_ByTrt |>
-  dplyr::mutate(
-      group1_groupingId = 'AnlsGrouping_01_Trt',
-      group1_groupId = dplyr::case_when(
-        as.character(group1_level) == 'Placebo' ~ 'AnlsGrouping_01_Trt_1',
-        as.character(group1_level) == 'Xanomeline Low Dose' ~ 'AnlsGrouping_01_Trt_2',
-        as.character(group1_level) == 'Xanomeline High Dose' ~ 'AnlsGrouping_01_Trt_3',
-        TRUE ~ NA_character_
-      ),
-      group2_groupingId = 'AnlsGrouping_05_Ethnic',
-      group2_groupId = dplyr::case_when(
-        as.character(group2_level) == 'HISPANIC OR LATINO' ~ 'AnlsGrouping_05_Ethnic_1',
-        as.character(group2_level) == 'NOT HISPANIC OR LATINO' ~ 'AnlsGrouping_05_Ethnic_2',
-        TRUE ~ NA_character_
-      )
+
+# Link ARS identifiers ---
+df3_An03_04_Ethnic_Summ_ByTrt <- siera::ars_stamp(
+  df3_An03_04_Ethnic_Summ_ByTrt,
+  analysis_id = 'An03_04_Ethnic_Summ_ByTrt', # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByGrp',   # analyses[].methodId
+  output_id   = 'Out14-1-1',                 # mainListOfContents outputId
+  groupings   = list(                        # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose')),
+    siera::ars_grouping('AnlsGrouping_05_Ethnic', groups = c(
+      'AnlsGrouping_05_Ethnic_1' = 'HISPANIC OR LATINO',
+      'AnlsGrouping_05_Ethnic_2' = 'NOT HISPANIC OR LATINO'))
   )
-}
-df3_An03_04_Ethnic_Summ_ByTrt <- df3_An03_04_Ethnic_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+)
 
 
 # Analysis An03_04_Ethnic_Comp_ByTrt----
@@ -455,32 +374,26 @@ df3_An03_04_Ethnic_Summ_ByTrt <- df3_An03_04_Ethnic_Summ_ByTrt |>
 df2_An03_04_Ethnic_Comp_ByTrt <- df_pop
 
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth03_CatVar_Comp_PChiSq
 # Method name:            Pearson's chi-square test group comparison for a categorical variable
 # Method description:     Comparison of groups by Pearson's chi-square test for a categorical variable
 
-if(nrow(df2_An03_04_Ethnic_Comp_ByTrt) != 0) {
-                              df3_An03_04_Ethnic_Comp_ByTrt <- 
+df3_An03_04_Ethnic_Comp_ByTrt <- NULL
+if (nrow(df2_An03_04_Ethnic_Comp_ByTrt) != 0) {
+df3_An03_04_Ethnic_Comp_ByTrt <- 
     cardx::ard_stats_chisq_test(by = TRT01A, data = df2_An03_04_Ethnic_Comp_ByTrt, variables = ETHNIC)|>
 dplyr::filter(stat_name == 'p.value') |>
-dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')}
-if(nrow(df2_An03_04_Ethnic_Comp_ByTrt) != 0){
-df3_An03_04_Ethnic_Comp_ByTrt <- df3_An03_04_Ethnic_Comp_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An03_04_Ethnic_Comp_ByTrt',
-               MethodId = 'Mth03_CatVar_Comp_PChiSq',
-               OutputId = 'Out14-1-1')
-} else {
-    df3_An03_04_Ethnic_Comp_ByTrt = data.frame(AnalysisId = 'An03_04_Ethnic_Comp_ByTrt',
-               MethodId = 'Mth03_CatVar_Comp_PChiSq',
-               OutputId = 'Out14-1-1')
+dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')
 }
-    df3_An03_04_Ethnic_Comp_ByTrt <- df3_An03_04_Ethnic_Comp_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+
+# Link ARS identifiers ---
+df3_An03_04_Ethnic_Comp_ByTrt <- siera::ars_stamp(
+  df3_An03_04_Ethnic_Comp_ByTrt,
+  analysis_id = 'An03_04_Ethnic_Comp_ByTrt', # analyses[].id
+  method_id   = 'Mth03_CatVar_Comp_PChiSq',  # analyses[].methodId
+  output_id   = 'Out14-1-1'                  # mainListOfContents outputId
+)
 
 
 # Analysis An03_05_Race_Summ_ByTrt----
@@ -489,14 +402,14 @@ df3_An03_04_Ethnic_Comp_ByTrt <- df3_An03_04_Ethnic_Comp_ByTrt |>
 df2_An03_05_Race_Summ_ByTrt <- df_pop
 
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
 # Method name:            Summary by group of a categorical variable
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
-if(nrow(df2_An03_05_Race_Summ_ByTrt) != 0) {
-                              denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
+df3_An03_05_Race_Summ_ByTrt <- NULL
+if (nrow(df2_An03_05_Race_Summ_ByTrt) != 0) {
+denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An03_05_Race_Summ_ByTrt |>
@@ -522,47 +435,32 @@ df3_An03_05_Race_Summ_ByTrt <-
 df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt|>
 dplyr::filter(stat_name %in% c('n', 'p')) |>
 dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))}
-if(nrow(df2_An03_05_Race_Summ_ByTrt) != 0){
-df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An03_05_Race_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-1-1')
-} else {
-    df3_An03_05_Race_Summ_ByTrt = data.frame(AnalysisId = 'An03_05_Race_Summ_ByTrt',
-               MethodId = 'Mth01_CatVar_Summ_ByGrp',
-               OutputId = 'Out14-1-1')
+                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
-    if(nrow(df2_An03_05_Race_Summ_ByTrt) != 0){
-df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt |>
-  dplyr::mutate(
-      group1_groupingId = 'AnlsGrouping_01_Trt',
-      group1_groupId = dplyr::case_when(
-        as.character(group1_level) == 'Placebo' ~ 'AnlsGrouping_01_Trt_1',
-        as.character(group1_level) == 'Xanomeline Low Dose' ~ 'AnlsGrouping_01_Trt_2',
-        as.character(group1_level) == 'Xanomeline High Dose' ~ 'AnlsGrouping_01_Trt_3',
-        TRUE ~ NA_character_
-      ),
-      group2_groupingId = 'AnlsGrouping_04_Race',
-      group2_groupId = dplyr::case_when(
-        as.character(group2_level) == 'AMERICAN INDIAN OR ALASKA NATIVE' ~ 'AnlsGrouping_04_Race_1',
-        as.character(group2_level) == 'ASIAN' ~ 'AnlsGrouping_04_Race_2',
-        as.character(group2_level) == 'BLACK OR AFRICAN AMERICAN' ~ 'AnlsGrouping_04_Race_3',
-        as.character(group2_level) == 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER' ~ 'AnlsGrouping_04_Race_4',
-        as.character(group2_level) == 'WHITE' ~ 'AnlsGrouping_04_Race_5',
-        as.character(group2_level) == 'MULTIPLE' ~ 'AnlsGrouping_04_Race_6',
-        as.character(group2_level) == 'NOT REPORTED' ~ 'AnlsGrouping_04_Race_7',
-        as.character(group2_level) == 'UNKNOWN' ~ 'AnlsGrouping_04_Race_8',
-        as.character(group2_level) == 'OTHER' ~ 'AnlsGrouping_04_Race_9',
-        TRUE ~ NA_character_
-      )
+
+# Link ARS identifiers ---
+df3_An03_05_Race_Summ_ByTrt <- siera::ars_stamp(
+  df3_An03_05_Race_Summ_ByTrt,
+  analysis_id = 'An03_05_Race_Summ_ByTrt', # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByGrp', # analyses[].methodId
+  output_id   = 'Out14-1-1',               # mainListOfContents outputId
+  groupings   = list(                      # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose')),
+    siera::ars_grouping('AnlsGrouping_04_Race', groups = c(
+      'AnlsGrouping_04_Race_1' = 'AMERICAN INDIAN OR ALASKA NATIVE',
+      'AnlsGrouping_04_Race_2' = 'ASIAN',
+      'AnlsGrouping_04_Race_3' = 'BLACK OR AFRICAN AMERICAN',
+      'AnlsGrouping_04_Race_4' = 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER',
+      'AnlsGrouping_04_Race_5' = 'WHITE',
+      'AnlsGrouping_04_Race_6' = 'MULTIPLE',
+      'AnlsGrouping_04_Race_7' = 'NOT REPORTED',
+      'AnlsGrouping_04_Race_8' = 'UNKNOWN',
+      'AnlsGrouping_04_Race_9' = 'OTHER'))
   )
-}
-df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+)
 
 
 # Analysis An03_05_Race_Comp_ByTrt----
@@ -571,32 +469,26 @@ df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt |>
 df2_An03_05_Race_Comp_ByTrt <- df_pop
 
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth03_CatVar_Comp_PChiSq
 # Method name:            Pearson's chi-square test group comparison for a categorical variable
 # Method description:     Comparison of groups by Pearson's chi-square test for a categorical variable
 
-if(nrow(df2_An03_05_Race_Comp_ByTrt) != 0) {
-                              df3_An03_05_Race_Comp_ByTrt <- 
+df3_An03_05_Race_Comp_ByTrt <- NULL
+if (nrow(df2_An03_05_Race_Comp_ByTrt) != 0) {
+df3_An03_05_Race_Comp_ByTrt <- 
     cardx::ard_stats_chisq_test(by = TRT01A, data = df2_An03_05_Race_Comp_ByTrt, variables = RACE)|>
 dplyr::filter(stat_name == 'p.value') |>
-dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')}
-if(nrow(df2_An03_05_Race_Comp_ByTrt) != 0){
-df3_An03_05_Race_Comp_ByTrt <- df3_An03_05_Race_Comp_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An03_05_Race_Comp_ByTrt',
-               MethodId = 'Mth03_CatVar_Comp_PChiSq',
-               OutputId = 'Out14-1-1')
-} else {
-    df3_An03_05_Race_Comp_ByTrt = data.frame(AnalysisId = 'An03_05_Race_Comp_ByTrt',
-               MethodId = 'Mth03_CatVar_Comp_PChiSq',
-               OutputId = 'Out14-1-1')
+dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')
 }
-    df3_An03_05_Race_Comp_ByTrt <- df3_An03_05_Race_Comp_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+
+# Link ARS identifiers ---
+df3_An03_05_Race_Comp_ByTrt <- siera::ars_stamp(
+  df3_An03_05_Race_Comp_ByTrt,
+  analysis_id = 'An03_05_Race_Comp_ByTrt',  # analyses[].id
+  method_id   = 'Mth03_CatVar_Comp_PChiSq', # analyses[].methodId
+  output_id   = 'Out14-1-1'                 # mainListOfContents outputId
+)
 
 
 # Analysis An03_06_Height_Summ_ByTrt----
@@ -605,14 +497,14 @@ df3_An03_05_Race_Comp_ByTrt <- df3_An03_05_Race_Comp_ByTrt |>
 df2_An03_06_Height_Summ_ByTrt <- df_pop
 
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth02_ContVar_Summ_ByGrp
 # Method name:            Summary by group of a continuous variable
 # Method description:     Descriptive summary statistics across groups for a continuous variable
 
-if(nrow(df2_An03_06_Height_Summ_ByTrt) != 0) {
-                              df3_An03_06_Height_Summ_ByTrt <-
+df3_An03_06_Height_Summ_ByTrt <- NULL
+if (nrow(df2_An03_06_Height_Summ_ByTrt) != 0) {
+df3_An03_06_Height_Summ_ByTrt <-
   cards::ard_summary(
     data = df2_An03_06_Height_Summ_ByTrt,
     by = c('TRT01A'),
@@ -625,34 +517,22 @@ dplyr::mutate(operationid = dplyr::case_when(stat_name == 'N' ~ 'Mth02_ContVar_S
                                                                      stat_name == 'p25' ~ 'Mth02_ContVar_Summ_ByGrp_5_Q1',
                                                                      stat_name == 'p75' ~ 'Mth02_ContVar_Summ_ByGrp_6_Q3',
                                                                      stat_name == 'min' ~ 'Mth02_ContVar_Summ_ByGrp_7_Min',
-                                                                     stat_name == 'max' ~ 'Mth02_ContVar_Summ_ByGrp_8_Max'))}
-if(nrow(df2_An03_06_Height_Summ_ByTrt) != 0){
-df3_An03_06_Height_Summ_ByTrt <- df3_An03_06_Height_Summ_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An03_06_Height_Summ_ByTrt',
-               MethodId = 'Mth02_ContVar_Summ_ByGrp',
-               OutputId = 'Out14-1-1')
-} else {
-    df3_An03_06_Height_Summ_ByTrt = data.frame(AnalysisId = 'An03_06_Height_Summ_ByTrt',
-               MethodId = 'Mth02_ContVar_Summ_ByGrp',
-               OutputId = 'Out14-1-1')
+                                                                     stat_name == 'max' ~ 'Mth02_ContVar_Summ_ByGrp_8_Max'))
 }
-    if(nrow(df2_An03_06_Height_Summ_ByTrt) != 0){
-df3_An03_06_Height_Summ_ByTrt <- df3_An03_06_Height_Summ_ByTrt |>
-  dplyr::mutate(
-      group1_groupingId = 'AnlsGrouping_01_Trt',
-      group1_groupId = dplyr::case_when(
-        as.character(group1_level) == 'Placebo' ~ 'AnlsGrouping_01_Trt_1',
-        as.character(group1_level) == 'Xanomeline Low Dose' ~ 'AnlsGrouping_01_Trt_2',
-        as.character(group1_level) == 'Xanomeline High Dose' ~ 'AnlsGrouping_01_Trt_3',
-        TRUE ~ NA_character_
-      )
+
+# Link ARS identifiers ---
+df3_An03_06_Height_Summ_ByTrt <- siera::ars_stamp(
+  df3_An03_06_Height_Summ_ByTrt,
+  analysis_id = 'An03_06_Height_Summ_ByTrt', # analyses[].id
+  method_id   = 'Mth02_ContVar_Summ_ByGrp',  # analyses[].methodId
+  output_id   = 'Out14-1-1',                 # mainListOfContents outputId
+  groupings   = list(                        # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose'))
   )
-}
-df3_An03_06_Height_Summ_ByTrt <- df3_An03_06_Height_Summ_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+)
 
 
 # Analysis An03_06_Height_Comp_ByTrt----
@@ -661,32 +541,26 @@ df3_An03_06_Height_Summ_ByTrt <- df3_An03_06_Height_Summ_ByTrt |>
 df2_An03_06_Height_Comp_ByTrt <- df_pop
 
 #Apply Method --- 
-#Apply Method --- 
 
 # Method ID:              Mth04_ContVar_Comp_Anova
 # Method name:            Analysis of variance group comparison for a continuous variable
 # Method description:     Comparison of groups by analysis of variance (ANOVA) for a continuous variable
 
-if(nrow(df2_An03_06_Height_Comp_ByTrt) != 0) {
-                              df3_An03_06_Height_Comp_ByTrt <- 
+df3_An03_06_Height_Comp_ByTrt <- NULL
+if (nrow(df2_An03_06_Height_Comp_ByTrt) != 0) {
+df3_An03_06_Height_Comp_ByTrt <- 
     cardx::ard_stats_aov(HEIGHTBL ~ TRT01A, data = df2_An03_06_Height_Comp_ByTrt) |>
 dplyr::filter(stat_name == 'p.value') |>
-dplyr::mutate(operationid = 'Mth04_ContVar_Comp_Anova_1_pval')}
-if(nrow(df2_An03_06_Height_Comp_ByTrt) != 0){
-df3_An03_06_Height_Comp_ByTrt <- df3_An03_06_Height_Comp_ByTrt |>
-        dplyr::mutate(AnalysisId = 'An03_06_Height_Comp_ByTrt',
-               MethodId = 'Mth04_ContVar_Comp_Anova',
-               OutputId = 'Out14-1-1')
-} else {
-    df3_An03_06_Height_Comp_ByTrt = data.frame(AnalysisId = 'An03_06_Height_Comp_ByTrt',
-               MethodId = 'Mth04_ContVar_Comp_Anova',
-               OutputId = 'Out14-1-1')
+dplyr::mutate(operationid = 'Mth04_ContVar_Comp_Anova_1_pval')
 }
-    df3_An03_06_Height_Comp_ByTrt <- df3_An03_06_Height_Comp_ByTrt |>
-  dplyr::mutate(dplyr::across(
-    dplyr::matches('_level$'),
-    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
-  ))
+
+# Link ARS identifiers ---
+df3_An03_06_Height_Comp_ByTrt <- siera::ars_stamp(
+  df3_An03_06_Height_Comp_ByTrt,
+  analysis_id = 'An03_06_Height_Comp_ByTrt', # analyses[].id
+  method_id   = 'Mth04_ContVar_Comp_Anova',  # analyses[].methodId
+  output_id   = 'Out14-1-1'                  # mainListOfContents outputId
+)
 
 
 # combine analyses to create ARD ----

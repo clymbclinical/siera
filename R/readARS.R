@@ -27,6 +27,15 @@
 #'  (`ARD_<OutputId>.json`) when the generated script is run. The
 #'  Dataset-JSON export requires the optional \pkg{datasetjson} package to be
 #'  installed in the environment that runs the generated script.
+#' @param code_style Style of the generated analysis code. Must be exactly one
+#'  of `"wrapped"` or `"expanded"` (no partial matching). `"wrapped"` (default)
+#'  ends each analysis with a call to \code{siera::ars_stamp()}, which links the
+#'  analysis' ARD to the ARS metadata (`AnalysisId`, `MethodId`, `OutputId` and
+#'  the `group[n]_*` identifiers), so every analysis reads as analysis set,
+#'  data subset, method, identifier linking. `"expanded"` writes all of that
+#'  linking out as plain \pkg{dplyr} code in the script, so the generated
+#'  script does not call siera functions for the linking step. Both styles
+#'  produce an identical ARD.
 #'
 #' @importFrom readxl read_excel
 #'
@@ -51,7 +60,8 @@ readARS <- function(ARS_path,
                     output_path = tempdir(),
                     adam_path = tempdir(),
                     spec_output = "",
-                    output_format = "none") {
+                    output_format = "none",
+                    code_style = "wrapped") {
   # Strict validation: no partial matching, omitted/NULL -> "none"
   if (is.null(output_format)) {
     output_format <- "none"
@@ -61,6 +71,17 @@ readARS <- function(ARS_path,
     cli::cli_abort(c(
       "{.arg output_format} must be one of {.val none} or {.val datasetjson}.",
       "x" = "You supplied {.val {output_format}}."
+    ))
+  }
+  # Same strict validation: omitted/NULL -> "wrapped"
+  if (is.null(code_style)) {
+    code_style <- "wrapped"
+  }
+  if (length(code_style) != 1L ||
+      !code_style %in% c("wrapped", "expanded")) {
+    cli::cli_abort(c(
+      "{.arg code_style} must be one of {.val wrapped} or {.val expanded}.",
+      "x" = "You supplied {.val {code_style}}."
     ))
   }
   code_libraries <- .generate_library_code()
@@ -340,7 +361,8 @@ readARS <- function(ARS_path,
         method_id = methodid,
         analysis_id = Anas_j,
         output_id = Output,
-        value_sources = value_sources
+        value_sources = value_sources,
+        code_style = code_style
       )
 
       code_method <- analysis_method_result$code
@@ -367,41 +389,63 @@ readARS <- function(ARS_path,
         analysis_method_code_parameters = AnalysisMethodCodeParameters
       )
 
-      code_groupid <- .generate_groupid_code(
-        analysis_id        = Anas_j,
-        groupids           = groupids,
-        n_group_cols       = n_group_cols,
-        AG_dataDriven      = AG_dataDriven,
-        analysis_groupings = AnalysisGroupings,
-        population_based   = population_based,
-        file_ext           = file_ext
-      )
-
       # Generate code for analysis ----------------------------------------------
 
-      # Coerce *_level columns (variable_level, group[n]_level) to character on
-      # each individual df3 BEFORE bind_rows combines them.  Cards returns
-      # variable_level as a list-of-NULLs for continuous analyses, and as
-      # character for categorical ones; left as-is they create type conflicts
-      # during bind_rows.  The vapply converts NULL -> NA_character_ safely
-      # without touching the numeric 'stat' list column.
-      code_listcoerce <- paste0(
-        "df3_", Anas_j, " <- df3_", Anas_j, " |>\n",
-        "  dplyr::mutate(dplyr::across(\n",
-        "    dplyr::matches('_level$'),\n",
-        "    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))\n",
-        "  ))\n"
-      )
+      if (code_style == "wrapped") {
+        # Identifier linking (AnalysisId/MethodId/OutputId, group[n]_* columns
+        # and the *_level coercion) is delegated to siera::ars_stamp().
+        code_per_analysis <- paste0(
+          "\n\n# Analysis ", Anas_j, "----\n#",
+          ana_name,
+          code_as,
+          code_ds,
+          code_method_frag,
+          .generate_stamp_code(
+            analysis_id        = Anas_j,
+            method_id          = methodid,
+            output_id          = Output,
+            groupids           = groupids,
+            n_group_cols       = n_group_cols,
+            AG_dataDriven      = AG_dataDriven,
+            analysis_groupings = AnalysisGroupings,
+            file_ext           = file_ext
+          )
+        )
+      } else {
+        code_groupid <- .generate_groupid_code(
+          analysis_id        = Anas_j,
+          groupids           = groupids,
+          n_group_cols       = n_group_cols,
+          AG_dataDriven      = AG_dataDriven,
+          analysis_groupings = AnalysisGroupings,
+          population_based   = population_based,
+          file_ext           = file_ext
+        )
 
-      code_per_analysis <- paste0(
-        "\n\n# Analysis ", Anas_j, "----\n#",
-        ana_name,
-        code_as,
-        code_ds,
-        code_method_frag,
-        code_groupid,
-        code_listcoerce
-      )
+        # Coerce *_level columns (variable_level, group[n]_level) to character on
+        # each individual df3 BEFORE bind_rows combines them.  Cards returns
+        # variable_level as a list-of-NULLs for continuous analyses, and as
+        # character for categorical ones; left as-is they create type conflicts
+        # during bind_rows.  The vapply converts NULL -> NA_character_ safely
+        # without touching the numeric 'stat' list column.
+        code_listcoerce <- paste0(
+          "df3_", Anas_j, " <- df3_", Anas_j, " |>\n",
+          "  dplyr::mutate(dplyr::across(\n",
+          "    dplyr::matches('_level$'),\n",
+          "    ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))\n",
+          "  ))\n"
+        )
+
+        code_per_analysis <- paste0(
+          "\n\n# Analysis ", Anas_j, "----\n#",
+          ana_name,
+          code_as,
+          code_ds,
+          code_method_frag,
+          code_groupid,
+          code_listcoerce
+        )
+      }
 
       run_code <- paste0(run_code, code_per_analysis)
 
@@ -470,54 +514,30 @@ readARS <- function(ARS_path,
 
     gpval_col <- paste0("group", k, "_groupValue")
 
-    if (isTRUE(as.logical(AG_dataDriven[k]))) {
+    spec <- .grouping_stamp_spec(gid, AG_dataDriven[k], analysis_groupings,
+                                 file_ext)
+
+    if (spec$data_driven) {
       mutate_parts <- c(mutate_parts,
         paste0("      ", gpid_col,  " = NA_character_"),
         paste0("      ", gpval_col, " = as.character(", grp_level_col, ")")
       )
+    } else if (length(spec$group_ids) == 0L) {
+      mutate_parts <- c(mutate_parts,
+        paste0("      ", gpid_col, " = NA_character_")
+      )
     } else {
-      grp_rows <- analysis_groupings[
-        analysis_groupings$id == gid &
-          !is.na(analysis_groupings$group_id) &
-          nchar(as.character(analysis_groupings$group_id)) > 0, ]
-
-      if (nrow(grp_rows) == 0L) {
-        mutate_parts <- c(mutate_parts,
-          paste0("      ", gpid_col, " = NA_character_")
-        )
-      } else {
-        cond_vals <- as.character(grp_rows$group_condition_value)
-        grp_ids   <- grp_rows$group_id
-
-        # The xlsx reader keeps a multi-value IN condition in one delimited
-        # cell (the JSON reader unnests it), so split it to one row per value
-        # or the level of an IN group would never match its group id.
-        if (identical(file_ext, "xlsx") &&
-            "group_condition_comparator" %in% names(grp_rows)) {
-          is_in <- grp_rows$group_condition_comparator %in% "IN"
-          split_vals <- lapply(seq_along(cond_vals), function(i) {
-            if (is_in[i]) {
-              .split_xlsx_values(cond_vals[i])
-            } else {
-              cond_vals[i]
-            }
-          })
-          grp_ids   <- rep(grp_ids, lengths(split_vals))
-          cond_vals <- unlist(split_vals)
-        }
-        cond_vals <- gsub("'", "\\'", cond_vals, fixed = TRUE)
-        cases <- paste(
-          paste0("        as.character(", grp_level_col, ") == '",
-                 cond_vals, "' ~ '", grp_ids, "'"),
-          collapse = ",\n"
-        )
-        mutate_parts <- c(mutate_parts,
-          paste0("      ", gpid_col, " = dplyr::case_when(\n",
-                 cases, ",\n",
-                 "        TRUE ~ NA_character_\n",
-                 "      )")
-        )
-      }
+      cases <- paste(
+        paste0("        as.character(", grp_level_col, ") == '",
+               .escape_single_quote(spec$values), "' ~ '", spec$group_ids, "'"),
+        collapse = ",\n"
+      )
+      mutate_parts <- c(mutate_parts,
+        paste0("      ", gpid_col, " = dplyr::case_when(\n",
+               cases, ",\n",
+               "        TRUE ~ NA_character_\n",
+               "      )")
+      )
     }
   }
 
@@ -535,6 +555,121 @@ readARS <- function(ARS_path,
   } else {
     paste0("if(nrow(df2_", analysis_id, ") != 0){\n", mutate_block, "}\n")
   }
+}
+
+# What the ID-linking step needs to know about one grouping: whether it is
+# data-driven and, for pre-defined groupings, the group ids and condition values
+# (one entry per condition value, so IN conditions repeat the group id). Shared
+# by the expanded generator (.generate_groupid_code()) and the wrapped one
+# (.generate_stamp_code()), so both styles stamp the same groups by construction.
+.grouping_stamp_spec <- function(gid, data_driven, analysis_groupings,
+                                 file_ext = "json") {
+  data_driven <- isTRUE(as.logical(data_driven))
+  values <- character(0)
+  group_ids <- character(0)
+
+  if (!data_driven) {
+    grp_rows <- analysis_groupings[
+      analysis_groupings$id == gid &
+        !is.na(analysis_groupings$group_id) &
+        nchar(as.character(analysis_groupings$group_id)) > 0, ]
+    values <- as.character(grp_rows$group_condition_value)
+    group_ids <- grp_rows$group_id
+
+    # The xlsx reader keeps a multi-value IN condition in one delimited
+    # cell (the JSON reader unnests it), so split it to one row per value
+    # or the level of an IN group would never match its group id
+    # (.split_xlsx_values() trims each value, #213).
+    if (identical(file_ext, "xlsx") &&
+        "group_condition_comparator" %in% names(grp_rows)) {
+      is_in <- grp_rows$group_condition_comparator %in% "IN"
+      split_vals <- lapply(seq_along(values), function(i) {
+        if (is_in[i]) {
+          .split_xlsx_values(values[i])
+        } else {
+          values[i]
+        }
+      })
+      group_ids <- rep(group_ids, lengths(split_vals))
+      values    <- unlist(split_vals)
+    }
+  }
+
+  list(id = gid, data_driven = data_driven, values = values, group_ids = group_ids)
+}
+
+# Escape single quotes so a value can sit inside a single-quoted R literal in
+# generated code.
+.escape_single_quote <- function(x) {
+  gsub("'", "\\'", x, fixed = TRUE)
+}
+
+# Generate the "Link ARS identifiers" step of the wrapped code style: one
+# siera::ars_stamp() call per analysis, one argument per line with a trailing
+# comment naming the ARS element it was copied from. n_group_cols is the number
+# of group[n] columns the method produces in the ARD (see
+# .n_group_cols_from_template()); the groupings argument is omitted when it is 0.
+.generate_stamp_code <- function(analysis_id, method_id, output_id, groupids,
+                                 n_group_cols, AG_dataDriven,
+                                 analysis_groupings, file_ext = "json") {
+  df3 <- paste0("df3_", analysis_id)
+  lit <- function(x) paste0("'", .escape_single_quote(x), "'")
+  has_groupings <- n_group_cols >= 1L
+
+  args <- paste0(
+    c("analysis_id = ", "method_id   = ", "output_id   = "),
+    c(lit(analysis_id), lit(method_id), lit(output_id)),
+    c(",", ",", if (has_groupings) "," else "")
+  )
+  notes <- c(
+    "analyses[].id",
+    "analyses[].methodId",
+    "mainListOfContents outputId"
+  )
+
+  if (has_groupings) {
+    args <- c(args, "groupings   = list(")
+    notes <- c(notes, "analyses[].orderedGroupings")
+  }
+
+  # Align the trailing ARS-path comments.
+  width <- max(nchar(args))
+  arg_lines <- paste0(
+    "  ", args, strrep(" ", width - nchar(args)), " # ", notes
+  )
+
+  if (has_groupings) {
+    grouping_calls <- vapply(seq_len(n_group_cols), function(k) {
+      spec <- .grouping_stamp_spec(groupids[k], AG_dataDriven[k],
+                                   analysis_groupings, file_ext)
+      if (spec$data_driven) {
+        paste0("    siera::ars_grouping(", lit(spec$id), ", data_driven = TRUE)")
+      } else if (length(spec$group_ids) == 0L) {
+        paste0("    siera::ars_grouping(", lit(spec$id), ")")
+      } else {
+        paste0(
+          "    siera::ars_grouping(", lit(spec$id), ", groups = c(\n",
+          paste0("      ", lit(spec$group_ids), " = ", lit(spec$values),
+                 collapse = ",\n"),
+          "))"
+        )
+      }
+    }, character(1L))
+
+    arg_lines <- c(
+      arg_lines,
+      paste(grouping_calls, collapse = ",\n"),
+      "  )"
+    )
+  }
+
+  paste0(
+    "\n# Link ARS identifiers ---\n",
+    df3, " <- siera::ars_stamp(\n",
+    "  ", df3, ",\n",
+    paste(arg_lines, collapse = "\n"),
+    "\n)\n"
+  )
 }
 
 # Determine how many group[n] columns a method produces in the ARD output.

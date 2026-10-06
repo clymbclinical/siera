@@ -94,6 +94,8 @@ siera picks the reader for each ADaM dataset from its file extension —
 `datasetjson::read_dataset_json()` — just as the ARS input format is
 inferred from `.json` vs `.xlsx`. No extra argument is needed.
 
+Every analysis in a generated script reads as analysis set, data subset, method, and a final call to `siera::ars_stamp()`, which links the result to the ARS metadata (`AnalysisId`, `MethodId`, `OutputId` and the grouping identifiers).  The generated scripts therefore need the siera package to be installed when run.  Use `readARS(code_style = "expanded")` if you prefer scripts that spell out that linking step in plain `dplyr` code; both styles produce an identical ARD.
+
 JSON is the recommended ARS representation. If you have an ARS Excel
 workbook, `ars_xlsx_to_json()` converts it to a faithful ARS JSON file (an
 R-native equivalent of CDISC's `excel2ars.py`) that can then be passed to

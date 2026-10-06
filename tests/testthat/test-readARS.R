@@ -404,7 +404,8 @@ test_that("group[n]_groupingId and group[n]_groupId stamped for by_listc methods
   ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
   output_dir <- withr::local_tempdir()
   adam_folder <- withr::local_tempdir()
-  readARS(ARS_path, output_dir, adam_folder, spec_output = "Out14-1-1")
+  readARS(ARS_path, output_dir, adam_folder, spec_output = "Out14-1-1",
+          code_style = "expanded")
 
   lines <- readLines(file.path(output_dir, "ARD_Out14-1-1.R"))
 
@@ -424,7 +425,7 @@ test_that("group[n]_groupingId and group[n]_groupId stamped for by_listc methods
   ARS_path <- ARS_example("test_cards.json")
   output_dir <- withr::local_tempdir()
   adam_folder <- withr::local_tempdir()
-  readARS(ARS_path, output_dir, adam_folder)
+  readARS(ARS_path, output_dir, adam_folder, code_style = "expanded")
 
   r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
   expect_true(length(r_files) > 0)
@@ -432,6 +433,40 @@ test_that("group[n]_groupingId and group[n]_groupId stamped for by_listc methods
   all_lines <- unlist(lapply(r_files, readLines))
   expect_true(any(grepl("group1_groupingId", all_lines)))
   expect_true(any(grepl("group1_groupId", all_lines)))
+})
+
+test_that("wrapped style stamps groupings via ars_grouping() for by_listc methods - xlsx", {
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+  output_dir <- withr::local_tempdir()
+  adam_folder <- withr::local_tempdir()
+  readARS(ARS_path, output_dir, adam_folder, spec_output = "Out14-1-1",
+          code_style = "wrapped")
+
+  lines <- readLines(file.path(output_dir, "ARD_Out14-1-1.R"))
+
+  # by_listc methods (continuous summary, n%) carry their groupings ...
+  expect_true(any(grepl("siera::ars_grouping(", lines, fixed = TRUE)))
+  expect_true(any(grepl("siera::ars_stamp(", lines, fixed = TRUE)))
+
+  # ... but the by_vars count method with num_grp=1 gets no groupings argument
+  # (the single grouping goes to variables=, so no group1 column in the ARD)
+  start <- grep("df3_An01_05_SAF_Summ_ByTrt <- siera::ars_stamp(", lines, fixed = TRUE)
+  expect_length(start, 1L)
+  stamp_end <- start + which(lines[(start + 1):length(lines)] == ")")[1]
+  expect_false(any(grepl("ars_grouping|groupings", lines[start:stamp_end])))
+})
+
+test_that("wrapped style stamps groupings via ars_grouping() for by_listc methods - json", {
+  ARS_path <- ARS_example("test_cards.json")
+  output_dir <- withr::local_tempdir()
+  adam_folder <- withr::local_tempdir()
+  readARS(ARS_path, output_dir, adam_folder, code_style = "wrapped")
+
+  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
+  all_lines <- unlist(lapply(r_files, readLines))
+  expect_true(any(grepl("siera::ars_grouping(", all_lines, fixed = TRUE)))
+  expect_true(any(grepl("siera::ars_stamp(", all_lines, fixed = TRUE)))
+  expect_false(any(grepl("group1_groupingId", all_lines)))
 })
 
 test_that(".generate_groupid_code falls back to NA_character_ when grouping has no rows", {
@@ -484,13 +519,26 @@ test_that(".generate_groupid_code drops the empty-data guard for population-base
 test_that("group[n]_groupValue stamped for data-driven groupings - json", {
   ARS_path <- ARS_example("exampleARS_5.json")
   output_dir <- withr::local_tempdir()
-  readARS(ARS_path, output_dir, tempdir())
+  readARS(ARS_path, output_dir, tempdir(), code_style = "expanded")
 
   lines <- readLines(file.path(output_dir, "ARD_Out_01.R"))
   # data-driven grouping: groupId must be NA, groupValue must carry the level
   expect_true(any(grepl("groupId = NA_character_", lines)))
   expect_true(any(grepl("groupValue = as.character(group", lines, fixed = TRUE)))
   # non-data-driven grouping in same script must NOT get groupValue
+  expect_false(any(grepl("group1_groupValue", lines)))
+})
+
+test_that("wrapped style flags data-driven groupings via ars_grouping(data_driven = TRUE)", {
+  ARS_path <- ARS_example("exampleARS_5.json")
+  output_dir <- withr::local_tempdir()
+  readARS(ARS_path, output_dir, withr::local_tempdir(), code_style = "wrapped")
+
+  lines <- readLines(file.path(output_dir, "ARD_Out_01.R"))
+  # data-driven grouping: flagged as such (ars_stamp() then stamps groupValue) ...
+  expect_true(any(grepl("data_driven = TRUE", lines, fixed = TRUE)))
+  # ... while the pre-defined grouping in the same script lists its groups
+  expect_true(any(grepl("ars_grouping\\('[^']+', groups = c\\(", lines)))
   expect_false(any(grepl("group1_groupValue", lines)))
 })
 
