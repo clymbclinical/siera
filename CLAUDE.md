@@ -1002,10 +1002,19 @@ after the xlsx templates are updated, then
     `"R (siera)"`) and metadata uses it — the XLSX **add-row** branch
     (documentRef method with no `AnalysisMethodCodeTemplate` sheet row)
     and a JSON documentRef method that omits `codeTemplate.context`
-    would otherwise get `context = NA` and be silently dropped. The
-    shipped `exampleARS_5_documentref.xlsx` fixture keeps one blanked
-    template row (update branch) and omits the other two (add-row
-    branch) so both are covered.
+    would otherwise get `context = NA` and be silently dropped.
+    **\#214:** the xlsx `AnalysisMethodDocumentRefs` sheet mixes the ARS
+    `method.documentRefs` (documentation,
+    `referenceType = "Documentation"`, e.g. SAP p. 9 in
+    `Common_Safety_Displays_cards.xlsx`) with the code-template
+    reference (`codeTemplate.documentRef`; the fixture uses
+    `referenceType = "ExternalCode"`). `metadata.R` drops
+    `Documentation` rows before resolving (a sheet without the column
+    resolves every row); the JSON path reads `codeTemplate.documentRef`
+    only and was never affected. The shipped
+    `exampleARS_5_documentref.xlsx` fixture keeps one blanked template
+    row (update branch) and omits the other two (add-row branch) so both
+    are covered.
 
 ## Documentation and vignettes
 

@@ -130,6 +130,17 @@ CRAN release: 2026-06-17
   subject with any AE). The JSON path now matches the XLSX path, which
   was unaffected
   ([\#211](https://github.com/clymbclinical/siera/issues/211)).
+- Fixed
+  [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+  aborting on **xlsx** ARS files whose methods carry documentation
+  references. The `AnalysisMethodDocumentRefs` sheet holds a method’s
+  documentation references (e.g. a SAP section) as well as its
+  code-template reference, and every row was resolved as a code
+  template - so a method resolved from a method library failed with
+  “location does not exist: ./sap.pdf” whenever its documentation row
+  came first. Rows with `referenceType` `Documentation` are now ignored
+  by code generation
+  ([\#214](https://github.com/clymbclinical/siera/issues/214)).
 - Fixed zero-event risk-difference analyses returning `NA` instead of
   `0`. Methods that compute over the full population (templates
   referencing `df_poptot`, e.g. risk differences) now bypass the
