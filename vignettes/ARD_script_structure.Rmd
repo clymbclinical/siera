@@ -38,6 +38,8 @@ Each auto-generated ARD program (one generated for each output) follows a logica
 # Section 6: Format results per ARS resultPattern
 ```
 
+Note that the generated scripts link each analysis to the ARS metadata with `siera::ars_stamp()` (see Step 4 below), so the _siera_ package needs to be installed wherever the scripts are run.  If you would rather have self-contained scripts that only use `dplyr` and `cards`/`cardx` for this, use `readARS(code_style = "expanded")`.
+
 Section 3 ("Load ADaM datasets") reads each ADaM dataset referenced by the output. siera supports three on-disk formats and chooses the reader from each file's extension: CSV (`.csv`) files are read with `readr::read_csv()`, SAS transport (`.xpt`) files with `haven::read_xpt()`, and CDISC Dataset-JSON (`.json`) files with `datasetjson::read_dataset_json()`. This mirrors how the ARS input format is inferred from `.json` vs `.xlsx`, so no extra argument is needed - just point `readARS()` at a folder of `.csv`, `.xpt` or `.json` ADaMs. Reading `.xpt` datasets requires the `haven` package, and `.json` datasets the `datasetjson` package, to be installed. The file lookup is case-insensitive, so the lower-case file names typical of regulatory submissions (e.g. `adsl.xpt`) are matched to the upper-case dataset names in the ARS metadata (`ADSL`). When several formats exist for the same dataset, precedence is `.csv`, then `.xpt`, then `.json`.
 
 
@@ -81,59 +83,91 @@ df2_An07_03_SerTEAE_Summ_ByTrt <- df_pop |>
 
 #### Step 3: Apply "Method"
 
-This step takes the subsetted dataset, and applies the required AnalysisMethod (e.g. counting subjects by treatment and a group, like RACE).  As explained in the vignette for [using `cards` and `cardx`](using-cards.html), functions from these packages are applied to handle the statistical operations for the analysis.  Typically, there would be some pre-work done on the dataset before passing it to a `cards` or `cardx` function.  When the function is applied, the result is an analysis-level ARD.  At the end of this step, record-level metadata from the ARS model is also merged to the ARD, to ensure the ability to trace each result back to ARS metadata.  See example below:
+This step takes the subsetted dataset, and applies the required AnalysisMethod (e.g. counting subjects by treatment and a group, like RACE).  As explained in the vignette for [using `cards` and `cardx`](using-cards.html), functions from these packages are applied to handle the statistical operations for the analysis.  Typically, there would be some pre-work done on the dataset before passing it to a `cards` or `cardx` function.  When the function is applied, the result is an analysis-level ARD.  See example below:
 
 ```{r MethodExample, eval=FALSE}
-# intermediate step: Prepare Denominator Dataset for `cards` function
-denom_dataset <- df2_An01_05_SAF_Summ_ByTrt |>
-  dplyr::select(TRT01A)
+# the method only runs when there is data; otherwise df3 stays NULL and Step 4
+# turns it into a stub row that still identifies the analysis
+df3_An03_05_Race_Summ_ByTrt <- NULL
+if (nrow(df2_An03_05_Race_Summ_ByTrt) != 0) {
+  # intermediate step: Prepare Denominator Dataset for `cards` function
+  denom_dataset <- df2_An01_05_SAF_Summ_ByTrt |>
+    dplyr::select(TRT01A)
 
-# intermediate step: Prepare input dataset for `cards` function
-in_data <- df2_An03_05_Race_Summ_ByTrt |>
-  dplyr::distinct(TRT01A, RACE, USUBJID) |>
-  dplyr::mutate(dummy = "dummyvar")
+  # intermediate step: Prepare input dataset for `cards` function
+  in_data <- df2_An03_05_Race_Summ_ByTrt |>
+    dplyr::distinct(TRT01A, RACE, USUBJID) |>
+    dplyr::mutate(dummy = "dummyvar")
 
-# calculate subject counts and % (based on big N) grouped by treatment and race
-df3_An03_05_Race_Summ_ByTrt <- cards::ard_tabulate(
-  data = in_data,
-  by = c("TRT01A", "RACE"),
-  variables = "dummy",
-  denominator = denom_dataset
-)
-
-# select relevant statistics as defined by the Method, and assign operation Ids
-df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt |>
-  dplyr::filter(stat_name %in% c("n", "p")) |>
-  dplyr::mutate(operationid = dplyr::case_when(
-    stat_name == "n" ~ "Mth01_1_n",
-    stat_name == "p" ~ "Mth01_2_pct"
-  ))
-
-# stamp CDISC ARD traceability metadata so each result traces back to the ARS definition
-df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt |>
-  dplyr::mutate(
-    AnalysisId = "An03_05_Race_Summ_ByTrt",
-    MethodId = "Mth01",
-    OutputId = "Out14-1-1",
-    # the grouping this column belongs to (here: the treatment-arm grouping)
-    group1_groupingId = "AnlsGrouping_01_Trt",
-    # for pre-defined groups, map each observed level to its ARS group id
-    group1_groupId = dplyr::case_when(
-      as.character(group1_level) == "Placebo"              ~ "AnlsGrouping_01_Trt_1",
-      as.character(group1_level) == "Xanomeline Low Dose"  ~ "AnlsGrouping_01_Trt_2",
-      as.character(group1_level) == "Xanomeline High Dose" ~ "AnlsGrouping_01_Trt_3"
-    )
-  )
+  # calculate subject counts and % (based on big N) grouped by treatment and race
+  df3_An03_05_Race_Summ_ByTrt <- cards::ard_tabulate(
+    data = in_data,
+    by = c("TRT01A", "RACE"),
+    variables = "dummy",
+    denominator = denom_dataset
+  ) |>
+    # select relevant statistics as defined by the Method, and assign operation Ids
+    dplyr::filter(stat_name %in% c("n", "p")) |>
+    dplyr::mutate(operationid = dplyr::case_when(
+      stat_name == "n" ~ "Mth01_1_n",
+      stat_name == "p" ~ "Mth01_2_pct"
+    ))
+}
 ```
 
 This example uses the current `cards` function name `ard_tabulate()` (formerly `ard_categorical()`); see the [using `cards` and `cardx`](using-cards.html) vignette for the full list of renames.
 
-The final `mutate()` is where _siera_ stamps the **CDISC ARD traceability columns** onto every row.  For each grouping applied to the analysis you will see a `group[n]_groupingId` (which grouping the column belongs to) plus one of:
+#### Step 4: Link the ARD to the ARS metadata
 
-- `group[n]_groupId` - for **pre-defined groups** (groups listed in the metadata, like treatment arms), mapped from `group[n]_level` via `case_when()`, as above; or
+The last step of every analysis is a single call to `ars_stamp()`.  It takes the analysis-level ARD from Step 3 and adds the **CDISC ARD traceability columns**, so that every result can be traced back to its ARS definition:
+
+```{r StampExample, eval=FALSE}
+# Link ARS identifiers ---
+df3_An03_05_Race_Summ_ByTrt <- siera::ars_stamp(
+  df3_An03_05_Race_Summ_ByTrt,
+  analysis_id = 'An03_05_Race_Summ_ByTrt',  # analyses[].id
+  method_id   = 'Mth01',                    # analyses[].methodId
+  output_id   = 'Out14-1-1',                # mainListOfContents outputId
+  groupings   = list(                       # analyses[].orderedGroupings
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
+      'AnlsGrouping_01_Trt_1' = 'Placebo',
+      'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose')),
+    siera::ars_grouping('AnlsGrouping_02_Race', data_driven = TRUE)
+  )
+)
+```
+
+Every argument is copied straight from the ARS metadata, so the call reads as a small, checkable summary of the analysis:
+
+| Argument | ARS JSON path | ARD column(s) |
+|---|---|---|
+| `analysis_id` | `analyses[].id` | `AnalysisId` |
+| `method_id` | `analyses[].methodId` | `MethodId` |
+| `output_id` | `mainListOfContents` list item `outputId` | `OutputId` |
+| `groupings` (position `n` in the list) | `analyses[].orderedGroupings[]` | `group[n]_groupingId` plus `group[n]_groupId` or `group[n]_groupValue` |
+| `ars_grouping(id, ...)` | `analysisGroupings[].id` | `group[n]_groupingId` |
+| `ars_grouping(groups = )` (names = group ids) | `analysisGroupings[].groups[].id` and `.condition.value` | `group[n]_groupId` |
+| `ars_grouping(data_driven = )` | `analysisGroupings[].dataDriven` | `group[n]_groupValue` |
+
+For each grouping you will get a `group[n]_groupingId` (which grouping the column belongs to) plus one of:
+
+- `group[n]_groupId` - for **pre-defined groups** (groups listed in the metadata, like treatment arms), looked up from `group[n]_level`; or
 - `group[n]_groupValue` - for **data-driven groupings** (`dataDriven: true`, where categories such as cause of death are discovered from the ADaM data at run time), capturing the discovered value directly.
 
+`ars_stamp()` also coerces every `*_level` column to character so the analysis-level ARDs can be appended safely, and, when Step 3 was skipped because the data subset was empty (`df3` is `NULL`), returns a stub row that holds only `AnalysisId`, `MethodId` and `OutputId`.
+
 See the [Concepts and conventions](concepts.html) vignette for the full picture of these traceability columns.
+
+##### Prefer to see everything spelled out?
+
+`ars_stamp()` is a convenience: it produces exactly the same ARD as the plain `dplyr` code that siera used to write into each script (an `AnalysisId`/`MethodId`/`OutputId` `mutate()`, a `case_when()` per grouping and a `vapply()` to coerce `*_level` columns).  If you would rather have your scripts not call any siera function for this step, or you want to review that plain code, generate the scripts with `code_style = "expanded"`:
+
+```{r expanded-style, eval=FALSE}
+readARS(ARS_path, output_path, adam_path, code_style = "expanded")
+```
+
+The default is `code_style = "wrapped"`.  Both styles are tested to produce identical ARDs.
 
 ### Final steps
 

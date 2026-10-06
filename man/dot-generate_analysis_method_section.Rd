@@ -11,7 +11,8 @@
   method_id,
   analysis_id,
   output_id,
-  value_sources = list()
+  value_sources = list(),
+  code_style = c("expanded", "wrapped")
 )
 }
 \arguments{
@@ -34,6 +35,12 @@ string; it is called lazily, only when a parameter of the method actually
 references that valueSource (e.g. AG_var2_group_values, whose resolution
 can warn). Operation IDs (operation_1, operation_2, …) are derived from the
 method itself and do not need to be supplied here.}
+
+\item{code_style}{`"expanded"` (default) writes the empty-data guard and the
+identifier stamp out inline; `"wrapped"` emits only the method call inside
+`df3_<id> <- NULL` followed by an `if (nrow(df2_<id>) != 0)` block, and leaves the
+identifier linking to the caller's `siera::ars_stamp()` step (see
+`.generate_stamp_code()`).}
 }
 \value{
 Character vector with formatted numbers.

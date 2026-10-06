@@ -9,7 +9,8 @@ readARS(
   output_path = tempdir(),
   adam_path = tempdir(),
   spec_output = "",
-  output_format = "none"
+  output_format = "none",
+  code_style = "wrapped"
 )
 }
 \arguments{
@@ -40,6 +41,16 @@ appends code that writes each ARD as a CDISC Dataset-JSON file
 (`ARD_<OutputId>.json`) when the generated script is run. The
 Dataset-JSON export requires the optional \pkg{datasetjson} package to be
 installed in the environment that runs the generated script.}
+
+\item{code_style}{Style of the generated analysis code. Must be exactly one
+of `"wrapped"` or `"expanded"` (no partial matching). `"wrapped"` (default)
+ends each analysis with a call to \code{siera::ars_stamp()}, which links the
+analysis' ARD to the ARS metadata (`AnalysisId`, `MethodId`, `OutputId` and
+the `group[n]_*` identifiers), so every analysis reads as analysis set,
+data subset, method, identifier linking. `"expanded"` writes all of that
+linking out as plain \pkg{dplyr} code in the script, so the generated
+script does not call siera functions for the linking step. Both styles
+produce an identical ARD.}
 }
 \value{
 R programmes generating ARDs - one for each output (or analysis from an output) specified in the ARS metadata
