@@ -23,6 +23,7 @@ reference.
 | `risk_difference_per_predefined_group` | Risk difference + 95% CI (per pre-defined group) | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03_1p |
 | `risk_difference_per_group_pair` | Risk difference + 95% CI (per group pair) | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t36-siera.json Mth_03_1b |
 | `categorical_summary_per_predefined_group` | Categorical n (%) (per pre-defined group) | verified | n, p | tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03p |
+| `chisq_per_predefined_group` | Chi-square p-value (per pre-defined group) | verified | p.value | Common_Safety_Displays An03_02_AgeGrp_Comp_ByTrt (AGEGR1 '< 65' vs '>= 65'): p = 0.4239, equal to stats::chisq.test() on the grouped table (the raw-value chisq method gives 0.1439) |
 
 ## Supported valueSources
 
@@ -692,4 +693,47 @@ df3_analysisidhere <- if (length(.levels_analysisidhere) > 0) {
                  stat_name = character(0), stat = list(),
                  operationid = character(0))
 }
+```
+
+---
+
+## `chisq_per_predefined_group` - Chi-square test across arms of a pre-defined inner grouping
+
+Pearson chi-square test p-value comparing treatment arms (Group1) over the PRE-DEFINED groups of Group2 (dataDriven: false). Where chisq tests the raw data values of the analysis variable, this maps each data value onto the group whose condition it satisfies (the AG_var2_group_conditions valueSource, shared with categorical_summary_per_predefined_group) and tests those groups, so the p-value matches the categories the n (%) rows of the same table report. Consequently (a) a group defined by a multi-value IN condition is one category (e.g. AGEGR1 IN (65-80, >80) = '>= 65'), and (b) data values satisfying no defined group are excluded. Defined groups no subject reaches drop out of the test, as a chi-square over an all-zero column is undefined. Only EQ and IN group conditions are supported; other comparators are skipped with a warning at generation time. For groupings whose groups are one-to-one with data values (sex, race, ...) the result is identical to chisq. Use chisq when the inner grouping is dataDriven: true.
+
+**Status:** verified &nbsp; **Verified against:** Common_Safety_Displays An03_02_AgeGrp_Comp_ByTrt (AGEGR1 '< 65' vs '>= 65'): p = 0.4239, equal to stats::chisq.test() on the grouped table (the raw-value chisq method gives 0.1439)
+
+**Operations**
+
+| order | stat_name | label | resultPattern |
+|-------|-----------|-------|---------------|
+| 1 | `p.value` | p-value | `x.xxx` |
+
+**Parameters**
+
+| token | valueSource | label | description |
+|-------|-------------|-------|-------------|
+| `groupvar1here` | `AG_var1` | grp var 1 | Grouping variable (treatment arm), the by-variable |
+| `group2conditionshere` | `AG_var2_group_conditions` | grp 2 conditions | case_when body mapping data values onto Group2's pre-defined groups, in group order |
+| `opid1here` | `operation_1` | op id 1 | Operation id for the 'p.value' statistic (order 1) |
+
+**Template**
+
+```r
+# Test the groups the ARS metadata DEFINES for the inner grouping (matched by
+# their conditions), not the raw data values: a multi-value IN group is one
+# category, and a value satisfying no defined group was never asked for, so
+# it is excluded. Defined groups without any subject drop out, as a
+# chi-square over an all-zero column is undefined.
+in_data_analysisidhere <- df2_analysisidhere |>
+    dplyr::mutate(ars_group = dplyr::case_when(
+      group2conditionshere,
+      TRUE ~ NA_character_
+    )) |>
+    dplyr::filter(!is.na(ars_group))
+
+df3_analysisidhere <-
+    cardx::ard_stats_chisq_test(by = groupvar1here, data = in_data_analysisidhere, variables = ars_group) |>
+  dplyr::filter(stat_name == 'p.value') |>
+  dplyr::mutate(operationid = 'opid1here')
 ```
