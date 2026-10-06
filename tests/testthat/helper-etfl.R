@@ -435,3 +435,41 @@
   comp$match <- comp$n.s == comp$n.t & abs(comp$p.s - comp$p.t) < 1e-8
   list(n_matched = sum(comp$match, na.rm = TRUE), n_total = nrow(comp), data = comp)
 }
+
+# Independent ground truth for a one-grouping (arm) subjects-with-event n and %
+# (#211). Distinct subjects per arm in the data subset, over the Safety
+# population denominators -- computed from the raw ADaM, NOT the reference
+# ARD (whose fda-ae-t06 counts are the first-record-per-subject defect, #171).
+# subset_fun applies the analysis's data subset to the merged ADSL x ADAE.
+.etfl_subset_npct_truth <- function(table, subset_fun, arms) {
+  paths <- .etfl_paths(table)
+  adsl <- haven::read_xpt(file.path(paths$adam_dir, "adsl.xpt"))
+  adae <- haven::read_xpt(file.path(paths$adam_dir, "adae.xpt"))
+  saf <- adsl |> dplyr::filter(SAFFL == "Y", TRT01AN %in% arms)
+  overlap <- setdiff(intersect(names(adsl), names(adae)), "USUBJID")
+  df_pop <- merge(saf, dplyr::select(adae, -dplyr::all_of(overlap)),
+                  by = "USUBJID", all = FALSE)
+  N <- saf |> dplyr::count(TRT01AN, name = "N")
+  subset_fun(df_pop) |>
+    dplyr::distinct(TRT01AN, USUBJID) |>
+    dplyr::count(TRT01AN, name = "n") |>
+    dplyr::right_join(N, by = "TRT01AN") |>
+    dplyr::mutate(arm = as.character(TRT01AN),
+                  n = ifelse(is.na(n), 0, n), p = n / N) |>
+    dplyr::select(arm, n, p)
+}
+
+# Compare siera's one-grouping n and % against that ground truth (full join,
+# so a missing or extra arm fails rather than passing silently).
+.cmp_subset_npct <- function(siera_ard, table, ana_id, subset_fun, arms) {
+  truth <- .etfl_subset_npct_truth(table, subset_fun, arms)
+  s <- siera_ard |>
+    dplyr::filter(AnalysisId == ana_id, stat_name %in% c("n", "p")) |>
+    dplyr::mutate(val = .etfl_safe_stat(stat),
+                  arm = as.character(group1_level)) |>
+    dplyr::select(arm, stat_name, val) |>
+    tidyr::pivot_wider(names_from = stat_name, values_from = val)
+  comp <- dplyr::full_join(s, truth, by = "arm", suffix = c(".s", ".t"))
+  comp$match <- comp$n.s == comp$n.t & abs(comp$p.s - comp$p.t) < 1e-8
+  list(n_matched = sum(comp$match, na.rm = TRUE), n_total = nrow(comp), data = comp)
+}

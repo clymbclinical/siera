@@ -188,6 +188,67 @@ test_that("generate_data_subset_code builds filter for single level", {
   expect_true(grepl("dplyr::filter(AGE >= 65)", res$code, fixed = TRUE))
 })
 
+test_that("generate_data_subset_code keeps multi-value IN/NOTIN list-column values apart (#211)", {
+  # jsonlite returns condition.value as a list-column; a single-condition
+  # subset must not collapse that list into one deparsed 'c("A", "B")' string.
+  single_row <- function(comparator, value) {
+    tibble::tibble(
+      id = "Dss_x",
+      name = "x",
+      level = 1,
+      condition_variable = "AEACN",
+      condition_comparator = comparator,
+      condition_value = value,
+      compoundExpression_logicalOperator = NA_character_
+    )
+  }
+
+  expect_no_warning(
+    res_notin <- code_fun(
+      single_row("NOTIN", list(c(" DOSE NOT CHANGED", "NOT APPLICABLE "))),
+      "Dss_x", "An_01", "df_pop", "json"
+    )
+  )
+  expect_equal(
+    res_notin$filter_expression,
+    "!(AEACN %in% c('DOSE NOT CHANGED', 'NOT APPLICABLE'))"
+  )
+
+  res_in <- code_fun(
+    single_row("IN", list(c("DOSE REDUCED", "DRUG INTERRUPTED"))),
+    "Dss_x", "An_01", "df_pop", "json"
+  )
+  expect_equal(
+    res_in$filter_expression,
+    "AEACN %in% c('DOSE REDUCED', 'DRUG INTERRUPTED')"
+  )
+
+  res_eq <- code_fun(
+    single_row("EQ", list("DOSE REDUCED")),
+    "Dss_x", "An_01", "df_pop", "json"
+  )
+  expect_equal(res_eq$filter_expression, "AEACN == 'DOSE REDUCED'")
+
+  # JSON/XLSX parity: the xlsx reader carries the same values pipe-delimited.
+  res_xlsx <- code_fun(
+    single_row("NOTIN", "DOSE NOT CHANGED|NOT APPLICABLE"),
+    "Dss_x", "An_01", "df_pop", "xlsx"
+  )
+  expect_equal(res_xlsx$filter_expression, res_notin$filter_expression)
+})
+
+test_that("JSON single-condition NOTIN subset is read and generated intact (#211)", {
+  # fda-ae-t06 Dss_67: AEACN NOTIN ["NOT APPLICABLE", "DOSE NOT CHANGED"].
+  meta <- siera:::.read_ars_json_metadata(
+    test_path("testdata", "etfl", "metadata", "fda-ae-t06-siera.json")
+  )
+  res <- code_fun(meta$DataSubsets, "Dss_67", "An_47", "df_pop", "json")
+  expect_equal(
+    res$filter_expression,
+    "!(AEACN %in% c('NOT APPLICABLE', 'DOSE NOT CHANGED'))"
+  )
+})
+
 test_that("generate_data_subset_code combines multiple expressions with logical operator", {
   metadata <- tibble::tibble(
     id = c(200, 200, 200),

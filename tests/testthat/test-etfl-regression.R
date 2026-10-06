@@ -128,6 +128,19 @@ test_that("fda-ae-t06 AE summary: bigN, n%, and per-category RD match spec (#171
     subset_fun = function(d) dplyr::filter(d, !is.na(AESEV), AESEV != "", TRTAN %in% c(2, 3)),
     cat_var = "AESEV", arms = c(2, 3), cats = aesev_groups))
 
+  # An_47 (subjects with an AE leading to dose modification, by arm) sits on
+  # Dss_67, a single-condition AEACN NOTIN ["NOT APPLICABLE", "DOSE NOT
+  # CHANGED"]. Before #211 the JSON path collapsed that value list into one
+  # deparsed string, so the NOTIN excluded nothing and An_47 silently reported
+  # every subject with any AE (77/79/69 instead of 68/70/47). Asserted against
+  # the independent ground truth: the reference's 44/34/26 is again the
+  # first-record-per-subject artefact (= its An_47_1 DRUG INTERRUPTED + DOSE
+  # REDUCED counts summed per arm).
+  .expect_all_match(.cmp_subset_npct(
+    ard, "fda-ae-t06", "An_47",
+    subset_fun = function(d) dplyr::filter(d, !(AEACN %in% c("NOT APPLICABLE", "DOSE NOT CHANGED"))),
+    arms = c(1, 2, 3)))
+
   # An_47_1 (n% by arm x action taken) uses Mth_03p, the categorical
   # counterpart of Mth_03_1p (#187): it aggregates per DEFINED group condition
   # instead of tabulating raw data values and stamping group ids afterwards.
