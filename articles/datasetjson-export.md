@@ -251,8 +251,8 @@ A few things to know about `column_labels`:
   without `output_format = "datasetjson"`,
   [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
   warns you that it is being ignored.
-- It works the same whether your ARS metadata is a `.json` or an `.xlsx`
-  file.
+- It works the same whether your ARS metadata is a `.json` file or a
+  (deprecated) `.xlsx` workbook.
 
 ### Where next?
 

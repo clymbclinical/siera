@@ -26,16 +26,16 @@ used.
 ARS_example()
 #>  [1] "ADAE.csv"                          "ADEXSUM.csv"                      
 #>  [3] "ADSL.csv"                          "ADVS.csv"                         
-#>  [5] "ADZSDER.csv"                       "Common_Safety_Displays_cards.xlsx"
-#>  [7] "cards_constructs.xlsx"             "exampleARS_1.json"                
-#>  [9] "exampleARS_1a.json"                "exampleARS_2.json"                
-#> [11] "exampleARS_2.xlsx"                 "exampleARS_2a.xlsx"               
-#> [13] "exampleARS_3.json"                 "exampleARS_3.xlsx"                
-#> [15] "exampleARS_4.json"                 "exampleARS_5.json"                
-#> [17] "exampleARS_5.xlsx"                 "exampleARS_5_documentref.json"    
-#> [19] "exampleARS_5_documentref.xlsx"     "exampleARS_6.json"                
-#> [21] "exampleARS_6.xlsx"                 "exampleARS_methods.json"          
-#> [23] "test_cards.json"                  
-ARS_example("Common_Safety_Displays_cards.xlsx")
-#> [1] "/home/runner/work/_temp/Library/siera/extdata/Common_Safety_Displays_cards.xlsx"
+#>  [5] "ADZSDER.csv"                       "Common_Safety_Displays_cards.json"
+#>  [7] "Common_Safety_Displays_cards.xlsx" "cards_constructs.xlsx"            
+#>  [9] "exampleARS_1.json"                 "exampleARS_1a.json"               
+#> [11] "exampleARS_2.json"                 "exampleARS_2.xlsx"                
+#> [13] "exampleARS_2a.xlsx"                "exampleARS_3.json"                
+#> [15] "exampleARS_3.xlsx"                 "exampleARS_4.json"                
+#> [17] "exampleARS_5.json"                 "exampleARS_5.xlsx"                
+#> [19] "exampleARS_5_documentref.json"     "exampleARS_6.json"                
+#> [21] "exampleARS_6.xlsx"                 "exampleARS_7.json"                
+#> [23] "exampleARS_methods.json"           "test_cards.json"                  
+ARS_example("Common_Safety_Displays_cards.json")
+#> [1] "/home/runner/work/_temp/Library/siera/extdata/Common_Safety_Displays_cards.json"
 ```

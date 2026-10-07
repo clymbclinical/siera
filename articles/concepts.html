@@ -124,8 +124,7 @@ writes the R that produces the ARD.</p>
 <p>The flow is always the same:</p>
 <ol style="list-style-type: decimal">
 <li>You start with <strong>ARS metadata</strong> (the Analysis Results
-Standard description of your reporting event), in either JSON or Excel
-format.</li>
+Standard description of your reporting event), as a JSON file.</li>
 <li>You pass it to <strong><code><a href="../reference/readARS.html">readARS()</a></code></strong>, which writes
 <strong>one R script per Output</strong> defined in the metadata.</li>
 <li>You run a generated script against your <strong>ADaM
@@ -210,15 +209,21 @@ sections above. See the <em>Using cards and cardx</em> article for how
 to wire it up.</p>
 </div>
 <div class="section level2">
-<h2 id="json-and-xlsx-parity">JSON and XLSX parity<a class="anchor" aria-label="anchor" href="#json-and-xlsx-parity"></a>
+<h2 id="ars-metadata-is-json">ARS metadata is JSON<a class="anchor" aria-label="anchor" href="#ars-metadata-is-json"></a>
 </h2>
-<p>ARS metadata officially travels as JSON, but <em>siera</em> also
-accepts an Excel (XLSX) representation of the same information.
-<strong>The two are semantically equivalent</strong> -
-<code><a href="../reference/readARS.html">readARS()</a></code> produces the same generated scripts either way,
-so you can choose whichever format fits your tooling. The examples
-shipped with the package include both (see
-<code><a href="../reference/ARS_example.html">ARS_example()</a></code>).</p>
+<p>ARS metadata officially travels as JSON, and JSON is what
+<em>siera</em> reads. Earlier releases also read an Excel
+(<code>.xlsx</code>) representation of the same information; that is now
+<strong>deprecated</strong>. <code><a href="../reference/readARS.html">readARS()</a></code> still accepts a
+workbook for now, with a warning, by converting it to JSON in memory
+first, so you get the same generated scripts as from the equivalent JSON
+file. A future release will read JSON only.</p>
+<p>If your ARS metadata lives in a workbook (for example a TFL Designer
+export), convert it once with <code><a href="../reference/ars_xlsx_to_json.html">ars_xlsx_to_json()</a></code> and keep
+the <code>.json</code> file from then on. The converter is deprecated as
+well and will be removed together with <code>.xlsx</code> input. After
+that, CDISC’s own <code>excel2ars.py</code> utility remains a route from
+Excel to ARS JSON.</p>
 </div>
 <div class="section level2">
 <h2 id="reading-an-ard-row-cdisc-traceability-columns">Reading an ARD row: CDISC traceability columns<a class="anchor" aria-label="anchor" href="#reading-an-ard-row-cdisc-traceability-columns"></a>

@@ -50,8 +50,7 @@ SAS transport (`.xpt`) files with
 [`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html),
 and CDISC Dataset-JSON (`.json`) files with
 [`datasetjson::read_dataset_json()`](https://atorus-research.github.io/datasetjson/reference/read_dataset_json.html).
-This mirrors how the ARS input format is inferred from `.json` vs
-`.xlsx`, so no extra argument is needed - just point
+No extra argument is needed - just point
 [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
 at a folder of `.csv`, `.xpt` or `.json` ADaMs. Reading `.xpt` datasets
 requires the `haven` package, and `.json` datasets the `datasetjson`

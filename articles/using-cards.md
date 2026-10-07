@@ -132,14 +132,6 @@ file.path(lib, "constructs.json")
 file.path(lib, "METHODS.md")
 ```
 
-An earlier, illustrative list of constructs is also bundled as a
-spreadsheet (the method-template library above is the source of truth):
-
-``` r
-
-ARS_example("cards_constructs.xlsx")
-```
-
 ## Referencing a method instead of copy-pasting its code
 
 So far the `cards`/`cardx` code template has lived **inline** in the ARS
@@ -184,7 +176,6 @@ end-to-end example shows this with no inline code at all:
 ``` r
 
 ARS_example("exampleARS_5_documentref.json")   # references exampleARS_methods.json
-ARS_example("exampleARS_5_documentref.xlsx")   # same, via the xlsx ReferenceDocuments sheets
 ```
 
 Running
@@ -196,9 +187,11 @@ practical notes:
 - The reference is resolved **locally**: `location` is a path relative
   to your ARS file (or an absolute path). Remote `http(s)` URLs are
   rejected, so generation stays reproducible and offline.
-- Excel ARS files carry the same wiring in their `ReferenceDocuments`
-  and `AnalysisMethodDocumentRefs` sheets, so JSON and xlsx behave
-  identically.
+- A (deprecated) Excel ARS workbook is converted to JSON before it is
+  read, so it follows the same rule when it uses the CDISC convention:
+  `specifiedAs = "DocumentRef"` on the `AnalysisMethodCodeTemplate`
+  sheet, plus a `ProgrammingCode` row in `AnalysisMethodDocumentRefs`
+  and the document in `ReferenceDocuments`.
 - You can also point at a single-method manifest, or at a bare `.R` file
   holding just the template body (in which case keep the parameters
   inline in the ARS).

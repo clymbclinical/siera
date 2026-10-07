@@ -1,7 +1,9 @@
 # Read ARS metadata from disk
 
 Internal helper that validates the ARS file extension and dispatches to
-the JSON or XLSX reader before returning the harmonised metadata list.
+the JSON reader, the single ARS parser in siera. A deprecated \`.xlsx\`
+workbook is converted to ARS JSON in memory first (see
+\`.read_ars_xlsx_via_json()\`).
 
 ## Usage
 
@@ -13,9 +15,10 @@ the JSON or XLSX reader before returning the harmonised metadata list.
 
 - ARS_path:
 
-  Path to the ARS metadata file (JSON or XLSX).
+  Path to the ARS metadata file (\`.json\`, or a deprecated \`.xlsx\`
+  workbook).
 
 ## Value
 
-A list containing harmonised metadata tables, or \`NULL\` if the file
-cannot be parsed.
+A list containing harmonised metadata tables, or \`NULL\` if the file is
+missing required sections.

@@ -89,8 +89,7 @@ ARD program. Datasets may be supplied as CSV (`.csv`), SAS transport
 for each dataset from the file extension found in this folder — `.csv`
 files are read with <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_csv()</a></code>, `.xpt` files with
 <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> and `.json` files with
-<code><a href="https://atorus-research.github.io/datasetjson/reference/read_dataset_json.html" class="external-link">datasetjson::read_dataset_json()</a></code> — so no extra argument is required
-(mirroring how the ARS input format is inferred from `.json` vs `.xlsx`).
+<code><a href="https://atorus-research.github.io/datasetjson/reference/read_dataset_json.html" class="external-link">datasetjson::read_dataset_json()</a></code> — so no extra argument is required.
 Reading `.xpt` datasets in the generated script requires the <span class="pkg">haven</span>
 package, and `.json` datasets the <span class="pkg">datasetjson</span> package. When several
 formats exist for the same dataset, precedence is `.csv`, then `.xpt`,
@@ -145,7 +144,7 @@ at script runtime (likely a typo) rather than an error. Only used when
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># path to file containing ARS metadata</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">ARS_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"Common_Safety_Displays_cards.xlsx"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ARS_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"Common_Safety_Displays_cards.json"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># output path for R programs</span></span></span>
 <span class="r-in"><span><span class="va">output_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span></span>
@@ -155,10 +154,6 @@ at script runtime (likely a typo) rather than an error. Only used when
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># run function, write to temp directory</span></span></span>
 <span class="r-in"><span><span class="fu">readARS</span><span class="op">(</span><span class="va">ARS_path</span>, <span class="va">output_dir</span>, <span class="va">adam_folder</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> New names:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...11`</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...12`</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...13`</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

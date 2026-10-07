@@ -2,13 +2,12 @@
 
 Internal helper that translates ARS data-subset metadata into a filter
 expression suitable for inclusion in generated R code. Handles
-comparator translation, type coercion, and workbook-specific formatting
-differences.
+comparator translation and type coercion.
 
 ## Usage
 
 ``` r
-.generate_data_subset_condition(variable, comparator, value, file_ext)
+.generate_data_subset_condition(variable, comparator, value)
 ```
 
 ## Arguments
@@ -23,11 +22,8 @@ differences.
 
 - value:
 
-  Value(s) associated with the comparator.
-
-- file_ext:
-
-  Extension of the source ARS file, used to normalise parsing.
+  Value(s) associated with the comparator; multi-value \`IN\` /
+  \`NOTIN\` conditions arrive as one element per value.
 
 ## Value
 

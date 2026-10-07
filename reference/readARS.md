@@ -40,11 +40,10 @@ readARS(
   [`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html)
   and \`.json\` files with
   [`datasetjson::read_dataset_json()`](https://atorus-research.github.io/datasetjson/reference/read_dataset_json.html)
-  — so no extra argument is required (mirroring how the ARS input format
-  is inferred from \`.json\` vs \`.xlsx\`). Reading \`.xpt\` datasets in
-  the generated script requires the haven package, and \`.json\`
-  datasets the datasetjson package. When several formats exist for the
-  same dataset, precedence is \`.csv\`, then \`.xpt\`, then \`.json\`.
+  — so no extra argument is required. Reading \`.xpt\` datasets in the
+  generated script requires the haven package, and \`.json\` datasets
+  the datasetjson package. When several formats exist for the same
+  dataset, precedence is \`.csv\`, then \`.xpt\`, then \`.json\`.
 
 - spec_output:
 
@@ -95,7 +94,7 @@ output) specified in the ARS metadata
 ``` r
 # path to file containing ARS metadata
 
-ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+ARS_path <- ARS_example("Common_Safety_Displays_cards.json")
 
 # output path for R programs
 output_dir <- tempdir()
@@ -105,8 +104,4 @@ adam_folder <- tempdir()
 
 # run function, write to temp directory
 readARS(ARS_path, output_dir, adam_folder)
-#> New names:
-#> • `` -> `...11`
-#> • `` -> `...12`
-#> • `` -> `...13`
 ```

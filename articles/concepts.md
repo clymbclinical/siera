@@ -42,8 +42,7 @@ ARD.](figures/siera-pipeline.svg)
 The flow is always the same:
 
 1.  You start with **ARS metadata** (the Analysis Results Standard
-    description of your reporting event), in either JSON or Excel
-    format.
+    description of your reporting event), as a JSON file.
 2.  You pass it to
     **[`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)**,
     which writes **one R script per Output** defined in the metadata.
@@ -94,16 +93,23 @@ This builds on `referenceDocuments`, which is otherwise outside the
 seven sections above. See the *Using cards and cardx* article for how to
 wire it up.
 
-## JSON and XLSX parity
+## ARS metadata is JSON
 
-ARS metadata officially travels as JSON, but *siera* also accepts an
-Excel (XLSX) representation of the same information. **The two are
-semantically equivalent** -
+ARS metadata officially travels as JSON, and JSON is what *siera* reads.
+Earlier releases also read an Excel (`.xlsx`) representation of the same
+information; that is now **deprecated**.
 [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
-produces the same generated scripts either way, so you can choose
-whichever format fits your tooling. The examples shipped with the
-package include both (see
-[`ARS_example()`](https://clymbclinical.github.io/siera/reference/ARS_example.md)).
+still accepts a workbook for now, with a warning, by converting it to
+JSON in memory first, so you get the same generated scripts as from the
+equivalent JSON file. A future release will read JSON only.
+
+If your ARS metadata lives in a workbook (for example a TFL Designer
+export), convert it once with
+[`ars_xlsx_to_json()`](https://clymbclinical.github.io/siera/reference/ars_xlsx_to_json.md)
+and keep the `.json` file from then on. The converter is deprecated as
+well and will be removed together with `.xlsx` input. After that,
+CDISC’s own `excel2ars.py` utility remains a route from Excel to ARS
+JSON.
 
 ## Reading an ARD row: CDISC traceability columns
 

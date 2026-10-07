@@ -7,13 +7,13 @@ library(siera)
 
 We will use the following example to get started:
 
-A modified *CDISC Common Safety Displays* ARS metadata (xlsx format,
-with example dynamic AnalysisMethodCodeTemplate R code handling
+A modified *CDISC Common Safety Displays* ARS metadata file (JSON
+format, with example dynamic AnalysisMethodCodeTemplate R code handling
 operations, based on functions from the `cards` package)
 
 In order to facilitate the example, *siera* includes several example
 files, which we use throughout the documentation. These include several
-ARS files (json and xlsx), as well as csv-format ADaMs which can be run
+ARS metadata files (JSON), as well as csv-format ADaMs which can be run
 with the R scripts produced by readARS function. Use the helper
 ARS_example() with no arguments to list them or call it with an example
 filename to get the path.
@@ -61,15 +61,15 @@ ARS_example()
 #>  [1] "ADAE.csv"                          "ADEXSUM.csv"                      
 #>  [3] "ADSL.csv"                          "ADVS.csv"                         
 #>  [5] "ADZSDER.csv"                       "cards_constructs.xlsx"            
-#>  [7] "Common_Safety_Displays_cards.xlsx" "exampleARS_1.json"                
-#>  [9] "exampleARS_1a.json"                "exampleARS_2.json"                
-#> [11] "exampleARS_2.xlsx"                 "exampleARS_2a.xlsx"               
-#> [13] "exampleARS_3.json"                 "exampleARS_3.xlsx"                
-#> [15] "exampleARS_4.json"                 "exampleARS_5_documentref.json"    
-#> [17] "exampleARS_5_documentref.xlsx"     "exampleARS_5.json"                
+#>  [7] "Common_Safety_Displays_cards.json" "Common_Safety_Displays_cards.xlsx"
+#>  [9] "exampleARS_1.json"                 "exampleARS_1a.json"               
+#> [11] "exampleARS_2.json"                 "exampleARS_2.xlsx"                
+#> [13] "exampleARS_2a.xlsx"                "exampleARS_3.json"                
+#> [15] "exampleARS_3.xlsx"                 "exampleARS_4.json"                
+#> [17] "exampleARS_5_documentref.json"     "exampleARS_5.json"                
 #> [19] "exampleARS_5.xlsx"                 "exampleARS_6.json"                
-#> [21] "exampleARS_6.xlsx"                 "exampleARS_methods.json"          
-#> [23] "test_cards.json"
+#> [21] "exampleARS_6.xlsx"                 "exampleARS_7.json"                
+#> [23] "exampleARS_methods.json"           "test_cards.json"
 
 # A temporary path to a specific file:
 ARS_example("exampleARS_1.json")
@@ -98,25 +98,28 @@ vignette.
 
 ### Example
 
-The *readARS* function reads in a completed ARS metadata file, and
-generates R scripts for each Output defined in the file. Below is an
-example of how this can be done using a ready-to-use ARS metadata Excel
-file (note that this is meant as an example. Official ARS metadata is in
-json format, which can also be passed to the *readARS* function).
+The *readARS* function reads in a completed ARS metadata file in JSON
+format, and generates R scripts for each Output defined in the file.
+Below is an example of how this can be done using a ready-to-use ARS
+metadata file.
 
-If you have an ARS workbook and prefer to work in the recommended JSON
-format, the
-[`ars_xlsx_to_json()`](https://clymbclinical.github.io/siera/reference/ars_xlsx_to_json.md)
-helper performs a faithful whole-workbook conversion (an R-native
-equivalent of CDISC’s `excel2ars.py`). For example,
-`json_path <- ars_xlsx_to_json(ARS_example("Common_Safety_Displays_cards.xlsx"))`
-writes a `.json` file that can then be passed to
-[`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md):
+> **Still working from an Excel workbook?** ARS metadata in `.xlsx`
+> format is deprecated in *siera* and will no longer be read in a future
+> release. For now
+> [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+> still accepts a workbook, with a warning. Convert each workbook to
+> JSON once with
+> [`ars_xlsx_to_json()`](https://clymbclinical.github.io/siera/reference/ars_xlsx_to_json.md)
+> (an R-native equivalent of CDISC’s `excel2ars.py`), for example
+> `ars_xlsx_to_json("study.xlsx")`, and keep the resulting `.json` file
+> as your ARS metadata from then on. The converter is deprecated too and
+> will be removed together with `.xlsx` input, so do the conversion
+> while it is available.
 
 ``` r
 
-# Path to the Excel ARS metadata file:
-ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+# Path to the ARS metadata file (JSON):
+ARS_path <- ARS_example("Common_Safety_Displays_cards.json")
 
 # Path to a folder which will contain the Output meta-programmed R scripts (recommended to update
 # to a more suitable local path)
@@ -138,12 +141,12 @@ ADaM_folder <- tempdir()
 readARS(ARS_path, output_folder, ADaM_folder)
 ```
 
-You should now have 5 R scripts (named ARD_Out14-1-1.R,
-ARD_Out14-3-1-1.R, ARD_Out14-3-2-1.R, ARD_Out14-3-3-1a.R, and
-ARD_Out14-3-3-1b.R) in the folder specified as *output_folder*. You can
-execute any of these 5 R scripts as-is (assuming the ADaM required for
-this script is available in the *ADaM_folder*), and the result will be
-an ARD (one result per row format) for each of the scripts.
+You should now have 4 R scripts (named ARD_Out14-1-1.R,
+ARD_Out14-3-1-1.R, ARD_Out14-3-3-1a.R, and ARD_Out14-3-3-1b.R) in the
+folder specified as *output_folder*. You can execute any of these 4 R
+scripts as-is (assuming the ADaM required for this script is available
+in the *ADaM_folder*), and the result will be an ARD (one result per row
+format) for each of the scripts.
 
 Each analysis in a generated script reads as four steps - analysis set,
 data subset, method, and a final call to

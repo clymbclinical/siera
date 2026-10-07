@@ -12,8 +12,7 @@ the subset that was applied.
   data_subsets,
   subset_id,
   analysis_id,
-  analysis_set_dataset,
-  file_ext
+  analysis_set_dataset
 )
 ```
 
@@ -34,10 +33,6 @@ the subset that was applied.
 - analysis_set_dataset:
 
   Dataset name produced by the analysis set step.
-
-- file_ext:
-
-  Extension of the source ARS metadata file (json or xlsx).
 
 ## Value
 

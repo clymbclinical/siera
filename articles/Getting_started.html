@@ -83,12 +83,13 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://clymbclinical.github.io/siera/">siera</a></span><span class="op">)</span></span></code></pre></div>
 <p>We will use the following example to get started:</p>
-<p>A modified <em>CDISC Common Safety Displays</em> ARS metadata (xlsx
-format, with example dynamic AnalysisMethodCodeTemplate R code handling
-operations, based on functions from the <code>cards</code> package)</p>
+<p>A modified <em>CDISC Common Safety Displays</em> ARS metadata file
+(JSON format, with example dynamic AnalysisMethodCodeTemplate R code
+handling operations, based on functions from the <code>cards</code>
+package)</p>
 <p>In order to facilitate the example, <em>siera</em> includes several
 example files, which we use throughout the documentation. These include
-several ARS files (json and xlsx), as well as csv-format ADaMs which can
+several ARS metadata files (JSON), as well as csv-format ADaMs which can
 be run with the R scripts produced by readARS function. Use the helper
 ARS_example() with no arguments to list them or call it with an example
 filename to get the path.</p>
@@ -130,15 +131,15 @@ detail.</p>
 <span><span class="co">#&gt;  [1] "ADAE.csv"                          "ADEXSUM.csv"                      </span></span>
 <span><span class="co">#&gt;  [3] "ADSL.csv"                          "ADVS.csv"                         </span></span>
 <span><span class="co">#&gt;  [5] "ADZSDER.csv"                       "cards_constructs.xlsx"            </span></span>
-<span><span class="co">#&gt;  [7] "Common_Safety_Displays_cards.xlsx" "exampleARS_1.json"                </span></span>
-<span><span class="co">#&gt;  [9] "exampleARS_1a.json"                "exampleARS_2.json"                </span></span>
-<span><span class="co">#&gt; [11] "exampleARS_2.xlsx"                 "exampleARS_2a.xlsx"               </span></span>
-<span><span class="co">#&gt; [13] "exampleARS_3.json"                 "exampleARS_3.xlsx"                </span></span>
-<span><span class="co">#&gt; [15] "exampleARS_4.json"                 "exampleARS_5_documentref.json"    </span></span>
-<span><span class="co">#&gt; [17] "exampleARS_5_documentref.xlsx"     "exampleARS_5.json"                </span></span>
+<span><span class="co">#&gt;  [7] "Common_Safety_Displays_cards.json" "Common_Safety_Displays_cards.xlsx"</span></span>
+<span><span class="co">#&gt;  [9] "exampleARS_1.json"                 "exampleARS_1a.json"               </span></span>
+<span><span class="co">#&gt; [11] "exampleARS_2.json"                 "exampleARS_2.xlsx"                </span></span>
+<span><span class="co">#&gt; [13] "exampleARS_2a.xlsx"                "exampleARS_3.json"                </span></span>
+<span><span class="co">#&gt; [15] "exampleARS_3.xlsx"                 "exampleARS_4.json"                </span></span>
+<span><span class="co">#&gt; [17] "exampleARS_5_documentref.json"     "exampleARS_5.json"                </span></span>
 <span><span class="co">#&gt; [19] "exampleARS_5.xlsx"                 "exampleARS_6.json"                </span></span>
-<span><span class="co">#&gt; [21] "exampleARS_6.xlsx"                 "exampleARS_methods.json"          </span></span>
-<span><span class="co">#&gt; [23] "test_cards.json"</span></span>
+<span><span class="co">#&gt; [21] "exampleARS_6.xlsx"                 "exampleARS_7.json"                </span></span>
+<span><span class="co">#&gt; [23] "exampleARS_methods.json"           "test_cards.json"</span></span>
 <span></span>
 <span><span class="co"># A temporary path to a specific file:</span></span>
 <span><span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"exampleARS_1.json"</span><span class="op">)</span></span>
@@ -176,22 +177,25 @@ they flow through <em>siera</em>, see the <a href="concepts.html">Concepts and c
 <div class="section level3">
 <h3 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h3>
-<p>The <em>readARS</em> function reads in a completed ARS metadata file,
-and generates R scripts for each Output defined in the file. Below is an
-example of how this can be done using a ready-to-use ARS metadata Excel
-file (note that this is meant as an example. Official ARS metadata is in
-json format, which can also be passed to the <em>readARS</em>
-function).</p>
-<p>If you have an ARS workbook and prefer to work in the recommended
-JSON format, the <code><a href="../reference/ars_xlsx_to_json.html">ars_xlsx_to_json()</a></code> helper performs a
-faithful whole-workbook conversion (an R-native equivalent of CDISC’s
-<code>excel2ars.py</code>). For example,
-<code>json_path &lt;- ars_xlsx_to_json(ARS_example("Common_Safety_Displays_cards.xlsx"))</code>
-writes a <code>.json</code> file that can then be passed to
-<code><a href="../reference/readARS.html">readARS()</a></code>:</p>
+<p>The <em>readARS</em> function reads in a completed ARS metadata file
+in JSON format, and generates R scripts for each Output defined in the
+file. Below is an example of how this can be done using a ready-to-use
+ARS metadata file.</p>
+<blockquote>
+<p><strong>Still working from an Excel workbook?</strong> ARS metadata
+in <code>.xlsx</code> format is deprecated in <em>siera</em> and will no
+longer be read in a future release. For now <code><a href="../reference/readARS.html">readARS()</a></code> still
+accepts a workbook, with a warning. Convert each workbook to JSON once
+with <code><a href="../reference/ars_xlsx_to_json.html">ars_xlsx_to_json()</a></code> (an R-native equivalent of CDISC’s
+<code>excel2ars.py</code>), for example
+<code>ars_xlsx_to_json("study.xlsx")</code>, and keep the resulting
+<code>.json</code> file as your ARS metadata from then on. The converter
+is deprecated too and will be removed together with <code>.xlsx</code>
+input, so do the conversion while it is available.</p>
+</blockquote>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Path to the Excel ARS metadata file:</span></span>
-<span><span class="va">ARS_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"Common_Safety_Displays_cards.xlsx"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Path to the ARS metadata file (JSON):</span></span>
+<span><span class="va">ARS_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ARS_example.html">ARS_example</a></span><span class="op">(</span><span class="st">"Common_Safety_Displays_cards.json"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Path to a folder which will contain the Output meta-programmed R scripts (recommended to update</span></span>
 <span><span class="co"># to a more suitable local path)</span></span>
@@ -211,13 +215,12 @@ writes a <code>.json</code> file that can then be passed to
 <span><span class="co"># run the readARS function with these 3 parameters.  This creates R scripts</span></span>
 <span><span class="co"># (1 for each Output in output_folder)</span></span>
 <span><span class="fu"><a href="../reference/readARS.html">readARS</a></span><span class="op">(</span><span class="va">ARS_path</span>, <span class="va">output_folder</span>, <span class="va">ADaM_folder</span><span class="op">)</span></span></code></pre></div>
-<p>You should now have 5 R scripts (named ARD_Out14-1-1.R,
-ARD_Out14-3-1-1.R, ARD_Out14-3-2-1.R, ARD_Out14-3-3-1a.R, and
-ARD_Out14-3-3-1b.R) in the folder specified as <em>output_folder</em>.
-You can execute any of these 5 R scripts as-is (assuming the ADaM
-required for this script is available in the <em>ADaM_folder</em>), and
-the result will be an ARD (one result per row format) for each of the
-scripts.</p>
+<p>You should now have 4 R scripts (named ARD_Out14-1-1.R,
+ARD_Out14-3-1-1.R, ARD_Out14-3-3-1a.R, and ARD_Out14-3-3-1b.R) in the
+folder specified as <em>output_folder</em>. You can execute any of these
+4 R scripts as-is (assuming the ADaM required for this script is
+available in the <em>ADaM_folder</em>), and the result will be an ARD
+(one result per row format) for each of the scripts.</p>
 <p>Each analysis in a generated script reads as four steps - analysis
 set, data subset, method, and a final call to
 <code><a href="../reference/ars_stamp.html">siera::ars_stamp()</a></code> that links the result to the ARS

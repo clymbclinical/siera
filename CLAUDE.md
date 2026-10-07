@@ -6,9 +6,9 @@ with code in this repository.
 ## Package overview
 
 **siera** is an R package that ingests CDISC Analysis Results Standard
-(ARS) metadata (JSON or Excel) and auto-generates R scripts that produce
-Analysis Results Datasets (ARDs) from ADaM datasets. The only exported
-user-facing function is
+(ARS) metadata (JSON; `.xlsx` input is deprecated, \#179) and
+auto-generates R scripts that produce Analysis Results Datasets (ARDs)
+from ADaM datasets. The only exported user-facing function is
 [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md).
 
 ## CRAN readiness
@@ -21,8 +21,17 @@ tests must be guarded with `skip_on_cran()`.
 
 ## Development commands
 
-All commands use R 4.4.1 at
-`C:\Program Files\R\R-4.4.1\bin\Rscript.exe`.
+All commands use R 4.5.1 at `C:\Program Files\R\R-4.5.1\bin\Rscript.exe`
+(default since 2026-10-06). Packages live in the per-user library
+`C:/Users/mbosm/AppData/Local/R/win-library/4.5` (the system library is
+not writable): devtools, roxygen2, rcmdcheck, testthat, covr, cards
+0.9.0 / cardx 0.3.4 and the rest of Imports/Suggests. Rtools 4.5 is
+installed at `C:\rtools45`. `devtools::check()` needs it even though
+siera is pure R: it aborts with “Could not find tools necessary to
+compile a package” when
+[`pkgbuild::has_build_tools()`](https://pkgbuild.r-lib.org/reference/has_build_tools.html)
+is FALSE. R 4.4.1 (with the old cards 0.8.1 / cardx 0.2.4 that broke
+`ard_stats_aov`’s `fmt_fun`) is still installed but no longer used.
 
 ``` r
 
@@ -68,8 +77,8 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
 | File | Purpose |
 |----|----|
 | `R/readARS.R` | Main entry point — [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md) orchestrates the full pipeline |
-| `R/metadata.R` | Parses ARS JSON/XLSX into flat R data frames |
-| `R/ars_xlsx_to_json.R` | [`ars_xlsx_to_json()`](https://clymbclinical.github.io/siera/reference/ars_xlsx_to_json.md) — faithful ARS Excel-to-JSON converter (R port of CDISC `excel2ars.py`) |
+| `R/metadata.R` | Parses ARS JSON into flat R data frames (a deprecated `.xlsx` is converted to JSON in memory first, [`.read_ars_xlsx_via_json()`](https://clymbclinical.github.io/siera/reference/dot-read_ars_xlsx_via_json.md)) |
+| `R/ars_xlsx_to_json.R` | [`ars_xlsx_to_json()`](https://clymbclinical.github.io/siera/reference/ars_xlsx_to_json.md) — faithful ARS Excel-to-JSON converter (R port of CDISC `excel2ars.py`); deprecated (#179), its `.x2a_build()` also backs the deprecated xlsx input path |
 | `R/AnalysisSet.R` | Generates analysis set (population) filter code |
 | `R/DataSubsets.R` | Generates data subset filter code |
 | `R/AnalysisMethods.R` | Resolves method code templates and valueSource parameters |
@@ -78,19 +87,22 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
 | `R/DatasetJSON.R` | Generates the optional CDISC Dataset-JSON export block appended to ARD scripts (`output_format = "datasetjson"`) |
 | `R/libraries.R` | Generates [`library()`](https://rdrr.io/r/base/library.html) calls for generated scripts |
 | `R/program_header.R` | Generates programme header comments |
-| `inst/extdata/` | Example ARS files (JSON and XLSX) used in tests and examples |
+| `inst/extdata/` | Example ARS files (JSON; the remaining `.xlsx` twins exist only for the deprecated xlsx path and go in \#179 Phase 2) used in tests and examples |
 | `inst/script/` | Example generated ARD scripts |
 
 ## Architecture and data flow
 
 `readARS(ARS_path, output_path, adam_path)` is the single entry point:
 
-1.  **Parse metadata** (`metadata.R`) — dispatches to
+1.  **Parse metadata** (`metadata.R`) —
+    [`.read_ars_metadata()`](https://clymbclinical.github.io/siera/reference/dot-read_ars_metadata.md)
+    sends `.json` to
     [`.read_ars_json_metadata()`](https://clymbclinical.github.io/siera/reference/dot-read_ars_json_metadata.md)
-    or
-    [`.read_ars_xlsx_metadata()`](https://clymbclinical.github.io/siera/reference/dot-read_ars_xlsx_metadata.md)
-    based on file extension. Both return the same normalised list of
-    tibbles:
+    (the single ARS parser) and a deprecated `.xlsx` to
+    [`.read_ars_xlsx_via_json()`](https://clymbclinical.github.io/siera/reference/dot-read_ars_xlsx_via_json.md)
+    (warns, then converts in memory via `.x2a_build()` and calls the
+    JSON reader with `json_from=`); any other extension aborts. Returns
+    a normalised list of tibbles:
     - `Lopo` — list of planned outputs
     - `Lopa` — list of planned analyses (maps analyses → outputs)
     - `DataSubsets`, `AnalysisSets`, `AnalysisGroupings`
@@ -128,11 +140,27 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
 
 ## Key implementation details
 
-- **JSON/XLSX parity is required**: every code-generation change must
-  work identically regardless of whether the ARS input file is `.json`
-  or `.xlsx`. Both parsers produce the same normalised tibble names and
-  column names; test both paths when adding new features that read from
-  those tibbles.
+- **JSON-only ARS input (#179)**: siera has ONE ARS parser,
+  [`.read_ars_json_metadata()`](https://clymbclinical.github.io/siera/reference/dot-read_ars_json_metadata.md).
+  Code generation never branches on the input format (the old `file_ext`
+  threading and every xlsx-only split were removed), so write and test
+  new features against JSON fixtures only. A `.xlsx` workbook still
+  works for one deprecation release:
+  [`.read_ars_xlsx_via_json()`](https://clymbclinical.github.io/siera/reference/dot-read_ars_xlsx_via_json.md)
+  warns (class `siera_deprecated_xlsx`, every call), keeps the old
+  missing-sheet contract (warn + `NULL`), converts with `.x2a_build()`
+  and round-trips through JSON text so the parsed object has jsonlite’s
+  exact shape. Tests that must touch xlsx muffle ONLY that class via
+  `.quiet_xlsx_deprecation()` (`tests/testthat/helper-xlsx.R`);
+  `test-xlsx-deprecation.R` holds the readARS(xlsx) == readARS(twin)
+  script-parity gate. Multi-value cells reach the generators already
+  unnested (one row per value), exactly like JSON. Phase 2 (owner-timed)
+  aborts on `.xlsx` and deletes the converter, all xlsx fixtures and
+  `readxl`/`openxlsx`. *Pre-#179 rule, kept for reference in case xlsx
+  is ever restored: “JSON/XLSX parity is required: every code-generation
+  change must work identically regardless of whether the ARS input file
+  is `.json` or `.xlsx`.”* If xlsx is ever restored, do it as an `.xlsx`
+  arm that converts then calls the JSON reader — never a second parser.
 - **Code generation is string-based**: method templates contain literal
   placeholder strings (e.g. `"analysisidhere"`, `"methodidhere"`)
   replaced with [`gsub()`](https://rdrr.io/r/base/grep.html). Don’t
@@ -167,8 +195,7 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   `IN`/`NOTIN` value list in ONE cell separated by `" | "` (TFL Designer
   / `excel2ars.py`;
   [`ars_xlsx_to_json()`](https://clymbclinical.github.io/siera/reference/ars_xlsx_to_json.md)
-  splits on `" | "` too). Always split with
-  [`.split_xlsx_values()`](https://clymbclinical.github.io/siera/reference/dot-split_xlsx_values.md)
+  splits on `" | "` too). Always split with `.split_xlsx_values()`
   (`R/DataSubsets.R`), which trims each value; a hand-rolled
   `strsplit(gsub("\|", ",", x), ",\s*")` keeps the blank BEFORE the
   separator (`"POSSIBLE "`) and silently matches nothing (shipped
@@ -309,13 +336,13 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   columns are guarded (NA results). `fmt_fun`/`fmt_fn` are dropped via
   `select(-any_of(...))`. Tests: `test-formatted-result.R` (formatter
   units, generator branches, runtime eval on stub ARDs, sourced-script
-  integration, JSON/XLSX block parity).
+  integration).
 - **ADaM input format (CSV, XPT or Dataset-JSON; issues \#161, \#192)**
   — `adam_path` may hold CSV (`.csv`), SAS transport (`.xpt`) or CDISC
   Dataset-JSON (`.json`) ADaM files; siera picks the reader **per
   dataset at generation time** from the extension found on disk (no
   [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
-  argument, mirroring `.json`/`.xlsx` ARS dispatch).
+  argument).
   [`.generate_one_adam_read()`](https://clymbclinical.github.io/siera/reference/dot-generate_one_adam_read.md)
   in `R/loadADaM.R` resolves the file: it prefers an exact-case match,
   else does a **case-insensitive**
@@ -360,8 +387,9 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   Pieces: `R/ars_stamp.R` (exports + `.stamp_grouping_cols()`),
   `.grouping_stamp_spec()` + `.escape_single_quote()` in `R/readARS.R`
   (shared by BOTH generators so group-id lookups agree by construction;
-  it also takes `file_ext` and splits a delimited xlsx `IN` cell into
-  one value per row, **trimming whitespace** —
+  its former `file_ext` xlsx `IN`-cell split was removed in \#179 —
+  multi-value `IN` now always arrives unnested, and the converter’s
+  tolerant pipe split + trim replaced the old trimming —
   `Common_Safety_Displays_cards.xlsx` writes `"65-80 | >80"`, and the
   `",\\s*"` split used elsewhere would keep `"65-80 "` and never match.
   This split moved here from \#204’s `.generate_groupid_code()` when
@@ -376,7 +404,7 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
   passes its value). **Acceptance gate = parity:**
   `test-code-style-parity.R` generates every runnable `inst/extdata`
-  example in both styles (JSON + xlsx + documentRef variants), sources
+  JSON example in both styles (incl. the documentRef variant), sources
   them and `expect_identical()`s the final `ARD` and each `df3_*` (after
   dropping the cards `fmt_fun` closure column — closures differ per run,
   so even two *expanded* runs are not
@@ -408,27 +436,38 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   and controlled-vs-sponsor term dispatch). Lives entirely in the
   **metadata/serialisation layer** (`R/ars_xlsx_to_json.R`) — no change
   to `readARS.R`/`AnalysisMethods.R`. Serialises with
-  `jsonlite::toJSON(auto_unbox=TRUE)`; internal builders prefixed
-  `.x2a_*`. **Detail standard = match excel2ars.py** (its fidelity is
-  the ceiling); the one deliberate extra is reading `About`/`StudyInfo`
-  (excel2ars.py skips them). **Controlled-term enums** (`.x2a_enums`:
+  `jsonlite::toJSON(auto_unbox=TRUE)` via `.x2a_json_text()`; the
+  workbook-to-list builder is `.x2a_build()` (shared with the deprecated
+  readARS xlsx path); internal builders prefixed `.x2a_*`. **Multivalued
+  ARS slots are ALWAYS JSON arrays** (`.x2a_split()` returns a list even
+  for one value): a scalar-for-one/array-for-many mix made jsonlite
+  simplify the same field to different column types and broke the JSON
+  reader on `Common_Safety_Displays_cards`. `.x2a_split()` splits on `|`
+  with optional surrounding whitespace and trims each value (never on
+  commas) — this fixes \#213. `OutputFiles` falls back to an `id` owner
+  column (older TFL Designer layout) and skips ownerless rows. **Detail
+  standard = match excel2ars.py** (its fidelity is the ceiling); the one
+  deliberate extra is reading `About`/`StudyInfo` (excel2ars.py skips
+  them). **Controlled-term enums** (`.x2a_enums`:
   OperationRole/AnalysisReason/AnalysisPurpose/OutputFileType) are
   mirrored from the ARS LinkML model and must be re-synced on ARS
-  version bumps. **Test oracle** (`test-ars-xlsx-to-json.R`):
-  `readARS(converted json)` generates byte-identical ARD scripts to
-  `readARS(xlsx)` after normalising the timestamp line +
-  carriage-returns/blank-lines (the JSON reader strips `\r` from
-  `templateCode`, the xlsx reader does not — so converted output is
-  actually *cleaner*). exampleARS_2/6 are exact; exampleARS_3 differs by
-  exactly one line (An_14 is a malformed source row: a denominator
-  `analysisId` with no relationship id, which excel2ars.py — and thus
-  siera — correctly drops). Advanced branches (results/docrefs/sponsor
-  terms/output files/DocumentRef code) are covered by a synthetic
-  `openxlsx`-built workbook (openxlsx added to Suggests). **This does
-  NOT yet make
-  [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
-  JSON-only — that is \#179.** NEWS entry deferred to next version bump
-  (0.5.6 is on CRAN / mid-submission).
+  version bumps. **Test oracle** (`test-ars-xlsx-to-json.R`): converted
+  JSON generates the same ARD scripts as the committed JSON twin
+  (exampleARS_2/3/5/6, Common_Safety_Displays_cards) after normalising
+  timestamp/blank lines; exampleARS_2 differs only in the “Overall”
+  group literal (blank xlsx cell gives `'NA'` vs the hand-written twin’s
+  `''`). `exampleARS_3.json` and `Common_Safety_Displays_cards.json` ARE
+  converter output (#179); the old, different `exampleARS_3.json`
+  (dynamic opid templates) now lives at `exampleARS_7.json`. A
+  denominator `analysisId` with no relationship id is dropped, as
+  excel2ars.py does; the one fixture row like that (exampleARS_3 An_14)
+  was repaired in \#179 (NUM = An_14, DEN = An_02), because dropping it
+  left `df2_denomanaidhere` in the generated script. **Deprecated
+  (#179)**: warns class `siera_deprecated_xlsx` on every call; removed
+  together with xlsx input in Phase 2. Advanced branches
+  (results/docrefs/sponsor terms/output files/DocumentRef code) are
+  covered by a synthetic `openxlsx`-built workbook (openxlsx added to
+  Suggests). NEWS entry deferred to next version bump.
 - **`opidNhere` tokens are declared as `operation_N` parameters in every
   method-library method (issue \#183)** — the `opidNhere` token family
   (which stamps the ARD `operationid` column) is resolved only by the
@@ -703,28 +742,29 @@ placeholder parameters, it does not rewrite the cards calls.
 **Consequence:** you cannot bring generated scripts onto a newer cards
 API by editing siera’s R code or the vignettes alone; the example
 metadata’s `templateCode` must be updated. The bundled
-`Common_Safety_Displays_cards.xlsx` carries the templates in the
-`AnalysisMethodCodeTemplate` sheet (`templateCode` column, 5 rows). A
-name-only swap (`ard_categorical`→`ard_tabulate`,
-`ard_continuous`→`ard_summary`) runs fine on current cards —
-`ard_tabulate()` still accepts the legacy
+`Common_Safety_Displays_cards.json` carries the templates in
+`methods[].codeTemplate.code` (its deprecated `.xlsx` twin in the
+`AnalysisMethodCodeTemplate` sheet). A name-only swap
+(`ard_categorical`→`ard_tabulate`, `ard_continuous`→`ard_summary`) runs
+fine on current cards — `ard_tabulate()` still accepts the legacy
 `by = c('grp','var'), variables = 'dummy', denominator = raw_df`
 pattern, so the “old” denominator pattern above still executes and
 yields identical results even though the `...ard_N...` form is preferred
 for new templates.
 
-Do not modify the test fixture xlsx files in `inst/extdata/` without
-explicit owner authorisation — the package owner normally updates those
-separately. (In PR \#162 the owner did authorise renaming the cards
-functions in `templateCode`; that edit was made with
+Do not modify the test fixture files in `inst/extdata/` without explicit
+owner authorisation (the owner authorised adding/removing fixtures for
+\#179) — the package owner normally updates those separately. (In PR
+\#162 the owner did authorise renaming the cards functions in
+`templateCode`; that edit was made with
 [`openxlsx::loadWorkbook()`](https://rdrr.io/pkg/openxlsx/man/loadWorkbook.html)
 → `writeData()` on the single column → `saveWorkbook()`, which preserves
 all 24 sheets — verify the sheet count and re-run
 [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
 afterwards.) The example R scripts in `inst/script/` are pre-generated
-and committed; regenerate them manually using
-[`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
-after the xlsx templates are updated, then
+and committed; regenerate them manually with
+`readARS(ARS_example("Common_Safety_Displays_cards.json"), <dir>, system.file("extdata", package = "siera"))`
+after the templates are updated, then
 [`gsub()`](https://rdrr.io/r/base/grep.html) the ADaM-loading
 `readr::read_csv('…/<DS>.csv'` lines to
 `readr::read_csv(siera::ARS_example("<DS>.csv")`.
@@ -753,8 +793,11 @@ after the xlsx templates are updated, then
   [`withr::local_tempdir()`](https://withr.r-lib.org/reference/with_tempfile.html)
   in \#167).
 - Example ARS files live in `inst/extdata/` (`exampleARS_1` –
-  `exampleARS_6`, both `.json` and `.xlsx`). Retrieve them in tests via
-  `ARS_example("exampleARS_6.json")`.
+  `exampleARS_7`, `test_cards`, `Common_Safety_Displays_cards`, all
+  `.json`; `.xlsx` twins of 2/3/5/6 and Common_Safety plus the broken
+  `exampleARS_2a.xlsx` remain only for the deprecated xlsx path until
+  \#179 Phase 2). Retrieve them in tests via
+  `ARS_example("exampleARS_6.json")`. Write new tests against JSON.
 - **eTFL Portal integration testing** — `tests/testthat/testdata/etfl/`
   holds the CDISC eTFL Portal fixtures unzipped into three subfolders
   (no `.zip` files are committed): `metadata/<table>-siera.json` (ARS
@@ -916,9 +959,8 @@ after the xlsx templates are updated, then
     [`dplyr::case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
     body mapping data values onto the defined groups (built by reusing
     [`.generate_data_subset_condition()`](https://clymbclinical.github.io/siera/reference/dot-generate_data_subset_condition.md),
-    so comparator/xlsx handling is shared) and
-    **`AG_var2_group_levels`** to the same levels as factor levels —
-    handing those to
+    so comparator handling is shared) and **`AG_var2_group_levels`** to
+    the same levels as factor levels — handing those to
     `cards::ard_tabulate(by = arm, variables = <cat>, denominator = <count>)`
     makes cards zero-fill **both** dimensions (verified: an entirely
     absent `by` level is zero-filled too, as long as BOTH data and
@@ -1063,7 +1105,21 @@ after the xlsx templates are updated, then
     only and was never affected. The shipped
     `exampleARS_5_documentref.xlsx` fixture keeps one blanked template
     row (update branch) and omits the other two (add-row branch) so both
-    are covered.
+    are covered. **\#179 update:** the XLSX reader described here is
+    gone, and so are the siera-specific xlsx documentRef wiring
+    (`referenceType = "ExternalCode"` with a blank `Code` template) and
+    its `exampleARS_5_documentref.xlsx` fixture. Deprecated xlsx input
+    is converted to JSON first, so it resolves documentRefs only via the
+    CDISC excel2ars convention (`specifiedAs = "DocumentRef"` + a
+    `ProgrammingCode` row in `AnalysisMethodDocumentRefs`);
+    test-method-reference.R builds such a workbook with openxlsx.
+    \#214’s `Documentation`-row filter went with the old reader: the
+    converter sends `Documentation` rows to `methods[].documentRefs` and
+    only `ProgrammingCode` rows to `codeTemplate.documentRef`, so
+    documentation references are never resolved as code
+    (test-method-reference.R keeps a \#214 regression test on a
+    CDISC-convention workbook). A docref sheet without a `referenceType`
+    column no longer resolves anything, matching excel2ars.py.
 
 ## Documentation and vignettes
 
