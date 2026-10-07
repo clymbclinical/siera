@@ -53,14 +53,6 @@ test_that(".is_absolute_path recognises POSIX and Windows absolutes", {
   expect_false(siera:::.is_absolute_path("m.json"))
 })
 
-test_that(".split_page_names splits and trims, empty for blank", {
-  expect_identical(siera:::.split_page_names("total_n"), "total_n")
-  expect_identical(siera:::.split_page_names("a, b ; c"), c("a", "b", "c"))
-  expect_identical(siera:::.split_page_names(NA), character(0))
-  expect_identical(siera:::.split_page_names(""), character(0))
-  expect_identical(siera:::.split_page_names(NULL), character(0))
-})
-
 test_that(".extract_reference_documents normalises NULL, data frame and list", {
   expect_identical(nrow(siera:::.extract_reference_documents(NULL)), 0L)
   df <- data.frame(id = "RD", name = "n", location = "x.json", stringsAsFactors = FALSE)
@@ -263,9 +255,8 @@ test_that("an absolute location is used as-is (not joined to ars_dir)", {
 
 # Generated scripts only; no script is sourced, so no ADaM data / cards needed.
 # Both ARS variants must use the SAME adam dir (its path is embedded in the
-# generated read_csv() calls). The inline xlsx path does not strip \r/_x000D_
-# from templateCode, so blank lines can differ cosmetically - compare with blank
-# lines (and the timestamp header) removed, asserting the logic is identical.
+# generated read_csv() calls). Compare with blank lines (and the timestamp
+# header) removed, asserting the logic is identical.
 .gen_script_norm <- function(ars_path, adam, env = parent.frame()) {
   out <- withr::local_tempdir(.local_envir = env)
   suppressWarnings(suppressMessages(readARS(ars_path, out, adam)))
@@ -284,10 +275,59 @@ test_that("JSON documentRef example generates the same script as the inline ARS"
   expect_identical(docref, inline)
 })
 
-test_that("XLSX documentRef example generates the same script as the inline ARS", {
+# Build a copy of exampleARS_5.xlsx whose method templates are document
+# references in the CDISC excel2ars.py convention: specifiedAs = "DocumentRef"
+# on AnalysisMethodCodeTemplate plus a ProgrammingCode row per method in
+# AnalysisMethodDocumentRefs, pointing at the bundled manifest. With
+# `with_documentation = TRUE` a Documentation reference to a non-existent SAP
+# is added for Mth_01, BEFORE its code reference (#214).
+.cdisc_docref_xlsx <- function(with_documentation = FALSE, env = parent.frame()) {
+  d <- withr::local_tempdir(.local_envir = env)
+  file.copy(ARS_example("exampleARS_methods.json"), d)
+
+  wb <- openxlsx::loadWorkbook(ARS_example("exampleARS_5.xlsx"))
+  tmpl <- openxlsx::readWorkbook(wb, "AnalysisMethodCodeTemplate")
+  tmpl$specifiedAs <- "DocumentRef"
+  tmpl$templateCode <- NA_character_
+  openxlsx::writeData(wb, "AnalysisMethodCodeTemplate", tmpl)
+
+  refs <- data.frame(
+    id = "RefDoc_siera_methods", name = "siera example method manifest",
+    description = NA_character_, label = NA_character_,
+    location = "exampleARS_methods.json"
+  )
+  docrefs <- data.frame(
+    method_id = tmpl$method_id, referenceType = "ProgrammingCode",
+    refDocumentId = "RefDoc_siera_methods", pageRef_refType = "NamedDestination",
+    pageRef_label = NA_character_, pageRef_pages = tmpl$method_id
+  )
+  if (with_documentation) {
+    refs <- rbind(refs, data.frame(
+      id = "SAP", name = "Statistical Analysis Plan", description = NA_character_,
+      label = NA_character_, location = "./sap.pdf"
+    ))
+    docrefs <- rbind(data.frame(
+      method_id = "Mth_01", referenceType = "Documentation", refDocumentId = "SAP",
+      pageRef_refType = "PhysicalRef", pageRef_label = NA_character_,
+      pageRef_pages = "9"
+    ), docrefs)
+  }
+  openxlsx::writeData(wb, "ReferenceDocuments", refs)
+  openxlsx::writeData(wb, "AnalysisMethodDocumentRefs", docrefs)
+
+  xlsx <- file.path(d, "docref.xlsx")
+  openxlsx::saveWorkbook(wb, xlsx)
+  xlsx
+}
+
+test_that("deprecated xlsx input resolves a CDISC-convention documentRef", {
+  # The xlsx path converts the workbook to ARS JSON first, so a method whose
+  # template is a ProgrammingCode document reference resolves exactly like
+  # JSON, relative to the workbook's own folder.
+  skip_if_not_installed("openxlsx")
   adam   <- withr::local_tempdir()
-  inline <- .gen_script_norm(ARS_example("exampleARS_5.xlsx"), adam)
-  docref <- .gen_script_norm(ARS_example("exampleARS_5_documentref.xlsx"), adam)
+  docref <- .gen_script_norm(.cdisc_docref_xlsx(), adam)
+  inline <- .gen_script_norm(ARS_example("exampleARS_5.json"), adam)
   expect_identical(docref, inline)
 })
 
@@ -401,57 +441,23 @@ test_that("the shipped documentRef example carries no inline templateCode", {
 
 # ---- documentation references are not code templates (#214) -----------------
 
-# Copy the XLSX documentRef example (and the manifest it references) to a temp
-# dir and add a Documentation reference to a non-existent SAP for Mth_01,
-# placed BEFORE its code reference.
-.docref_xlsx_with_documentation <- function(drop_reference_type = FALSE,
-                                            env = parent.frame()) {
-  d <- withr::local_tempdir(.local_envir = env)
-  file.copy(ARS_example("exampleARS_methods.json"), d)
-  ars <- file.path(d, "ars.xlsx")
-  wb <- openxlsx::loadWorkbook(ARS_example("exampleARS_5_documentref.xlsx"))
-
-  refs <- openxlsx::readWorkbook(wb, "ReferenceDocuments")
-  sap <- refs[1, , drop = FALSE]
-  sap[] <- NA
-  sap$id <- "SAP"
-  sap$name <- "Statistical Analysis Plan"
-  sap$location <- "./sap.pdf"
-  openxlsx::writeData(wb, "ReferenceDocuments", rbind(refs, sap))
-
-  docrefs <- openxlsx::readWorkbook(wb, "AnalysisMethodDocumentRefs")
-  doc <- docrefs[1, , drop = FALSE]
-  doc$referenceType <- "Documentation"
-  doc$refDocumentId <- "SAP"
-  doc$pageRef_refType <- "PhysicalRef"
-  doc$pageRef_pages <- "9"
-  docrefs <- rbind(doc, docrefs)
-  if (drop_reference_type) {
-    docrefs <- docrefs[-1, setdiff(names(docrefs), "referenceType")]
-    openxlsx::removeWorksheet(wb, "AnalysisMethodDocumentRefs")
-    openxlsx::addWorksheet(wb, "AnalysisMethodDocumentRefs")
-  }
-  openxlsx::writeData(wb, "AnalysisMethodDocumentRefs", docrefs)
-  openxlsx::saveWorkbook(wb, ars, overwrite = TRUE)
-  ars
-}
-
-test_that("XLSX Documentation references are not resolved as code (#214)", {
+test_that("xlsx Documentation references are not resolved as code (#214)", {
+  # The SAP row comes first and points at a file that does not exist; resolving
+  # it as a template would abort. The conversion routes it to the method's
+  # documentRefs instead, leaving only the ProgrammingCode row as the template.
   skip_if_not_installed("openxlsx")
+  xlsx   <- .cdisc_docref_xlsx(with_documentation = TRUE)
   adam   <- withr::local_tempdir()
-  inline <- .gen_script_norm(ARS_example("exampleARS_5.xlsx"), adam)
-  # Without the fix, the SAP row (first) is resolved and readARS() aborts on
-  # the missing ./sap.pdf.
-  docref <- .gen_script_norm(.docref_xlsx_with_documentation(), adam)
+  docref <- .gen_script_norm(xlsx, adam)
+  inline <- .gen_script_norm(ARS_example("exampleARS_5.json"), adam)
   expect_identical(docref, inline)
-})
 
-test_that("an XLSX docref sheet without referenceType resolves every row", {
-  skip_if_not_installed("openxlsx")
-  adam   <- withr::local_tempdir()
-  inline <- .gen_script_norm(ARS_example("exampleARS_5.xlsx"), adam)
-  docref <- .gen_script_norm(
-    .docref_xlsx_with_documentation(drop_reference_type = TRUE), adam
+  j <- jsonlite::fromJSON(
+    siera:::.x2a_json_text(siera:::.x2a_build(xlsx)),
+    simplifyVector = FALSE
   )
-  expect_identical(docref, inline)
+  m1 <- Filter(function(m) identical(m$id, "Mth_01"), j$methods)[[1]]
+  expect_identical(m1$documentRefs[[1]]$referenceDocumentId, "SAP")
+  expect_identical(m1$codeTemplate$documentRef$referenceDocumentId,
+                   "RefDoc_siera_methods")
 })

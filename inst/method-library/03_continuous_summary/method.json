@@ -5,7 +5,7 @@
   "description": "Descriptive statistics of a continuous analysis variable per group. Verified against Common_Safety_Displays Mth02_ContVar_Summ_ByGrp; current cards API (ard_summary, by_listc). Fixes the legacy sheet which used the deprecated ard_continuous + by_stmt (the latter stamps no group metadata).",
   "context": "R (siera)",
   "status": "verified",
-  "verified_against": "Common_Safety_Displays_cards.xlsx Mth02_ContVar_Summ_ByGrp",
+  "verified_against": "Common_Safety_Displays_cards.json Mth02_ContVar_Summ_ByGrp",
   "operations": [
     {
       "order": 1,

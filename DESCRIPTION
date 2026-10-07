@@ -9,13 +9,12 @@ Description: Analysis Results Standard (ARS), a foundational standard by CDISC
     (Clinical Data Interchange Standards Consortium), provides a logical
     data model for metadata describing all components to calculate Analysis
     Results. <https://www.cdisc.org/standards/foundational/analysis-results-standard>
-    Using 'siera', ARS metadata is ingested (JSON or Excel format), producing
+    Using 'siera', ARS metadata is ingested (JSON format), producing
     R programmes to generate Analysis Results Datasets (ARDs). Supports
     arbitrary-depth table structures, multi-value conditions, data-driven
     groupings, and CDISC-compliant ARD column stamping.
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.3.3
 Depends: 
     R (>= 4.1)
 Imports:
@@ -46,3 +45,4 @@ VignetteBuilder: knitr
 URL: https://clymbclinical.github.io/siera/, https://github.com/clymbclinical/siera
 BugReports: https://github.com/clymbclinical/siera/issues
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0

@@ -59,10 +59,8 @@ An ARS author wires a method to a library entry like this (JSON):
 
 `location` resolves **locally only** (relative to the ARS file, or absolute);
 remote URLs are rejected. A single-method manifest or a bare `.R`/`.txt` code
-file (parameters then stay inline in the ARS) are also accepted. The XLSX ARS
-representation carries the same wiring in its `ReferenceDocuments` and
-`AnalysisMethodDocumentRefs` sheets. See the bundled
-`exampleARS_5_documentref.json` / `.xlsx` (with `exampleARS_methods.json`) for a
+file (parameters then stay inline in the ARS) are also accepted. See the
+bundled `exampleARS_5_documentref.json` (with `exampleARS_methods.json`) for a
 runnable end-to-end example.
 
 Access from R with the exported accessor: `method_library()` lists the available

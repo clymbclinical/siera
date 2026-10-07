@@ -5,7 +5,7 @@
   "description": "Distinct count of the analysis variable (typically USUBJID) per treatment group. Used as the N= header / denominator source. Verified against Common_Safety_Displays Mth01_CatVar_Count_ByGrp; current cards API.",
   "context": "R (siera)",
   "status": "verified",
-  "verified_against": "Common_Safety_Displays_cards.xlsx Mth01_CatVar_Count_ByGrp",
+  "verified_against": "Common_Safety_Displays_cards.json Mth01_CatVar_Count_ByGrp",
   "operations": [
     {
       "order": 1,

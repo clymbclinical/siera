@@ -12,8 +12,7 @@
 #'  for each dataset from the file extension found in this folder — `.csv`
 #'  files are read with \code{readr::read_csv()}, `.xpt` files with
 #'  \code{haven::read_xpt()} and `.json` files with
-#'  \code{datasetjson::read_dataset_json()} — so no extra argument is required
-#'  (mirroring how the ARS input format is inferred from `.json` vs `.xlsx`).
+#'  \code{datasetjson::read_dataset_json()} — so no extra argument is required.
 #'  Reading `.xpt` datasets in the generated script requires the \pkg{haven}
 #'  package, and `.json` datasets the \pkg{datasetjson} package. When several
 #'  formats exist for the same dataset, precedence is `.csv`, then `.xpt`,
@@ -46,15 +45,13 @@
 #'  at script runtime (likely a typo) rather than an error. Only used when
 #'  `output_format = "datasetjson"`; otherwise it is ignored with a warning.
 #'
-#' @importFrom readxl read_excel
-#'
 #' @returns R programmes generating ARDs - one for each output (or analysis from an output) specified in the ARS metadata
 #' @export
 #'
 #' @examples
 #' # path to file containing ARS metadata
 #'
-#' ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+#' ARS_path <- ARS_example("Common_Safety_Displays_cards.json")
 #'
 #' # output path for R programs
 #' output_dir <- tempdir()
@@ -111,7 +108,6 @@ readARS <- function(ARS_path,
     return(invisible(NULL))
   }
 
-  file_ext <- metadata$file_ext
   Lopo <- metadata$Lopo
   Lopa <- metadata$Lopa
   DataSubsets <- metadata$DataSubsets
@@ -316,8 +312,7 @@ readARS <- function(ARS_path,
         data_subsets = DataSubsets,
         subset_id = subsetid,
         analysis_id = Anas_j,
-        analysis_set_dataset = AnSetDataSubsets,
-        file_ext = file_ext
+        analysis_set_dataset = AnSetDataSubsets
       )
 
       code_ds <- data_subset_result$code
@@ -362,10 +357,10 @@ readARS <- function(ARS_path,
         if (n_actual_groups >= 2) {
           list(
             AG_var2_group_conditions = function() {
-              .ag_group_conditions(AnalysisGroupings, groupids[2], file_ext)$conditions
+              .ag_group_conditions(AnalysisGroupings, groupids[2])$conditions
             },
             AG_var2_group_levels = function() {
-              .ag_group_conditions(AnalysisGroupings, groupids[2], file_ext)$levels
+              .ag_group_conditions(AnalysisGroupings, groupids[2])$levels
             }
           )
         }
@@ -424,8 +419,7 @@ readARS <- function(ARS_path,
             groupids           = groupids,
             n_group_cols       = n_group_cols,
             AG_dataDriven      = AG_dataDriven,
-            analysis_groupings = AnalysisGroupings,
-            file_ext           = file_ext
+            analysis_groupings = AnalysisGroupings
           )
         )
       } else {
@@ -435,8 +429,7 @@ readARS <- function(ARS_path,
           n_group_cols       = n_group_cols,
           AG_dataDriven      = AG_dataDriven,
           analysis_groupings = AnalysisGroupings,
-          population_based   = population_based,
-          file_ext           = file_ext
+          population_based   = population_based
         )
 
         # Coerce *_level columns (variable_level, group[n]_level) to character on
@@ -508,13 +501,12 @@ readARS <- function(ARS_path,
 }
 
 # Generate mutate code that stamps group[n]_groupingId and group[n]_groupId
-# onto df3_<analysis_id> for each ARD group column produced by the method.
-# Works identically for XLSX- and JSON-sourced ARS files because both produce
-# the same AnalysisGroupings tibble with id, group_id, group_condition_value,
-# and dataDriven columns.
+# onto df3_<analysis_id> for each ARD group column produced by the method,
+# from the AnalysisGroupings tibble (id, group_id, group_condition_value,
+# dataDriven).
 .generate_groupid_code <- function(analysis_id, groupids, n_group_cols,
                                    AG_dataDriven, analysis_groupings,
-                                   population_based = FALSE, file_ext = "json") {
+                                   population_based = FALSE) {
   if (n_group_cols < 1L) return("")
 
   mutate_parts <- character(0)
@@ -531,8 +523,7 @@ readARS <- function(ARS_path,
 
     gpval_col <- paste0("group", k, "_groupValue")
 
-    spec <- .grouping_stamp_spec(gid, AG_dataDriven[k], analysis_groupings,
-                                 file_ext)
+    spec <- .grouping_stamp_spec(gid, AG_dataDriven[k], analysis_groupings)
 
     if (spec$data_driven) {
       mutate_parts <- c(mutate_parts,
@@ -579,8 +570,7 @@ readARS <- function(ARS_path,
 # (one entry per condition value, so IN conditions repeat the group id). Shared
 # by the expanded generator (.generate_groupid_code()) and the wrapped one
 # (.generate_stamp_code()), so both styles stamp the same groups by construction.
-.grouping_stamp_spec <- function(gid, data_driven, analysis_groupings,
-                                 file_ext = "json") {
+.grouping_stamp_spec <- function(gid, data_driven, analysis_groupings) {
   data_driven <- isTRUE(as.logical(data_driven))
   values <- character(0)
   group_ids <- character(0)
@@ -592,24 +582,6 @@ readARS <- function(ARS_path,
         nchar(as.character(analysis_groupings$group_id)) > 0, ]
     values <- as.character(grp_rows$group_condition_value)
     group_ids <- grp_rows$group_id
-
-    # The xlsx reader keeps a multi-value IN condition in one delimited
-    # cell (the JSON reader unnests it), so split it to one row per value
-    # or the level of an IN group would never match its group id
-    # (.split_xlsx_values() trims each value, #213).
-    if (identical(file_ext, "xlsx") &&
-        "group_condition_comparator" %in% names(grp_rows)) {
-      is_in <- grp_rows$group_condition_comparator %in% "IN"
-      split_vals <- lapply(seq_along(values), function(i) {
-        if (is_in[i]) {
-          .split_xlsx_values(values[i])
-        } else {
-          values[i]
-        }
-      })
-      group_ids <- rep(group_ids, lengths(split_vals))
-      values    <- unlist(split_vals)
-    }
   }
 
   list(id = gid, data_driven = data_driven, values = values, group_ids = group_ids)
@@ -628,7 +600,7 @@ readARS <- function(ARS_path,
 # .n_group_cols_from_template()); the groupings argument is omitted when it is 0.
 .generate_stamp_code <- function(analysis_id, method_id, output_id, groupids,
                                  n_group_cols, AG_dataDriven,
-                                 analysis_groupings, file_ext = "json") {
+                                 analysis_groupings) {
   df3 <- paste0("df3_", analysis_id)
   lit <- function(x) paste0("'", .escape_single_quote(x), "'")
   has_groupings <- n_group_cols >= 1L
@@ -658,7 +630,7 @@ readARS <- function(ARS_path,
   if (has_groupings) {
     grouping_calls <- vapply(seq_len(n_group_cols), function(k) {
       spec <- .grouping_stamp_spec(groupids[k], AG_dataDriven[k],
-                                   analysis_groupings, file_ext)
+                                   analysis_groupings)
       if (spec$data_driven) {
         paste0("    siera::ars_grouping(", lit(spec$id), ", data_driven = TRUE)")
       } else if (length(spec$group_ids) == 0L) {
@@ -818,7 +790,7 @@ readARS <- function(ARS_path,
 # the correct group[n]_groupId. Only EQ and IN conditions define a group as a
 # set of data values that way, so other comparators are skipped with a warning,
 # as they are for AG_var2_group_values.
-.ag_group_conditions <- function(analysis_groupings, grouping_id, file_ext = "json") {
+.ag_group_conditions <- function(analysis_groupings, grouping_id) {
   gid <- grouping_id
   # The empty conditions fallback is a case_when arm that matches nothing, so a
   # template embedding it still parses; the empty levels fallback resolves to
@@ -854,7 +826,7 @@ readARS <- function(ARS_path,
   group_levels <- character(0)
   skipped <- character(0)
 
-  # One entry per group; an IN group contributes several rows (the JSON reader
+  # One entry per group; an IN group contributes several rows (the reader
   # unnests condition.value), so collect the values back up per group_id.
   for (gpid in unique(groups$group_id)) {
     rows <- groups[groups$group_id == gpid, , drop = FALSE]
@@ -869,20 +841,12 @@ readARS <- function(ARS_path,
     condition <- .generate_data_subset_condition(
       variable   = as.character(rows$group_condition_variable[1]),
       comparator = comparator,
-      value      = values,
-      file_ext   = file_ext
+      value      = values
     )
 
     if (!nzchar(condition)) {
       skipped <- c(skipped, gpid)
       next
-    }
-
-    # The xlsx reader keeps a multi-value IN condition in one delimited cell,
-    # so take the level from the same split .generate_data_subset_condition()
-    # applies rather than from the raw cell.
-    if (identical(comparator, "IN") && identical(file_ext, "xlsx")) {
-      values <- .split_xlsx_values(values[1])
     }
 
     level <- gsub("'", "\\'", values[1], fixed = TRUE)

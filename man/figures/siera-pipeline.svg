@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" font-family="Helvetica, Arial, sans-serif" role="img" aria-label="siera pipeline: ARS metadata flows through readARS to generated R scripts, which run against ADaM datasets to produce an ARD">
   <title>The siera pipeline</title>
-  <desc>ARS metadata (JSON or XLSX) is read by readARS(), which writes one ARD_Output.R script per output. Each script runs against ADaM datasets (CSV or XPT) to produce an ARD (one row per result). The cards and cardx packages perform the computation.</desc>
+  <desc>ARS metadata (JSON) is read by readARS(), which writes one ARD_Output.R script per output. Each script runs against ADaM datasets (CSV or XPT) to produce an ARD (one row per result). The cards and cardx packages perform the computation.</desc>
 
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
@@ -11,7 +11,7 @@
   <!-- Box 1: ARS metadata -->
   <rect x="12" y="60" width="160" height="74" rx="9" fill="#eaf2f8" stroke="#2c6e9b" stroke-width="2"/>
   <text x="92" y="92" text-anchor="middle" font-size="17" font-weight="bold" fill="#1b4f72">ARS metadata</text>
-  <text x="92" y="113" text-anchor="middle" font-size="13" fill="#34495e">JSON / XLSX</text>
+  <text x="92" y="113" text-anchor="middle" font-size="13" fill="#34495e">JSON</text>
 
   <!-- arrow 1 -> 2 -->
   <line x1="172" y1="97" x2="214" y2="97" stroke="#34495e" stroke-width="2" marker-end="url(#arrow)"/>
