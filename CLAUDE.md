@@ -442,13 +442,16 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   ARS slots are ALWAYS JSON arrays** (`.x2a_split()` returns a list even
   for one value): a scalar-for-one/array-for-many mix made jsonlite
   simplify the same field to different column types and broke the JSON
-  reader on `Common_Safety_Displays_cards`. `.x2a_split()` splits on `|`
-  with optional surrounding whitespace and trims each value (never on
-  commas) — this fixes \#213. `OutputFiles` falls back to an `id` owner
-  column (older TFL Designer layout) and skips ownerless rows. **Detail
-  standard = match excel2ars.py** (its fidelity is the ceiling); the one
-  deliberate extra is reading `About`/`StudyInfo` (excel2ars.py skips
-  them). **Controlled-term enums** (`.x2a_enums`:
+  reader on `Common_Safety_Displays_cards`. The JSON reader also
+  tolerates that mix from other tools: `.as_value_list()`
+  (`R/metadata.R`) makes every data-subset `condition_value` a
+  list-column at all three binding points (#217). `.x2a_split()` splits
+  on `|` with optional surrounding whitespace and trims each value
+  (never on commas) — this fixes \#213. `OutputFiles` falls back to an
+  `id` owner column (older TFL Designer layout) and skips ownerless
+  rows. **Detail standard = match excel2ars.py** (its fidelity is the
+  ceiling); the one deliberate extra is reading `About`/`StudyInfo`
+  (excel2ars.py skips them). **Controlled-term enums** (`.x2a_enums`:
   OperationRole/AnalysisReason/AnalysisPurpose/OutputFileType) are
   mirrored from the ARS LinkML model and must be re-synced on ARS
   version bumps. **Test oracle** (`test-ars-xlsx-to-json.R`): converted

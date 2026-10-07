@@ -181,6 +181,14 @@ CRAN release: 2026-06-17
   came first. Rows with `referenceType` `Documentation` are now ignored
   by code generation
   ([\#214](https://github.com/clymbclinical/siera/issues/214)).
+- Fixed
+  [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+  failing on ARS JSON that writes some condition values as a single
+  value (`"value": "Y"`) and others as an array (`"value": ["A", "B"]`).
+  jsonlite read the two forms into different column types and combining
+  the data subsets aborted; both forms are now read, whichever tool
+  wrote the file
+  ([\#217](https://github.com/clymbclinical/siera/issues/217)).
 - Fixed zero-event risk-difference analyses returning `NA` instead of
   `0`. Methods that compute over the full population (templates
   referencing `df_poptot`, e.g. risk differences) now bypass the

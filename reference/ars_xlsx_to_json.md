@@ -59,6 +59,6 @@ json <- suppressWarnings(
   ars_xlsx_to_json(ARS_example("exampleARS_6.xlsx"),
                    json_path = tempfile(fileext = ".json"))
 )
-#> Wrote ARS JSON: /tmp/RtmpSHF7Q6/file19fc13801e6f.json
+#> Wrote ARS JSON: /tmp/RtmpTte3k8/file19fa1de8d589.json
 readARS(json, output_path = tempdir(), adam_path = tempdir())
 ```
