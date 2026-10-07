@@ -80,7 +80,7 @@ body:
       label: ARS metadata format
       options:
         - JSON
-        - xlsx
+        - xlsx (deprecated)
     validations:
       required: true
 

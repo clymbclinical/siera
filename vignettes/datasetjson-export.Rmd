@@ -160,7 +160,7 @@ A few things to know about `column_labels`:
 - `readARS()` checks the vector straight away. It must be a character vector where every element has a name, no name appears twice, and no label is missing; otherwise you get an error.
 - Whether each name is a real ARD column can only be checked once the script runs, because that is when the ARD's columns are known. If a name does not match any column (for example a typo such as `TRT01AA`), the script warns you and carries on writing the file. Look out for that warning.
 - `column_labels` only affects the Dataset-JSON export. If you supply it without `output_format = "datasetjson"`, `readARS()` warns you that it is being ignored.
-- It works the same whether your ARS metadata is a `.json` or an `.xlsx` file.
+- It works the same whether your ARS metadata is a `.json` file or a (deprecated) `.xlsx` workbook.
 
 ### Where next?
 

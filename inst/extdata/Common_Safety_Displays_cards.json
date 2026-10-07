@@ -1,0 +1,3256 @@
+{
+  "name": "Common Safety Displays",
+  "id": "CSD",
+  "version": 1,
+  "mainListOfContents": {
+    "name": "List of Planned Analyses",
+    "label": "LOPA",
+    "contentsList": {
+      "listItems": [
+        {
+          "level": 1,
+          "name": "Summary of Demographics",
+          "order": 1,
+          "outputId": "Out14-1-1",
+          "sublist": {
+            "listItems": [
+              {
+                "level": 2,
+                "name": "Summary of Subjects by Treatment",
+                "order": 1,
+                "analysisId": "An01_05_SAF_Summ_ByTrt"
+              },
+              {
+                "level": 2,
+                "name": "Age",
+                "order": 2,
+                "sublist": {
+                  "listItems": [
+                    {
+                      "level": 3,
+                      "name": "Summary by Treatment",
+                      "order": 1,
+                      "analysisId": "An03_01_Age_Summ_ByTrt"
+                    },
+                    {
+                      "level": 3,
+                      "name": "Comparison by Treatment",
+                      "order": 2,
+                      "analysisId": "An03_01_Age_Comp_ByTrt"
+                    }
+                  ]
+                }
+              },
+              {
+                "level": 2,
+                "name": "Age Group",
+                "order": 3,
+                "sublist": {
+                  "listItems": [
+                    {
+                      "level": 3,
+                      "name": "Summary of Subjects by Treatment",
+                      "order": 1,
+                      "analysisId": "An03_02_AgeGrp_Summ_ByTrt"
+                    },
+                    {
+                      "level": 3,
+                      "name": "Comparison of Subjects by Treatment",
+                      "order": 2,
+                      "analysisId": "An03_02_AgeGrp_Comp_ByTrt"
+                    }
+                  ]
+                }
+              },
+              {
+                "level": 2,
+                "name": "Sex",
+                "order": 4,
+                "sublist": {
+                  "listItems": [
+                    {
+                      "level": 3,
+                      "name": "Summary of Subjects by Treatment",
+                      "order": 1,
+                      "analysisId": "An03_03_Sex_Summ_ByTrt"
+                    },
+                    {
+                      "level": 3,
+                      "name": "Comparison of Subjects by Treatment",
+                      "order": 2,
+                      "analysisId": "An03_03_Sex_Comp_ByTrt"
+                    }
+                  ]
+                }
+              },
+              {
+                "level": 2,
+                "name": "Ethnicity",
+                "order": 5,
+                "sublist": {
+                  "listItems": [
+                    {
+                      "level": 3,
+                      "name": "Summary of Subjects by Treatment",
+                      "order": 1,
+                      "analysisId": "An03_04_Ethnic_Summ_ByTrt"
+                    },
+                    {
+                      "level": 3,
+                      "name": "Comparison of Subjects by Treatment",
+                      "order": 2,
+                      "analysisId": "An03_04_Ethnic_Comp_ByTrt"
+                    }
+                  ]
+                }
+              },
+              {
+                "level": 2,
+                "name": "Race",
+                "order": 6,
+                "sublist": {
+                  "listItems": [
+                    {
+                      "level": 3,
+                      "name": "Summary of Subjects by Treatment",
+                      "order": 1,
+                      "analysisId": "An03_05_Race_Summ_ByTrt"
+                    },
+                    {
+                      "level": 3,
+                      "name": "Comparison of Subjects by Treatment",
+                      "order": 2,
+                      "analysisId": "An03_05_Race_Comp_ByTrt"
+                    }
+                  ]
+                }
+              },
+              {
+                "level": 2,
+                "name": "Height",
+                "order": 7,
+                "sublist": {
+                  "listItems": [
+                    {
+                      "level": 3,
+                      "name": "Summary by Treatment",
+                      "order": 1,
+                      "analysisId": "An03_06_Height_Summ_ByTrt"
+                    },
+                    {
+                      "level": 3,
+                      "name": "Comparison by Treatment",
+                      "order": 2,
+                      "analysisId": "An03_06_Height_Comp_ByTrt"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "name": "Overall Summary of Treatment-Emergent Adverse Events",
+          "order": 2,
+          "outputId": "Out14-3-1-1",
+          "sublist": {
+            "listItems": [
+              {
+                "level": 2,
+                "name": "Summary of Subjects by Treatment",
+                "order": 1,
+                "analysisId": "An01_05_SAF_Summ_ByTrt"
+              },
+              {
+                "level": 2,
+                "name": "Number of subjects with at least one event",
+                "order": 2,
+                "sublist": {
+                  "listItems": [
+                    {
+                      "level": 3,
+                      "name": "TEAE",
+                      "order": 1,
+                      "analysisId": "An07_01_TEAE_Summ_ByTrt"
+                    },
+                    {
+                      "level": 3,
+                      "name": "Related TEAE",
+                      "order": 2,
+                      "analysisId": "An07_02_RelTEAE_Summ_ByTrt"
+                    },
+                    {
+                      "level": 3,
+                      "name": "Serious TEAE",
+                      "order": 3,
+                      "analysisId": "An07_03_SerTEAE_Summ_ByTrt"
+                    },
+                    {
+                      "level": 3,
+                      "name": "Related Serious TEAE",
+                      "order": 4,
+                      "analysisId": "An07_04_RelSerTEAE_Summ_ByTrt"
+                    },
+                    {
+                      "level": 3,
+                      "name": "TEAE Leading to Death",
+                      "order": 5,
+                      "analysisId": "An07_05_TEAELd2Dth_Summ_ByTrt"
+                    },
+                    {
+                      "level": 3,
+                      "name": "Related TEAE Leading to Death",
+                      "order": 6,
+                      "analysisId": "An07_06_RelTEAELd2Dth_Summ_ByTrt"
+                    },
+                    {
+                      "level": 3,
+                      "name": "TEAE Leading to Dose Modification",
+                      "order": 7,
+                      "analysisId": "An07_07_TEAELd2DoseMod_Summ_ByTrt"
+                    },
+                    {
+                      "level": 3,
+                      "name": "TEAE Leading to Treatment Discontinuation",
+                      "order": 8,
+                      "analysisId": "An07_08_TEAELd2TrtDsc_Summ_ByTrt"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "name": "Summary of Observed and Change from Baseline by Scheduled Visits - Vital Signs (Horizontal)",
+          "order": 4,
+          "outputId": "Out14-3-3-1a",
+          "sublist": {
+            "listItems": [
+              {
+                "level": 2,
+                "name": "Summary of Subjects by Treatment",
+                "order": 1,
+                "analysisId": "An01_05_SAF_Summ_ByTrt"
+              },
+              {
+                "level": 2,
+                "name": "Summary of Observed Value by Treatment, Parameter and Visit",
+                "order": 2,
+                "analysisId": "An08_01_Obs_Summ_ByTrt"
+              },
+              {
+                "level": 2,
+                "name": "Summary of Change from Baseline by Treatment, Parameter and Visit",
+                "order": 3,
+                "analysisId": "An08_02_ChgBl_Summ_ByTrt"
+              }
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "name": "Summary of Observed and Change from Baseline by Scheduled Visits - Vital Signs (Vertical)",
+          "order": 5,
+          "outputId": "Out14-3-3-1b",
+          "sublist": {
+            "listItems": [
+              {
+                "level": 2,
+                "name": "Summary of Subjects by Treatment",
+                "order": 1,
+                "analysisId": "An01_05_SAF_Summ_ByTrt"
+              },
+              {
+                "level": 2,
+                "name": "Summary of Observed Value by Treatment, Parameter and Visit",
+                "order": 2,
+                "analysisId": "An08_01_Obs_Summ_ByTrt"
+              },
+              {
+                "level": 2,
+                "name": "Summary of Change from Baseline by Treatment, Parameter and Visit",
+                "order": 3,
+                "analysisId": "An08_02_ChgBl_Summ_ByTrt"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "otherListsOfContents": [
+    {
+      "name": "List of Planned Outputs",
+      "label": "LOPO",
+      "contentsList": {
+        "listItems": [
+          {
+            "level": 1,
+            "name": "Summary of Demographics",
+            "order": 1,
+            "outputId": "Out14-1-1"
+          },
+          {
+            "level": 1,
+            "name": "Overall Summary of Treatment-Emergent Adverse Events",
+            "order": 2,
+            "outputId": "Out14-3-1-1"
+          },
+          {
+            "level": 1,
+            "name": "Summary of Observed and Change from Baseline by Scheduled Visits - Vital Signs (Horizontal)",
+            "order": 3,
+            "outputId": "Out14-3-3-1a"
+          },
+          {
+            "level": 1,
+            "name": "Summary of Observed and Change from Baseline by Scheduled Visits - Vital Signs (Vertical)",
+            "order": 4,
+            "outputId": "Out14-3-3-1b"
+          }
+        ]
+      }
+    }
+  ],
+  "referenceDocuments": [
+    {
+      "id": "CDISCPILOT01_SAP",
+      "name": "Statistical Analysis Plan",
+      "location": "./sap.pdf"
+    },
+    {
+      "id": "CDISCPILOT01_CSR",
+      "name": "Clinical Study Report",
+      "location": "./csr-cdiscpilot01.pdf"
+    },
+    {
+      "id": "at14-5-01_sas",
+      "name": "at14-5-01.sas",
+      "location": "./at14-5-01.sas"
+    },
+    {
+      "id": "AE_Summary_Table_Shell",
+      "name": "AE Summary Table Shell",
+      "location": "./AE_Summary_Table_Shell.pdf"
+    }
+  ],
+  "terminologyExtensions": [
+    {
+      "id": "TermEx1",
+      "enumeration": "AnalysisReasonEnum",
+      "sponsorTerms": [
+        {
+          "id": "TermEx1_1",
+          "submissionValue": "ADDITIONAL EXAMPLE",
+          "description": "The analysis was included in the set as an additional example to demonstrate both a different type of analysis and sponsor terminology for analysis reason."
+        }
+      ]
+    }
+  ],
+  "analysisOutputCategorizations": [
+    {
+      "id": "Catn_01_Grp",
+      "label": "Group of Analyses",
+      "categories": [
+        {
+          "id": "Catn_01_Grp_1_Pop",
+          "label": "Population Description"
+        },
+        {
+          "id": "Catn_01_Grp_2_Saf",
+          "label": "Safety"
+        },
+        {
+          "id": "Catn_01_Grp_3_Eff",
+          "label": "Efficacy"
+        }
+      ]
+    },
+    {
+      "id": "Catn_02_DClass",
+      "subCategorizations": [
+        {
+          "id": "Catn_03_SbjDType",
+          "label": "Subject-level Data Type",
+          "categories": [
+            {
+              "id": "Catn_03_SbjDType_1_Dm",
+              "label": "Demographics"
+            }
+          ]
+        },
+        {
+          "id": "Catn_04_EvtDType",
+          "label": "Events Data Type",
+          "categories": [
+            {
+              "id": "Catn_04_EvtDType_1_Ae",
+              "label": "Adverse Events"
+            },
+            {
+              "id": "Catn_04_EvtDType_2_Ce",
+              "label": "Clinical Events"
+            },
+            {
+              "id": "Catn_04_EvtDType_3_Ds",
+              "label": "Disposition"
+            }
+          ]
+        },
+        {
+          "id": "Catn_05_EvtAType",
+          "label": "Events Analysis Type",
+          "categories": [
+            {
+              "id": "Catn_05_EvtAType_1_Occ",
+              "label": "Occurrence"
+            },
+            {
+              "id": "Catn_05_EvtAType_2_Tte",
+              "label": "Time-to-Event"
+            }
+          ]
+        },
+        {
+          "id": "Catn_06_FndDType",
+          "label": "Findings Data Type",
+          "categories": [
+            {
+              "id": "Catn_06_FndDType_1_Vs",
+              "label": "Vital Signs"
+            },
+            {
+              "id": "Catn_06_FndDType_2_Lb",
+              "label": "Laboratory Tests"
+            }
+          ]
+        },
+        {
+          "id": "Catn_07_FndAType",
+          "label": "Findings Analysis Type",
+          "categories": [
+            {
+              "id": "Catn_07_FndAType_1_Chg",
+              "label": "Change from Baseline"
+            },
+            {
+              "id": "Catn_07_FndAType_2_Sft",
+              "label": "Shift Table"
+            }
+          ]
+        }
+      ],
+      "label": "Analysis Data Class",
+      "categories": [
+        {
+          "id": "Catn_02_Dclass_1_Sbj",
+          "label": "Subject-level"
+        },
+        {
+          "id": "Catn_02_Dclass_2_Evt",
+          "label": "Events"
+        },
+        {
+          "id": "Catn_02_Dclass_3_Fnd",
+          "label": "Findings"
+        }
+      ]
+    }
+  ],
+  "analysisSets": [
+    {
+      "level": 1,
+      "order": 1,
+      "id": "AnalysisSet_01_ITT",
+      "name": "Intent-to-Treat Population",
+      "label": "ITT",
+      "condition": {
+        "dataset": "ADSL",
+        "variable": "ITTFL",
+        "comparator": "EQ",
+        "value": [
+          "Y"
+        ]
+      }
+    },
+    {
+      "level": 1,
+      "order": 1,
+      "id": "AnalysisSet_02_SAF",
+      "name": "Safety Population",
+      "label": "SAF",
+      "condition": {
+        "dataset": "ADSL",
+        "variable": "SAFFL",
+        "comparator": "EQ",
+        "value": [
+          "Y"
+        ]
+      }
+    }
+  ],
+  "analysisGroupings": [
+    {
+      "name": "Treatment",
+      "id": "AnlsGrouping_01_Trt",
+      "dataDriven": false,
+      "groupingDataset": "ADSL",
+      "groupingVariable": "TRT01A",
+      "groups": [
+        {
+          "level": 1,
+          "order": 1,
+          "id": "AnlsGrouping_01_Trt_1",
+          "name": "Placebo",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "TRT01A",
+            "comparator": "EQ",
+            "value": [
+              "Placebo"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 2,
+          "id": "AnlsGrouping_01_Trt_2",
+          "name": "Xanomeline Low Dose",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "TRT01A",
+            "comparator": "EQ",
+            "value": [
+              "Xanomeline Low Dose"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 3,
+          "id": "AnlsGrouping_01_Trt_3",
+          "name": "Xanomeline High Dose",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "TRT01A",
+            "comparator": "EQ",
+            "value": [
+              "Xanomeline High Dose"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Gender",
+      "id": "AnlsGrouping_02_Sex",
+      "dataDriven": false,
+      "groupingDataset": "ADSL",
+      "groupingVariable": "SEX",
+      "groups": [
+        {
+          "level": 1,
+          "order": 1,
+          "id": "AnlsGrouping_02_Sex_1",
+          "name": "Male",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "SEX",
+            "comparator": "EQ",
+            "value": [
+              "M"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 2,
+          "id": "AnlsGrouping_02_Sex_2",
+          "name": "Female",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "SEX",
+            "comparator": "EQ",
+            "value": [
+              "F"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Age Group",
+      "id": "AnlsGrouping_03_AgeGp",
+      "dataDriven": false,
+      "groupingDataset": "ADSL",
+      "groupingVariable": "AGEGR1",
+      "groups": [
+        {
+          "level": 1,
+          "order": 1,
+          "id": "AnlsGrouping_03_AgeGp_1",
+          "name": "< 65 years",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "AGEGR1",
+            "comparator": "EQ",
+            "value": [
+              "<65"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 2,
+          "id": "AnlsGrouping_03_AgeGp_2",
+          "name": "≥ 65 years",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "AGEGR1",
+            "comparator": "IN",
+            "value": [
+              "65-80",
+              ">80"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Primary Race",
+      "id": "AnlsGrouping_04_Race",
+      "dataDriven": false,
+      "groupingDataset": "ADSL",
+      "groupingVariable": "RACE",
+      "groups": [
+        {
+          "level": 1,
+          "order": 1,
+          "id": "AnlsGrouping_04_Race_1",
+          "name": "American Indian or Alaska Native",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "RACE",
+            "comparator": "EQ",
+            "value": [
+              "AMERICAN INDIAN OR ALASKA NATIVE"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 2,
+          "id": "AnlsGrouping_04_Race_2",
+          "name": "Asian",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "RACE",
+            "comparator": "EQ",
+            "value": [
+              "ASIAN"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 3,
+          "id": "AnlsGrouping_04_Race_3",
+          "name": "Black or African American",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "RACE",
+            "comparator": "EQ",
+            "value": [
+              "BLACK OR AFRICAN AMERICAN"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 4,
+          "id": "AnlsGrouping_04_Race_4",
+          "name": "Native Hawaiian or Other Pacific Islander",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "RACE",
+            "comparator": "EQ",
+            "value": [
+              "NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 5,
+          "id": "AnlsGrouping_04_Race_5",
+          "name": "White",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "RACE",
+            "comparator": "EQ",
+            "value": [
+              "WHITE"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 6,
+          "id": "AnlsGrouping_04_Race_6",
+          "name": "Multiple",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "RACE",
+            "comparator": "EQ",
+            "value": [
+              "MULTIPLE"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 7,
+          "id": "AnlsGrouping_04_Race_7",
+          "name": "Not Reported",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "RACE",
+            "comparator": "EQ",
+            "value": [
+              "NOT REPORTED"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 8,
+          "id": "AnlsGrouping_04_Race_8",
+          "name": "Unknown",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "RACE",
+            "comparator": "EQ",
+            "value": [
+              "UNKNOWN"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 9,
+          "id": "AnlsGrouping_04_Race_9",
+          "name": "Other",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "RACE",
+            "comparator": "EQ",
+            "value": [
+              "OTHER"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ethnicity",
+      "id": "AnlsGrouping_05_Ethnic",
+      "dataDriven": false,
+      "groupingDataset": "ADSL",
+      "groupingVariable": "ETHNIC",
+      "groups": [
+        {
+          "level": 1,
+          "order": 1,
+          "id": "AnlsGrouping_05_Ethnic_1",
+          "name": "Hispanic or Latino",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "ETHNIC",
+            "comparator": "EQ",
+            "value": [
+              "HISPANIC OR LATINO"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 2,
+          "id": "AnlsGrouping_05_Ethnic_2",
+          "name": "Not Hispanic or Latino",
+          "condition": {
+            "dataset": "ADSL",
+            "variable": "ETHNIC",
+            "comparator": "EQ",
+            "value": [
+              "NOT HISPANIC OR LATINO"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parameter",
+      "id": "AnlsGrouping_08_Param",
+      "dataDriven": false,
+      "groupingDataset": "ADVS",
+      "groupingVariable": "PARAMCD",
+      "groups": [
+        {
+          "level": 1,
+          "order": 1,
+          "id": "AnlsGrouping_08_Param_1",
+          "name": "Systolic Blood Pressure (mmHg)",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "PARAMCD",
+            "comparator": "EQ",
+            "value": [
+              "SYSBP"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 2,
+          "id": "AnlsGrouping_08_Param_2",
+          "name": "Diastolic Blood Pressure (mmHg)",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "PARAMCD",
+            "comparator": "EQ",
+            "value": [
+              "DIABP"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 3,
+          "id": "AnlsGrouping_08_Param_3",
+          "name": "Pulse Rate (beats/min)",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "PARAMCD",
+            "comparator": "EQ",
+            "value": [
+              "PULSE"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 4,
+          "id": "AnlsGrouping_08_Param_4",
+          "name": "Temperature (C)",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "PARAMCD",
+            "comparator": "EQ",
+            "value": [
+              "TEMP"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Visit",
+      "id": "AnlsGrouping_09_Visit",
+      "dataDriven": false,
+      "groupingDataset": "ADVS",
+      "groupingVariable": "AVISIT",
+      "groups": [
+        {
+          "level": 1,
+          "order": 1,
+          "id": "AnlsGrouping_09_Visit_01",
+          "name": "Baseline",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "AVISIT",
+            "comparator": "EQ",
+            "value": [
+              "Baseline"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 2,
+          "id": "AnlsGrouping_09_Visit_02",
+          "name": "Week 2",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "AVISIT",
+            "comparator": "EQ",
+            "value": [
+              "Week 2"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 3,
+          "id": "AnlsGrouping_09_Visit_03",
+          "name": "Week 4",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "AVISIT",
+            "comparator": "EQ",
+            "value": [
+              "Week 4"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 4,
+          "id": "AnlsGrouping_09_Visit_04",
+          "name": "Week 6",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "AVISIT",
+            "comparator": "EQ",
+            "value": [
+              "Week 6"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 5,
+          "id": "AnlsGrouping_09_Visit_05",
+          "name": "Week 8",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "AVISIT",
+            "comparator": "EQ",
+            "value": [
+              "Week 8"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 6,
+          "id": "AnlsGrouping_09_Visit_06",
+          "name": "Week 12",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "AVISIT",
+            "comparator": "EQ",
+            "value": [
+              "Week 12"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 7,
+          "id": "AnlsGrouping_09_Visit_07",
+          "name": "Week 16",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "AVISIT",
+            "comparator": "EQ",
+            "value": [
+              "Week 16"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 8,
+          "id": "AnlsGrouping_09_Visit_08",
+          "name": "Week 20",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "AVISIT",
+            "comparator": "EQ",
+            "value": [
+              "Week 20"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 9,
+          "id": "AnlsGrouping_09_Visit_09",
+          "name": "Week 24",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "AVISIT",
+            "comparator": "EQ",
+            "value": [
+              "Week 24"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 10,
+          "id": "AnlsGrouping_09_Visit_10",
+          "name": "Week 26",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "AVISIT",
+            "comparator": "EQ",
+            "value": [
+              "Week 26"
+            ]
+          }
+        },
+        {
+          "level": 1,
+          "order": 11,
+          "id": "AnlsGrouping_09_Visit_11",
+          "name": "End of Treatment",
+          "condition": {
+            "dataset": "ADVS",
+            "variable": "AVISIT",
+            "comparator": "EQ",
+            "value": [
+              "End of Treatment"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "dataSubsets": [
+    {
+      "level": 1,
+      "order": 1,
+      "id": "Dss01_TEAE",
+      "name": "Treatment-Emergent Adverse Events",
+      "condition": {
+        "dataset": "ADAE",
+        "variable": "TRTEMFL",
+        "comparator": "EQ",
+        "value": [
+          "Y"
+        ]
+      }
+    },
+    {
+      "level": 1,
+      "order": 1,
+      "id": "Dss02_Related_TEAE",
+      "name": "Related Treatment-Emergent Adverse Events",
+      "compoundExpression": {
+        "logicalOperator": "AND",
+        "whereClauses": [
+          {
+            "level": 2,
+            "order": 1,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "TRTEMFL",
+              "comparator": "EQ",
+              "value": [
+                "Y"
+              ]
+            }
+          },
+          {
+            "level": 2,
+            "order": 2,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "AEREL",
+              "comparator": "IN",
+              "value": [
+                "POSSIBLE",
+                "PROBABLE"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "level": 1,
+      "order": 1,
+      "id": "Dss03_Serious_TEAE",
+      "name": "Serious Treatment-Emergent Adverse Events",
+      "compoundExpression": {
+        "logicalOperator": "AND",
+        "whereClauses": [
+          {
+            "level": 2,
+            "order": 1,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "TRTEMFL",
+              "comparator": "EQ",
+              "value": [
+                "Y"
+              ]
+            }
+          },
+          {
+            "level": 2,
+            "order": 2,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "AESER",
+              "comparator": "EQ",
+              "value": [
+                "Y"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "level": 1,
+      "order": 1,
+      "id": "Dss04_RelSer_TEAE",
+      "name": "Related Serious Treatment-Emergent Adverse Events",
+      "compoundExpression": {
+        "logicalOperator": "AND",
+        "whereClauses": [
+          {
+            "level": 2,
+            "order": 1,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "TRTEMFL",
+              "comparator": "EQ",
+              "value": [
+                "Y"
+              ]
+            }
+          },
+          {
+            "level": 2,
+            "order": 2,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "AEREL",
+              "comparator": "IN",
+              "value": [
+                "POSSIBLE",
+                "PROBABLE"
+              ]
+            }
+          },
+          {
+            "level": 2,
+            "order": 3,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "AESER",
+              "comparator": "EQ",
+              "value": [
+                "Y"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "level": 1,
+      "order": 1,
+      "id": "Dss05_TEAE_Ld2Dth",
+      "name": "Treatment-Emergent Adverse Events Leading to Death",
+      "compoundExpression": {
+        "logicalOperator": "AND",
+        "whereClauses": [
+          {
+            "level": 2,
+            "order": 1,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "TRTEMFL",
+              "comparator": "EQ",
+              "value": [
+                "Y"
+              ]
+            }
+          },
+          {
+            "level": 2,
+            "order": 2,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "AESDTH",
+              "comparator": "EQ",
+              "value": [
+                "Y"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "level": 1,
+      "order": 1,
+      "id": "Dss06_Rel_TEAE_Ld2Dth",
+      "name": "Related Treatment-Emergent Adverse Events Leading to Death",
+      "compoundExpression": {
+        "logicalOperator": "AND",
+        "whereClauses": [
+          {
+            "level": 2,
+            "order": 1,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "TRTEMFL",
+              "comparator": "EQ",
+              "value": [
+                "Y"
+              ]
+            }
+          },
+          {
+            "level": 2,
+            "order": 2,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "AESDTH",
+              "comparator": "EQ",
+              "value": [
+                "Y"
+              ]
+            }
+          },
+          {
+            "level": 2,
+            "order": 3,
+            "compoundExpression": {
+              "logicalOperator": "OR",
+              "whereClauses": [
+                {
+                  "level": 3,
+                  "order": 1,
+                  "condition": {
+                    "dataset": "ADAE",
+                    "variable": "AEREL",
+                    "comparator": "EQ",
+                    "value": [
+                      "POSSIBLE"
+                    ]
+                  }
+                },
+                {
+                  "level": 3,
+                  "order": 2,
+                  "condition": {
+                    "dataset": "ADAE",
+                    "variable": "AEREL",
+                    "comparator": "EQ",
+                    "value": [
+                      "PROBABLE"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "level": 1,
+      "order": 1,
+      "id": "Dss07_TEAE_Ld2DoseMod",
+      "name": "Treatment-Emergent Adverse Events Leading to Dose Modification",
+      "compoundExpression": {
+        "logicalOperator": "AND",
+        "whereClauses": [
+          {
+            "level": 2,
+            "order": 1,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "TRTEMFL",
+              "comparator": "EQ",
+              "value": [
+                "Y"
+              ]
+            }
+          },
+          {
+            "level": 2,
+            "order": 2,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "AEACN",
+              "comparator": "IN",
+              "value": [
+                "DOSE REDUCED",
+                "DRUG INTERRUPTED"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "level": 1,
+      "order": 1,
+      "id": "Dss08_AE_Ld2TrtDsc",
+      "name": "Treatment-Emergent Adverse Events Leading to Treatment Discontinuation",
+      "compoundExpression": {
+        "logicalOperator": "AND",
+        "whereClauses": [
+          {
+            "level": 2,
+            "order": 1,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "TRTEMFL",
+              "comparator": "EQ",
+              "value": [
+                "Y"
+              ]
+            }
+          },
+          {
+            "level": 2,
+            "order": 2,
+            "condition": {
+              "dataset": "ADAE",
+              "variable": "AEACN",
+              "comparator": "EQ",
+              "value": [
+                "DRUG WITHDRAWN"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "level": 1,
+      "order": 1,
+      "id": "Dss09_VS_AnRec",
+      "name": "Vital Signs Analysis Records",
+      "condition": {
+        "dataset": "ADVS",
+        "variable": "ANL01FL",
+        "comparator": "EQ",
+        "value": [
+          "Y"
+        ]
+      }
+    },
+    {
+      "level": 1,
+      "order": 1,
+      "id": "Dss10_VS_NonBl_AnRec",
+      "name": "Vital Signs Non-baseline Analysis Records",
+      "compoundExpression": {
+        "logicalOperator": "AND",
+        "whereClauses": [
+          {
+            "level": 2,
+            "order": 1,
+            "condition": {
+              "dataset": "ADVS",
+              "variable": "ANL01FL",
+              "comparator": "EQ",
+              "value": [
+                "Y"
+              ]
+            }
+          },
+          {
+            "level": 2,
+            "order": 2,
+            "condition": {
+              "dataset": "ADVS",
+              "variable": "AVISIT",
+              "comparator": "NE",
+              "value": [
+                "Baseline"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "methods": [
+    {
+      "name": "Count by group for a categorical variable",
+      "description": "Count across groups for a categorical variable, based on subject occurrence",
+      "label": "Grouped count for categorical variable",
+      "id": "Mth01_CatVar_Count_ByGrp",
+      "operations": [
+        {
+          "name": "Count of subjects",
+          "label": "n",
+          "id": "Mth01_CatVar_Count_ByGrp_1_n",
+          "order": 1,
+          "resultPattern": "(N=XX)"
+        }
+      ],
+      "codeTemplate": {
+        "context": "R",
+        "code": "in_data = df2_analysisidhere |>\r\n    dplyr::select(anavarhere, groupvar1here) |>\r\n    unique()\r\ndf3_analysisidhere <-\r\n  cards::ard_tabulate(\r\n    data = in_data\r\n    bystmthere\r\n  ) |>\r\ndplyr::filter(stat_name == 'n') |>\r\n dplyr::mutate(operationid = 'Mth01_CatVar_Count_ByGrp_1_n')",
+        "parameters": [
+          {
+            "name": "anavarhere",
+            "description": "Analysis variable to be summarised",
+            "valueSource": "ana_var"
+          },
+          {
+            "name": "groupvar1here",
+            "description": "Analysis grouping variable from Group1",
+            "valueSource": "AG_var1"
+          },
+          {
+            "name": "bystmthere",
+            "description": "\"by = \" and \"variable = \" statements for ard_tabulate() with dynamic variables",
+            "valueSource": "by_vars"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Summary by group of a categorical variable",
+      "description": "Descriptive summary statistics across groups for a categorical variable, based on subject occurrence",
+      "label": "Grouped summary of categorical variable",
+      "id": "Mth01_CatVar_Summ_ByGrp",
+      "operations": [
+        {
+          "name": "Count of subjects",
+          "label": "n",
+          "id": "Mth01_CatVar_Summ_ByGrp_1_n",
+          "order": 1,
+          "resultPattern": "XXX"
+        },
+        {
+          "name": "Percent of subjects",
+          "label": "%",
+          "id": "Mth01_CatVar_Summ_ByGrp_2_pct",
+          "order": 2,
+          "resultPattern": "( XX.X)",
+          "referencedOperationRelationships": [
+            {
+              "id": "Mth01_CatVar_Summ_ByGrp_2_pct_NUM",
+              "referencedOperationRole": {
+                "controlledTerm": "NUMERATOR"
+              },
+              "operationId": "Mth01_CatVar_Summ_ByGrp_1_n",
+              "description": "The count operation whose result provides the numerator for calculation of the percentage. The referenced analysis should be the analysis that contains this percent operation."
+            },
+            {
+              "id": "Mth01_CatVar_Summ_ByGrp_2_pct_DEN",
+              "referencedOperationRole": {
+                "controlledTerm": "DENOMINATOR"
+              },
+              "operationId": "Mth01_CatVar_Count_ByGrp_1_n",
+              "description": "The count operation whose result provides the denominator for calculation of the percentage. The referenced analysis should have the same analysis set and subject grouping(s) as the analysis containing this percent operation."
+            }
+          ]
+        }
+      ],
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "7. GENERAL CONSIDERATIONS FOR DATA ANALYSES",
+              "pageNumbers": [
+                "9"
+              ]
+            }
+          ]
+        }
+      ],
+      "codeTemplate": {
+        "context": "R",
+        "code": "denom_dataset = df2_denomanaidhere |>\r\n  dplyr::select(denom_anagroupvarshere)\r\n\r\nin_data = df2_analysisidhere |>\r\n    dplyr::distinct(distinctlisthere) |>\r\n    dplyr::mutate(dummy = 'dummyvar')\r\n\r\ndataDriven = isdatadrivenhere\r\nif(dataDriven == TRUE){\r\ndf3_analysisidhere <-\r\n  cards::ard_tabulate(\r\n    data = in_data,\r\n    strata = c(byvarshere),\r\n    variables = 'dummy',\r\n    denominator = denom_dataset\r\n  ) } else {\r\ndf3_analysisidhere <-\r\n cards::ard_tabulate(\r\n    data = in_data,\r\n    by = c(byvarshere),\r\n    variables = 'dummy',\r\n    denominator = denom_dataset\r\n  ) }\r\ndf3_analysisidhere <- df3_analysisidhere|>\r\ndplyr::filter(stat_name %in% c('n', 'p')) |>\r\ndplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',\r\n                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))",
+        "parameters": [
+          {
+            "name": "distinctlisthere",
+            "description": "list of variables by which to apply the \"distinct\" function from dplyr",
+            "valueSource": "distinct_list"
+          },
+          {
+            "name": "denomanaidhere",
+            "description": "Analysis ID for Denominator Analysis",
+            "valueSource": "DEN_analysisid"
+          },
+          {
+            "name": "denom_anagroupvarshere",
+            "description": "Analysis Grouping variables for denominator dataset",
+            "valueSource": "AG_denom_var1"
+          },
+          {
+            "name": "isdatadrivenhere",
+            "description": "dataDriven boolean value for highest Analysisgrouping factor",
+            "valueSource": "AG_max_dataDriven"
+          },
+          {
+            "name": "bystmthere",
+            "description": "\"by =  and \"variable = \" statements for ard_tabulate() with dynamic variables",
+            "valueSource": "by_vars"
+          },
+          {
+            "name": "stratastmthere",
+            "description": "\"strata =  and \"variable = \" statements for ard_tabulate() with dynamic variables",
+            "valueSource": "strata_vars"
+          },
+          {
+            "name": "byvarshere",
+            "description": "string for \"by\" and \"variables\" parameter for the ard_continuous function",
+            "valueSource": "by_listc"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Summary by group of a continuous variable",
+      "description": "Descriptive summary statistics across groups for a continuous variable",
+      "label": "Grouped summary of continuous variable",
+      "id": "Mth02_ContVar_Summ_ByGrp",
+      "operations": [
+        {
+          "name": "Count of non-missing values",
+          "label": "n",
+          "id": "Mth02_ContVar_Summ_ByGrp_1_n",
+          "order": 1,
+          "resultPattern": "XX"
+        },
+        {
+          "name": "Mean",
+          "label": "Mean",
+          "id": "Mth02_ContVar_Summ_ByGrp_2_Mean",
+          "order": 2,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "Standard deviation",
+          "label": "SD",
+          "id": "Mth02_ContVar_Summ_ByGrp_3_SD",
+          "order": 3,
+          "resultPattern": "(XX.XX)"
+        },
+        {
+          "name": "Median",
+          "label": "Median",
+          "id": "Mth02_ContVar_Summ_ByGrp_4_Median",
+          "order": 4,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "First quartile",
+          "label": "Q1",
+          "id": "Mth02_ContVar_Summ_ByGrp_5_Q1",
+          "order": 5,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "Third quartile",
+          "label": "Q3",
+          "id": "Mth02_ContVar_Summ_ByGrp_6_Q3",
+          "order": 6,
+          "resultPattern": "XX.X"
+        },
+        {
+          "name": "Minimum",
+          "label": "Min",
+          "id": "Mth02_ContVar_Summ_ByGrp_7_Min",
+          "order": 7,
+          "resultPattern": "XX"
+        },
+        {
+          "name": "Maximum",
+          "label": "Max",
+          "id": "Mth02_ContVar_Summ_ByGrp_8_Max",
+          "order": 8,
+          "resultPattern": "XX"
+        }
+      ],
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "7. GENERAL CONSIDERATIONS FOR DATA ANALYSES",
+              "pageNumbers": [
+                "9"
+              ]
+            }
+          ]
+        }
+      ],
+      "codeTemplate": {
+        "context": "R",
+        "code": "df3_analysisidhere <-\r\n  cards::ard_summary(\r\n    data = df2_analysisidhere,\r\n    by = c(byvarshere),\r\n    variables = anavarhere\r\n  ) |>\r\ndplyr::mutate(operationid = dplyr::case_when(stat_name == 'N' ~ 'Mth02_ContVar_Summ_ByGrp_1_n',\r\n                                                                     stat_name == 'mean' ~ 'Mth02_ContVar_Summ_ByGrp_2_Mean',\r\n                                                                     stat_name == 'sd' ~ 'Mth02_ContVar_Summ_ByGrp_3_SD',\r\n                                                                     stat_name == 'median' ~ 'Mth02_ContVar_Summ_ByGrp_4_Median',\r\n                                                                     stat_name == 'p25' ~ 'Mth02_ContVar_Summ_ByGrp_5_Q1',\r\n                                                                     stat_name == 'p75' ~ 'Mth02_ContVar_Summ_ByGrp_6_Q3',\r\n                                                                     stat_name == 'min' ~ 'Mth02_ContVar_Summ_ByGrp_7_Min',\r\n                                                                     stat_name == 'max' ~ 'Mth02_ContVar_Summ_ByGrp_8_Max'))",
+        "parameters": [
+          {
+            "name": "byvarshere",
+            "description": "string for \"by\" and \"variables\" parameter for the ard_continuous function",
+            "valueSource": "by_listc"
+          },
+          {
+            "name": "anavarhere",
+            "description": "Analysis variable to be summarised",
+            "valueSource": "ana_var"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Pearson's chi-square test group comparison for a categorical variable",
+      "description": "Comparison of groups by Pearson's chi-square test for a categorical variable",
+      "label": "Pearson's chi-square test group comparison for categorical variable",
+      "id": "Mth03_CatVar_Comp_PChiSq",
+      "operations": [
+        {
+          "name": "P-value",
+          "label": "p-value",
+          "id": "Mth03_CatVar_Comp_PChiSq_1_pval",
+          "order": 1,
+          "resultPattern": "X.XXXX"
+        }
+      ],
+      "codeTemplate": {
+        "context": "R",
+        "code": "df3_analysisidhere <- \r\n    cardx::ard_stats_chisq_test(by = groupvar1here, data = df2_analysisidhere, variables = groupvar2here)|>\r\ndplyr::filter(stat_name == 'p.value') |>\r\ndplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')",
+        "parameters": [
+          {
+            "name": "groupvar1here",
+            "description": "Analysis grouping variable from Group1",
+            "valueSource": "AG_var1"
+          },
+          {
+            "name": "groupvar2here",
+            "description": "Analysis grouping variable from Group2",
+            "valueSource": "AG_var2"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Analysis of variance group comparison for a continuous variable",
+      "description": "Comparison of groups by analysis of variance (ANOVA) for a continuous variable",
+      "label": "ANOVA group comparison for continuous variable",
+      "id": "Mth04_ContVar_Comp_Anova",
+      "operations": [
+        {
+          "name": "P-value",
+          "label": "p-value",
+          "id": "Mth04_ContVar_Comp_Anova_1_pval",
+          "order": 1,
+          "resultPattern": "X.XXXX"
+        }
+      ],
+      "codeTemplate": {
+        "context": "R",
+        "code": "df3_analysisidhere <- \r\n    cardx::ard_stats_aov(anavarhere ~ groupvar1here, data = df2_analysisidhere) |>\r\ndplyr::filter(stat_name == 'p.value') |>\r\ndplyr::mutate(operationid = 'Mth04_ContVar_Comp_Anova_1_pval')",
+        "parameters": [
+          {
+            "name": "anavarhere",
+            "description": "Analysis variable to be summarised",
+            "valueSource": "ana_var"
+          },
+          {
+            "name": "groupvar1here",
+            "description": "Analysis grouping variable from Group1",
+            "valueSource": "AG_var1"
+          }
+        ]
+      }
+    }
+  ],
+  "analyses": [
+    {
+      "name": "Summary of Subjects by Treatment",
+      "id": "An01_05_SAF_Summ_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "6. ANALYSIS POPULATIONS",
+              "pageNumbers": [
+                "9"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth01_CatVar_Count_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_1_Pop",
+        "Catn_02_Dclass_1_Sbj",
+        "Catn_03_SbjDType_1_Dm"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Age by Treatment",
+      "id": "An03_01_Age_Summ_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "9.2. Demographic and Baseline Characteristics",
+              "pageNumbers": [
+                "13"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth02_ContVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_1_Pop",
+        "Catn_02_Dclass_1_Sbj",
+        "Catn_03_SbjDType_1_Dm"
+      ],
+      "dataset": "ADSL",
+      "variable": "AGE",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of Age by Treatment",
+      "id": "An03_01_Age_Comp_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "9.2. Demographic and Baseline Characteristics",
+              "pageNumbers": [
+                "13"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth04_ContVar_Comp_Anova",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_1_Pop",
+        "Catn_02_Dclass_1_Sbj",
+        "Catn_03_SbjDType_1_Dm"
+      ],
+      "dataset": "ADSL",
+      "variable": "AGE",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": false,
+          "groupingId": "AnlsGrouping_01_Trt"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Subjects by Treatment and Age Group",
+      "id": "An03_02_AgeGrp_Summ_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "9.2. Demographic and Baseline Characteristics",
+              "pageNumbers": [
+                "13"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth01_CatVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_1_Pop",
+        "Catn_02_Dclass_1_Sbj",
+        "Catn_03_SbjDType_1_Dm"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        },
+        {
+          "order": 2,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_03_AgeGp"
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_NUM",
+          "analysisId": "An03_02_AgeGrp_Summ_ByTrt"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_DEN",
+          "analysisId": "An01_05_SAF_Summ_ByTrt"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of Age Group by Treatment",
+      "id": "An03_02_AgeGrp_Comp_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "9.2. Demographic and Baseline Characteristics",
+              "pageNumbers": [
+                "13"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth03_CatVar_Comp_PChiSq",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_1_Pop",
+        "Catn_02_Dclass_1_Sbj",
+        "Catn_03_SbjDType_1_Dm"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": false,
+          "groupingId": "AnlsGrouping_01_Trt"
+        },
+        {
+          "order": 2,
+          "resultsByGroup": false,
+          "groupingId": "AnlsGrouping_03_AgeGp"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Subjects by Treatment and Sex",
+      "id": "An03_03_Sex_Summ_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "9.2. Demographic and Baseline Characteristics",
+              "pageNumbers": [
+                "13"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth01_CatVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_1_Pop",
+        "Catn_02_Dclass_1_Sbj",
+        "Catn_03_SbjDType_1_Dm"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        },
+        {
+          "order": 2,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_02_Sex"
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_NUM",
+          "analysisId": "An03_03_Sex_Summ_ByTrt"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_DEN",
+          "analysisId": "An01_05_SAF_Summ_ByTrt"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of Sex by Treatment",
+      "id": "An03_03_Sex_Comp_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "9.2. Demographic and Baseline Characteristics",
+              "pageNumbers": [
+                "13"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth03_CatVar_Comp_PChiSq",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_1_Pop",
+        "Catn_02_Dclass_1_Sbj",
+        "Catn_03_SbjDType_1_Dm"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": false,
+          "groupingId": "AnlsGrouping_01_Trt"
+        },
+        {
+          "order": 2,
+          "resultsByGroup": false,
+          "groupingId": "AnlsGrouping_02_Sex"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Subjects by Treatment and Ethnicity",
+      "id": "An03_04_Ethnic_Summ_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "9.2. Demographic and Baseline Characteristics",
+              "pageNumbers": [
+                "13"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth01_CatVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_1_Pop",
+        "Catn_02_Dclass_1_Sbj",
+        "Catn_03_SbjDType_1_Dm"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        },
+        {
+          "order": 2,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_05_Ethnic"
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_NUM",
+          "analysisId": "An03_04_Ethnic_Summ_ByTrt"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_DEN",
+          "analysisId": "An01_05_SAF_Summ_ByTrt"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of Ethnicity by Treatment",
+      "id": "An03_04_Ethnic_Comp_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "9.2. Demographic and Baseline Characteristics",
+              "pageNumbers": [
+                "13"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth03_CatVar_Comp_PChiSq",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_1_Pop",
+        "Catn_02_Dclass_1_Sbj",
+        "Catn_03_SbjDType_1_Dm"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": false,
+          "groupingId": "AnlsGrouping_01_Trt"
+        },
+        {
+          "order": 2,
+          "resultsByGroup": false,
+          "groupingId": "AnlsGrouping_05_Ethnic"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Subjects by Treatment and Race",
+      "id": "An03_05_Race_Summ_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "9.2. Demographic and Baseline Characteristics",
+              "pageNumbers": [
+                "13"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth01_CatVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_1_Pop",
+        "Catn_02_Dclass_1_Sbj",
+        "Catn_03_SbjDType_1_Dm"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        },
+        {
+          "order": 2,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_04_Race"
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_NUM",
+          "analysisId": "An03_05_Race_Summ_ByTrt"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_DEN",
+          "analysisId": "An01_05_SAF_Summ_ByTrt"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of Race by Treatment",
+      "id": "An03_05_Race_Comp_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "9.2. Demographic and Baseline Characteristics",
+              "pageNumbers": [
+                "13"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth03_CatVar_Comp_PChiSq",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_1_Pop",
+        "Catn_02_Dclass_1_Sbj",
+        "Catn_03_SbjDType_1_Dm"
+      ],
+      "dataset": "ADSL",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": false,
+          "groupingId": "AnlsGrouping_01_Trt"
+        },
+        {
+          "order": 2,
+          "resultsByGroup": false,
+          "groupingId": "AnlsGrouping_04_Race"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Height by Treatment",
+      "id": "An03_06_Height_Summ_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "9.2. Demographic and Baseline Characteristics",
+              "pageNumbers": [
+                "13"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth02_ContVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_1_Pop",
+        "Catn_02_Dclass_1_Sbj",
+        "Catn_03_SbjDType_1_Dm"
+      ],
+      "dataset": "ADSL",
+      "variable": "HEIGHTBL",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        }
+      ]
+    },
+    {
+      "name": "Comparison of Height by Treatment",
+      "id": "An03_06_Height_Comp_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "9.2. Demographic and Baseline Characteristics",
+              "pageNumbers": [
+                "13"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth04_ContVar_Comp_Anova",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_1_Pop",
+        "Catn_02_Dclass_1_Sbj",
+        "Catn_03_SbjDType_1_Dm"
+      ],
+      "dataset": "ADSL",
+      "variable": "HEIGHTBL",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": false,
+          "groupingId": "AnlsGrouping_01_Trt"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Subjects with At Least One TEAE, by Treatment",
+      "id": "An07_01_TEAE_Summ_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "11.2. Adverse Events",
+              "firstPage": "15",
+              "lastPage": "16"
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth01_CatVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_2_Saf",
+        "Catn_02_Dclass_2_Evt",
+        "Catn_04_EvtDType_1_Ae",
+        "Catn_05_EvtAType_1_Occ"
+      ],
+      "dataset": "ADAE",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "dataSubsetId": "Dss01_TEAE",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_NUM",
+          "analysisId": "An07_01_TEAE_Summ_ByTrt"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_DEN",
+          "analysisId": "An01_05_SAF_Summ_ByTrt"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Subjects with At Least One Related TEAE, by Treatment",
+      "id": "An07_02_RelTEAE_Summ_ByTrt",
+      "reason": {
+        "sponsorTermId": "TermEx1_1"
+      },
+      "purpose": {
+        "controlledTerm": "SECONDARY OUTCOME MEASURE"
+      },
+      "methodId": "Mth01_CatVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_2_Saf",
+        "Catn_02_Dclass_2_Evt",
+        "Catn_04_EvtDType_1_Ae",
+        "Catn_05_EvtAType_1_Occ"
+      ],
+      "dataset": "ADAE",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "dataSubsetId": "Dss02_Related_TEAE",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_NUM",
+          "analysisId": "An07_02_RelTEAE_Summ_ByTrt"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_DEN",
+          "analysisId": "An01_05_SAF_Summ_ByTrt"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Subjects with At Least One Serious TEAE, by Treatment",
+      "id": "An07_03_SerTEAE_Summ_ByTrt",
+      "reason": {
+        "sponsorTermId": "TermEx1_1"
+      },
+      "purpose": {
+        "controlledTerm": "SECONDARY OUTCOME MEASURE"
+      },
+      "methodId": "Mth01_CatVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_2_Saf",
+        "Catn_02_Dclass_2_Evt",
+        "Catn_04_EvtDType_1_Ae",
+        "Catn_05_EvtAType_1_Occ"
+      ],
+      "dataset": "ADAE",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "dataSubsetId": "Dss03_Serious_TEAE",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_NUM",
+          "analysisId": "An07_03_SerTEAE_Summ_ByTrt"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_DEN",
+          "analysisId": "An01_05_SAF_Summ_ByTrt"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Subjects with At Least One Related Serious TEAE, by Treatment",
+      "id": "An07_04_RelSerTEAE_Summ_ByTrt",
+      "reason": {
+        "sponsorTermId": "TermEx1_1"
+      },
+      "purpose": {
+        "controlledTerm": "SECONDARY OUTCOME MEASURE"
+      },
+      "methodId": "Mth01_CatVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_2_Saf",
+        "Catn_02_Dclass_2_Evt",
+        "Catn_04_EvtDType_1_Ae",
+        "Catn_05_EvtAType_1_Occ"
+      ],
+      "dataset": "ADAE",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "dataSubsetId": "Dss04_RelSer_TEAE",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_NUM",
+          "analysisId": "An07_04_RelSerTEAE_Summ_ByTrt"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_DEN",
+          "analysisId": "An01_05_SAF_Summ_ByTrt"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Subjects with At Least One TEAE Leading to Death, by Treatment",
+      "id": "An07_05_TEAELd2Dth_Summ_ByTrt",
+      "reason": {
+        "sponsorTermId": "TermEx1_1"
+      },
+      "purpose": {
+        "controlledTerm": "SECONDARY OUTCOME MEASURE"
+      },
+      "methodId": "Mth01_CatVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_2_Saf",
+        "Catn_02_Dclass_2_Evt",
+        "Catn_04_EvtDType_1_Ae",
+        "Catn_05_EvtAType_1_Occ"
+      ],
+      "dataset": "ADAE",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "dataSubsetId": "Dss05_TEAE_Ld2Dth",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_NUM",
+          "analysisId": "An07_05_TEAELd2Dth_Summ_ByTrt"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_DEN",
+          "analysisId": "An01_05_SAF_Summ_ByTrt"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Subjects with At Least One Related TEAE Leading to Death, by Treatment",
+      "id": "An07_06_RelTEAELd2Dth_Summ_ByTrt",
+      "reason": {
+        "sponsorTermId": "TermEx1_1"
+      },
+      "purpose": {
+        "controlledTerm": "SECONDARY OUTCOME MEASURE"
+      },
+      "methodId": "Mth01_CatVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_2_Saf",
+        "Catn_02_Dclass_2_Evt",
+        "Catn_04_EvtDType_1_Ae",
+        "Catn_05_EvtAType_1_Occ"
+      ],
+      "dataset": "ADAE",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "dataSubsetId": "Dss06_Rel_TEAE_Ld2Dth",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_NUM",
+          "analysisId": "An07_06_RelTEAELd2Dth_Summ_ByTrt"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_DEN",
+          "analysisId": "An01_05_SAF_Summ_ByTrt"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Subjects with At Least One TEAE Leading to Dose Modification, by Treatment",
+      "id": "An07_07_TEAELd2DoseMod_Summ_ByTrt",
+      "reason": {
+        "sponsorTermId": "TermEx1_1"
+      },
+      "purpose": {
+        "controlledTerm": "SECONDARY OUTCOME MEASURE"
+      },
+      "methodId": "Mth01_CatVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_2_Saf",
+        "Catn_02_Dclass_2_Evt",
+        "Catn_04_EvtDType_1_Ae",
+        "Catn_05_EvtAType_1_Occ"
+      ],
+      "dataset": "ADAE",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "dataSubsetId": "Dss07_TEAE_Ld2DoseMod",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_NUM",
+          "analysisId": "An07_07_TEAELd2DoseMod_Summ_ByTrt"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_DEN",
+          "analysisId": "An01_05_SAF_Summ_ByTrt"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Subjects with At Least One TEAE Leading to Treatment Discontinuation, by Treatment",
+      "id": "An07_08_TEAELd2TrtDsc_Summ_ByTrt",
+      "reason": {
+        "sponsorTermId": "TermEx1_1"
+      },
+      "purpose": {
+        "controlledTerm": "SECONDARY OUTCOME MEASURE"
+      },
+      "methodId": "Mth01_CatVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_2_Saf",
+        "Catn_02_Dclass_2_Evt",
+        "Catn_04_EvtDType_1_Ae",
+        "Catn_05_EvtAType_1_Occ"
+      ],
+      "dataset": "ADAE",
+      "variable": "USUBJID",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "dataSubsetId": "Dss08_AE_Ld2TrtDsc",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        }
+      ],
+      "referencedAnalysisOperations": [
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_NUM",
+          "analysisId": "An07_08_TEAELd2TrtDsc_Summ_ByTrt"
+        },
+        {
+          "referencedOperationRelationshipId": "Mth01_CatVar_Summ_ByGrp_2_pct_DEN",
+          "analysisId": "An01_05_SAF_Summ_ByTrt"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Observed Value by Treatment, Parameter and Visit",
+      "id": "An08_01_Obs_Summ_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "Sections 7 (General Considerations) and 11.6 (Other Safety Measures)",
+              "pageNumbers": [
+                "9",
+                "17"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth02_ContVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_2_Saf",
+        "Catn_02_Dclass_3_Fnd",
+        "Catn_06_FndDType_1_Vs",
+        "Catn_07_FndAType_1_Chg"
+      ],
+      "dataset": "ADVS",
+      "variable": "AVAL",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "dataSubsetId": "Dss09_VS_AnRec",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        },
+        {
+          "order": 2,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_08_Param"
+        },
+        {
+          "order": 3,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_09_Visit"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Change from Baseline by Treatment, Parameter and Visit",
+      "id": "An08_02_ChgBl_Summ_ByTrt",
+      "reason": {
+        "controlledTerm": "SPECIFIED IN SAP"
+      },
+      "purpose": {
+        "controlledTerm": "PRIMARY OUTCOME MEASURE"
+      },
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_SAP",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "Sections 7 (General Considerations)",
+              "pageNumbers": [
+                "9"
+              ]
+            },
+            {
+              "refType": "PhysicalRef",
+              "label": "11.6 (Other Safety Measures)",
+              "pageNumbers": [
+                "17"
+              ]
+            }
+          ]
+        },
+        {
+          "referenceDocumentId": "CDISCPILOT01_CSR",
+          "pageRefs": [
+            {
+              "refType": "NamedDestination",
+              "pageNames": [
+                "Table 14-7.02"
+              ]
+            }
+          ]
+        }
+      ],
+      "methodId": "Mth02_ContVar_Summ_ByGrp",
+      "version": 1,
+      "categoryIds": [
+        "Catn_01_Grp_2_Saf",
+        "Catn_02_Dclass_3_Fnd",
+        "Catn_06_FndDType_1_Vs",
+        "Catn_07_FndAType_1_Chg"
+      ],
+      "dataset": "ADVS",
+      "variable": "CHG",
+      "analysisSetId": "AnalysisSet_02_SAF",
+      "dataSubsetId": "Dss10_VS_NonBl_AnRec",
+      "orderedGroupings": [
+        {
+          "order": 1,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_01_Trt"
+        },
+        {
+          "order": 2,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_08_Param"
+        },
+        {
+          "order": 3,
+          "resultsByGroup": true,
+          "groupingId": "AnlsGrouping_09_Visit"
+        }
+      ]
+    }
+  ],
+  "globalDisplaySections": [
+    {
+      "sectionType": "Header",
+      "subSections": [
+        {
+          "id": "GlobalDisp_Header_1",
+          "text": "Study - CDISC 360"
+        },
+        {
+          "id": "GlobalDisp_Header_2",
+          "text": "Page x of y"
+        }
+      ]
+    },
+    {
+      "sectionType": "Title",
+      "subSections": [
+        {
+          "id": "GlobalDisp_Title_1",
+          "text": "Safety Population"
+        }
+      ]
+    },
+    {
+      "sectionType": "Footer",
+      "subSections": [
+        {
+          "id": "GlobalDisp_Footer_1",
+          "text": "Program: <pid>.sas, Output: <pid><oid>.rtf, Generated on: DDMONYYYY:HH:MM"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "name": "Summary of Demographics",
+      "id": "Out14-1-1",
+      "version": 1,
+      "fileSpecifications": [
+        {
+          "name": "t14-1-1-demog (RTF)",
+          "label": "t14-1-1-demog",
+          "location": "./t14-1-1-demog.rtf",
+          "fileType": {
+            "controlledTerm": "rtf"
+          }
+        },
+        {
+          "name": "t14-1-1-demog (PDF)",
+          "label": "t14-1-1-demog",
+          "location": "./t14-1-1-demog.pdf",
+          "fileType": {
+            "controlledTerm": "pdf"
+          }
+        }
+      ],
+      "displays": [
+        {
+          "order": 1,
+          "display": {
+            "id": "Disp14-1-1",
+            "name": "Demographics",
+            "label": "Demog",
+            "version": 1,
+            "displayTitle": "Summary of Demographics",
+            "displaySections": [
+              {
+                "sectionType": "Header",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSectionId": "GlobalDisp_Header_1"
+                  },
+                  {
+                    "order": 2,
+                    "subSectionId": "GlobalDisp_Header_2"
+                  }
+                ]
+              },
+              {
+                "sectionType": "Title",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp14-1-1_Title_1",
+                      "text": "Table 14.1.1"
+                    }
+                  },
+                  {
+                    "order": 2,
+                    "subSection": {
+                      "id": "Disp14-1-1_Title_2",
+                      "text": "Summary of Demographics"
+                    }
+                  },
+                  {
+                    "order": 3,
+                    "subSectionId": "GlobalDisp_Title_1"
+                  }
+                ]
+              },
+              {
+                "sectionType": "Footer",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp14-1-1_Footer_1",
+                      "text": "Source dataset: adsl, Generated on: DDMONYYYY:HH:MM"
+                    }
+                  },
+                  {
+                    "order": 2,
+                    "subSectionId": "GlobalDisp_Footer_1"
+                  }
+                ]
+              },
+              {
+                "sectionType": "Rowlabel Header",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp14-1-1_RLbHd_1",
+                      "text": "Characteristics"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "categoryIds": [
+        "Catn_01_Grp_1_Pop",
+        "Catn_03_SbjDType_1_Dm"
+      ],
+      "documentRefs": [
+        {
+          "referenceDocumentId": "CDISCPILOT01_CSR",
+          "pageRefs": [
+            {
+              "refType": "PhysicalRef",
+              "label": "Table 14-2.01",
+              "firstPage": "46",
+              "lastPage": "48"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Overall Summary of Treatment-Emergent Adverse Events",
+      "id": "Out14-3-1-1",
+      "version": 1,
+      "fileSpecifications": [
+        {
+          "name": "t14-3-1-1-teae-summ (RTF)",
+          "label": "t14-3-1-1-teae-summ",
+          "location": "./t14-3-1-1-teae-summ.rtf",
+          "fileType": {
+            "controlledTerm": "rtf"
+          }
+        },
+        {
+          "name": "t14-3-1-1-teae-summ (PDF)",
+          "label": "t14-3-1-1-teae-summ",
+          "location": "./t14-3-1-1-teae-summ.pdf",
+          "fileType": {
+            "controlledTerm": "pdf"
+          }
+        }
+      ],
+      "displays": [
+        {
+          "order": 1,
+          "display": {
+            "id": "Disp14-3-1-1",
+            "name": "AE Summary",
+            "label": "AE_Summ",
+            "version": 1,
+            "displayTitle": "Overall Summary of Treatment-Emergent Adverse Events",
+            "displaySections": [
+              {
+                "sectionType": "Header",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSectionId": "GlobalDisp_Header_1"
+                  },
+                  {
+                    "order": 2,
+                    "subSectionId": "GlobalDisp_Header_2"
+                  }
+                ]
+              },
+              {
+                "sectionType": "Title",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp14-3-1-1_Title_1",
+                      "text": "Table 14.3.1.<x>.<y>"
+                    }
+                  },
+                  {
+                    "order": 2,
+                    "subSection": {
+                      "id": "Disp14-3-1-1_Title_2",
+                      "text": "Overall Summary of Treatment-Emergent Adverse Events"
+                    }
+                  },
+                  {
+                    "order": 3,
+                    "subSectionId": "GlobalDisp_Title_1"
+                  }
+                ]
+              },
+              {
+                "sectionType": "Abbreviation",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp14-3-1-1_Abbrv_1",
+                      "text": "Note: TEAE=Treatment-Emergent Adverse Events."
+                    }
+                  }
+                ]
+              },
+              {
+                "sectionType": "Footnote",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp14-3-1-1_Fnote_1",
+                      "text": "[a] Dose Modification includes Dose Reduced; Drug Interrupted in the AE action taken with study treatment."
+                    }
+                  }
+                ]
+              },
+              {
+                "sectionType": "Footer",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp14-3-1-1_Footer_1",
+                      "text": "Source dataset: adae, Generated on: DDMONYYYY:HH:MM"
+                    }
+                  },
+                  {
+                    "order": 2,
+                    "subSectionId": "GlobalDisp_Footer_1"
+                  }
+                ]
+              },
+              {
+                "sectionType": "Rowlabel Header",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp14-3-1-1_RLbHd_1",
+                      "text": "Categories, n (%)"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "categoryIds": [
+        "Catn_01_Grp_2_Saf",
+        "Catn_04_EvtDType_1_Ae"
+      ],
+      "documentRefs": [
+        {
+          "referenceDocumentId": "AE_Summary_Table_Shell"
+        }
+      ]
+    },
+    {
+      "name": "Summary of Observed and Change from Baseline by Scheduled Visits - Vital Signs Horizontal",
+      "id": "Out14-3-3-1a",
+      "version": 1,
+      "fileSpecifications": [
+        {
+          "name": "t14-3-3-1-vitals-chgbl (RTF)",
+          "label": "t14-3-3-1-vitals-chgbl",
+          "location": "./t14-3-3-1-vitals-chgbl.rtf",
+          "fileType": {
+            "controlledTerm": "rtf"
+          }
+        },
+        {
+          "name": "t14-3-3-1-vitals-chgbl (PDF)",
+          "label": "t14-3-3-1-vitals-chgbl",
+          "location": "./t14-3-3-1-vitals-chgbl.pdf",
+          "fileType": {
+            "controlledTerm": "pdf"
+          }
+        }
+      ],
+      "displays": [
+        {
+          "order": 1,
+          "display": {
+            "id": "Disp14-3-3-1a",
+            "name": "Vitals Change from Baseline",
+            "label": "Vitals_ChgBl",
+            "version": 1,
+            "displayTitle": "Summary of Observed and Change from Baseline by Scheduled Visits - Vital Signs",
+            "displaySections": [
+              {
+                "sectionType": "Header",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSectionId": "GlobalDisp_Header_1"
+                  },
+                  {
+                    "order": 2,
+                    "subSectionId": "GlobalDisp_Header_2"
+                  }
+                ]
+              },
+              {
+                "sectionType": "Title",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp14-3-3-1a_Title_1",
+                      "text": "Table 14.3.3.1a"
+                    }
+                  },
+                  {
+                    "order": 2,
+                    "subSection": {
+                      "id": "Disp14-3-3-1a_Title_2",
+                      "text": "Summary of Observed and Change from Baseline by Scheduled Visits – Vital Signs"
+                    }
+                  },
+                  {
+                    "order": 3,
+                    "subSectionId": "GlobalDisp_Title_1"
+                  }
+                ]
+              },
+              {
+                "sectionType": "Legend",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp14-3-3-1a_Legnd_1",
+                      "text": "Note: Baseline is defined as the last assessment that is non-missing prior to first dose of investigational product."
+                    }
+                  }
+                ]
+              },
+              {
+                "sectionType": "Footer",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp14-3-3-1a_Footer_1",
+                      "text": "Source dataset: advs, Generated on: DDMONYYYY:HH:MM"
+                    }
+                  },
+                  {
+                    "order": 2,
+                    "subSectionId": "GlobalDisp_Footer_1"
+                  }
+                ]
+              },
+              {
+                "sectionType": "Rowlabel Header",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp14-3-3-1a_RLbHd_1",
+                      "text": "Parameter (Units)"
+                    }
+                  },
+                  {
+                    "order": 2,
+                    "subSection": {
+                      "id": "Disp14-3-3-1a_RLbHd_2",
+                      "text": "Visit"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "categoryIds": [
+        "Catn_01_Grp_2_Saf",
+        "Catn_06_FndDType_1_Vs"
+      ]
+    },
+    {
+      "name": "Summary of Observed and Change from Baseline by Scheduled Visits - Vital Signs Vertical",
+      "id": "Out14-3-3-1b",
+      "version": 1,
+      "fileSpecifications": [
+        {
+          "name": "t14-3-3-1-vitals-chgbl-vert (RTF)",
+          "label": "t14-3-3-1-vitals-chgbl-vert",
+          "location": "./t14-3-3-1-vitals-chgbl-vert.rtf",
+          "fileType": {
+            "controlledTerm": "rtf"
+          }
+        },
+        {
+          "name": "t14-3-3-1-vitals-chgbl-vert (PDF)",
+          "label": "t14-3-3-1-vitals-chgbl-vert",
+          "location": "./t14-3-3-1-vitals-chgbl-vert.pdf",
+          "fileType": {
+            "controlledTerm": "pdf"
+          }
+        }
+      ],
+      "displays": [
+        {
+          "order": 1,
+          "display": {
+            "id": "Disp14-3-3-1b",
+            "name": "Vitals Change from Baseline - Vertical",
+            "label": "Vitals_ChgBl_Vert",
+            "version": 1,
+            "displayTitle": "Summary of Observed and Change from Baseline by Scheduled Visits - Vital Signs <Vertical Layout>",
+            "displaySections": [
+              {
+                "sectionType": "Header",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSectionId": "GlobalDisp_Header_1"
+                  },
+                  {
+                    "order": 2,
+                    "subSectionId": "GlobalDisp_Header_2"
+                  }
+                ]
+              },
+              {
+                "sectionType": "Title",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSection": {
+                      "id": "Disp14-3-3-1b_Title_1",
+                      "text": "Table 14.3.3.1b"
+                    }
+                  },
+                  {
+                    "order": 2,
+                    "subSectionId": "Disp14-3-3-1a_Title_2"
+                  },
+                  {
+                    "order": 3,
+                    "subSectionId": "GlobalDisp_Title_1"
+                  }
+                ]
+              },
+              {
+                "sectionType": "Legend",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSectionId": "Disp14-3-3-1a_Legnd_1"
+                  }
+                ]
+              },
+              {
+                "sectionType": "Footer",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSectionId": "Disp14-3-3-1a_Footer_1"
+                  },
+                  {
+                    "order": 2,
+                    "subSectionId": "GlobalDisp_Footer_1"
+                  }
+                ]
+              },
+              {
+                "sectionType": "Rowlabel Header",
+                "orderedSubSections": [
+                  {
+                    "order": 1,
+                    "subSectionId": "Disp14-3-3-1a_RLbHd_1"
+                  },
+                  {
+                    "order": 2,
+                    "subSectionId": "Disp14-3-3-1a_RLbHd_2"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "categoryIds": [
+        "Catn_01_Grp_2_Saf",
+        "Catn_06_FndDType_1_Vs"
+      ]
+    }
+  ],
+  "@type": "ReportingEvent"
+}

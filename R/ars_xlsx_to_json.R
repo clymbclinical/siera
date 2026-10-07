@@ -2,10 +2,12 @@
 #
 # R-native reimplementation of CDISC's Python `excel2ars.py`
 # (https://github.com/cdisc-org/analysis-results-standard/blob/main/utilities/python/excel2ars.py).
-# siera keeps a single JSON ingestion path in `readARS()`; this converter is the
-# supported way to bring an ARS Excel workbook (as emitted by TFL Designer or the
-# CDISC ARS template) onto that path. It is a faithful whole-workbook conversion:
-# every ARS worksheet is mapped, not just the sheets siera itself consumes.
+# siera keeps a single JSON ingestion path in `readARS()`. This converter brings
+# an ARS Excel workbook (as emitted by TFL Designer or the CDISC ARS template)
+# onto that path, and also backs the deprecated `.xlsx` input of `readARS()`.
+# It is a faithful whole-workbook conversion: every ARS worksheet is mapped, not
+# just the sheets siera itself consumes. Both the converter and `.xlsx` input are
+# deprecated and will be removed together (#179).
 
 # --- low-level cell helpers -------------------------------------------------
 
@@ -39,12 +41,15 @@
   x[!vapply(x, is.null, logical(1L))]
 }
 
-# Split a delimited multi-value cell into an unnamed list (JSON array); return a
-# scalar for a single value so `jsonlite`'s auto_unbox keeps it a plain string.
-.x2a_split <- function(v, sep) {
+# Split a pipe-delimited multi-value cell into an unnamed list, so it always
+# serialises as a JSON array -- even for a single value. These ARS slots are
+# multivalued, and a scalar/array mix across rows makes `jsonlite` simplify the
+# same field to different column types. Whitespace around `|` is tolerated
+# ("a|b", "a | b", "65-80 | >80") and each value is trimmed; commas are never
+# treated as delimiters because they can occur inside values.
+.x2a_split <- function(v) {
   if (length(v) == 0L || is.na(v)) return(NULL)
-  s <- as.character(v)
-  if (grepl(sep, s, fixed = TRUE)) as.list(strsplit(s, sep, fixed = TRUE)[[1]]) else s
+  as.list(trimws(strsplit(as.character(v), "\\s*\\|\\s*")[[1]]))
 }
 
 # A row accessor for one sheet: returns the cell in `col` at row `i`, or NA when
@@ -103,7 +108,7 @@
   if (is.null(reftype)) return(NULL)
   if (identical(reftype, "NamedDestination")) {
     return(.x2a_obj(refType = reftype, label = label,
-                    pageNames = .x2a_split(pages, "|")))
+                    pageNames = .x2a_split(pages)))
   }
   if (identical(reftype, "PhysicalRef")) {
     ps <- if (is.null(pages)) "" else as.character(pages)
@@ -114,7 +119,7 @@
     }
     if (grepl("^[0-9]+([|][0-9]+)*$", ps)) {
       return(.x2a_obj(refType = reftype, label = label,
-                      pageNumbers = .x2a_split(pages, "|")))
+                      pageNumbers = .x2a_split(pages)))
     }
     cli::cli_warn("Invalid {.field pageRef_pages} value: {.val {ps}}")
     return(NULL)
@@ -259,7 +264,7 @@
             dataset    = .x2a_str(g(paste0(pfx, "condition_dataset"), i)),
             variable   = cond_var,
             comparator = .x2a_str(g(paste0(pfx, "condition_comparator"), i)),
-            value      = .x2a_split(g(paste0(pfx, "condition_value"), i), " | ")
+            value      = .x2a_split(g(paste0(pfx, "condition_value"), i))
           )
         )
         i <- i + 1L
@@ -318,7 +323,7 @@
   .x2a_obj(
     studyId            = .x2a_str(g("studyId", 1L)),
     studyTitle         = .x2a_str(g("studyTitle", 1L)),
-    phase              = .x2a_split(g("phase", 1L), " | "),
+    phase              = .x2a_split(g("phase", 1L)),
     compoundUnderStudy = .x2a_str(g("compoundUnderStudy", 1L)),
     description        = .x2a_str(g("description", 1L)),
     diseaseArea        = .x2a_str(g("diseaseArea", 1L)),
@@ -543,7 +548,7 @@
         description = .x2a_str(g("parameter_description", i)),
         label       = .x2a_str(g("parameter_label", i)),
         valueSource = .x2a_str(g("parameter_valueSource", i)),
-        value       = .x2a_split(g("parameter_value", i), "|")
+        value       = .x2a_split(g("parameter_value", i))
       )
     } else {
       p <- .x2a_obj(
@@ -741,7 +746,7 @@
       documentRefs  = adocrefs$Documentation[[id]],
       methodId      = .x2a_str(g("method_id", i)),
       version       = .x2a_num(g("version", i)),
-      categoryIds   = .x2a_split(g("categoryIds", i), " | "),
+      categoryIds   = .x2a_split(g("categoryIds", i)),
       dataset       = .x2a_str(g("dataset", i)),
       variable      = .x2a_str(g("variable", i)),
       analysisSetId = .x2a_str(g("analysisSetId", i)),
@@ -812,18 +817,14 @@
 .x2a_output_files <- function(path, sheets) {
   if (!"OutputFiles" %in% sheets) return(list())
   df <- .x2a_read_sheet(path, "OutputFiles")
+  # Older TFL Designer exports key the owning output as `id` rather than the
+  # CDISC template's `output_id`; accept either so such workbooks still convert.
+  owner_col <- if ("output_id" %in% names(df)) "output_id" else "id"
   files <- list()
   for (i in .x2a_nonblank_rows(df)) {
     g <- .x2a_rowget(df)
-    owner <- .x2a_str(g("output_id", i))
-    # TFL Designer exports key the owning output as `id` (#217).
-    if (is.null(owner)) owner <- .x2a_str(g("id", i))
-    if (is.null(owner)) {
-      cli::cli_abort(c(
-        "OutputFiles row {i} names no owning output.",
-        "i" = "Expected an {.field output_id} (or {.field id}) value."
-      ))
-    }
+    owner <- .x2a_str(g(owner_col, i))
+    if (is.null(owner)) next
     ftype <- .x2a_str(g("fileType", i))
     fs <- .x2a_obj(
       name        = .x2a_str(g("name", i)),
@@ -868,7 +869,7 @@
       version = .x2a_num(g("version", i)),
       fileSpecifications = if (!is.null(ofiles[[id]])) ofiles[[id]] else NULL,
       displays    = if (length(displays) > 0L) displays else NULL,
-      categoryIds = .x2a_split(g("categoryIds", i), " | "),
+      categoryIds = .x2a_split(g("categoryIds", i)),
       documentRefs    = odocrefs$Documentation[[id]],
       programmingCode = if (!is.null(oprog[[id]])) oprog[[id]] else NULL
     )
@@ -876,59 +877,12 @@
   out
 }
 
-# --- public entry point -----------------------------------------------------
+# --- builder (shared by ars_xlsx_to_json() and readARS()'s xlsx path) -------
 
-#' Convert an ARS Excel workbook to ARS JSON
-#'
-#' Converts a CDISC Analysis Results Standard (ARS) metadata workbook (`.xlsx`)
-#' into an ARS ReportingEvent JSON file. This is an R-native reimplementation of
-#' CDISC's Python `excel2ars.py` utility and performs a faithful whole-workbook
-#' conversion: every ARS worksheet is mapped, not only the sheets that
-#' [readARS()] itself consumes.
-#'
-#' `readARS()` ingests ARS JSON. Use `ars_xlsx_to_json()` first to convert an
-#' Excel workbook, then pass the resulting `.json` file to `readARS()`.
-#'
-#' @param xlsx_path Path to the ARS Excel workbook (`.xlsx`).
-#' @param json_path Optional path for the output JSON file. When `NULL` (the
-#'   default), the JSON is written beside `xlsx_path` with the same base name and
-#'   a `.json` extension.
-#'
-#' @return The path to the written JSON file, invisibly.
-#'
-#' @details
-#' The converter maps the full ARS object model: `about`, `studyInfo`, the main
-#' and other lists of contents, reference documents, terminology extensions,
-#' analysis output categorizations, analysis sets, analysis groupings, data
-#' subsets, methods (with operations and code templates), analyses, global
-#' display sections and outputs (with displays).
-#'
-#' Note that the ARS spec evolves; this converter targets the worksheet layout
-#' emitted by TFL Designer and the CDISC ARS template and may need updating for
-#' future ARS versions.
-#'
-#' @examples
-#' \dontrun{
-#' # Convert a workbook and generate ARD scripts from the result.
-#' json <- ars_xlsx_to_json("study.xlsx")
-#' readARS(json, output_path = tempdir(), adam_path = "adam")
-#' }
-#'
-#' @export
-ars_xlsx_to_json <- function(xlsx_path, json_path = NULL) {
-  if (is.null(xlsx_path) || length(xlsx_path) != 1L || is.na(xlsx_path) ||
-        !nzchar(xlsx_path)) {
-    cli::cli_abort("{.arg xlsx_path} must be a single, non-empty file path.")
-  }
-  if (tolower(tools::file_ext(xlsx_path)) != "xlsx") {
-    cli::cli_abort(
-      "{.arg xlsx_path} must be an {.file .xlsx} file; got {.path {xlsx_path}}."
-    )
-  }
-  if (!file.exists(xlsx_path)) {
-    cli::cli_abort("ARS workbook not found: {.path {xlsx_path}}")
-  }
-
+# Build the ARS ReportingEvent for a workbook as a nested R list. Shared by the
+# exported converter and by the deprecated xlsx input path of readARS()
+# (.read_ars_xlsx_via_json()), so both see exactly the same conversion.
+.x2a_build <- function(xlsx_path) {
   sheets <- readxl::excel_sheets(xlsx_path)
   required <- c(
     "ReportingEvent", "MainListOfContents", "OtherListsOfContents",
@@ -940,10 +894,6 @@ ars_xlsx_to_json <- function(xlsx_path, json_path = NULL) {
     cli::cli_abort(
       "ARS workbook is missing required sheet{?s}: {.val {missing}}"
     )
-  }
-
-  if (is.null(json_path)) {
-    json_path <- paste0(tools::file_path_sans_ext(xlsx_path), ".json")
   }
 
   # ReportingEvent header row.
@@ -977,9 +927,89 @@ ars_xlsx_to_json <- function(xlsx_path, json_path = NULL) {
     outputs           = .x2a_outputs(xlsx_path)
   )
   rptevt[["@type"]] <- "ReportingEvent"
+  rptevt
+}
 
-  json <- jsonlite::toJSON(rptevt, auto_unbox = TRUE, pretty = TRUE, null = "null")
-  writeLines(json, json_path)
+# Serialise a built ReportingEvent to ARS JSON text.
+.x2a_json_text <- function(rptevt) {
+  jsonlite::toJSON(rptevt, auto_unbox = TRUE, pretty = TRUE, null = "null")
+}
+
+# --- public entry point -----------------------------------------------------
+
+#' Convert an ARS Excel workbook to ARS JSON
+#'
+#' @description
+#' **Deprecated.** siera is moving to JSON-only ARS metadata, and both `.xlsx` input to
+#' [readARS()] and this converter will be removed in a future release. Use it
+#' now to convert each workbook once, then keep the `.json` file as the source
+#' of truth for your ARS metadata. Every call warns with class
+#' `siera_deprecated_xlsx`.
+#'
+#' Converts a CDISC Analysis Results Standard (ARS) metadata workbook (`.xlsx`)
+#' into an ARS ReportingEvent JSON file. This is an R-native reimplementation of
+#' CDISC's Python `excel2ars.py` utility and performs a faithful whole-workbook
+#' conversion: every ARS worksheet is mapped, not only the sheets that
+#' [readARS()] itself consumes.
+#'
+#' @param xlsx_path Path to the ARS Excel workbook (`.xlsx`).
+#' @param json_path Optional path for the output JSON file. When `NULL` (the
+#'   default), the JSON is written beside `xlsx_path` with the same base name and
+#'   a `.json` extension.
+#'
+#' @return The path to the written JSON file, invisibly.
+#'
+#' @details
+#' The converter maps the full ARS object model: `about`, `studyInfo`, the main
+#' and other lists of contents, reference documents, terminology extensions,
+#' analysis output categorizations, analysis sets, analysis groupings, data
+#' subsets, methods (with operations and code templates), analyses, global
+#' display sections and outputs (with displays).
+#'
+#' Multi-value cells (for example the values of an `IN` condition, or
+#' `categoryIds`) are split on `|`, with or without surrounding spaces, and each
+#' value is trimmed. Commas are never treated as separators. Multi-value ARS
+#' fields are always written as JSON arrays, even when they hold one value.
+#'
+#' Note that the ARS spec evolves; this converter targets the worksheet layout
+#' emitted by TFL Designer and the CDISC ARS template and may need updating for
+#' future ARS versions.
+#'
+#' @examples
+#' json <- suppressWarnings(
+#'   ars_xlsx_to_json(ARS_example("exampleARS_6.xlsx"),
+#'                    json_path = tempfile(fileext = ".json"))
+#' )
+#' readARS(json, output_path = tempdir(), adam_path = tempdir())
+#'
+#' @export
+ars_xlsx_to_json <- function(xlsx_path, json_path = NULL) {
+  if (is.null(xlsx_path) || length(xlsx_path) != 1L || is.na(xlsx_path) ||
+        !nzchar(xlsx_path)) {
+    cli::cli_abort("{.arg xlsx_path} must be a single, non-empty file path.")
+  }
+  if (tolower(tools::file_ext(xlsx_path)) != "xlsx") {
+    cli::cli_abort(
+      "{.arg xlsx_path} must be an {.file .xlsx} file; got {.path {xlsx_path}}."
+    )
+  }
+  if (!file.exists(xlsx_path)) {
+    cli::cli_abort("ARS workbook not found: {.path {xlsx_path}}")
+  }
+
+  cli::cli_warn(
+    c(
+      "{.fn ars_xlsx_to_json} is deprecated and will be removed in a future siera release, together with {.file .xlsx} ARS input.",
+      "i" = "Keep the converted {.file .json} file as the source of truth for your ARS metadata."
+    ),
+    class = "siera_deprecated_xlsx"
+  )
+
+  if (is.null(json_path)) {
+    json_path <- paste0(tools::file_path_sans_ext(xlsx_path), ".json")
+  }
+
+  writeLines(.x2a_json_text(.x2a_build(xlsx_path)), json_path)
   cli::cli_inform("Wrote ARS JSON: {.path {json_path}}")
   invisible(json_path)
 }

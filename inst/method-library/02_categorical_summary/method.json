@@ -5,7 +5,7 @@
   "description": "n and percentage of a categorical analysis variable per group, with a referenced denominator analysis and a data-driven/pre-defined grouping branch. Verified against Common_Safety_Displays Mth01_CatVar_Summ_ByGrp; current cards API. Spurious by_vars/strata_vars params from the legacy sheet have been dropped (the template uses by_listc).",
   "context": "R (siera)",
   "status": "verified",
-  "verified_against": "Common_Safety_Displays_cards.xlsx Mth01_CatVar_Summ_ByGrp",
+  "verified_against": "Common_Safety_Displays_cards.json Mth01_CatVar_Summ_ByGrp",
   "operations": [
     {
       "order": 1,

@@ -1,11 +1,10 @@
 
 # Programme:    Generate code to produce ARD for Out14-3-1-1
 # Output:       Overall Summary of Treatment-Emergent Adverse Events
-# Date created: 2026-10-06 14:42:30
+# Date created: 2026-10-06 16:10:54
 
   # load libraries ----
     library(dplyr)
-    library(readxl)
     library(readr)
     library(cards)
     library(cardx)

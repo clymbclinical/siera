@@ -63,7 +63,7 @@
 
 # Build the self-contained runtime block appended to each generated script.
 # The operationid -> pattern lookup is embedded at generation time from the
-# AnalysisMethods tibble (identical for JSON- and XLSX-sourced ARS files);
+# AnalysisMethods tibble;
 # .format_ars_result() itself is deparse()'d in so the generated script needs
 # no siera at runtime, and the package function stays the single source of
 # truth.

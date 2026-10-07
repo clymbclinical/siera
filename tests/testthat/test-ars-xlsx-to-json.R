@@ -1,39 +1,41 @@
 # Tests for ars_xlsx_to_json() -------------------------------------------------
+# (.gen_scripts() and .quiet_xlsx_deprecation() live in helper-xlsx.R.)
 
-# Generate ARD scripts from an ARS file and return each script's normalised text
-# (timestamp line dropped, carriage returns and blank lines removed) keyed by
-# file name. The JSON reader strips carriage returns from templateCode while the
-# xlsx reader does not, so blank-line normalisation is required to compare the
-# two paths (see metadata.R codeTemplate handling).
-.gen_scripts <- function(ars_path, adam_path) {
-  d <- withr::local_tempdir()
-  suppressMessages(suppressWarnings(
-    readARS(ars_path, output_path = d, adam_path = adam_path)
-  ))
-  fs <- sort(list.files(d, pattern = "\\.R$", full.names = TRUE))
-  stats::setNames(lapply(fs, function(f) {
-    ls <- readLines(f, warn = FALSE)
-    ls <- ls[!grepl("^# Date created:", ls)]
-    ls <- gsub("\r", "", ls)
-    ls <- ls[nzchar(trimws(ls))]
-    paste(ls, collapse = "\n")
-  }), basename(fs))
-}
-
-test_that("converted JSON generates identical ARD scripts to the source xlsx", {
-  skip_on_cran()
-  for (base in c("exampleARS_2", "exampleARS_6")) {
-    xlsx  <- ARS_example(paste0(base, ".xlsx"))
+test_that("ars_xlsx_to_json() is deprecated and warns on every call", {
+  xlsx <- ARS_example("exampleARS_6.xlsx")
+  for (k in 1:2) {
     jfile <- withr::local_tempfile(fileext = ".json")
-    expect_message(ars_xlsx_to_json(xlsx, jfile), "Wrote ARS JSON")
+    expect_warning(
+      suppressMessages(ars_xlsx_to_json(xlsx, jfile)),
+      class = "siera_deprecated_xlsx"
+    )
+    expect_true(file.exists(jfile))
+  }
+})
 
-    adam <- withr::local_tempdir()
-    from_xlsx <- .gen_scripts(xlsx, adam)
-    from_json <- .gen_scripts(jfile, adam)
-    expect_identical(names(from_json), names(from_xlsx))
-    for (f in names(from_xlsx)) {
-      expect_identical(from_json[[f]], from_xlsx[[f]],
-                       info = paste(base, f))
+test_that("converted JSON generates the same ARD scripts as the committed JSON twin", {
+  skip_on_cran()
+  adam <- withr::local_tempdir()
+  for (base in c("exampleARS_2", "exampleARS_3", "exampleARS_5", "exampleARS_6",
+                 "Common_Safety_Displays_cards")) {
+    jfile <- withr::local_tempfile(fileext = ".json")
+    expect_message(
+      .quiet_xlsx_deprecation(
+        ars_xlsx_to_json(ARS_example(paste0(base, ".xlsx")), jfile)
+      ),
+      "Wrote ARS JSON"
+    )
+    from_conv <- .gen_scripts(jfile, adam)
+    from_twin <- .gen_scripts(ARS_example(paste0(base, ".json")), adam)
+    if (base == "exampleARS_2") {
+      # The workbook's "Overall" group is `TRT01AN NE <blank cell>`, which
+      # converts to a condition without a value (NA); the hand-written JSON twin
+      # spells the same blank as "". Only that group-level literal differs.
+      from_conv <- lapply(from_conv, function(x) gsub("'NA'", "''", x, fixed = TRUE))
+    }
+    expect_identical(names(from_conv), names(from_twin), info = base)
+    for (f in names(from_twin)) {
+      expect_identical(from_conv[[f]], from_twin[[f]], info = paste(base, f))
     }
   }
 })
@@ -41,7 +43,7 @@ test_that("converted JSON generates identical ARD scripts to the source xlsx", {
 test_that("converted JSON is readable by siera's JSON reader", {
   xlsx  <- ARS_example("exampleARS_2.xlsx")
   jfile <- withr::local_tempfile(fileext = ".json")
-  ars_xlsx_to_json(xlsx, jfile)
+  suppressMessages(.quiet_xlsx_deprecation(ars_xlsx_to_json(xlsx, jfile)))
 
   meta <- siera:::.read_ars_json_metadata(jfile)
   expect_type(meta, "list")
@@ -55,7 +57,7 @@ test_that("converted JSON is readable by siera's JSON reader", {
 test_that("referenced analysis operations survive conversion (numerator/denominator)", {
   xlsx  <- ARS_example("exampleARS_3.xlsx")
   jfile <- withr::local_tempfile(fileext = ".json")
-  ars_xlsx_to_json(xlsx, jfile)
+  suppressMessages(.quiet_xlsx_deprecation(ars_xlsx_to_json(xlsx, jfile)))
   j <- jsonlite::fromJSON(jfile, simplifyVector = FALSE)
   an04 <- Filter(function(a) identical(a$id, "An_04"), j$analyses)[[1]]
   rao  <- an04$referencedAnalysisOperations
@@ -71,7 +73,7 @@ test_that("default json_path is written beside the workbook", {
   dir <- withr::local_tempdir()
   xlsx <- file.path(dir, "study.xlsx")
   file.copy(src, xlsx)
-  out <- ars_xlsx_to_json(xlsx)
+  out <- suppressMessages(.quiet_xlsx_deprecation(ars_xlsx_to_json(xlsx)))
   expect_equal(out, file.path(dir, "study.json"))
   expect_true(file.exists(out))
 })
@@ -92,7 +94,7 @@ test_that("missing required sheets abort", {
   skip_if_not_installed("openxlsx")
   bad <- withr::local_tempfile(fileext = ".xlsx")
   openxlsx::write.xlsx(list(ReportingEvent = data.frame(id = "R", name = "x")), bad)
-  expect_error(ars_xlsx_to_json(bad), "missing required sheet")
+  expect_error(.quiet_xlsx_deprecation(ars_xlsx_to_json(bad)), "missing required sheet")
 })
 
 test_that("an empty ReportingEvent sheet aborts", {
@@ -104,7 +106,7 @@ test_that("an empty ReportingEvent sheet aborts", {
   wb <- stats::setNames(lapply(sheets, function(s) data.frame()), sheets)
   wb$ReportingEvent <- data.frame(id = character(0), name = character(0))
   openxlsx::write.xlsx(wb, bad)
-  expect_error(ars_xlsx_to_json(bad), "no data row")
+  expect_error(.quiet_xlsx_deprecation(ars_xlsx_to_json(bad)), "no data row")
 })
 
 # --- pure helper units ------------------------------------------------------
@@ -125,8 +127,8 @@ test_that(".x2a_pageref dispatches on refType", {
   nd <- siera:::.x2a_pageref("NamedDestination", "a|b", "lbl")
   expect_identical(nd$pageNames, list("a", "b"))
   expect_identical(nd$label, "lbl")
-  # NamedDestination, single value stays scalar
-  expect_identical(siera:::.x2a_pageref("NamedDestination", "a", NULL)$pageNames, "a")
+  # NamedDestination, single value is still an array (pageNames is multivalued)
+  expect_identical(siera:::.x2a_pageref("NamedDestination", "a", NULL)$pageNames, list("a"))
   # PhysicalRef page range
   rng <- siera:::.x2a_pageref("PhysicalRef", "3-7", NULL)
   expect_identical(rng$firstPage, "3"); expect_identical(rng$lastPage, "7")
@@ -145,9 +147,51 @@ test_that(".x2a scalar helpers coerce and NULL-guard", {
   expect_equal(siera:::.x2a_num("3.5"), 3.5); expect_equal(siera:::.x2a_num(2L), 2L)
   expect_null(siera:::.x2a_bool(NA)); expect_true(siera:::.x2a_bool(TRUE))
   expect_true(siera:::.x2a_bool("TRUE"))
-  expect_null(siera:::.x2a_split(NA, " | "))
-  expect_identical(siera:::.x2a_split("a", " | "), "a")
-  expect_identical(siera:::.x2a_split("a | b", " | "), list("a", "b"))
+  expect_null(siera:::.x2a_split(NA))
+  expect_null(siera:::.x2a_split(character(0)))
+})
+
+test_that(".x2a_split always returns an array, splits tolerantly on | and trims", {
+  # a single value is still a one-element array (multivalued ARS slot)
+  expect_identical(siera:::.x2a_split("a"), list("a"))
+  expect_identical(siera:::.x2a_split(5), list("5"))
+  # spaces around the pipe are optional, and never kept (#213)
+  expect_identical(siera:::.x2a_split("a | b"), list("a", "b"))
+  expect_identical(siera:::.x2a_split("a|b"), list("a", "b"))
+  expect_identical(siera:::.x2a_split("65-80 |>80"), list("65-80", ">80"))
+  expect_identical(siera:::.x2a_split(" POSSIBLE  |  PROBABLE "),
+                   list("POSSIBLE", "PROBABLE"))
+  # commas are part of a value, never a separator
+  expect_identical(siera:::.x2a_split("a, b"), list("a, b"))
+})
+
+test_that("single- and multi-value conditions serialise to JSON arrays alike", {
+  # A scalar for one value but an array for several made jsonlite simplify the
+  # same field to different column types across clauses, which broke the JSON
+  # reader on converted workbooks (e.g. Common_Safety_Displays_cards).
+  txt <- siera:::.x2a_json_text(list(
+    a = list(value = siera:::.x2a_split("Y")),
+    b = list(value = siera:::.x2a_split("Y | N"))
+  ))
+  j <- jsonlite::fromJSON(txt, simplifyVector = FALSE)
+  expect_identical(j$a$value, list("Y"))
+  expect_identical(j$b$value, list("Y", "N"))
+})
+
+test_that("OutputFiles keyed by `id` (older TFL Designer layout) converts", {
+  skip_if_not_installed("openxlsx")
+  wb <- withr::local_tempfile(fileext = ".xlsx")
+  openxlsx::write.xlsx(list(
+    OutputFiles = data.frame(
+      id = c("O1", "O1", NA), name = c("f1", "f2", "orphan"),
+      location = c("f1.rtf", "f2.pdf", "x.pdf"), fileType = c("rtf", "pdf", "pdf")
+    )
+  ), wb)
+  files <- siera:::.x2a_output_files(wb, "OutputFiles")
+  # both owned rows land under O1; the row with no owner is skipped
+  expect_named(files, "O1")
+  expect_length(files$O1, 2L)
+  expect_identical(files$O1[[2]]$fileType, list(controlledTerm = "pdf"))
 })
 
 # --- synthetic workbook: advanced branches ----------------------------------
@@ -304,7 +348,9 @@ test_that("advanced sheets convert (docrefs, results, sponsor terms, files)", {
   .write_advanced_wb(wb)
   jfile <- withr::local_tempfile(fileext = ".json")
   # Invalid specifiedAs ("Bogus") and an unresolved DocumentRef both warn.
-  w <- testthat::capture_warnings(ars_xlsx_to_json(wb, jfile))
+  w <- testthat::capture_warnings(
+    suppressMessages(.quiet_xlsx_deprecation(ars_xlsx_to_json(wb, jfile)))
+  )
   expect_true(any(grepl("specifiedAs", w)))
   expect_true(any(grepl("ProgrammingCode document reference", w)))
   j <- jsonlite::fromJSON(jfile, simplifyVector = FALSE)
@@ -411,54 +457,11 @@ test_that("present-but-empty optional sheets convert without error", {
   wb <- withr::local_tempfile(fileext = ".xlsx")
   openxlsx::write.xlsx(sh, wb)
   jfile <- withr::local_tempfile(fileext = ".json")
-  expect_message(ars_xlsx_to_json(wb, jfile))
+  expect_message(.quiet_xlsx_deprecation(ars_xlsx_to_json(wb, jfile)))
   j <- jsonlite::fromJSON(jfile, simplifyVector = FALSE)
   expect_identical(j[["@type"]], "ReportingEvent")
   expect_null(j$about)
   expect_null(j$studyInfo)
   expect_length(j$otherListsOfContents, 0L)
   expect_length(j$analysisOutputCategorizations, 0L)
-})
-
-test_that("the bundled Common Safety Displays workbook converts (#217)", {
-  skip_on_cran()
-  xlsx  <- ARS_example("Common_Safety_Displays_cards.xlsx")
-  jfile <- withr::local_tempfile(fileext = ".json")
-  expect_message(ars_xlsx_to_json(xlsx, jfile), "Wrote ARS JSON")
-
-  # TFL Designer keys OutputFiles by `id`; the files land on their output.
-  j <- jsonlite::fromJSON(jfile, simplifyVector = FALSE)
-  out <- Filter(function(o) o$id == "Out14-1-1", j$outputs)[[1]]
-  expect_length(out$fileSpecifications, 2L)
-
-  adam <- withr::local_tempdir()
-  from_xlsx <- .gen_scripts(xlsx, adam)
-  from_json <- .gen_scripts(jfile, adam)
-  expect_identical(names(from_json), names(from_xlsx))
-  for (f in names(from_xlsx)) {
-    expect_identical(from_json[[f]], from_xlsx[[f]], info = f)
-  }
-})
-
-test_that(".x2a_output_files reads the owner from id when output_id is absent", {
-  skip_if_not_installed("openxlsx")
-  wb <- withr::local_tempfile(fileext = ".xlsx")
-  openxlsx::write.xlsx(list(OutputFiles = data.frame(
-    id = c("O1", "O1", "O2"), name = c("f1", "f2", "f3"),
-    location = c("f1.rtf", "f1.pdf", "f3.rtf"), fileType = c("rtf", "pdf", "rtf")
-  )), wb)
-  files <- siera:::.x2a_output_files(wb, "OutputFiles")
-  expect_identical(names(files), c("O1", "O2"))
-  expect_length(files$O1, 2L)
-  expect_identical(files$O2[[1]]$location, "f3.rtf")
-})
-
-test_that(".x2a_output_files aborts on a file row with no owning output", {
-  skip_if_not_installed("openxlsx")
-  wb <- withr::local_tempfile(fileext = ".xlsx")
-  openxlsx::write.xlsx(list(OutputFiles = data.frame(
-    name = "f1", location = "f1.rtf", fileType = "rtf"
-  )), wb)
-  expect_error(siera:::.x2a_output_files(wb, "OutputFiles"),
-               "names no owning output")
 })

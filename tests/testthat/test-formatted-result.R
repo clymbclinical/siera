@@ -189,23 +189,3 @@ test_that("sourced ARD carries res/pattern/disp and drops fmt_fun/fmt_fn", {
   expect_gt(length(fmt), 0)
   expect_true(all(grepl("^-?\\d+\\.\\d$", fmt)))
 })
-
-test_that("formatting block is identical for JSON and XLSX ARS sources", {
-  ARS_json <- ARS_example("exampleARS_6.json")
-  ARS_xlsx <- ARS_example("exampleARS_6.xlsx")
-  out_json <- withr::local_tempdir()
-  out_xlsx <- withr::local_tempdir()
-  adam_dir <- withr::local_tempdir()
-
-  readARS(ARS_json, out_json, adam_dir)
-  readARS(ARS_xlsx, out_xlsx, adam_dir)
-
-  extract_block <- function(dir) {
-    lines <- readLines(file.path(dir, "ARD_Out_01.R"))
-    start <- grep("Format results per ARS resultPattern", lines)
-    expect_length(start, 1)
-    lines[start:length(lines)]
-  }
-
-  expect_identical(extract_block(out_json), extract_block(out_xlsx))
-})

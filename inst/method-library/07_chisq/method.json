@@ -5,7 +5,7 @@
   "description": "Chi-square test p-value of a categorical variable across treatment arms. Verified against Common_Safety_Displays Mth03_CatVar_Comp_PChiSq.",
   "context": "R (siera)",
   "status": "verified",
-  "verified_against": "Common_Safety_Displays_cards.xlsx Mth03_CatVar_Comp_PChiSq",
+  "verified_against": "Common_Safety_Displays_cards.json Mth03_CatVar_Comp_PChiSq",
   "operations": [
     {
       "order": 1,

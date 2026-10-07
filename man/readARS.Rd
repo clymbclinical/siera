@@ -25,8 +25,7 @@ ARD program. Datasets may be supplied as CSV (`.csv`), SAS transport
 for each dataset from the file extension found in this folder — `.csv`
 files are read with \code{readr::read_csv()}, `.xpt` files with
 \code{haven::read_xpt()} and `.json` files with
-\code{datasetjson::read_dataset_json()} — so no extra argument is required
-(mirroring how the ARS input format is inferred from `.json` vs `.xlsx`).
+\code{datasetjson::read_dataset_json()} — so no extra argument is required.
 Reading `.xpt` datasets in the generated script requires the \pkg{haven}
 package, and `.json` datasets the \pkg{datasetjson} package. When several
 formats exist for the same dataset, precedence is `.csv`, then `.xpt`,
@@ -74,7 +73,7 @@ datasets
 \examples{
 # path to file containing ARS metadata
 
-ARS_path <- ARS_example("Common_Safety_Displays_cards.xlsx")
+ARS_path <- ARS_example("Common_Safety_Displays_cards.json")
 
 # output path for R programs
 output_dir <- tempdir()

@@ -12,14 +12,14 @@ reference.
 
 | id | label | status | operations | verified against |
 |----|-------|--------|------------|------------------|
-| `total_n` | Total N (per group) | verified | n | Common_Safety_Displays_cards.xlsx Mth01_CatVar_Count_ByGrp |
-| `categorical_summary` | Categorical n (%) | verified | n, p | Common_Safety_Displays_cards.xlsx Mth01_CatVar_Summ_ByGrp |
-| `continuous_summary` | Continuous summary (N, mean, SD, median, Q1, Q3, min, max) | verified | N, mean, sd, median, p25, p75, min, max | Common_Safety_Displays_cards.xlsx Mth02_ContVar_Summ_ByGrp |
+| `total_n` | Total N (per group) | verified | n | Common_Safety_Displays_cards.json Mth01_CatVar_Count_ByGrp |
+| `categorical_summary` | Categorical n (%) | verified | n, p | Common_Safety_Displays_cards.json Mth01_CatVar_Summ_ByGrp |
+| `continuous_summary` | Continuous summary (N, mean, SD, median, Q1, Q3, min, max) | verified | N, mean, sd, median, p25, p75, min, max | Common_Safety_Displays_cards.json Mth02_ContVar_Summ_ByGrp |
 | `risk_difference` | Risk difference + 95% CI | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03_1 |
 | `risk_difference_per_group` | Risk difference + 95% CI (per group) | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t13-siera.json Mth_03_1a |
 | `fishers_exact` | Fisher's exact (odds ratio + 95% CI) | corrected-unvalidated | estimate, conf.low, conf.high | - |
-| `chisq` | Chi-square p-value | verified | p.value | Common_Safety_Displays_cards.xlsx Mth03_CatVar_Comp_PChiSq |
-| `anova` | ANOVA p-value | verified | p.value | Common_Safety_Displays_cards.xlsx Mth04_ContVar_Comp_Anova |
+| `chisq` | Chi-square p-value | verified | p.value | Common_Safety_Displays_cards.json Mth03_CatVar_Comp_PChiSq |
+| `anova` | ANOVA p-value | verified | p.value | Common_Safety_Displays_cards.json Mth04_ContVar_Comp_Anova |
 | `risk_difference_per_predefined_group` | Risk difference + 95% CI (per pre-defined group) | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03_1p |
 | `risk_difference_per_group_pair` | Risk difference + 95% CI (per group pair) | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t36-siera.json Mth_03_1b |
 | `categorical_summary_per_predefined_group` | Categorical n (%) (per pre-defined group) | verified | n, p | tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03p |
@@ -53,7 +53,7 @@ reference.
 
 Distinct count of the analysis variable (typically USUBJID) per treatment group. Used as the N= header / denominator source. Verified against Common_Safety_Displays Mth01_CatVar_Count_ByGrp; current cards API.
 
-**Status:** verified &nbsp; **Verified against:** Common_Safety_Displays_cards.xlsx Mth01_CatVar_Count_ByGrp
+**Status:** verified &nbsp; **Verified against:** Common_Safety_Displays_cards.json Mth01_CatVar_Count_ByGrp
 
 **Operations**
 
@@ -91,7 +91,7 @@ df3_analysisidhere <-
 
 n and percentage of a categorical analysis variable per group, with a referenced denominator analysis and a data-driven/pre-defined grouping branch. Verified against Common_Safety_Displays Mth01_CatVar_Summ_ByGrp; current cards API. Spurious by_vars/strata_vars params from the legacy sheet have been dropped (the template uses by_listc).
 
-**Status:** verified &nbsp; **Verified against:** Common_Safety_Displays_cards.xlsx Mth01_CatVar_Summ_ByGrp
+**Status:** verified &nbsp; **Verified against:** Common_Safety_Displays_cards.json Mth01_CatVar_Summ_ByGrp
 
 **Operations**
 
@@ -150,7 +150,7 @@ df3_analysisidhere <- df3_analysisidhere|>
 
 Descriptive statistics of a continuous analysis variable per group. Verified against Common_Safety_Displays Mth02_ContVar_Summ_ByGrp; current cards API (ard_summary, by_listc). Fixes the legacy sheet which used the deprecated ard_continuous + by_stmt (the latter stamps no group metadata).
 
-**Status:** verified &nbsp; **Verified against:** Common_Safety_Displays_cards.xlsx Mth02_ContVar_Summ_ByGrp
+**Status:** verified &nbsp; **Verified against:** Common_Safety_Displays_cards.json Mth02_ContVar_Summ_ByGrp
 
 **Operations**
 
@@ -404,7 +404,7 @@ df3_analysisidhere = if (length(.arms_analysisidhere) >= 2) {
 
 Chi-square test p-value of a categorical variable across treatment arms. Verified against Common_Safety_Displays Mth03_CatVar_Comp_PChiSq.
 
-**Status:** verified &nbsp; **Verified against:** Common_Safety_Displays_cards.xlsx Mth03_CatVar_Comp_PChiSq
+**Status:** verified &nbsp; **Verified against:** Common_Safety_Displays_cards.json Mth03_CatVar_Comp_PChiSq
 
 **Operations**
 
@@ -435,7 +435,7 @@ df3_analysisidhere <-
 
 One-way ANOVA p-value of a continuous variable across treatment arms. Verified against Common_Safety_Displays Mth04_ContVar_Comp_Anova.
 
-**Status:** verified &nbsp; **Verified against:** Common_Safety_Displays_cards.xlsx Mth04_ContVar_Comp_Anova
+**Status:** verified &nbsp; **Verified against:** Common_Safety_Displays_cards.json Mth04_ContVar_Comp_Anova
 
 **Operations**
 

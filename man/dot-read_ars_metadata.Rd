@@ -7,14 +7,16 @@
 .read_ars_metadata(ARS_path)
 }
 \arguments{
-\item{ARS_path}{Path to the ARS metadata file (JSON or XLSX).}
+\item{ARS_path}{Path to the ARS metadata file (`.json`, or a deprecated
+`.xlsx` workbook).}
 }
 \value{
 A list containing harmonised metadata tables, or `NULL` if the file
-  cannot be parsed.
+  is missing required sections.
 }
 \description{
 Internal helper that validates the ARS file extension and dispatches to the
-JSON or XLSX reader before returning the harmonised metadata list.
+JSON reader, the single ARS parser in siera. A deprecated `.xlsx` workbook is
+converted to ARS JSON in memory first (see `.read_ars_xlsx_via_json()`).
 }
 \keyword{internal}
