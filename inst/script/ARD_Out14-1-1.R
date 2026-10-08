@@ -61,7 +61,7 @@ df3_An01_05_SAF_Summ_ByTrt <- siera::ars_stamp(
 # Analysis An03_01_Age_Summ_ByTrt----
 #Summary of Age by Treatment
 #Apply Data Subset ---
-df2_An03_01_Age_Summ_ByTrt <- df_pop
+df2_An03_01_Age_Summ_ByTrt <- df_poptot
 
 #Apply Method --- 
 
@@ -105,7 +105,7 @@ df3_An03_01_Age_Summ_ByTrt <- siera::ars_stamp(
 # Analysis An03_01_Age_Comp_ByTrt----
 #Comparison of Age by Treatment
 #Apply Data Subset ---
-df2_An03_01_Age_Comp_ByTrt <- df_pop
+df2_An03_01_Age_Comp_ByTrt <- df_poptot
 
 #Apply Method --- 
 
@@ -133,7 +133,7 @@ df3_An03_01_Age_Comp_ByTrt <- siera::ars_stamp(
 # Analysis An03_02_AgeGrp_Summ_ByTrt----
 #Summary of Subjects by Treatment and Age Group
 #Apply Data Subset ---
-df2_An03_02_AgeGrp_Summ_ByTrt <- df_pop
+df2_An03_02_AgeGrp_Summ_ByTrt <- df_poptot
 
 #Apply Method --- 
 
@@ -194,7 +194,7 @@ df3_An03_02_AgeGrp_Summ_ByTrt <- siera::ars_stamp(
 # Analysis An03_02_AgeGrp_Comp_ByTrt----
 #Comparison of Age Group by Treatment
 #Apply Data Subset ---
-df2_An03_02_AgeGrp_Comp_ByTrt <- df_pop
+df2_An03_02_AgeGrp_Comp_ByTrt <- df_poptot
 
 #Apply Method --- 
 
@@ -222,7 +222,7 @@ df3_An03_02_AgeGrp_Comp_ByTrt <- siera::ars_stamp(
 # Analysis An03_03_Sex_Summ_ByTrt----
 #Summary of Subjects by Treatment and Sex
 #Apply Data Subset ---
-df2_An03_03_Sex_Summ_ByTrt <- df_pop
+df2_An03_03_Sex_Summ_ByTrt <- df_poptot
 
 #Apply Method --- 
 
@@ -282,7 +282,7 @@ df3_An03_03_Sex_Summ_ByTrt <- siera::ars_stamp(
 # Analysis An03_03_Sex_Comp_ByTrt----
 #Comparison of Sex by Treatment
 #Apply Data Subset ---
-df2_An03_03_Sex_Comp_ByTrt <- df_pop
+df2_An03_03_Sex_Comp_ByTrt <- df_poptot
 
 #Apply Method --- 
 
@@ -310,7 +310,7 @@ df3_An03_03_Sex_Comp_ByTrt <- siera::ars_stamp(
 # Analysis An03_04_Ethnic_Summ_ByTrt----
 #Summary of Subjects by Treatment and Ethnicity
 #Apply Data Subset ---
-df2_An03_04_Ethnic_Summ_ByTrt <- df_pop
+df2_An03_04_Ethnic_Summ_ByTrt <- df_poptot
 
 #Apply Method --- 
 
@@ -370,7 +370,7 @@ df3_An03_04_Ethnic_Summ_ByTrt <- siera::ars_stamp(
 # Analysis An03_04_Ethnic_Comp_ByTrt----
 #Comparison of Ethnicity by Treatment
 #Apply Data Subset ---
-df2_An03_04_Ethnic_Comp_ByTrt <- df_pop
+df2_An03_04_Ethnic_Comp_ByTrt <- df_poptot
 
 #Apply Method --- 
 
@@ -398,7 +398,7 @@ df3_An03_04_Ethnic_Comp_ByTrt <- siera::ars_stamp(
 # Analysis An03_05_Race_Summ_ByTrt----
 #Summary of Subjects by Treatment and Race
 #Apply Data Subset ---
-df2_An03_05_Race_Summ_ByTrt <- df_pop
+df2_An03_05_Race_Summ_ByTrt <- df_poptot
 
 #Apply Method --- 
 
@@ -465,7 +465,7 @@ df3_An03_05_Race_Summ_ByTrt <- siera::ars_stamp(
 # Analysis An03_05_Race_Comp_ByTrt----
 #Comparison of Race by Treatment
 #Apply Data Subset ---
-df2_An03_05_Race_Comp_ByTrt <- df_pop
+df2_An03_05_Race_Comp_ByTrt <- df_poptot
 
 #Apply Method --- 
 
@@ -493,7 +493,7 @@ df3_An03_05_Race_Comp_ByTrt <- siera::ars_stamp(
 # Analysis An03_06_Height_Summ_ByTrt----
 #Summary of Height by Treatment
 #Apply Data Subset ---
-df2_An03_06_Height_Summ_ByTrt <- df_pop
+df2_An03_06_Height_Summ_ByTrt <- df_poptot
 
 #Apply Method --- 
 
@@ -537,7 +537,7 @@ df3_An03_06_Height_Summ_ByTrt <- siera::ars_stamp(
 # Analysis An03_06_Height_Comp_ByTrt----
 #Comparison of Height by Treatment
 #Apply Data Subset ---
-df2_An03_06_Height_Comp_ByTrt <- df_pop
+df2_An03_06_Height_Comp_ByTrt <- df_poptot
 
 #Apply Method --- 
 

@@ -51,7 +51,7 @@ The ARS metadata contains all ARS information for the Reporting Event. This info
 - _mainListOfContents_ (links outputs to their respective analyses)
 - _otherListsOfContents_ (contains Output metadata)
 - _dataSubsets_ (filters data for individual analyses)
-- _analysisSets_ (filters data to get the Population Set for the Output)
+- _analysisSets_ (filters data to get the Population Set for each analysis)
 - _analysisGroupings_ (groups data according to analysis specifications)
 - _analyses_ (contains linking information to all components required for calculation of results)
 - _methods_ (describes operations to be performed on data to get results)

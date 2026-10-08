@@ -1,193 +1,81 @@
-get_analysis_set_code <- function(...) {
-  siera:::`.generate_analysis_set_code`(...)
-}
+# Tests for .generate_population_code() / .resolve_analysis_set() (#197):
+# populations are derived per analysis from metadata, never from the position
+# of an analysis within its output.
 
-make_analysis_sets <- function(...) {
-  tibble::tibble(...)
-}
-
-make_analyses <- function(...) {
-  tibble::tibble(...)
-}
-
-make_anas <- function(...) {
-  tibble::tibble(...)
+pop_code <- function(...) {
+  siera:::`.generate_population_code`(...)
 }
 
 expect_code_lines <- function(code, expected) {
   lines <- strsplit(code, "\n", fixed = TRUE)[[1]]
-
   if (length(lines) > 0 && lines[[1]] == "") {
     lines <- lines[-1]
   }
-
   testthat::expect_equal(lines, expected)
 }
 
-test_that("non-first analyses do not generate analysis set code", {
-  result <- get_analysis_set_code(
-    j = 2,
-    analysis_sets = NULL,
-    analyses = NULL,
-    anas = NULL,
-    analysis_set_id = "AS1",
-    analysis_id = "AN1"
+saf_set <- function(id = "AS1", dataset = "ADSL", variable = "SAFFL",
+                    comparator = "EQ", value = "Y", name = "Safety") {
+  tibble::tibble(
+    id = id,
+    condition_dataset = dataset,
+    condition_variable = variable,
+    condition_comparator = comparator,
+    condition_value = value,
+    name = name
   )
+}
 
-  expect_equal(result$code, "")
-  expect_equal(result$data_subset, "df_pop")
-})
+trt_grouping <- tibble::tibble(
+  id = c("AG_TRT", "AG_SOC", "AG_PARAM"),
+  groupingDataset = c("ADSL", "ADAE", "ADLB")
+)
 
-test_that("missing analysis set id triggers a warning and fallback code", {
-  analysis_sets <- make_analysis_sets(
-    id = "AS1",
-    condition_dataset = "ADSL",
-    condition_variable = "SAFFL",
-    condition_comparator = "EQ",
-    condition_value = "Y",
-    name = "Safety"
-  )
+subsets <- tibble::tibble(
+  id = c("DS_TEAE", "DS_LB"),
+  condition_dataset = c("ADAE", "ADLB")
+)
 
-  analyses <- make_analyses(
-    id = "AN1",
-    dataset = "ADSL"
-  )
+anas_for <- function(ids) tibble::tibble(listItem_analysisId = ids)
 
-  anas <- make_anas(
-    listItem_analysisId = c("AN1", "AN1", "AN1")
-  )
-
-  expect_warning(
-    result <- get_analysis_set_code(
-      j = 1,
-      analysis_sets = analysis_sets,
-      analyses = analyses,
-      anas = anas,
-      analysis_set_id = NA_character_,
-      analysis_id = "AN1"
-    ),
-    "missing an analysisSetId"
-  )
-
-  expected_lines <- c(
-    "# Apply Analysis Set ---",
-    "df_pop <- ADSL",
-    "df_poptot <- df_pop"
-  )
-
-  expect_code_lines(result$code, expected_lines)
-  expect_equal(result$data_subset, "df_poptot")
-})
-
-test_that("missing analysis set components warn the user and fall back", {
-  analysis_sets <- make_analysis_sets(
-    id = "AS1",
-    condition_dataset = "ADSL",
-    condition_variable = NA_character_,
-    condition_comparator = "EQ",
-    condition_value = "Y",
-    name = "Safety"
-  )
-
-  analyses <- make_analyses(
+test_that("single set on the analysis dataset: one filter, subject-level frames", {
+  analyses <- tibble::tibble(
     id = c("AN1", "AN2"),
-    dataset = c("ADSL", "ADSL")
+    dataset = c("ADSL", "ADSL"),
+    variable = c("USUBJID", "AGE"),
+    analysisSetId = "AS1",
+    groupingId1 = "AG_TRT",
+    dataSubsetId = NA_character_
   )
 
-  anas <- make_anas(
-    listItem_analysisId = c("AN1", "AN2", "AN1")
-  )
+  res <- pop_code(anas_for(c("AN1", "AN2")), analyses, saf_set(), trt_grouping, subsets)
 
-  expect_warning(
-    result <- get_analysis_set_code(
-      j = 1,
-      analysis_sets = analysis_sets,
-      analyses = analyses,
-      anas = anas,
-      analysis_set_id = "AS1",
-      analysis_id = "AN1"
-    ),
-    "missing condition variable"
-  )
-
-  expected_lines <- c(
-    "# Apply Analysis Set ---",
-    "df_pop <- ADSL",
-    "df_poptot <- df_pop"
-  )
-
-  expect_code_lines(result$code, expected_lines)
-  expect_equal(result$data_subset, "df_poptot")
-})
-
-test_that("analysis set code is generated when population comes from same dataset", {
-  analysis_sets <- make_analysis_sets(
-    id = "AS1",
-    condition_dataset = "ADSL",
-    condition_variable = "SAFFL",
-    condition_comparator = "EQ",
-    condition_value = "Y",
-    name = "Safety"
-  )
-
-  analyses <- make_analyses(
-    id = c("AN1", "AN2"),
-    dataset = c("ADSL", "ADAE")
-  )
-
-  anas <- make_anas(
-    listItem_analysisId = c("AN1", "AN2", "AN1")
-  )
-
-  result <- get_analysis_set_code(
-    j = 1,
-    analysis_sets = analysis_sets,
-    analyses = analyses,
-    anas = anas,
-    analysis_set_id = "AS1",
-    analysis_id = "AN1"
-  )
-
-  expected_lines <- c(
+  expect_code_lines(res$code, c(
     "# Apply Analysis Set ---",
     "df_pop <- dplyr::filter(ADSL,",
     "            SAFFL == 'Y')",
     "df_poptot <- df_pop"
-  )
-
-  expect_code_lines(result$code, expected_lines)
-  expect_equal(result$data_subset, "df_poptot")
+  ))
+  expect_equal(res$frames, c(AN1 = "df_poptot", AN2 = "df_poptot"))
+  expect_equal(res$poptot, c(AN1 = "df_poptot", AN2 = "df_poptot"))
 })
 
-test_that("analysis set code merges companion dataset when needed", {
-  analysis_sets <- make_analysis_sets(
-    id = "AS2",
-    condition_dataset = "ADSL",
-    condition_variable = "SAFFL",
-    condition_comparator = "EQ",
-    condition_value = "Y",
-    name = "Safety"
+test_that("content analyses merge, while a bigN declared on ADAE stays subject-level", {
+  # In the eTFL AE tables the bigN analysis declares dataset = ADAE with
+  # variable USUBJID; it must still count every subject in the population.
+  analyses <- tibble::tibble(
+    id = c("BIGN", "TEAE", "SOC"),
+    dataset = "ADAE",
+    variable = "USUBJID",
+    analysisSetId = "AS1",
+    groupingId1 = "AG_TRT",
+    groupingId2 = c(NA, NA, "AG_SOC"),
+    dataSubsetId = c(NA, "DS_TEAE", NA)
   )
 
-  analyses <- make_analyses(
-    id = c("AN1", "AN2"),
-    dataset = c("ADSL", "ADAE")
-  )
+  res <- pop_code(anas_for(analyses$id), analyses, saf_set(), trt_grouping, subsets)
 
-  anas <- make_anas(
-    listItem_analysisId = c("AN1", "AN2", "AN2")
-  )
-
-  result <- get_analysis_set_code(
-    j = 1,
-    analysis_sets = analysis_sets,
-    analyses = analyses,
-    anas = anas,
-    analysis_set_id = "AS2",
-    analysis_id = "AN1"
-  )
-
-  expected_lines <- c(
+  expect_code_lines(res$code, c(
     "# Apply Analysis Set ---",
     "overlap <- intersect(names(ADSL), names(ADAE))",
     "overlapfin <- setdiff(overlap, 'USUBJID')",
@@ -198,80 +86,214 @@ test_that("analysis set code merges companion dataset when needed", {
     "                  all = FALSE)",
     "df_poptot = dplyr::filter(ADSL,",
     "            SAFFL == 'Y')"
-  )
-
-  expect_code_lines(result$code, expected_lines)
-  expect_equal(result$data_subset, "df_poptot")
+  ))
+  # subset on ADAE and grouping on ADAE both need the merged frame
+  expect_equal(res$frames, c(BIGN = "df_poptot", TEAE = "df_pop", SOC = "df_pop"))
 })
 
-test_that("condition value containing regex special characters is preserved verbatim", {
-  # Without fixed = TRUE the replacement string can interact unexpectedly with
-  # regex back-references. A value like "Y(1)" contains "(" which is a regex
-  # metacharacter; with fixed = TRUE it is treated as a literal string.
-  analysis_sets <- make_analysis_sets(
-    id = "AS4",
-    condition_dataset = "ADSL",
-    condition_variable = "TRTGRP",
-    condition_comparator = "EQ",
-    condition_value = "A (High)",
-    name = "TrtGroup"
+test_that("a second bigN anywhere in the output gets the subject-level frame", {
+  # e.g. a Total treatment column: two population counts, not by position
+  analyses <- tibble::tibble(
+    id = c("TEAE", "BIGN", "BIGN_TOT"),
+    dataset = "ADAE",
+    variable = "USUBJID",
+    analysisSetId = "AS1",
+    groupingId1 = c("AG_TRT", "AG_TRT", NA),
+    dataSubsetId = c("DS_TEAE", NA, NA)
   )
 
-  analyses <- make_analyses(
-    id = c("AN1", "AN2"),
-    dataset = c("ADSL", "ADSL")
-  )
+  res <- pop_code(anas_for(analyses$id), analyses, saf_set(), trt_grouping, subsets)
 
-  anas <- make_anas(
-    listItem_analysisId = c("AN1", "AN2", "AN1")
+  expect_equal(
+    res$frames,
+    c(TEAE = "df_pop", BIGN = "df_poptot", BIGN_TOT = "df_poptot")
   )
-
-  result <- get_analysis_set_code(
-    j = 1,
-    analysis_sets = analysis_sets,
-    analyses = analyses,
-    anas = anas,
-    analysis_set_id = "AS4",
-    analysis_id = "AN1"
-  )
-
-  expect_true(grepl("A (High)", result$code, fixed = TRUE))
 })
 
-test_that("missing condition values are replaced with empty strings", {
-  analysis_sets <- make_analysis_sets(
-    id = "AS3",
-    condition_dataset = "ADSL",
-    condition_variable = "SAFFL",
-    condition_comparator = "EQ",
-    condition_value = NA_character_,
-    name = "Safety"
+test_that("a non-USUBJID variable on a content dataset needs the merged frame", {
+  analyses <- tibble::tibble(
+    id = c("BIGN", "AVAL"),
+    dataset = c("ADSL", "ADEXSUM"),
+    variable = c("USUBJID", "AVAL"),
+    analysisSetId = "AS1",
+    groupingId1 = "AG_TRT",
+    dataSubsetId = NA_character_
   )
 
-  analyses <- make_analyses(
-    id = c("AN1", "AN2"),
-    dataset = c("ADSL", "ADSL")
+  res <- pop_code(anas_for(analyses$id), analyses, saf_set(), trt_grouping, subsets)
+
+  expect_match(res$code, "merge(ADEXSUM", fixed = TRUE)
+  expect_equal(res$frames, c(BIGN = "df_poptot", AVAL = "df_pop"))
+})
+
+test_that("one set merged onto two content datasets gets one frame per dataset", {
+  analyses <- tibble::tibble(
+    id = c("BIGN", "AE", "LB"),
+    dataset = c("ADSL", "ADAE", "ADLB"),
+    variable = "USUBJID",
+    analysisSetId = "AS1",
+    groupingId1 = "AG_TRT",
+    dataSubsetId = c(NA, "DS_TEAE", "DS_LB")
   )
 
-  anas <- make_anas(
-    listItem_analysisId = c("AN1", "AN2", "AN1")
+  res <- pop_code(anas_for(analyses$id), analyses, saf_set(), trt_grouping, subsets)
+
+  expect_equal(res$frames, c(BIGN = "df_poptot", AE = "df_pop__ADAE", LB = "df_pop__ADLB"))
+  expect_match(res$code, "df_pop__ADAE <- dplyr::filter(ADSL,", fixed = TRUE)
+  expect_match(res$code, "merge(ADAE |>", fixed = TRUE)
+  expect_match(res$code, "df_pop__ADLB <- dplyr::filter(ADSL,", fixed = TRUE)
+  expect_match(res$code, "merge(ADLB |>", fixed = TRUE)
+  expect_match(res$code, "df_poptot = dplyr::filter(ADSL,", fixed = TRUE)
+})
+
+test_that("an analysis touching two content datasets aborts", {
+  analyses <- tibble::tibble(
+    id = "AN1",
+    dataset = "ADAE",
+    variable = "USUBJID",
+    analysisSetId = "AS1",
+    groupingId1 = "AG_PARAM",
+    dataSubsetId = "DS_TEAE"
   )
 
-  result <- get_analysis_set_code(
-    j = 1,
-    analysis_sets = analysis_sets,
-    analyses = analyses,
-    anas = anas,
-    analysis_set_id = "AS3",
-    analysis_id = "AN1"
+  expect_error(
+    pop_code(anas_for("AN1"), analyses, saf_set(), trt_grouping, subsets),
+    "more than one dataset"
+  )
+})
+
+test_that("each analysis set gets its own suffixed frames", {
+  sets <- dplyr::bind_rows(
+    saf_set("AS_ALL", variable = "ARM", comparator = "NE", value = "",
+            name = "  All Subjects\n[1]"),
+    saf_set("AS_PP", variable = "PPROTFL", name = NA_character_)
+  )
+  analyses <- tibble::tibble(
+    id = c("AN1", "AN2", "AN3"),
+    dataset = "ADSL",
+    variable = "USUBJID",
+    analysisSetId = c("AS_ALL", "AS_PP", "AS_ALL"),
+    groupingId1 = "AG_TRT",
+    dataSubsetId = NA_character_
   )
 
-  expected_lines <- c(
+  res <- pop_code(anas_for(analyses$id), analyses, sets, trt_grouping, subsets)
+
+  expect_code_lines(res$code, c(
     "# Apply Analysis Set ---",
-    "df_pop <- dplyr::filter(ADSL,",
-    "            SAFFL == '')",
-    "df_poptot <- df_pop"
+    "# Analysis set: AS_ALL - All Subjects [1]",
+    "df_pop__AS_ALL <- dplyr::filter(ADSL,",
+    "            ARM != '')",
+    "df_poptot__AS_ALL <- df_pop__AS_ALL",
+    "",
+    "# Analysis set: AS_PP",
+    "df_pop__AS_PP <- dplyr::filter(ADSL,",
+    "            PPROTFL == 'Y')",
+    "df_poptot__AS_PP <- df_pop__AS_PP"
+  ))
+  expect_equal(
+    res$frames,
+    c(AN1 = "df_poptot__AS_ALL", AN2 = "df_poptot__AS_PP", AN3 = "df_poptot__AS_ALL")
+  )
+  expect_equal(res$poptot, res$frames)
+})
+
+test_that("a missing analysis set id warns and falls back to the unfiltered dataset", {
+  analyses <- tibble::tibble(id = "AN1", dataset = "ADSL")
+
+  expect_warning(
+    res <- pop_code(anas_for("AN1"), analyses, saf_set()),
+    "missing an analysisSetId"
+  )
+  # historical fallback layout: no leading blank line
+  expect_equal(res$code, "# Apply Analysis Set ---\ndf_pop <- ADSL\ndf_poptot <- df_pop\n")
+  expect_equal(res$frames, c(AN1 = "df_poptot"))
+})
+
+test_that("a set-less analysis alongside a real set is named 'unspecified'", {
+  analyses <- tibble::tibble(
+    id = c("AN1", "AN2"),
+    dataset = c("ADSL", "ADAE"),
+    variable = c("USUBJID", "AETERM"),
+    analysisSetId = c("AS1", NA)
   )
 
-  expect_code_lines(result$code, expected_lines)
+  expect_warning(
+    res <- pop_code(anas_for(analyses$id), analyses, saf_set()),
+    "AN2: Analysis is missing an analysisSetId"
+  )
+  expect_match(res$code, "# Analysis set: (none)", fixed = TRUE)
+  # unfiltered fallback populations are never merged
+  expect_match(res$code, "df_pop__unspecified <- ADAE", fixed = TRUE)
+  expect_equal(res$frames, c(AN1 = "df_poptot__AS1", AN2 = "df_poptot__unspecified"))
+})
+
+test_that("an analysis absent from the Analyses metadata falls back without a dataset", {
+  expect_warning(
+    res <- pop_code(anas_for("GHOST"), tibble::tibble(id = "AN1", dataset = "ADSL"), saf_set()),
+    "missing an analysisSetId"
+  )
+  expect_match(res$code, "df_pop <- df_pop", fixed = TRUE)
+})
+
+test_that("absent AnalysisSets metadata warns and falls back", {
+  analyses <- tibble::tibble(id = "AN1", dataset = "ADSL", analysisSetId = "AS1")
+  expect_warning(
+    res <- pop_code(anas_for("AN1"), analyses, NULL),
+    "AnalysisSets metadata not supplied"
+  )
+  expect_match(res$code, "df_pop <- ADSL", fixed = TRUE)
+})
+
+test_that("an unknown analysis set id warns and falls back", {
+  analyses <- tibble::tibble(id = "AN1", dataset = "ADSL", analysisSetId = "AS_NOPE")
+  expect_warning(
+    pop_code(anas_for("AN1"), analyses, saf_set()),
+    "AnalysisSet AS_NOPE not found"
+  )
+})
+
+test_that("missing analysis set components warn the user and fall back", {
+  analyses <- tibble::tibble(id = "AN1", dataset = "ADSL", analysisSetId = "AS1")
+  expect_warning(
+    res <- pop_code(anas_for("AN1"), analyses, saf_set(variable = NA_character_)),
+    "missing condition variable"
+  )
+  expect_match(res$code, "df_pop <- ADSL", fixed = TRUE)
+})
+
+test_that("comparators are translated and odd values are preserved", {
+  analyses <- tibble::tibble(id = "AN1", dataset = "ADSL", analysisSetId = "AS1")
+  cmp <- function(comparator, value = "1") {
+    pop_code(anas_for("AN1"), analyses,
+             saf_set(variable = "X", comparator = comparator, value = value))$code
+  }
+  expect_match(cmp("GE"), "X >= '1'", fixed = TRUE)
+  expect_match(cmp("GT"), "X > '1'", fixed = TRUE)
+  expect_match(cmp("LE"), "X <= '1'", fixed = TRUE)
+  expect_match(cmp("LT"), "X < '1'", fixed = TRUE)
+  expect_match(cmp("NE"), "X != '1'", fixed = TRUE)
+  # unknown comparators pass through unchanged
+  expect_match(cmp("%in%"), "X %in% '1'", fixed = TRUE)
+  # regex metacharacters are kept literally
+  expect_match(cmp("EQ", "A (High)"), "X == 'A (High)'", fixed = TRUE)
+  # a missing value becomes an empty string
+  expect_match(cmp("EQ", NA_character_), "X == ''", fixed = TRUE)
+})
+
+test_that("a NULL list-column condition value and a nameless set are handled", {
+  sets <- tibble::tibble(
+    id = c("AS1", "AS2"),
+    condition_dataset = "ADSL",
+    condition_variable = c("SAFFL", "ITTFL"),
+    condition_comparator = "EQ",
+    condition_value = list(NULL, "Y")
+  )
+  analyses <- tibble::tibble(
+    id = c("AN1", "AN2"), dataset = "ADSL", analysisSetId = c("AS1", "AS2")
+  )
+
+  res <- pop_code(anas_for(analyses$id), analyses, sets)
+  expect_match(res$code, "SAFFL == ''", fixed = TRUE)
+  expect_match(res$code, "# Analysis set: AS2\n", fixed = TRUE)
 })

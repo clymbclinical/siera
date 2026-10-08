@@ -53,7 +53,7 @@ ARS metadata describes a whole reporting event, but _siera_ only needs seven sec
 |---|---|
 | _mainListOfContents_ | Links each Output to its analyses, and sets the row order and indentation of the table stub. |
 | _otherListsOfContents_ | Supplies Output-level metadata (the list of planned outputs). |
-| _analysisSets_ | Defines the population filter for the Output (e.g. Safety Population, `SAFFL == "Y"`). |
+| _analysisSets_ | Defines a population filter (e.g. Safety Population, `SAFFL == "Y"`). Each analysis names its own, so one output can report several populations. |
 | _dataSubsets_ | Adds row-level filters for individual analyses (e.g. serious, treatment-emergent AEs). |
 | _analysisGroupings_ | Defines the columns/subgroups results are split by (e.g. treatment arm), including data-driven groupings discovered at run time. |
 | _analyses_ | Ties everything together for one calculation: which method, population, subset and groupings apply. |
