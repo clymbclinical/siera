@@ -641,6 +641,12 @@ test_that("ARD values - Common_Safety_Displays_cards", {
         select(stat) %>%
         unlist()
       expect_equal(unname(ge65), c(72, 73, 76))
+      # ... and its rows are labelled with the group's name, not with one of
+      # its two data values (#232)
+      ge65_level <- ARD %>%
+        filter(AnalysisId == "An03_02_AgeGrp_Summ_ByTrt",
+               group2_groupId == "AnlsGrouping_03_AgeGp_2")
+      expect_true(all(ge65_level$group2_level == "≥ 65 years"))
 
       # ... and every one of the 9 defined race groups is reported per arm,
       # with zero counts for the groups that do not occur in an arm

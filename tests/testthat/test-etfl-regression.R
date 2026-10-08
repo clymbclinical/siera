@@ -213,15 +213,24 @@ test_that("fda-ae-t06 AE summary: bigN, n%, and per-category RD match spec (#171
   .expect_all_match(.cmp_predefined_npct(
     ard, "fda-ae-t06", "An_47_1",
     subset_fun = function(d) dplyr::filter(d, !(AEACN %in% c("NOT APPLICABLE", "DOSE NOT CHANGED"))),
-    cat_var = "AEACN", arms = c(1, 2, 3), cats = aeacn_groups))
+    cat_var = "AEACN", arms = c(1, 2, 3), cats = aeacn_groups,
+    cat_ids = sprintf("AnlsGrouping_24_Aeacn_%02d", 1:4)))
 
   # The defined-but-absent groups really are zero-filled, and every row carries
   # CDISC group metadata for BOTH groupings (n_group_cols = num_grp).
   an47_1 <- ard |> dplyr::filter(AnalysisId == "An_47_1")
   expect_equal(
-    sum(.etfl_safe_stat(an47_1$stat)[an47_1$group2_level %in% c("DOSE DELAY", "OTHER")]),
+    sum(.etfl_safe_stat(an47_1$stat)[an47_1$group2_groupId %in%
+                                       c("AnlsGrouping_24_Aeacn_03", "AnlsGrouping_24_Aeacn_04")]),
     0
   )
+  expect_identical(sum(an47_1$group2_groupId %in%
+                         c("AnlsGrouping_24_Aeacn_03", "AnlsGrouping_24_Aeacn_04")), 12L)
+  # rows are labelled with the group names (#232)
+  expect_setequal(unique(an47_1$group2_level),
+                  c("AE leading to interruption of study drug",
+                    "AE leading to reduction of study drug",
+                    "AE leading to dose delay of study drug", "Other"))
   expect_true(all(an47_1$group2_groupingId == "AnlsGrouping_24_Aeacn"))
   expect_false(any(is.na(an47_1$group1_groupId) | is.na(an47_1$group2_groupId)))
 })

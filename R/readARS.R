@@ -416,6 +416,10 @@ readARS <- function(ARS_path,
         analysis_method_code_template = AnalysisMethodCodeTemplate,
         analysis_method_code_parameters = AnalysisMethodCodeParameters
       )
+      stamp_by_name <- .stamp_by_name(
+        n_group_cols, methodid, AnalysisMethodCodeTemplate,
+        AnalysisMethodCodeParameters
+      )
 
       # Generate code for analysis ----------------------------------------------
 
@@ -435,7 +439,8 @@ readARS <- function(ARS_path,
             groupids           = groupids,
             n_group_cols       = n_group_cols,
             AG_dataDriven      = AG_dataDriven,
-            analysis_groupings = AnalysisGroupings
+            analysis_groupings = AnalysisGroupings,
+            stamp_by_name      = stamp_by_name
           )
         )
       } else {
@@ -445,7 +450,8 @@ readARS <- function(ARS_path,
           n_group_cols       = n_group_cols,
           AG_dataDriven      = AG_dataDriven,
           analysis_groupings = AnalysisGroupings,
-          population_based   = population_based
+          population_based   = population_based,
+          stamp_by_name      = stamp_by_name
         )
 
         # Coerce *_level columns (variable_level, group[n]_level) to character on
@@ -522,7 +528,8 @@ readARS <- function(ARS_path,
 # dataDriven).
 .generate_groupid_code <- function(analysis_id, groupids, n_group_cols,
                                    AG_dataDriven, analysis_groupings,
-                                   population_based = FALSE) {
+                                   population_based = FALSE,
+                                   stamp_by_name = logical(0)) {
   if (n_group_cols < 1L) return("")
 
   mutate_parts <- character(0)
@@ -539,7 +546,8 @@ readARS <- function(ARS_path,
 
     gpval_col <- paste0("group", k, "_groupValue")
 
-    spec <- .grouping_stamp_spec(gid, AG_dataDriven[k], analysis_groupings)
+    spec <- .grouping_stamp_spec(gid, AG_dataDriven[k], analysis_groupings,
+                                 by_name = isTRUE(stamp_by_name[k]))
 
     if (spec$data_driven) {
       mutate_parts <- c(mutate_parts,
@@ -582,11 +590,15 @@ readARS <- function(ARS_path,
 }
 
 # What the ID-linking step needs to know about one grouping: whether it is
-# data-driven and, for pre-defined groupings, the group ids and condition values
-# (one entry per condition value, so IN conditions repeat the group id). Shared
-# by the expanded generator (.generate_groupid_code()) and the wrapped one
+# data-driven and, for pre-defined groupings, the group ids and the level values
+# that identify them. By default those are the condition values (one entry per
+# value, so IN conditions repeat the group id). With `by_name = TRUE`, for a
+# grouping whose levels a template takes from AG_var<n>_group_conditions /
+# _levels, they are the group levels (.group_level(): the group names, #232).
+# Shared by the expanded generator (.generate_groupid_code()) and the wrapped one
 # (.generate_stamp_code()), so both styles stamp the same groups by construction.
-.grouping_stamp_spec <- function(gid, data_driven, analysis_groupings) {
+.grouping_stamp_spec <- function(gid, data_driven, analysis_groupings,
+                                 by_name = FALSE) {
   data_driven <- isTRUE(as.logical(data_driven))
   values <- character(0)
   group_ids <- character(0)
@@ -596,17 +608,38 @@ readARS <- function(ARS_path,
       analysis_groupings$id == gid &
         !is.na(analysis_groupings$group_id) &
         nchar(as.character(analysis_groupings$group_id)) > 0, ]
-    values <- as.character(grp_rows$group_condition_value)
-    group_ids <- grp_rows$group_id
+    if (by_name) {
+      group_ids <- unique(as.character(grp_rows$group_id))
+      values <- vapply(group_ids, function(g) {
+        .group_level(grp_rows[grp_rows$group_id == g, , drop = FALSE])
+      }, character(1L), USE.NAMES = FALSE)
+    } else {
+      values <- as.character(grp_rows$group_condition_value)
+      group_ids <- grp_rows$group_id
+    }
   }
 
   list(id = gid, data_driven = data_driven, values = values, group_ids = group_ids)
 }
 
-# Escape single quotes so a value can sit inside a single-quoted R literal in
-# generated code.
+# Escape a value so it can sit inside a single-quoted R literal in generated
+# code: backslashes, single quotes and line breaks, and non-ASCII characters as
+# \u escapes so the script is portable whatever the reader's encoding (ARS group
+# names carry text such as "Placebo\n(N=XX)" or "≥ 65 years", #232).
 .escape_single_quote <- function(x) {
-  gsub("'", "\\'", x, fixed = TRUE)
+  x <- gsub("\\", "\\\\", x, fixed = TRUE)
+  x <- gsub("'", "\\'", x, fixed = TRUE)
+  x <- gsub("\n", "\\n", x, fixed = TRUE)
+  x <- gsub("\r", "\\r", x, fixed = TRUE)
+  x <- gsub("\t", "\\t", x, fixed = TRUE)
+  vapply(x, function(s) {
+    if (is.na(s)) return(s)
+    cp <- utf8ToInt(enc2utf8(s))
+    if (anyNA(cp) || all(cp < 128L)) return(s)
+    paste(vapply(cp, function(k) {
+      if (k < 128L) intToUtf8(k) else if (k <= 0xFFFF) sprintf("\\u%04X", k) else sprintf("\\U{%X}", k)
+    }, character(1L)), collapse = "")
+  }, character(1L), USE.NAMES = FALSE)
 }
 
 # Generate the "Link ARS identifiers" step of the wrapped code style: one
@@ -616,7 +649,8 @@ readARS <- function(ARS_path,
 # .n_group_cols_from_template()); the groupings argument is omitted when it is 0.
 .generate_stamp_code <- function(analysis_id, method_id, output_id, groupids,
                                  n_group_cols, AG_dataDriven,
-                                 analysis_groupings) {
+                                 analysis_groupings,
+                                 stamp_by_name = logical(0)) {
   df3 <- paste0("df3_", analysis_id)
   lit <- function(x) paste0("'", .escape_single_quote(x), "'")
   has_groupings <- n_group_cols >= 1L
@@ -646,7 +680,8 @@ readARS <- function(ARS_path,
   if (has_groupings) {
     grouping_calls <- vapply(seq_len(n_group_cols), function(k) {
       spec <- .grouping_stamp_spec(groupids[k], AG_dataDriven[k],
-                                   analysis_groupings)
+                                   analysis_groupings,
+                                   by_name = isTRUE(stamp_by_name[k]))
       if (spec$data_driven) {
         paste0("    siera::ars_grouping(", lit(spec$id), ", data_driven = TRUE)")
       } else if (length(spec$group_ids) == 0L) {
@@ -691,6 +726,43 @@ readARS <- function(ARS_path,
                                         analysis_method_code_parameters) {
   if (num_grp == 0L) return(0L)
 
+  active_sources <- .template_value_sources(
+    method_id, analysis_method_code_template, analysis_method_code_parameters
+  )
+
+  # A template driven by pre-defined group conditions (#187, #227) puts the
+  # grouping into variables= like by_vars does, but then renames the resulting
+  # variable_level to group[n]_level itself, so it does produce a full set of
+  # group columns.
+  if (any(active_sources %in% c("AG_var1_group_conditions", "AG_var2_group_conditions"))) {
+    num_grp
+  } else if (any(active_sources %in% c("by_vars", "strata_vars"))) {
+    max(0L, num_grp - 1L)
+  } else if (any(active_sources == "by_listc")) {
+    num_grp
+  } else {
+    0L
+  }
+}
+
+# For each of a method's n groupings, whether its group[n]_level values are the
+# group levels from AG_var<n>_group_conditions / _levels (the ARS group names,
+# #232) rather than data values, so the group-id stamp must match on names.
+.stamp_by_name <- function(n, method_id, analysis_method_code_template,
+                           analysis_method_code_parameters) {
+  active_sources <- .template_value_sources(
+    method_id, analysis_method_code_template, analysis_method_code_parameters
+  )
+  vapply(seq_len(n), function(k) {
+    any(active_sources %in% paste0("AG_var", k, c("_group_conditions", "_group_levels")))
+  }, logical(1L))
+}
+
+# The valueSources of the parameters whose placeholder token actually appears in
+# a method's R code template.
+.template_value_sources <- function(method_id,
+                                    analysis_method_code_template,
+                                    analysis_method_code_parameters) {
   mid <- method_id
 
   template_code <- analysis_method_code_template |>
@@ -714,21 +786,7 @@ readARS <- function(ARS_path,
     function(p) grepl(p, template_code, fixed = TRUE),
     logical(1L)
   )
-  active_sources <- params$parameter_valueSource[in_template]
-
-  # A template driven by pre-defined group conditions (#187, #227) puts the
-  # grouping into variables= like by_vars does, but then renames the resulting
-  # variable_level to group[n]_level itself, so it does produce a full set of
-  # group columns.
-  if (any(active_sources %in% c("AG_var1_group_conditions", "AG_var2_group_conditions"))) {
-    num_grp
-  } else if (any(active_sources %in% c("by_vars", "strata_vars"))) {
-    max(0L, num_grp - 1L)
-  } else if (any(active_sources == "by_listc")) {
-    num_grp
-  } else {
-    0L
-  }
+  params$parameter_valueSource[in_template]
 }
 
 # Resolve the AG_var2_group_values valueSource: a quoted, comma-separated list
@@ -802,12 +860,13 @@ readARS <- function(ARS_path,
 #                order, for use as factor levels (this is what makes cards
 #                zero-fill the groups that no data value satisfies)
 #
-# The level of a group is its FIRST condition value, which keeps it a real data
-# value: siera's own group-id stamping (.generate_groupid_code) maps every
-# condition value of a group to that group's id, so the level resolves back to
-# the correct group[n]_groupId. Only EQ and IN conditions define a group as a
-# set of data values that way, so other comparators are skipped with a warning,
-# as they are for AG_var2_group_values.
+# The level of a group is its ARS group NAME (.group_level(); #232), so a group
+# covering several values reads as one category (">= 65 years", not "65-80").
+# The group-id stamping of a grouping whose levels come from here maps those
+# names to group ids (.grouping_stamp_spec(by_name = TRUE)), so the level still
+# resolves to the correct group[n]_groupId. Only EQ and IN conditions define a
+# group as a set of data values, so other comparators are skipped with a
+# warning, as they are for AG_var2_group_values.
 .ag_group_conditions <- function(analysis_groupings, grouping_id,
                                  value_source = "AG_var2_group_conditions") {
   gid <- grouping_id
@@ -868,13 +927,14 @@ readARS <- function(ARS_path,
       next
     }
 
-    level <- gsub("'", "\\'", values[1], fixed = TRUE)
-    # Sibling groups must be disjoint; two groups sharing a first value would
+    level_raw <- .group_level(rows)
+    level <- .escape_single_quote(level_raw)
+    # Sibling groups need distinct levels; two groups sharing one would
     # otherwise fail inside factor() at script runtime with a cryptic message.
     if (paste0("'", level, "'") %in% group_levels) {
       cli::cli_abort(c(
-        "{value_source}: groups of grouping {.val {gid}} share the level {.val {level}}.",
-        "i" = "Groups within a grouping must be mutually exclusive; check the group conditions."
+        "{value_source}: groups of grouping {.val {gid}} share the level {.val {level_raw}}.",
+        "i" = "Groups within a grouping need distinct names; check the group names and conditions."
       ))
     }
     conditions <- c(conditions, paste0(condition, " ~ '", level, "'"))
@@ -896,4 +956,15 @@ readARS <- function(ARS_path,
     conditions = paste(conditions, collapse = ",\n      "),
     levels     = paste(group_levels, collapse = ", ")
   )
+}
+
+# The level of one pre-defined group (the AnalysisGroupings rows of a single
+# group_id) for templates that aggregate per group condition (#232): the ARS
+# group name, or its first condition value when the group has no name.
+.group_level <- function(rows) {
+  name <- if ("group_name" %in% names(rows)) as.character(rows$group_name[1]) else NA
+  if (is.na(name) || !nzchar(trimws(name))) {
+    name <- as.character(rows$group_condition_value[1])
+  }
+  name
 }
