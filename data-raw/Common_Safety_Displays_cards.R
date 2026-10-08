@@ -67,8 +67,8 @@ method$description <- paste(
 )
 method$operations <- lapply(method$operations, function(op) {
   op$id <- rename(op$id)
-  # Only operations that have relationships carry the field (siera's JSON
-  # reader does not accept an empty array here).
+  # Only operations that have relationships carry the field, as in the rest
+  # of the file.
   if (length(op$referencedOperationRelationships) > 0) {
     op$referencedOperationRelationships <- lapply(
       op$referencedOperationRelationships,
