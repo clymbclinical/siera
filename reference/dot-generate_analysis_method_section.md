@@ -13,7 +13,8 @@ Internal helper to apply consistent number formatting across analyses.
   analysis_id,
   output_id,
   value_sources = list(),
-  code_style = c("expanded", "wrapped")
+  code_style = c("expanded", "wrapped"),
+  population_frame = "df_poptot"
 )
 ```
 
@@ -60,6 +61,14 @@ Internal helper to apply consistent number formatting across analyses.
   inside \`df3\_\<id\> \<- NULL\` followed by an \`if (nrow(df2\_\<id\>)
   != 0)\` block, and leaves the identifier linking to the caller's
   \`siera::ars_stamp()\` step (see \`.generate_stamp_code()\`).
+
+- population_frame:
+
+  Name of the subject-level population frame of the analysis' own
+  analysis set. Method templates refer to the population as
+  \`df_poptot\`; when an output uses more than one analysis set the
+  frames are suffixed (e.g. \`df_poptot\_\_AnalysisSet_07\`, \#197) and
+  the template's \`df_poptot\` is rewritten to this name.
 
 ## Value
 

@@ -119,9 +119,11 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
       —
       [`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html)
       calls for required ADaM datasets
-    - [`.generate_analysis_set_code()`](https://clymbclinical.github.io/siera/reference/dot-generate_analysis_set_code.md)
-      — population filter (`SAFFL` etc.), with USUBJID merge when
-      analysis dataset ≠ analysis-set dataset
+    - [`.generate_population_code()`](https://clymbclinical.github.io/siera/reference/dot-generate_population_code.md)
+      (`R/AnalysisSet.R`) — called **once per output, before the
+      analysis loop**; builds every analysis-set population frame and
+      returns per-analysis frame lookups (see “Population frames (#197)”
+      below)
     - [`.generate_data_subset_code()`](https://clymbclinical.github.io/siera/reference/dot-generate_data_subset_code.md)
       — WHERE clause filters; supports ARS comparators (EQ, NE, IN,
       NOTIN, CONTAINS, …) and multi-level AND/OR nesting
@@ -240,6 +242,35 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   `group[n]_groupId` (pre-defined groups, via `case_when` on
   `group[n]_level`) or `group[n]_groupValue` (data-driven groupings).
   See `.generate_groupid_code()` in `readARS.R`.
+- **Population frames (#197)** —
+  [`.generate_population_code()`](https://clymbclinical.github.io/siera/reference/dot-generate_population_code.md)
+  derives populations from metadata, never from an analysis’s position
+  in the output (the old code gave only `j == 1` a population and picked
+  the merge partner via `anas[3, ]`, so analyses 2..n ignored their own
+  `analysisSetId` and outputs with \<3 analyses aborted). Rules:
+  - **One frame pair per distinct `analysisSetId`** in the output.
+  - **Subject-level vs record-level:** an analysis reads the
+    subject-level `df_poptot` iff every dataset it *touches* equals the
+    set’s `condition_dataset`. Touched datasets are its groupings’
+    `groupingDataset`, its subset’s `condition_dataset`, and its own
+    `dataset` **unless `variable == "USUBJID"`**. That exception is
+    essential: every eTFL AE/LB/VS bigN declares
+    `dataset = ADAE/ADLB/ADVS` with `USUBJID`. Otherwise the analysis
+    reads the merged record-level `df_pop`, built on its own single
+    foreign dataset; two foreign datasets → `cli_abort`.
+  - **Naming:** a single set keeps `df_pop`/`df_poptot`. With multiple
+    sets the frames become `df_poptot__<setId>`, and when one set merges
+    onto several datasets the merged frames become `df_pop__<DS>`.
+  - **Templates:**
+    `.generate_analysis_method_section(population_frame =)` rewrites
+    `\bdf_poptot\b` in population-based templates
+    (RD/Fisher/predefined-group) to the analysis’s own set frame.
+
+  Verified against all 318 analyses in the eTFL + bundled fixtures:
+  merge outputs are byte-identical to pre-#197. ADSL-only outputs only
+  rename `df2_X <- df_pop` → `df_poptot`; that is identical data, and
+  the owner accepted the churn. Out of scope / still open: analysis sets
+  defined by `compoundExpression` or IN/NOTIN are not parsed (Atlas B3).
 - **Empty-data guard** — generated method code is wrapped in
   `if(nrow(df2_<analysisid>) != 0){ ... } else { df3_<analysisid> = data.frame(AnalysisId, MethodId, OutputId) }`
   (see
@@ -523,7 +554,7 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
 - **No global state**: all inputs must be explicit arguments; no reads
   from or writes to global objects.
 - **Function naming**: internal helpers prefixed with `.`
-  (e.g. [`.generate_analysis_set_code()`](https://clymbclinical.github.io/siera/reference/dot-generate_analysis_set_code.md));
+  (e.g. [`.generate_population_code()`](https://clymbclinical.github.io/siera/reference/dot-generate_population_code.md));
   exported functions in camelCase
   (e.g. [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md),
   [`ARS_example()`](https://clymbclinical.github.io/siera/reference/ARS_example.md)).

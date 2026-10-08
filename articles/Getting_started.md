@@ -84,7 +84,8 @@ This information includes:
 - *mainListOfContents* (links outputs to their respective analyses)
 - *otherListsOfContents* (contains Output metadata)
 - *dataSubsets* (filters data for individual analyses)
-- *analysisSets* (filters data to get the Population Set for the Output)
+- *analysisSets* (filters data to get the Population Set for each
+  analysis)
 - *analysisGroupings* (groups data according to analysis specifications)
 - *analyses* (contains linking information to all components required
   for calculation of results)

@@ -4,6 +4,27 @@
 
 CRAN release: 2026-06-17
 
+- Fixed analyses using the wrong population.
+  [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+  used to apply only the first analysis’s analysis set to a whole
+  output, and picked the dataset to merge the population onto from the
+  third analysis. Now every analysis uses the population its own
+  `analysisSetId` declares, and the merge dataset comes from the
+  analysis’s own metadata. In the eTFL disposition table (fda-ds-t04),
+  the per-protocol row now reports 81 / 74 / 79 subjects instead of the
+  All Subjects counts 84 / 84 / 86. Outputs with fewer than three
+  analyses (e.g. a big N plus one content analysis), which used to stop
+  with “invalid ‘replacement’ argument”, now generate normally. Big N
+  analyses still count every subject in the population, wherever they
+  sit in the output, including a second big N for a Total column.
+  Generated scripts change in two visible ways. In outputs drawn only
+  from ADSL, analyses now start from `df_poptot` rather than `df_pop`
+  (identical data, so the results are unchanged). An output with several
+  analysis sets names each population after its set
+  (e.g. `df_poptot__AnalysisSet_07`), and method templates that refer to
+  `df_poptot`, such as risk differences, use their own analysis’s
+  population
+  ([\#197](https://github.com/clymbclinical/siera/issues/197)).
 - Added CDISC Dataset-JSON (v1.1) export of generated ARDs.
   `readARS(..., output_format = "datasetjson")` appends a section to
   each generated `ARD_<OutputId>.R` script that, when the script runs,

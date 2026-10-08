@@ -140,11 +140,11 @@ follows:</p>
 <div class="section level4">
 <h4 id="step-1-apply-analysis-set-to-adams">Step 1: Apply “Analysis Set” to ADaM(s)<a class="anchor" aria-label="anchor" href="#step-1-apply-analysis-set-to-adams"></a>
 </h4>
-<p>This step applies the Analysis Set assigned to the output
-(e.g. Safety Population) to the ADaM dataset(s). In the case where the
-“big N” count is based on another dataset (like ADSL) than the main ADaM
-(e.g. ADAE), two separate datasets are created for downstream use in
-subsequent analyses. Example:</p>
+<p>This step applies each analysis’s Analysis Set (e.g. Safety
+Population) to the ADaM dataset(s). In the case where the “big N” count
+is based on another dataset (like ADSL) than the main ADaM (e.g. ADAE),
+two separate datasets are created for downstream use in subsequent
+analyses. Example:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">overlap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">intersect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">ADSL</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">ADAE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">overlapfin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="va">overlap</span>, <span class="st">"USUBJID"</span><span class="op">)</span></span>
@@ -162,9 +162,29 @@ subsequent analyses. Example:</p>
 <span>  <span class="va">ADSL</span>,</span>
 <span>  <span class="va">SAFFL</span> <span class="op">==</span> <span class="st">"Y"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Note: this is only done once for the first Analysis, and assigned by
-subsequent analyses, since the dataset(s) remain the same for the
-remainder of the program’s analyses.</p>
+<p><code>df_poptot</code> holds one row per subject in the population,
+and <code>df_pop</code> holds the population’s records in the content
+dataset (here ADAE). The population code is written once, above the
+first analysis, and every analysis then starts from whichever of the two
+it needs. <em>siera</em> decides this from the metadata, not from where
+the analysis sits in the output:</p>
+<ul>
+<li>An analysis whose groupings and data subset all use the analysis
+set’s dataset (ADSL) reads <code>df_poptot</code>. This is how the “big
+N” analysis counts every subject in the population, including subjects
+with no records in ADAE.</li>
+<li>An analysis that uses another dataset - a data subset on ADAE
+(e.g. treatment-emergent events), a grouping on an ADAE variable
+(e.g. system organ class) or an analysis variable from that dataset -
+reads <code>df_pop</code>.</li>
+</ul>
+<p>When the analyses of one output use different Analysis Sets - say, a
+disposition table with a row each for the randomized, ITT, safety and
+per-protocol populations - a population is built for each set and every
+analysis reads its own. The data frames are then named after the set,
+e.g. <code>df_poptot__AnalysisSet_07</code>. Similarly, if one Analysis
+Set is merged onto more than one content dataset, each merged data frame
+is named after its dataset, e.g. <code>df_pop__ADLB</code>.</p>
 </div>
 <div class="section level4">
 <h4 id="step-2-apply-data-subset">Step 2: Apply “Data Subset”<a class="anchor" aria-label="anchor" href="#step-2-apply-data-subset"></a>

@@ -25,11 +25,11 @@
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-extract_reference_documents.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_adam_loading_code.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_analysis_method_section.html</loc></url>
-<url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_analysis_set_code.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_data_subset_code.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_data_subset_condition.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_library_code.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_one_adam_read.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_population_code.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-generate_program_header.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-is_absolute_path.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-is_remote_uri.html</loc></url>
@@ -41,6 +41,7 @@
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-read_template_code_file.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-render_method_library_json.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-render_method_library_md.html</loc></url>
+<url><loc>https://clymbclinical.github.io/siera/reference/dot-resolve_analysis_set.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-resolve_method_documentref.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-resolve_method_from_manifest.html</loc></url>
 <url><loc>https://clymbclinical.github.io/siera/reference/dot-supported_value_sources.html</loc></url>

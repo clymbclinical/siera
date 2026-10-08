@@ -68,11 +68,10 @@ follows:
 
 #### Step 1: Apply “Analysis Set” to ADaM(s)
 
-This step applies the Analysis Set assigned to the output (e.g. Safety
-Population) to the ADaM dataset(s). In the case where the “big N” count
-is based on another dataset (like ADSL) than the main ADaM (e.g. ADAE),
-two separate datasets are created for downstream use in subsequent
-analyses. Example:
+This step applies each analysis’s Analysis Set (e.g. Safety Population)
+to the ADaM dataset(s). In the case where the “big N” count is based on
+another dataset (like ADSL) than the main ADaM (e.g. ADAE), two separate
+datasets are created for downstream use in subsequent analyses. Example:
 
 ``` r
 
@@ -94,9 +93,28 @@ df_poptot <- dplyr::filter(
 )
 ```
 
-Note: this is only done once for the first Analysis, and assigned by
-subsequent analyses, since the dataset(s) remain the same for the
-remainder of the program’s analyses.
+`df_poptot` holds one row per subject in the population, and `df_pop`
+holds the population’s records in the content dataset (here ADAE). The
+population code is written once, above the first analysis, and every
+analysis then starts from whichever of the two it needs. *siera* decides
+this from the metadata, not from where the analysis sits in the output:
+
+- An analysis whose groupings and data subset all use the analysis set’s
+  dataset (ADSL) reads `df_poptot`. This is how the “big N” analysis
+  counts every subject in the population, including subjects with no
+  records in ADAE.
+- An analysis that uses another dataset - a data subset on ADAE
+  (e.g. treatment-emergent events), a grouping on an ADAE variable
+  (e.g. system organ class) or an analysis variable from that dataset -
+  reads `df_pop`.
+
+When the analyses of one output use different Analysis Sets - say, a
+disposition table with a row each for the randomized, ITT, safety and
+per-protocol populations - a population is built for each set and every
+analysis reads its own. The data frames are then named after the set,
+e.g. `df_poptot__AnalysisSet_07`. Similarly, if one Analysis Set is
+merged onto more than one content dataset, each merged data frame is
+named after its dataset, e.g. `df_pop__ADLB`.
 
 #### Step 2: Apply “Data Subset”
 

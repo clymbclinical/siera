@@ -75,7 +75,7 @@ contributes:
 |----|----|
 | *mainListOfContents* | Links each Output to its analyses, and sets the row order and indentation of the table stub. |
 | *otherListsOfContents* | Supplies Output-level metadata (the list of planned outputs). |
-| *analysisSets* | Defines the population filter for the Output (e.g. Safety Population, `SAFFL == "Y"`). |
+| *analysisSets* | Defines a population filter (e.g. Safety Population, `SAFFL == "Y"`). Each analysis names its own, so one output can report several populations. |
 | *dataSubsets* | Adds row-level filters for individual analyses (e.g. serious, treatment-emergent AEs). |
 | *analysisGroupings* | Defines the columns/subgroups results are split by (e.g. treatment arm), including data-driven groupings discovered at run time. |
 | *analyses* | Ties everything together for one calculation: which method, population, subset and groupings apply. |

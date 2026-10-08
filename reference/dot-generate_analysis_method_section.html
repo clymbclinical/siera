@@ -61,7 +61,8 @@
 <span>  <span class="va">analysis_id</span>,</span>
 <span>  <span class="va">output_id</span>,</span>
 <span>  value_sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  code_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"expanded"</span>, <span class="st">"wrapped"</span><span class="op">)</span></span>
+<span>  code_style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"expanded"</span>, <span class="st">"wrapped"</span><span class="op">)</span>,</span>
+<span>  population_frame <span class="op">=</span> <span class="st">"df_poptot"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -109,6 +110,14 @@ identifier stamp out inline; `"wrapped"` emits only the method call inside
 `df3_&lt;id&gt; &lt;- NULL` followed by an `if (nrow(df2_&lt;id&gt;) != 0)` block, and leaves the
 identifier linking to the caller's `siera::ars_stamp()` step (see
 `.generate_stamp_code()`).</p></dd>
+
+
+<dt id="arg-population-frame">population_frame<a class="anchor" aria-label="anchor" href="#arg-population-frame"></a></dt>
+<dd><p>Name of the subject-level population frame of the
+analysis' own analysis set. Method templates refer to the population as
+`df_poptot`; when an output uses more than one analysis set the frames are
+suffixed (e.g. `df_poptot__AnalysisSet_07`, #197) and the template's
+`df_poptot` is rewritten to this name.</p></dd>
 
 </dl></div>
     <div class="section level2">
