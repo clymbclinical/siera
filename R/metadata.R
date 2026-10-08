@@ -363,7 +363,8 @@
   for (h in seq_len(nrow(JSON_AnalysesL1))) {
     tmp_id <- as.character(JSON_AN[h, ]$id)
 
-    if (!is.null(JSON_AN[["referencedAnalysisOperations"]][[h]])) {
+    # An empty array (`[]`) means "no references", like an absent field (#230)
+    if (NROW(JSON_AN[["referencedAnalysisOperations"]][[h]]) > 0) {
       tmp_ref <- JSON_AN[["referencedAnalysisOperations"]][[h]] %>%
         dplyr::mutate(order = dplyr::row_number()) %>%
         tidyr::pivot_wider(
@@ -416,7 +417,9 @@
       lenrOF <- length(rOF)
 
       for (j in seq_len(lenrOF)) {
-        if (!is.null(rOF[[j]])) {
+        # An operation with `referencedOperationRelationships: []` has none,
+        # exactly like one without the field (#230)
+        if (NROW(rOF[[j]]) > 0) {
           tmp_l3 <- tibble::tibble(
             id = rOF[[j]]$id,
             operationId = rOF[[j]]$operationId,
