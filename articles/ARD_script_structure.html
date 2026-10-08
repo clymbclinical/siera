@@ -203,42 +203,52 @@ starting the dataframe name with “df2”, followed by the AnalysisId.</p>
 <h4 id="step-3-apply-method">Step 3: Apply “Method”<a class="anchor" aria-label="anchor" href="#step-3-apply-method"></a>
 </h4>
 <p>This step takes the subsetted dataset, and applies the required
-AnalysisMethod (e.g. counting subjects by treatment and a group, like
-RACE). As explained in the vignette for <a href="using-cards.html">using
-<code>cards</code> and <code>cardx</code></a>, functions from these
-packages are applied to handle the statistical operations for the
-analysis. Typically, there would be some pre-work done on the dataset
-before passing it to a <code>cards</code> or <code>cardx</code>
-function. When the function is applied, the result is an analysis-level
-ARD. See example below:</p>
+AnalysisMethod (e.g. counting the subjects with a serious TEAE in each
+treatment arm). As explained in the vignette for <a href="using-cards.html">using <code>cards</code> and
+<code>cardx</code></a>, functions from these packages are applied to
+handle the statistical operations for the analysis. Typically, there
+would be some pre-work done on the dataset before passing it to a
+<code>cards</code> or <code>cardx</code> function. When the function is
+applied, the result is an analysis-level ARD. See example below:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># the method only runs when there is data; otherwise df3 stays NULL and Step 4</span></span>
 <span><span class="co"># turns it into a stub row that still identifies the analysis</span></span>
-<span><span class="va">df3_An03_05_Race_Summ_ByTrt</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df2_An03_05_Race_Summ_ByTrt</span><span class="op">)</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="va">df3_An07_03_SerTEAE_Summ_ByTrt</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df2_An07_03_SerTEAE_Summ_ByTrt</span><span class="op">)</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># intermediate step: Prepare Denominator Dataset for `cards` function</span></span>
 <span>  <span class="va">denom_dataset</span> <span class="op">&lt;-</span> <span class="va">df2_An01_05_SAF_Summ_ByTrt</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">TRT01A</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="co"># intermediate step: Prepare input dataset for `cards` function</span></span>
-<span>  <span class="va">in_data</span> <span class="op">&lt;-</span> <span class="va">df2_An03_05_Race_Summ_ByTrt</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">TRT01A</span>, <span class="va">RACE</span>, <span class="va">USUBJID</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="co"># (one row per subject and arm, however many serious TEAEs they had)</span></span>
+<span>  <span class="va">in_data</span> <span class="op">&lt;-</span> <span class="va">df2_An07_03_SerTEAE_Summ_ByTrt</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">TRT01A</span>, <span class="va">USUBJID</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>dummy <span class="op">=</span> <span class="st">"dummyvar"</span><span class="op">)</span></span>
 <span></span>
-<span>  <span class="co"># calculate subject counts and % (based on big N) grouped by treatment and race</span></span>
-<span>  <span class="va">df3_An03_05_Race_Summ_ByTrt</span> <span class="op">&lt;-</span> <span class="fu">cards</span><span class="fu">::</span><span class="fu"><a href="https://pharmaverse.github.io/cards/latest-tag/reference/ard_tabulate.html" class="external-link">ard_tabulate</a></span><span class="op">(</span></span>
+<span>  <span class="co"># calculate subject counts and % (based on big N) grouped by treatment</span></span>
+<span>  <span class="va">df3_An07_03_SerTEAE_Summ_ByTrt</span> <span class="op">&lt;-</span> <span class="fu">cards</span><span class="fu">::</span><span class="fu"><a href="https://pharmaverse.github.io/cards/latest-tag/reference/ard_tabulate.html" class="external-link">ard_tabulate</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">in_data</span>,</span>
-<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRT01A"</span>, <span class="st">"RACE"</span><span class="op">)</span>,</span>
+<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRT01A"</span><span class="op">)</span>,</span>
 <span>    variables <span class="op">=</span> <span class="st">"dummy"</span>,</span>
 <span>    denominator <span class="op">=</span> <span class="va">denom_dataset</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="co"># select relevant statistics as defined by the Method, and assign operation Ids</span></span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">stat_name</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n"</span>, <span class="st">"p"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>operationid <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>      <span class="va">stat_name</span> <span class="op">==</span> <span class="st">"n"</span> <span class="op">~</span> <span class="st">"Mth01_1_n"</span>,</span>
-<span>      <span class="va">stat_name</span> <span class="op">==</span> <span class="st">"p"</span> <span class="op">~</span> <span class="st">"Mth01_2_pct"</span></span>
+<span>      <span class="va">stat_name</span> <span class="op">==</span> <span class="st">"n"</span> <span class="op">~</span> <span class="st">"Mth01_CatVar_Summ_ByGrp_1_n"</span>,</span>
+<span>      <span class="va">stat_name</span> <span class="op">==</span> <span class="st">"p"</span> <span class="op">~</span> <span class="st">"Mth01_CatVar_Summ_ByGrp_2_pct"</span></span>
 <span>    <span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
+<p>Not every method follows this shape. Methods that must report
+something even when no subject qualifies - a zero count for every
+<strong>pre-defined</strong> group, or a risk difference of
+<code>0</code> - compute over the whole population and skip the
+empty-data guard. The demographics analyses in the same example (age
+group, sex, ethnicity and race) use such a method from siera’s method
+library, <code>categorical_summary_per_predefined_group</code>, so all
+nine race groups that the ARS defines are reported, with zero counts for
+those that do not occur in the data. See the <a href="concepts.html">Concepts and conventions</a> vignette for when to
+choose which.</p>
 <p>This example uses the current <code>cards</code> function name
 <code>ard_tabulate()</code> (formerly <code>ard_categorical()</code>);
 see the <a href="using-cards.html">using <code>cards</code> and
@@ -253,19 +263,36 @@ and adds the <strong>CDISC ARD traceability columns</strong>, so that
 every result can be traced back to its ARS definition:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Link ARS identifiers ---</span></span>
-<span><span class="va">df3_An03_05_Race_Summ_ByTrt</span> <span class="op">&lt;-</span> <span class="fu">siera</span><span class="fu">::</span><span class="fu"><a href="../reference/ars_stamp.html">ars_stamp</a></span><span class="op">(</span></span>
-<span>  <span class="va">df3_An03_05_Race_Summ_ByTrt</span>,</span>
-<span>  analysis_id <span class="op">=</span> <span class="st">'An03_05_Race_Summ_ByTrt'</span>,  <span class="co"># analyses[].id</span></span>
-<span>  method_id   <span class="op">=</span> <span class="st">'Mth01'</span>,                    <span class="co"># analyses[].methodId</span></span>
-<span>  output_id   <span class="op">=</span> <span class="st">'Out14-1-1'</span>,                <span class="co"># mainListOfContents outputId</span></span>
-<span>  groupings   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>                       <span class="co"># analyses[].orderedGroupings</span></span>
+<span><span class="va">df3_An07_03_SerTEAE_Summ_ByTrt</span> <span class="op">&lt;-</span> <span class="fu">siera</span><span class="fu">::</span><span class="fu"><a href="../reference/ars_stamp.html">ars_stamp</a></span><span class="op">(</span></span>
+<span>  <span class="va">df3_An07_03_SerTEAE_Summ_ByTrt</span>,</span>
+<span>  analysis_id <span class="op">=</span> <span class="st">'An07_03_SerTEAE_Summ_ByTrt'</span>, <span class="co"># analyses[].id</span></span>
+<span>  method_id   <span class="op">=</span> <span class="st">'Mth01_CatVar_Summ_ByGrp'</span>,    <span class="co"># analyses[].methodId</span></span>
+<span>  output_id   <span class="op">=</span> <span class="st">'Out14-3-1-1'</span>,                <span class="co"># mainListOfContents outputId</span></span>
+<span>  groupings   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>                         <span class="co"># analyses[].orderedGroupings</span></span>
 <span>    <span class="fu">siera</span><span class="fu">::</span><span class="fu"><a href="../reference/ars_grouping.html">ars_grouping</a></span><span class="op">(</span><span class="st">'AnlsGrouping_01_Trt'</span>, groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>      <span class="st">'AnlsGrouping_01_Trt_1'</span> <span class="op">=</span> <span class="st">'Placebo'</span>,</span>
 <span>      <span class="st">'AnlsGrouping_01_Trt_2'</span> <span class="op">=</span> <span class="st">'Xanomeline Low Dose'</span>,</span>
-<span>      <span class="st">'AnlsGrouping_01_Trt_3'</span> <span class="op">=</span> <span class="st">'Xanomeline High Dose'</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    <span class="fu">siera</span><span class="fu">::</span><span class="fu"><a href="../reference/ars_grouping.html">ars_grouping</a></span><span class="op">(</span><span class="st">'AnlsGrouping_02_Race'</span>, data_driven <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>      <span class="st">'AnlsGrouping_01_Trt_3'</span> <span class="op">=</span> <span class="st">'Xanomeline High Dose'</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<p>An analysis with more than one grouping gets one
+<code><a href="../reference/ars_grouping.html">ars_grouping()</a></code> per grouping, in the order of
+<code>analyses[].orderedGroupings</code>. The race analysis, for
+example, adds its nine pre-defined race groups after the treatment arms
+(shortened here):</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span>  <span class="va">groupings</span>   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu">siera</span><span class="fu">::</span><span class="fu"><a href="../reference/ars_grouping.html">ars_grouping</a></span><span class="op">(</span><span class="st">'AnlsGrouping_01_Trt'</span>, groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu">siera</span><span class="fu">::</span><span class="fu"><a href="../reference/ars_grouping.html">ars_grouping</a></span><span class="op">(</span><span class="st">'AnlsGrouping_04_Race'</span>, groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>      <span class="st">'AnlsGrouping_04_Race_1'</span> <span class="op">=</span> <span class="st">'AMERICAN INDIAN OR ALASKA NATIVE'</span>,</span>
+<span>      <span class="st">'AnlsGrouping_04_Race_2'</span> <span class="op">=</span> <span class="st">'ASIAN'</span>,</span>
+<span>      <span class="co"># ...</span></span>
+<span>      <span class="st">'AnlsGrouping_04_Race_9'</span> <span class="op">=</span> <span class="st">'OTHER'</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p>A data-driven grouping, such as the system organ class of an adverse
+event, is written
+<code>siera::ars_grouping('&lt;groupingId&gt;', data_driven = TRUE)</code>
+instead.</p>
 <p>Every argument is copied straight from the ARS metadata, so the call
 reads as a small, checkable summary of the analysis:</p>
 <table class="table">
@@ -360,7 +387,7 @@ into each script (an
 would rather have your scripts not call any siera function for this
 step, or you want to review that plain code, generate the scripts with
 <code>code_style = "expanded"</code>:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/readARS.html">readARS</a></span><span class="op">(</span><span class="va">ARS_path</span>, <span class="va">output_path</span>, <span class="va">adam_path</span>, code_style <span class="op">=</span> <span class="st">"expanded"</span><span class="op">)</span></span></code></pre></div>
 <p>The default is <code>code_style = "wrapped"</code>. Both styles are
 tested to produce identical ARDs.</p>
@@ -374,7 +401,7 @@ tested to produce identical ARDs.</p>
 each step would of course vary (as defined in the specific ARS metadata
 for each Analysis). Once each Analysis ARD has been created, these ARDs
 are all appened to create output-level ARD. See example below:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># combine analyses to create ARD ----</span></span>
 <span><span class="va">ARD</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
 <span>  <span class="va">df3_An01_05_SAF_Summ_ByTrt</span>,</span>
@@ -465,15 +492,15 @@ Below are such examples, for</p>
 ARD_Out14-3-1-1.R</li>
 </ul>
 <p>Access these with the below functions:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># see location of script:</span></span>
 <span><span class="fu"><a href="../reference/ARD_script_example.html">ARD_script_example</a></span><span class="op">(</span><span class="st">"ARD_Out14-1-1.R"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/ARD_script_example.html">ARD_script_example</a></span><span class="op">(</span><span class="st">"ARD_Out14-3-1-1.R"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># open script to inspect:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/file.edit.html" class="external-link">file.edit</a></span><span class="op">(</span><span class="fu"><a href="../reference/ARD_script_example.html">ARD_script_example</a></span><span class="op">(</span><span class="st">"ARD_Out14-1-1.R"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/file.edit.html" class="external-link">file.edit</a></span><span class="op">(</span><span class="fu"><a href="../reference/ARD_script_example.html">ARD_script_example</a></span><span class="op">(</span><span class="st">"ARD_Out14-3-1-1.R"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># run script locally:</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="../reference/ARD_script_example.html">ARD_script_example</a></span><span class="op">(</span><span class="st">"ARD_Out14-1-1.R"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="fu"><a href="../reference/ARD_script_example.html">ARD_script_example</a></span><span class="op">(</span><span class="st">"ARD_Out14-3-1-1.R"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>

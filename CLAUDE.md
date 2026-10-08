@@ -832,6 +832,21 @@ after the templates are updated, then
   `exampleARS_2a.xlsx` remain only for the deprecated xlsx path until
   \#179 Phase 2). Retrieve them in tests via
   `ARS_example("exampleARS_6.json")`. Write new tests against JSON.
+  **`Common_Safety_Displays_cards.json` is no longer a pure conversion
+  of its xlsx twin (#216):** `data-raw/Common_Safety_Displays_cards.R`
+  (build-ignored; edits the JSON in place, idempotent) adds
+  `Mth01_CatVar_Summ_ByPreGrp` (library
+  `categorical_summary_per_predefined_group`) for the four demographic n
+  (%) analyses and gives `Mth03_CatVar_Comp_PChiSq` the
+  `chisq_per_predefined_group` template. The deprecated xlsx was
+  deliberately left as is, so the xlsx-vs-JSON parity tests drop
+  `ARD_Out14-1-1.R` and the event-wide `.op_patterns` lookup block for
+  this demo via `.drop_predefined_group_methods()` (`helper-xlsx.R`).
+  Edit the demo by changing that script and re-running it, then
+  regenerate `inst/script/`. Gotcha: the JSON reader aborts on an
+  operation carrying an empty `referencedOperationRelationships: []`
+  (`pivot_wider` on a column-less tibble, `R/metadata.R`), so omit the
+  field rather than write `[]`.
 - **eTFL Portal integration testing** — `tests/testthat/testdata/etfl/`
   holds the CDISC eTFL Portal fixtures unzipped into three subfolders
   (no `.zip` files are committed): `metadata/<table>-siera.json` (ARS

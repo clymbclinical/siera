@@ -210,6 +210,22 @@ CRAN release: 2026-06-17
   the data subsets aborted; both forms are now read, whichever tool
   wrote the file
   ([\#217](https://github.com/clymbclinical/siera/issues/217)).
+- Changed the bundled demo reporting event
+  `Common_Safety_Displays_cards.json` (used by the README, the vignettes
+  and `ARD_script_example("ARD_Out14-1-1.R")`) so its demographics
+  output follows its own ARS groupings. The age group, sex, ethnicity
+  and race n (%) analyses use a new method,
+  `Mth01_CatVar_Summ_ByPreGrp`, with the
+  `categorical_summary_per_predefined_group` template, and the
+  chi-square tests use `chisq_per_predefined_group`. The ARD now reports
+  the defined age groups `< 65` and `>= 65` (`AGEGR1` IN `65-80`, `>80`:
+  72 / 73 / 76 subjects, previously the three `AGEGR1` categories), all
+  nine defined race groups (zero-filled where no subject has that race,
+  previously only the three observed), a group id on every row, and the
+  age-group chi-square over the two defined groups (p = 0.4239,
+  previously 0.1439 over the three categories). The deprecated xlsx twin
+  is unchanged
+  ([\#216](https://github.com/clymbclinical/siera/issues/216)).
 - Fixed zero-event risk-difference analyses returning `NA` instead of
   `0`. Methods that compute over the full population (templates
   referencing `df_poptot`, e.g. risk differences) now bypass the

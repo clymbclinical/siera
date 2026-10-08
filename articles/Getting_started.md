@@ -32,7 +32,7 @@ toward:
 # Run a ready-made example script shipped with siera; the result is the object `ARD`
 source(ARD_script_example("ARD_Out14-1-1.R"))
 head(ARD)
-#> # An ARD data frame: 6 × 23
+#> # An ARD data frame: 6 × 22
 #>   variable variable_level       stat_name   stat operationid AnalysisId MethodId
 #>   <chr>    <chr>                <chr>     <name> <chr>       <chr>      <chr>   
 #> 1 TRT01A   Placebo              n          86    Mth01_CatV… An01_05_S… Mth01_C…
@@ -41,11 +41,11 @@ head(ARD)
 #> 4 AGE      NA                   N          86    Mth02_Cont… An03_01_A… Mth02_C…
 #> 5 AGE      NA                   mean       75.2  Mth02_Cont… An03_01_A… Mth02_C…
 #> 6 AGE      NA                   sd          8.59 Mth02_Cont… An03_01_A… Mth02_C…
-#> # ℹ 16 more variables: context <chr>, stat_label <chr>, warning <named list>,
+#> # ℹ 15 more variables: context <chr>, stat_label <chr>, warning <named list>,
 #> #   error <named list>, OutputId <chr>, group1 <chr>, group1_level <chr>,
-#> #   group1_groupingId <chr>, group1_groupId <chr>, group2 <chr>,
-#> #   group2_level <chr>, group2_groupingId <chr>, group2_groupId <chr>,
-#> #   res <dbl>, pattern <chr>, disp <chr>
+#> #   group1_groupingId <chr>, group1_groupId <chr>, group2_level <chr>,
+#> #   group2_groupingId <chr>, group2_groupId <chr>, res <dbl>, pattern <chr>,
+#> #   disp <chr>
 ```
 
 Each row carries the statistic together with metadata (such as
