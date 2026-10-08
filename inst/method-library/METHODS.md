@@ -92,7 +92,7 @@ df3_analysisidhere <-
 
 ## `categorical_summary` - Summary of a categorical variable (n and %)
 
-n and percentage of a categorical analysis variable per group, with a referenced denominator analysis and a data-driven/pre-defined grouping branch. Verified against Common_Safety_Displays Mth01_CatVar_Summ_ByGrp; current cards API. Spurious by_vars/strata_vars params from the legacy sheet have been dropped (the template uses by_listc).
+n and percentage of a categorical analysis variable per group, with a referenced denominator analysis and a data-driven/pre-defined grouping branch. Verified against Common_Safety_Displays Mth01_CatVar_Summ_ByGrp; current cards API. Spurious by_vars/strata_vars params from the legacy sheet have been dropped (the template uses by_listc). Result rows carry the ARS analysis variable as `variable` (variable_level NA) rather than the internal 'dummy' column (#231).
 
 **Status:** verified &nbsp; **Verified against:** Common_Safety_Displays_cards.json Mth01_CatVar_Summ_ByGrp
 
@@ -112,6 +112,7 @@ n and percentage of a categorical analysis variable per group, with a referenced
 | `denom_anagroupvarshere` | `AG_denom_var1` | denom grp var | Grouping variable(s) of the denominator analysis |
 | `isdatadrivenhere` | `AG_max_dataDriven` | is dataDriven | TRUE/FALSE: highest grouping is data-driven |
 | `byvarshere` | `by_listc` | by vars (list) | Grouping variables as a quoted, comma-separated list |
+| `anavarhere` | `ana_var` | ana var | Analysis variable (e.g. USUBJID), stamped as the result rows' `variable` |
 | `opid1here` | `operation_1` | op id 1 | Operation id for the 'n' statistic (order 1) |
 | `opid2here` | `operation_2` | op id 2 | Operation id for the 'p' statistic (order 2) |
 
@@ -143,7 +144,11 @@ df3_analysisidhere <-
   ) }
 df3_analysisidhere <- df3_analysisidhere|>
   dplyr::filter(stat_name %in% c('n', 'p')) |>
-  dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'opid1here',
+  # 'dummy' only makes ard_tabulate() count the distinct rows per group; the
+  # result row describes the ARS analysis variable (#231)
+  dplyr::mutate(variable = 'anavarhere',
+                variable_level = list(NULL),
+                operationid = dplyr::case_when(stat_name == 'n' ~ 'opid1here',
                                                stat_name == 'p' ~ 'opid2here'))
 ```
 

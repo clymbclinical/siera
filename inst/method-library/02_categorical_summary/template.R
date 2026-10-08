@@ -23,5 +23,9 @@ df3_analysisidhere <-
   ) }
 df3_analysisidhere <- df3_analysisidhere|>
   dplyr::filter(stat_name %in% c('n', 'p')) |>
-  dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'opid1here',
+  # 'dummy' only makes ard_tabulate() count the distinct rows per group; the
+  # result row describes the ARS analysis variable (#231)
+  dplyr::mutate(variable = 'anavarhere',
+                variable_level = list(NULL),
+                operationid = dplyr::case_when(stat_name == 'n' ~ 'opid1here',
                                                stat_name == 'p' ~ 'opid2here'))

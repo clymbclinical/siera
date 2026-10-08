@@ -1,7 +1,7 @@
 
 # Programme:    Generate code to produce ARD for Out14-3-1-1
 # Output:       Overall Summary of Treatment-Emergent Adverse Events
-# Date created: 2026-10-07 13:48:07
+# Date created: 2026-10-08 14:26:02
 
   # load libraries ----
     library(dplyr)
@@ -105,9 +105,13 @@ df3_An07_01_TEAE_Summ_ByTrt <-
     denominator = denom_dataset
   ) }
 df3_An07_01_TEAE_Summ_ByTrt <- df3_An07_01_TEAE_Summ_ByTrt|>
-dplyr::filter(stat_name %in% c('n', 'p')) |>
-dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  # 'dummy' only makes ard_tabulate() count the distinct rows per group; the
+  # result row describes the ARS analysis variable (#231)
+  dplyr::mutate(variable = 'USUBJID',
+                variable_level = list(NULL),
+                operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
+                                               stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
 
 # Link ARS identifiers ---
@@ -162,9 +166,13 @@ df3_An07_02_RelTEAE_Summ_ByTrt <-
     denominator = denom_dataset
   ) }
 df3_An07_02_RelTEAE_Summ_ByTrt <- df3_An07_02_RelTEAE_Summ_ByTrt|>
-dplyr::filter(stat_name %in% c('n', 'p')) |>
-dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  # 'dummy' only makes ard_tabulate() count the distinct rows per group; the
+  # result row describes the ARS analysis variable (#231)
+  dplyr::mutate(variable = 'USUBJID',
+                variable_level = list(NULL),
+                operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
+                                               stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
 
 # Link ARS identifiers ---
@@ -219,9 +227,13 @@ df3_An07_03_SerTEAE_Summ_ByTrt <-
     denominator = denom_dataset
   ) }
 df3_An07_03_SerTEAE_Summ_ByTrt <- df3_An07_03_SerTEAE_Summ_ByTrt|>
-dplyr::filter(stat_name %in% c('n', 'p')) |>
-dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  # 'dummy' only makes ard_tabulate() count the distinct rows per group; the
+  # result row describes the ARS analysis variable (#231)
+  dplyr::mutate(variable = 'USUBJID',
+                variable_level = list(NULL),
+                operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
+                                               stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
 
 # Link ARS identifiers ---
@@ -276,9 +288,13 @@ df3_An07_04_RelSerTEAE_Summ_ByTrt <-
     denominator = denom_dataset
   ) }
 df3_An07_04_RelSerTEAE_Summ_ByTrt <- df3_An07_04_RelSerTEAE_Summ_ByTrt|>
-dplyr::filter(stat_name %in% c('n', 'p')) |>
-dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  # 'dummy' only makes ard_tabulate() count the distinct rows per group; the
+  # result row describes the ARS analysis variable (#231)
+  dplyr::mutate(variable = 'USUBJID',
+                variable_level = list(NULL),
+                operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
+                                               stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
 
 # Link ARS identifiers ---
@@ -333,9 +349,13 @@ df3_An07_05_TEAELd2Dth_Summ_ByTrt <-
     denominator = denom_dataset
   ) }
 df3_An07_05_TEAELd2Dth_Summ_ByTrt <- df3_An07_05_TEAELd2Dth_Summ_ByTrt|>
-dplyr::filter(stat_name %in% c('n', 'p')) |>
-dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  # 'dummy' only makes ard_tabulate() count the distinct rows per group; the
+  # result row describes the ARS analysis variable (#231)
+  dplyr::mutate(variable = 'USUBJID',
+                variable_level = list(NULL),
+                operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
+                                               stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
 
 # Link ARS identifiers ---
@@ -390,9 +410,13 @@ df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <-
     denominator = denom_dataset
   ) }
 df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- df3_An07_06_RelTEAELd2Dth_Summ_ByTrt|>
-dplyr::filter(stat_name %in% c('n', 'p')) |>
-dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  # 'dummy' only makes ard_tabulate() count the distinct rows per group; the
+  # result row describes the ARS analysis variable (#231)
+  dplyr::mutate(variable = 'USUBJID',
+                variable_level = list(NULL),
+                operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
+                                               stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
 
 # Link ARS identifiers ---
@@ -447,9 +471,13 @@ df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <-
     denominator = denom_dataset
   ) }
 df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <- df3_An07_07_TEAELd2DoseMod_Summ_ByTrt|>
-dplyr::filter(stat_name %in% c('n', 'p')) |>
-dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  # 'dummy' only makes ard_tabulate() count the distinct rows per group; the
+  # result row describes the ARS analysis variable (#231)
+  dplyr::mutate(variable = 'USUBJID',
+                variable_level = list(NULL),
+                operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
+                                               stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
 
 # Link ARS identifiers ---
@@ -504,9 +532,13 @@ df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt <-
     denominator = denom_dataset
   ) }
 df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt|>
-dplyr::filter(stat_name %in% c('n', 'p')) |>
-dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  # 'dummy' only makes ard_tabulate() count the distinct rows per group; the
+  # result row describes the ARS analysis variable (#231)
+  dplyr::mutate(variable = 'USUBJID',
+                variable_level = list(NULL),
+                operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
+                                               stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
 }
 
 # Link ARS identifiers ---

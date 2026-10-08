@@ -1469,43 +1469,48 @@
         }
       ],
       "codeTemplate": {
-        "context": "R",
-        "code": "denom_dataset = df2_denomanaidhere |>\r\n  dplyr::select(denom_anagroupvarshere)\r\n\r\nin_data = df2_analysisidhere |>\r\n    dplyr::distinct(distinctlisthere) |>\r\n    dplyr::mutate(dummy = 'dummyvar')\r\n\r\ndataDriven = isdatadrivenhere\r\nif(dataDriven == TRUE){\r\ndf3_analysisidhere <-\r\n  cards::ard_tabulate(\r\n    data = in_data,\r\n    strata = c(byvarshere),\r\n    variables = 'dummy',\r\n    denominator = denom_dataset\r\n  ) } else {\r\ndf3_analysisidhere <-\r\n cards::ard_tabulate(\r\n    data = in_data,\r\n    by = c(byvarshere),\r\n    variables = 'dummy',\r\n    denominator = denom_dataset\r\n  ) }\r\ndf3_analysisidhere <- df3_analysisidhere|>\r\ndplyr::filter(stat_name %in% c('n', 'p')) |>\r\ndplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',\r\n                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))",
+        "context": "R (siera)",
+        "code": "denom_dataset = df2_denomanaidhere |>\n  dplyr::select(denom_anagroupvarshere)\n\nin_data = df2_analysisidhere |>\n    dplyr::distinct(distinctlisthere) |>\n    dplyr::mutate(dummy = 'dummyvar')\n\ndataDriven = isdatadrivenhere\nif(dataDriven == TRUE){\ndf3_analysisidhere <-\n  cards::ard_tabulate(\n    data = in_data,\n    strata = c(byvarshere),\n    variables = 'dummy',\n    denominator = denom_dataset\n  ) } else {\ndf3_analysisidhere <-\n cards::ard_tabulate(\n    data = in_data,\n    by = c(byvarshere),\n    variables = 'dummy',\n    denominator = denom_dataset\n  ) }\ndf3_analysisidhere <- df3_analysisidhere|>\n  dplyr::filter(stat_name %in% c('n', 'p')) |>\n  # 'dummy' only makes ard_tabulate() count the distinct rows per group; the\n  # result row describes the ARS analysis variable (#231)\n  dplyr::mutate(variable = 'anavarhere',\n                variable_level = list(NULL),\n                operationid = dplyr::case_when(stat_name == 'n' ~ 'opid1here',\n                                               stat_name == 'p' ~ 'opid2here'))",
         "parameters": [
           {
             "name": "distinctlisthere",
-            "description": "list of variables by which to apply the \"distinct\" function from dplyr",
+            "description": "Grouping variables + analysis variable, comma separated",
             "valueSource": "distinct_list"
           },
           {
             "name": "denomanaidhere",
-            "description": "Analysis ID for Denominator Analysis",
+            "description": "Analysis ID supplying the denominator",
             "valueSource": "DEN_analysisid"
           },
           {
             "name": "denom_anagroupvarshere",
-            "description": "Analysis Grouping variables for denominator dataset",
+            "description": "Grouping variable(s) of the denominator analysis",
             "valueSource": "AG_denom_var1"
           },
           {
             "name": "isdatadrivenhere",
-            "description": "dataDriven boolean value for highest Analysisgrouping factor",
+            "description": "TRUE/FALSE: highest grouping is data-driven",
             "valueSource": "AG_max_dataDriven"
           },
           {
-            "name": "bystmthere",
-            "description": "\"by =  and \"variable = \" statements for ard_tabulate() with dynamic variables",
-            "valueSource": "by_vars"
-          },
-          {
-            "name": "stratastmthere",
-            "description": "\"strata =  and \"variable = \" statements for ard_tabulate() with dynamic variables",
-            "valueSource": "strata_vars"
-          },
-          {
             "name": "byvarshere",
-            "description": "string for \"by\" and \"variables\" parameter for the ard_continuous function",
+            "description": "Grouping variables as a quoted, comma-separated list",
             "valueSource": "by_listc"
+          },
+          {
+            "name": "anavarhere",
+            "description": "Analysis variable (e.g. USUBJID), stamped as the result rows' `variable`",
+            "valueSource": "ana_var"
+          },
+          {
+            "name": "opid1here",
+            "description": "Operation id for the 'n' statistic (order 1)",
+            "valueSource": "operation_1"
+          },
+          {
+            "name": "opid2here",
+            "description": "Operation id for the 'p' statistic (order 2)",
+            "valueSource": "operation_2"
           }
         ]
       }
