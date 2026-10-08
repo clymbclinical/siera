@@ -33,6 +33,10 @@ test_that("converted JSON generates the same ARD scripts as the committed JSON t
       # spells the same blank as "". Only that group-level literal differs.
       from_conv <- lapply(from_conv, function(x) gsub("'NA'", "''", x, fixed = TRUE))
     }
+    if (base == "Common_Safety_Displays_cards") {
+      from_conv <- .drop_predefined_group_methods(from_conv)
+      from_twin <- .drop_predefined_group_methods(from_twin)
+    }
     expect_identical(names(from_conv), names(from_twin), info = base)
     for (f in names(from_twin)) {
       expect_identical(from_conv[[f]], from_twin[[f]], info = paste(base, f))

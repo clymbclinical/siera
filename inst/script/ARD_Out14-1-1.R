@@ -1,7 +1,7 @@
 
 # Programme:    Generate code to produce ARD for Out14-1-1
 # Output:       Summary of Demographics
-# Date created: 2026-10-06 16:10:53
+# Date created: 2026-10-07 13:48:05
 
   # load libraries ----
     library(dplyr)
@@ -137,48 +137,76 @@ df2_An03_02_AgeGrp_Summ_ByTrt <- df_poptot
 
 #Apply Method --- 
 
-# Method ID:              Mth01_CatVar_Summ_ByGrp
-# Method name:            Summary by group of a categorical variable
-# Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
+# Method ID:              Mth01_CatVar_Summ_ByPreGrp
+# Method name:            Summary by pre-defined group of a categorical variable
+# Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence, counted per pre-defined group condition of the inner grouping: every defined group is reported, including empty ones.
 
-df3_An03_02_AgeGrp_Summ_ByTrt <- NULL
-if (nrow(df2_An03_02_AgeGrp_Summ_ByTrt) != 0) {
-denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
-  dplyr::select(TRT01A)
+# Population-based (see df_poptot): the zero-fill below must also run when the
+# data subset is empty, so siera drops its empty-data guard for this method -
+# an empty subset yields n = 0 / 0.0% for every arm x group.
+# Denominator: the referenced analysis's population count per Group1 level.
+denom_An03_02_AgeGrp_Summ_ByTrt <- df2_An01_05_SAF_Summ_ByTrt |>
+    dplyr::count(TRT01A) |>
+    dplyr::rename(`...ard_N...` = n) |>
+    dplyr::mutate(dplyr::across(-`...ard_N...`, as.character))
 
-in_data = df2_An03_02_AgeGrp_Summ_ByTrt |>
-    dplyr::distinct(TRT01A, AGEGR1, USUBJID) |>
-    dplyr::mutate(dummy = 'dummyvar')
+# Group1's levels come from the denominator, so an arm in which no subject
+# qualifies still gets a zero row; Group2's levels are the ones the ARS
+# metadata DEFINES, not the ones the data happens to contain.
+.arms_An03_02_AgeGrp_Summ_ByTrt <- as.character(denom_An03_02_AgeGrp_Summ_ByTrt$TRT01A)
+.levels_An03_02_AgeGrp_Summ_ByTrt <- c('<65', '65-80')
 
-dataDriven = FALSE
-if(dataDriven == TRUE){
-df3_An03_02_AgeGrp_Summ_ByTrt <-
+denom_An03_02_AgeGrp_Summ_ByTrt <- denom_An03_02_AgeGrp_Summ_ByTrt |>
+    dplyr::mutate(TRT01A = factor(TRT01A, levels = .arms_An03_02_AgeGrp_Summ_ByTrt))
+
+in_data_An03_02_AgeGrp_Summ_ByTrt <- df2_An03_02_AgeGrp_Summ_ByTrt |>
+    dplyr::mutate(ars_group = dplyr::case_when(
+      AGEGR1 == '<65' ~ '<65',
+      AGEGR1 %in% c('65-80', '>80') ~ '65-80',
+      TRUE ~ NA_character_
+    )) |>
+    # A data value satisfying none of the defined group conditions was never
+    # asked for by the ARS, so it is excluded rather than tabulated.
+    dplyr::filter(!is.na(ars_group)) |>
+    dplyr::distinct(TRT01A, ars_group, USUBJID) |>
+    dplyr::mutate(
+      TRT01A = factor(as.character(TRT01A), levels = .arms_An03_02_AgeGrp_Summ_ByTrt),
+      ars_group     = factor(ars_group, levels = .levels_An03_02_AgeGrp_Summ_ByTrt)
+    ) |>
+    dplyr::select(TRT01A, ars_group)
+
+df3_An03_02_AgeGrp_Summ_ByTrt <- if (length(.levels_An03_02_AgeGrp_Summ_ByTrt) > 0) {
   cards::ard_tabulate(
-    data = in_data,
-    strata = c('TRT01A', 'AGEGR1'),
-    variables = 'dummy',
-    denominator = denom_dataset
-  ) } else {
-df3_An03_02_AgeGrp_Summ_ByTrt <-
- cards::ard_tabulate(
-    data = in_data,
-    by = c('TRT01A', 'AGEGR1'),
-    variables = 'dummy',
-    denominator = denom_dataset
-  ) }
-df3_An03_02_AgeGrp_Summ_ByTrt <- df3_An03_02_AgeGrp_Summ_ByTrt|>
-dplyr::filter(stat_name %in% c('n', 'p')) |>
-dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+      data = in_data_An03_02_AgeGrp_Summ_ByTrt,
+      by = 'TRT01A',
+      variables = 'ars_group',
+      denominator = denom_An03_02_AgeGrp_Summ_ByTrt
+    ) |>
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  dplyr::rename(group2_level = variable_level) |>
+  # cards returns the levels as list-columns of factors, whose as.character()
+  # is the integer code - flatten to the labels before siera stamps group ids.
+  dplyr::mutate(dplyr::across(
+      dplyr::matches('_level$'),
+      ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
+    )) |>
+  dplyr::mutate(operationid = dplyr::case_when(
+      stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByPreGrp_1_n',
+      stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByPreGrp_2_pct'
+    ))
+} else {
+  tibble::tibble(group1_level = character(0), group2_level = character(0),
+                 stat_name = character(0), stat = list(),
+                 operationid = character(0))
 }
 
 # Link ARS identifiers ---
 df3_An03_02_AgeGrp_Summ_ByTrt <- siera::ars_stamp(
   df3_An03_02_AgeGrp_Summ_ByTrt,
-  analysis_id = 'An03_02_AgeGrp_Summ_ByTrt', # analyses[].id
-  method_id   = 'Mth01_CatVar_Summ_ByGrp',   # analyses[].methodId
-  output_id   = 'Out14-1-1',                 # mainListOfContents outputId
-  groupings   = list(                        # analyses[].orderedGroupings
+  analysis_id = 'An03_02_AgeGrp_Summ_ByTrt',  # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByPreGrp', # analyses[].methodId
+  output_id   = 'Out14-1-1',                  # mainListOfContents outputId
+  groupings   = list(                         # analyses[].orderedGroupings
     siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
       'AnlsGrouping_01_Trt_1' = 'Placebo',
       'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
@@ -204,10 +232,23 @@ df2_An03_02_AgeGrp_Comp_ByTrt <- df_poptot
 
 df3_An03_02_AgeGrp_Comp_ByTrt <- NULL
 if (nrow(df2_An03_02_AgeGrp_Comp_ByTrt) != 0) {
-df3_An03_02_AgeGrp_Comp_ByTrt <- 
-    cardx::ard_stats_chisq_test(by = TRT01A, data = df2_An03_02_AgeGrp_Comp_ByTrt, variables = AGEGR1)|>
-dplyr::filter(stat_name == 'p.value') |>
-dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')
+# Test the groups the ARS metadata DEFINES for the inner grouping (matched by
+# their conditions), not the raw data values: a multi-value IN group is one
+# category, and a value satisfying no defined group was never asked for, so
+# it is excluded. Defined groups without any subject drop out, as a
+# chi-square over an all-zero column is undefined.
+in_data_An03_02_AgeGrp_Comp_ByTrt <- df2_An03_02_AgeGrp_Comp_ByTrt |>
+    dplyr::mutate(ars_group = dplyr::case_when(
+      AGEGR1 == '<65' ~ '<65',
+      AGEGR1 %in% c('65-80', '>80') ~ '65-80',
+      TRUE ~ NA_character_
+    )) |>
+    dplyr::filter(!is.na(ars_group))
+
+df3_An03_02_AgeGrp_Comp_ByTrt <-
+    cardx::ard_stats_chisq_test(by = TRT01A, data = in_data_An03_02_AgeGrp_Comp_ByTrt, variables = ars_group) |>
+  dplyr::filter(stat_name == 'p.value') |>
+  dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')
 }
 
 # Link ARS identifiers ---
@@ -226,48 +267,76 @@ df2_An03_03_Sex_Summ_ByTrt <- df_poptot
 
 #Apply Method --- 
 
-# Method ID:              Mth01_CatVar_Summ_ByGrp
-# Method name:            Summary by group of a categorical variable
-# Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
+# Method ID:              Mth01_CatVar_Summ_ByPreGrp
+# Method name:            Summary by pre-defined group of a categorical variable
+# Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence, counted per pre-defined group condition of the inner grouping: every defined group is reported, including empty ones.
 
-df3_An03_03_Sex_Summ_ByTrt <- NULL
-if (nrow(df2_An03_03_Sex_Summ_ByTrt) != 0) {
-denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
-  dplyr::select(TRT01A)
+# Population-based (see df_poptot): the zero-fill below must also run when the
+# data subset is empty, so siera drops its empty-data guard for this method -
+# an empty subset yields n = 0 / 0.0% for every arm x group.
+# Denominator: the referenced analysis's population count per Group1 level.
+denom_An03_03_Sex_Summ_ByTrt <- df2_An01_05_SAF_Summ_ByTrt |>
+    dplyr::count(TRT01A) |>
+    dplyr::rename(`...ard_N...` = n) |>
+    dplyr::mutate(dplyr::across(-`...ard_N...`, as.character))
 
-in_data = df2_An03_03_Sex_Summ_ByTrt |>
-    dplyr::distinct(TRT01A, SEX, USUBJID) |>
-    dplyr::mutate(dummy = 'dummyvar')
+# Group1's levels come from the denominator, so an arm in which no subject
+# qualifies still gets a zero row; Group2's levels are the ones the ARS
+# metadata DEFINES, not the ones the data happens to contain.
+.arms_An03_03_Sex_Summ_ByTrt <- as.character(denom_An03_03_Sex_Summ_ByTrt$TRT01A)
+.levels_An03_03_Sex_Summ_ByTrt <- c('M', 'F')
 
-dataDriven = FALSE
-if(dataDriven == TRUE){
-df3_An03_03_Sex_Summ_ByTrt <-
+denom_An03_03_Sex_Summ_ByTrt <- denom_An03_03_Sex_Summ_ByTrt |>
+    dplyr::mutate(TRT01A = factor(TRT01A, levels = .arms_An03_03_Sex_Summ_ByTrt))
+
+in_data_An03_03_Sex_Summ_ByTrt <- df2_An03_03_Sex_Summ_ByTrt |>
+    dplyr::mutate(ars_group = dplyr::case_when(
+      SEX == 'M' ~ 'M',
+      SEX == 'F' ~ 'F',
+      TRUE ~ NA_character_
+    )) |>
+    # A data value satisfying none of the defined group conditions was never
+    # asked for by the ARS, so it is excluded rather than tabulated.
+    dplyr::filter(!is.na(ars_group)) |>
+    dplyr::distinct(TRT01A, ars_group, USUBJID) |>
+    dplyr::mutate(
+      TRT01A = factor(as.character(TRT01A), levels = .arms_An03_03_Sex_Summ_ByTrt),
+      ars_group     = factor(ars_group, levels = .levels_An03_03_Sex_Summ_ByTrt)
+    ) |>
+    dplyr::select(TRT01A, ars_group)
+
+df3_An03_03_Sex_Summ_ByTrt <- if (length(.levels_An03_03_Sex_Summ_ByTrt) > 0) {
   cards::ard_tabulate(
-    data = in_data,
-    strata = c('TRT01A', 'SEX'),
-    variables = 'dummy',
-    denominator = denom_dataset
-  ) } else {
-df3_An03_03_Sex_Summ_ByTrt <-
- cards::ard_tabulate(
-    data = in_data,
-    by = c('TRT01A', 'SEX'),
-    variables = 'dummy',
-    denominator = denom_dataset
-  ) }
-df3_An03_03_Sex_Summ_ByTrt <- df3_An03_03_Sex_Summ_ByTrt|>
-dplyr::filter(stat_name %in% c('n', 'p')) |>
-dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+      data = in_data_An03_03_Sex_Summ_ByTrt,
+      by = 'TRT01A',
+      variables = 'ars_group',
+      denominator = denom_An03_03_Sex_Summ_ByTrt
+    ) |>
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  dplyr::rename(group2_level = variable_level) |>
+  # cards returns the levels as list-columns of factors, whose as.character()
+  # is the integer code - flatten to the labels before siera stamps group ids.
+  dplyr::mutate(dplyr::across(
+      dplyr::matches('_level$'),
+      ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
+    )) |>
+  dplyr::mutate(operationid = dplyr::case_when(
+      stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByPreGrp_1_n',
+      stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByPreGrp_2_pct'
+    ))
+} else {
+  tibble::tibble(group1_level = character(0), group2_level = character(0),
+                 stat_name = character(0), stat = list(),
+                 operationid = character(0))
 }
 
 # Link ARS identifiers ---
 df3_An03_03_Sex_Summ_ByTrt <- siera::ars_stamp(
   df3_An03_03_Sex_Summ_ByTrt,
-  analysis_id = 'An03_03_Sex_Summ_ByTrt',  # analyses[].id
-  method_id   = 'Mth01_CatVar_Summ_ByGrp', # analyses[].methodId
-  output_id   = 'Out14-1-1',               # mainListOfContents outputId
-  groupings   = list(                      # analyses[].orderedGroupings
+  analysis_id = 'An03_03_Sex_Summ_ByTrt',     # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByPreGrp', # analyses[].methodId
+  output_id   = 'Out14-1-1',                  # mainListOfContents outputId
+  groupings   = list(                         # analyses[].orderedGroupings
     siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
       'AnlsGrouping_01_Trt_1' = 'Placebo',
       'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
@@ -292,10 +361,23 @@ df2_An03_03_Sex_Comp_ByTrt <- df_poptot
 
 df3_An03_03_Sex_Comp_ByTrt <- NULL
 if (nrow(df2_An03_03_Sex_Comp_ByTrt) != 0) {
-df3_An03_03_Sex_Comp_ByTrt <- 
-    cardx::ard_stats_chisq_test(by = TRT01A, data = df2_An03_03_Sex_Comp_ByTrt, variables = SEX)|>
-dplyr::filter(stat_name == 'p.value') |>
-dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')
+# Test the groups the ARS metadata DEFINES for the inner grouping (matched by
+# their conditions), not the raw data values: a multi-value IN group is one
+# category, and a value satisfying no defined group was never asked for, so
+# it is excluded. Defined groups without any subject drop out, as a
+# chi-square over an all-zero column is undefined.
+in_data_An03_03_Sex_Comp_ByTrt <- df2_An03_03_Sex_Comp_ByTrt |>
+    dplyr::mutate(ars_group = dplyr::case_when(
+      SEX == 'M' ~ 'M',
+      SEX == 'F' ~ 'F',
+      TRUE ~ NA_character_
+    )) |>
+    dplyr::filter(!is.na(ars_group))
+
+df3_An03_03_Sex_Comp_ByTrt <-
+    cardx::ard_stats_chisq_test(by = TRT01A, data = in_data_An03_03_Sex_Comp_ByTrt, variables = ars_group) |>
+  dplyr::filter(stat_name == 'p.value') |>
+  dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')
 }
 
 # Link ARS identifiers ---
@@ -314,48 +396,76 @@ df2_An03_04_Ethnic_Summ_ByTrt <- df_poptot
 
 #Apply Method --- 
 
-# Method ID:              Mth01_CatVar_Summ_ByGrp
-# Method name:            Summary by group of a categorical variable
-# Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
+# Method ID:              Mth01_CatVar_Summ_ByPreGrp
+# Method name:            Summary by pre-defined group of a categorical variable
+# Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence, counted per pre-defined group condition of the inner grouping: every defined group is reported, including empty ones.
 
-df3_An03_04_Ethnic_Summ_ByTrt <- NULL
-if (nrow(df2_An03_04_Ethnic_Summ_ByTrt) != 0) {
-denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
-  dplyr::select(TRT01A)
+# Population-based (see df_poptot): the zero-fill below must also run when the
+# data subset is empty, so siera drops its empty-data guard for this method -
+# an empty subset yields n = 0 / 0.0% for every arm x group.
+# Denominator: the referenced analysis's population count per Group1 level.
+denom_An03_04_Ethnic_Summ_ByTrt <- df2_An01_05_SAF_Summ_ByTrt |>
+    dplyr::count(TRT01A) |>
+    dplyr::rename(`...ard_N...` = n) |>
+    dplyr::mutate(dplyr::across(-`...ard_N...`, as.character))
 
-in_data = df2_An03_04_Ethnic_Summ_ByTrt |>
-    dplyr::distinct(TRT01A, ETHNIC, USUBJID) |>
-    dplyr::mutate(dummy = 'dummyvar')
+# Group1's levels come from the denominator, so an arm in which no subject
+# qualifies still gets a zero row; Group2's levels are the ones the ARS
+# metadata DEFINES, not the ones the data happens to contain.
+.arms_An03_04_Ethnic_Summ_ByTrt <- as.character(denom_An03_04_Ethnic_Summ_ByTrt$TRT01A)
+.levels_An03_04_Ethnic_Summ_ByTrt <- c('HISPANIC OR LATINO', 'NOT HISPANIC OR LATINO')
 
-dataDriven = FALSE
-if(dataDriven == TRUE){
-df3_An03_04_Ethnic_Summ_ByTrt <-
+denom_An03_04_Ethnic_Summ_ByTrt <- denom_An03_04_Ethnic_Summ_ByTrt |>
+    dplyr::mutate(TRT01A = factor(TRT01A, levels = .arms_An03_04_Ethnic_Summ_ByTrt))
+
+in_data_An03_04_Ethnic_Summ_ByTrt <- df2_An03_04_Ethnic_Summ_ByTrt |>
+    dplyr::mutate(ars_group = dplyr::case_when(
+      ETHNIC == 'HISPANIC OR LATINO' ~ 'HISPANIC OR LATINO',
+      ETHNIC == 'NOT HISPANIC OR LATINO' ~ 'NOT HISPANIC OR LATINO',
+      TRUE ~ NA_character_
+    )) |>
+    # A data value satisfying none of the defined group conditions was never
+    # asked for by the ARS, so it is excluded rather than tabulated.
+    dplyr::filter(!is.na(ars_group)) |>
+    dplyr::distinct(TRT01A, ars_group, USUBJID) |>
+    dplyr::mutate(
+      TRT01A = factor(as.character(TRT01A), levels = .arms_An03_04_Ethnic_Summ_ByTrt),
+      ars_group     = factor(ars_group, levels = .levels_An03_04_Ethnic_Summ_ByTrt)
+    ) |>
+    dplyr::select(TRT01A, ars_group)
+
+df3_An03_04_Ethnic_Summ_ByTrt <- if (length(.levels_An03_04_Ethnic_Summ_ByTrt) > 0) {
   cards::ard_tabulate(
-    data = in_data,
-    strata = c('TRT01A', 'ETHNIC'),
-    variables = 'dummy',
-    denominator = denom_dataset
-  ) } else {
-df3_An03_04_Ethnic_Summ_ByTrt <-
- cards::ard_tabulate(
-    data = in_data,
-    by = c('TRT01A', 'ETHNIC'),
-    variables = 'dummy',
-    denominator = denom_dataset
-  ) }
-df3_An03_04_Ethnic_Summ_ByTrt <- df3_An03_04_Ethnic_Summ_ByTrt|>
-dplyr::filter(stat_name %in% c('n', 'p')) |>
-dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+      data = in_data_An03_04_Ethnic_Summ_ByTrt,
+      by = 'TRT01A',
+      variables = 'ars_group',
+      denominator = denom_An03_04_Ethnic_Summ_ByTrt
+    ) |>
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  dplyr::rename(group2_level = variable_level) |>
+  # cards returns the levels as list-columns of factors, whose as.character()
+  # is the integer code - flatten to the labels before siera stamps group ids.
+  dplyr::mutate(dplyr::across(
+      dplyr::matches('_level$'),
+      ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
+    )) |>
+  dplyr::mutate(operationid = dplyr::case_when(
+      stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByPreGrp_1_n',
+      stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByPreGrp_2_pct'
+    ))
+} else {
+  tibble::tibble(group1_level = character(0), group2_level = character(0),
+                 stat_name = character(0), stat = list(),
+                 operationid = character(0))
 }
 
 # Link ARS identifiers ---
 df3_An03_04_Ethnic_Summ_ByTrt <- siera::ars_stamp(
   df3_An03_04_Ethnic_Summ_ByTrt,
-  analysis_id = 'An03_04_Ethnic_Summ_ByTrt', # analyses[].id
-  method_id   = 'Mth01_CatVar_Summ_ByGrp',   # analyses[].methodId
-  output_id   = 'Out14-1-1',                 # mainListOfContents outputId
-  groupings   = list(                        # analyses[].orderedGroupings
+  analysis_id = 'An03_04_Ethnic_Summ_ByTrt',  # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByPreGrp', # analyses[].methodId
+  output_id   = 'Out14-1-1',                  # mainListOfContents outputId
+  groupings   = list(                         # analyses[].orderedGroupings
     siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
       'AnlsGrouping_01_Trt_1' = 'Placebo',
       'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
@@ -380,10 +490,23 @@ df2_An03_04_Ethnic_Comp_ByTrt <- df_poptot
 
 df3_An03_04_Ethnic_Comp_ByTrt <- NULL
 if (nrow(df2_An03_04_Ethnic_Comp_ByTrt) != 0) {
-df3_An03_04_Ethnic_Comp_ByTrt <- 
-    cardx::ard_stats_chisq_test(by = TRT01A, data = df2_An03_04_Ethnic_Comp_ByTrt, variables = ETHNIC)|>
-dplyr::filter(stat_name == 'p.value') |>
-dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')
+# Test the groups the ARS metadata DEFINES for the inner grouping (matched by
+# their conditions), not the raw data values: a multi-value IN group is one
+# category, and a value satisfying no defined group was never asked for, so
+# it is excluded. Defined groups without any subject drop out, as a
+# chi-square over an all-zero column is undefined.
+in_data_An03_04_Ethnic_Comp_ByTrt <- df2_An03_04_Ethnic_Comp_ByTrt |>
+    dplyr::mutate(ars_group = dplyr::case_when(
+      ETHNIC == 'HISPANIC OR LATINO' ~ 'HISPANIC OR LATINO',
+      ETHNIC == 'NOT HISPANIC OR LATINO' ~ 'NOT HISPANIC OR LATINO',
+      TRUE ~ NA_character_
+    )) |>
+    dplyr::filter(!is.na(ars_group))
+
+df3_An03_04_Ethnic_Comp_ByTrt <-
+    cardx::ard_stats_chisq_test(by = TRT01A, data = in_data_An03_04_Ethnic_Comp_ByTrt, variables = ars_group) |>
+  dplyr::filter(stat_name == 'p.value') |>
+  dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')
 }
 
 # Link ARS identifiers ---
@@ -402,48 +525,83 @@ df2_An03_05_Race_Summ_ByTrt <- df_poptot
 
 #Apply Method --- 
 
-# Method ID:              Mth01_CatVar_Summ_ByGrp
-# Method name:            Summary by group of a categorical variable
-# Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
+# Method ID:              Mth01_CatVar_Summ_ByPreGrp
+# Method name:            Summary by pre-defined group of a categorical variable
+# Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence, counted per pre-defined group condition of the inner grouping: every defined group is reported, including empty ones.
 
-df3_An03_05_Race_Summ_ByTrt <- NULL
-if (nrow(df2_An03_05_Race_Summ_ByTrt) != 0) {
-denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
-  dplyr::select(TRT01A)
+# Population-based (see df_poptot): the zero-fill below must also run when the
+# data subset is empty, so siera drops its empty-data guard for this method -
+# an empty subset yields n = 0 / 0.0% for every arm x group.
+# Denominator: the referenced analysis's population count per Group1 level.
+denom_An03_05_Race_Summ_ByTrt <- df2_An01_05_SAF_Summ_ByTrt |>
+    dplyr::count(TRT01A) |>
+    dplyr::rename(`...ard_N...` = n) |>
+    dplyr::mutate(dplyr::across(-`...ard_N...`, as.character))
 
-in_data = df2_An03_05_Race_Summ_ByTrt |>
-    dplyr::distinct(TRT01A, RACE, USUBJID) |>
-    dplyr::mutate(dummy = 'dummyvar')
+# Group1's levels come from the denominator, so an arm in which no subject
+# qualifies still gets a zero row; Group2's levels are the ones the ARS
+# metadata DEFINES, not the ones the data happens to contain.
+.arms_An03_05_Race_Summ_ByTrt <- as.character(denom_An03_05_Race_Summ_ByTrt$TRT01A)
+.levels_An03_05_Race_Summ_ByTrt <- c('AMERICAN INDIAN OR ALASKA NATIVE', 'ASIAN', 'BLACK OR AFRICAN AMERICAN', 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER', 'WHITE', 'MULTIPLE', 'NOT REPORTED', 'UNKNOWN', 'OTHER')
 
-dataDriven = FALSE
-if(dataDriven == TRUE){
-df3_An03_05_Race_Summ_ByTrt <-
+denom_An03_05_Race_Summ_ByTrt <- denom_An03_05_Race_Summ_ByTrt |>
+    dplyr::mutate(TRT01A = factor(TRT01A, levels = .arms_An03_05_Race_Summ_ByTrt))
+
+in_data_An03_05_Race_Summ_ByTrt <- df2_An03_05_Race_Summ_ByTrt |>
+    dplyr::mutate(ars_group = dplyr::case_when(
+      RACE == 'AMERICAN INDIAN OR ALASKA NATIVE' ~ 'AMERICAN INDIAN OR ALASKA NATIVE',
+      RACE == 'ASIAN' ~ 'ASIAN',
+      RACE == 'BLACK OR AFRICAN AMERICAN' ~ 'BLACK OR AFRICAN AMERICAN',
+      RACE == 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER' ~ 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER',
+      RACE == 'WHITE' ~ 'WHITE',
+      RACE == 'MULTIPLE' ~ 'MULTIPLE',
+      RACE == 'NOT REPORTED' ~ 'NOT REPORTED',
+      RACE == 'UNKNOWN' ~ 'UNKNOWN',
+      RACE == 'OTHER' ~ 'OTHER',
+      TRUE ~ NA_character_
+    )) |>
+    # A data value satisfying none of the defined group conditions was never
+    # asked for by the ARS, so it is excluded rather than tabulated.
+    dplyr::filter(!is.na(ars_group)) |>
+    dplyr::distinct(TRT01A, ars_group, USUBJID) |>
+    dplyr::mutate(
+      TRT01A = factor(as.character(TRT01A), levels = .arms_An03_05_Race_Summ_ByTrt),
+      ars_group     = factor(ars_group, levels = .levels_An03_05_Race_Summ_ByTrt)
+    ) |>
+    dplyr::select(TRT01A, ars_group)
+
+df3_An03_05_Race_Summ_ByTrt <- if (length(.levels_An03_05_Race_Summ_ByTrt) > 0) {
   cards::ard_tabulate(
-    data = in_data,
-    strata = c('TRT01A', 'RACE'),
-    variables = 'dummy',
-    denominator = denom_dataset
-  ) } else {
-df3_An03_05_Race_Summ_ByTrt <-
- cards::ard_tabulate(
-    data = in_data,
-    by = c('TRT01A', 'RACE'),
-    variables = 'dummy',
-    denominator = denom_dataset
-  ) }
-df3_An03_05_Race_Summ_ByTrt <- df3_An03_05_Race_Summ_ByTrt|>
-dplyr::filter(stat_name %in% c('n', 'p')) |>
-dplyr::mutate(operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
-                                                              stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+      data = in_data_An03_05_Race_Summ_ByTrt,
+      by = 'TRT01A',
+      variables = 'ars_group',
+      denominator = denom_An03_05_Race_Summ_ByTrt
+    ) |>
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  dplyr::rename(group2_level = variable_level) |>
+  # cards returns the levels as list-columns of factors, whose as.character()
+  # is the integer code - flatten to the labels before siera stamps group ids.
+  dplyr::mutate(dplyr::across(
+      dplyr::matches('_level$'),
+      ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
+    )) |>
+  dplyr::mutate(operationid = dplyr::case_when(
+      stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByPreGrp_1_n',
+      stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByPreGrp_2_pct'
+    ))
+} else {
+  tibble::tibble(group1_level = character(0), group2_level = character(0),
+                 stat_name = character(0), stat = list(),
+                 operationid = character(0))
 }
 
 # Link ARS identifiers ---
 df3_An03_05_Race_Summ_ByTrt <- siera::ars_stamp(
   df3_An03_05_Race_Summ_ByTrt,
-  analysis_id = 'An03_05_Race_Summ_ByTrt', # analyses[].id
-  method_id   = 'Mth01_CatVar_Summ_ByGrp', # analyses[].methodId
-  output_id   = 'Out14-1-1',               # mainListOfContents outputId
-  groupings   = list(                      # analyses[].orderedGroupings
+  analysis_id = 'An03_05_Race_Summ_ByTrt',    # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByPreGrp', # analyses[].methodId
+  output_id   = 'Out14-1-1',                  # mainListOfContents outputId
+  groupings   = list(                         # analyses[].orderedGroupings
     siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
       'AnlsGrouping_01_Trt_1' = 'Placebo',
       'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
@@ -475,10 +633,30 @@ df2_An03_05_Race_Comp_ByTrt <- df_poptot
 
 df3_An03_05_Race_Comp_ByTrt <- NULL
 if (nrow(df2_An03_05_Race_Comp_ByTrt) != 0) {
-df3_An03_05_Race_Comp_ByTrt <- 
-    cardx::ard_stats_chisq_test(by = TRT01A, data = df2_An03_05_Race_Comp_ByTrt, variables = RACE)|>
-dplyr::filter(stat_name == 'p.value') |>
-dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')
+# Test the groups the ARS metadata DEFINES for the inner grouping (matched by
+# their conditions), not the raw data values: a multi-value IN group is one
+# category, and a value satisfying no defined group was never asked for, so
+# it is excluded. Defined groups without any subject drop out, as a
+# chi-square over an all-zero column is undefined.
+in_data_An03_05_Race_Comp_ByTrt <- df2_An03_05_Race_Comp_ByTrt |>
+    dplyr::mutate(ars_group = dplyr::case_when(
+      RACE == 'AMERICAN INDIAN OR ALASKA NATIVE' ~ 'AMERICAN INDIAN OR ALASKA NATIVE',
+      RACE == 'ASIAN' ~ 'ASIAN',
+      RACE == 'BLACK OR AFRICAN AMERICAN' ~ 'BLACK OR AFRICAN AMERICAN',
+      RACE == 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER' ~ 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER',
+      RACE == 'WHITE' ~ 'WHITE',
+      RACE == 'MULTIPLE' ~ 'MULTIPLE',
+      RACE == 'NOT REPORTED' ~ 'NOT REPORTED',
+      RACE == 'UNKNOWN' ~ 'UNKNOWN',
+      RACE == 'OTHER' ~ 'OTHER',
+      TRUE ~ NA_character_
+    )) |>
+    dplyr::filter(!is.na(ars_group))
+
+df3_An03_05_Race_Comp_ByTrt <-
+    cardx::ard_stats_chisq_test(by = TRT01A, data = in_data_An03_05_Race_Comp_ByTrt, variables = ars_group) |>
+  dplyr::filter(stat_name == 'p.value') |>
+  dplyr::mutate(operationid = 'Mth03_CatVar_Comp_PChiSq_1_pval')
 }
 
 # Link ARS identifiers ---
@@ -619,6 +797,8 @@ df3_An03_06_Height_Comp_ByTrt)
     "Mth01_CatVar_Count_ByGrp_1_n",
     "Mth01_CatVar_Summ_ByGrp_1_n",
     "Mth01_CatVar_Summ_ByGrp_2_pct",
+    "Mth01_CatVar_Summ_ByPreGrp_1_n",
+    "Mth01_CatVar_Summ_ByPreGrp_2_pct",
     "Mth02_ContVar_Summ_ByGrp_1_n",
     "Mth02_ContVar_Summ_ByGrp_2_Mean",
     "Mth02_ContVar_Summ_ByGrp_3_SD",
@@ -632,6 +812,8 @@ df3_An03_06_Height_Comp_ByTrt)
   ),
   pattern = c(
     "(N=XX)",
+    "XXX",
+    "( XX.X)",
     "XXX",
     "( XX.X)",
     "XX",

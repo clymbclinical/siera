@@ -1,7 +1,7 @@
 
 # Programme:    Generate code to produce ARD for Out14-3-1-1
 # Output:       Overall Summary of Treatment-Emergent Adverse Events
-# Date created: 2026-10-06 16:10:54
+# Date created: 2026-10-07 13:48:07
 
   # load libraries ----
     library(dplyr)
@@ -577,6 +577,8 @@ df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt)
     "Mth01_CatVar_Count_ByGrp_1_n",
     "Mth01_CatVar_Summ_ByGrp_1_n",
     "Mth01_CatVar_Summ_ByGrp_2_pct",
+    "Mth01_CatVar_Summ_ByPreGrp_1_n",
+    "Mth01_CatVar_Summ_ByPreGrp_2_pct",
     "Mth02_ContVar_Summ_ByGrp_1_n",
     "Mth02_ContVar_Summ_ByGrp_2_Mean",
     "Mth02_ContVar_Summ_ByGrp_3_SD",
@@ -590,6 +592,8 @@ df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt)
   ),
   pattern = c(
     "(N=XX)",
+    "XXX",
+    "( XX.X)",
     "XXX",
     "( XX.X)",
     "XX",

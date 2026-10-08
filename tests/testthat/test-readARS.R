@@ -626,7 +626,33 @@ test_that("ARD values - Common_Safety_Displays_cards", {
         ) %>%
         select(stat) %>%
         unlist()
-      expect_equal(round(test4[[1]], digits = 6), 0.143917)
+      # over the two DEFINED age groups, '< 65' vs '>= 65' (#215/#216), not
+      # the three AGEGR1 data categories (p = 0.143917)
+      expect_equal(round(test4[[1]], digits = 6), 0.423879)
+
+      # Pre-defined groups (#216): '>= 65' is AGEGR1 IN ('65-80', '>80'), so
+      # it counts both categories ...
+      ge65 <- ARD %>%
+        filter(
+          AnalysisId == "An03_02_AgeGrp_Summ_ByTrt",
+          operationid == "Mth01_CatVar_Summ_ByPreGrp_1_n",
+          group2_groupId == "AnlsGrouping_03_AgeGp_2"
+        ) %>%
+        select(stat) %>%
+        unlist()
+      expect_equal(unname(ge65), c(72, 73, 76))
+
+      # ... and every one of the 9 defined race groups is reported per arm,
+      # with zero counts for the groups that do not occur in an arm
+      race <- ARD %>%
+        filter(
+          AnalysisId == "An03_05_Race_Summ_ByTrt",
+          operationid == "Mth01_CatVar_Summ_ByPreGrp_1_n"
+        )
+      expect_equal(nrow(race), 27L)
+      expect_setequal(race$group2_groupId,
+                      paste0("AnlsGrouping_04_Race_", 1:9))
+      expect_equal(sum(unlist(race$stat) == 0), 20L)
     } else if (length(grep("Out14-3-1-1", f)) > 0) {
       # categorical counts
       test1 <- ARD %>%

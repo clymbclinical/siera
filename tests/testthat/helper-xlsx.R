@@ -26,3 +26,17 @@
     ls[nzchar(trimws(ls))]
   }), basename(fs))
 }
+
+# The JSON demo Common_Safety_Displays_cards carries the pre-defined-group
+# methods of #216 (data-raw/Common_Safety_Displays_cards.R); the deprecated
+# workbook does not. They change the demographics output, and the
+# operation -> resultPattern lookup that every script embeds for the whole
+# reporting event. Drop both, so the rest of each script is still compared.
+.drop_predefined_group_methods <- function(scripts) {
+  scripts[["ARD_Out14-1-1.R"]] <- NULL
+  lapply(scripts, function(ls) {
+    s <- which(ls == ".op_patterns <- data.frame(")
+    e <- which(ls == ")")
+    ls[-(s:e[e > s][1])]
+  })
+}
