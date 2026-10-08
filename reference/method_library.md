@@ -36,18 +36,19 @@ The human-readable catalog (\`METHODS.md\`) and the valueSource registry
 
 ``` r
 method_library()
-#>  [1] "anova"                                   
-#>  [2] "categorical_summary"                     
-#>  [3] "categorical_summary_per_predefined_group"
-#>  [4] "chisq"                                   
-#>  [5] "chisq_per_predefined_group"              
-#>  [6] "continuous_summary"                      
-#>  [7] "fishers_exact"                           
-#>  [8] "risk_difference"                         
-#>  [9] "risk_difference_per_group"               
-#> [10] "risk_difference_per_group_pair"          
-#> [11] "risk_difference_per_predefined_group"    
-#> [12] "total_n"                                 
+#>  [1] "anova"                                           
+#>  [2] "categorical_summary"                             
+#>  [3] "categorical_summary_per_predefined_group"        
+#>  [4] "categorical_summary_per_predefined_group_overall"
+#>  [5] "chisq"                                           
+#>  [6] "chisq_per_predefined_group"                      
+#>  [7] "continuous_summary"                              
+#>  [8] "fishers_exact"                                   
+#>  [9] "risk_difference"                                 
+#> [10] "risk_difference_per_group"                       
+#> [11] "risk_difference_per_group_pair"                  
+#> [12] "risk_difference_per_predefined_group"            
+#> [13] "total_n"                                         
 method_library("risk_difference")
 #> [1] "/home/runner/work/_temp/Library/siera/method-library/04_risk_difference"
 ```
