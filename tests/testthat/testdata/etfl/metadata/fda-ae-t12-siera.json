@@ -650,6 +650,106 @@
           }
         ]
       }
+    },
+    {
+      "id": "Mth_03b",
+      "name": "Categorical n% (3-grouping: first grouping -> by=, outer x inner category pair -> strata=)",
+      "description": "Categorical n% for 3-grouping analyses such as treatment x SOC x PT: n and % per treatment arm x observed (outer, inner) category pair, zero-filled across arms, % over the referenced denominator analysis's arm count",
+      "label": "Categorical n% (3-grouping)",
+      "operations": [
+        {
+          "id": "Mth_03b_01_n",
+          "name": "n",
+          "label": "n",
+          "order": 1,
+          "resultPattern": "XX"
+        },
+        {
+          "id": "Mth_03b_02_%",
+          "name": "%",
+          "label": "%",
+          "order": 2,
+          "resultPattern": "XX.X",
+          "referencedOperationRelationships": [
+            {
+              "id": "Mth_03b_pct_NUM",
+              "description": "Numerator for percentage.",
+              "referencedOperationRole": {
+                "controlledTerm": "NUMERATOR"
+              },
+              "operationId": "Mth_03b_01_n"
+            },
+            {
+              "id": "Mth_03b_pct_DEN",
+              "description": "Denominator for percentage.",
+              "referencedOperationRole": {
+                "controlledTerm": "DENOMINATOR"
+              },
+              "operationId": "Mth_00_1_01_n"
+            }
+          ]
+        }
+      ],
+      "codeTemplate": {
+        "context": "R (siera)",
+        "code": "denom_dataset = df2_denomanaidhere |>\n    dplyr::count(denom_anagroupvarshere) |>\n    dplyr::rename(`...ard_N...` = n) |>\n    dplyr::mutate(dplyr::across(-`...ard_N...`, as.character))\n\n# Arms come from the denominator, so an arm with no event in the subset\n# still gets zero rows.\n.arms_analysisidhere <- denom_dataset$groupvar1here\n\nin_data = df2_analysisidhere |>\n    dplyr::distinct(dplyr::across(c(bylisthere, anavarhere))) |>\n    dplyr::mutate(dplyr::across(dplyr::everything(), as.character), dummy = 'dummyvar') |>\n    dplyr::mutate(groupvar1here = factor(groupvar1here, levels = .arms_analysisidhere))\n\n# cards needs every by/strata column in the denominator: repeat each arm's\n# count for every observed (outer, inner) category pair\ndenom_dataset = in_data |>\n    dplyr::distinct(groupvar2here, groupvar3here) |>\n    dplyr::cross_join(denom_dataset) |>\n    dplyr::mutate(groupvar1here = factor(groupvar1here, levels = .arms_analysisidhere))\n\ndf3_analysisidhere <- cards::ard_tabulate(\n    data = in_data,\n    by = 'groupvar1here',\n    strata = c('groupvar2here', 'groupvar3here'),\n    variables = 'dummy',\n    denominator = denom_dataset\n  ) |>\ndplyr::filter(stat_name %in% c('n', 'p')) |>\n dplyr::mutate(operationid = dplyr::case_when(\n    stat_name == 'n' ~ 'opid1here',\n    stat_name == 'p' ~ 'opid2here'\n  ))",
+        "parameters": [
+          {
+            "name": "denomanaidhere",
+            "label": "denom ana id",
+            "description": "Denominator analysis ID",
+            "valueSource": "DEN_analysisid"
+          },
+          {
+            "name": "denom_anagroupvarshere",
+            "label": "denom grp var",
+            "description": "Denominator grouping variable",
+            "valueSource": "AG_denom_var1"
+          },
+          {
+            "name": "bylisthere",
+            "label": "grouping vars",
+            "description": "Quoted grouping variables (treatment, outer, inner)",
+            "valueSource": "by_listc"
+          },
+          {
+            "name": "anavarhere",
+            "label": "ana var",
+            "description": "Analysis variable (subject ID)",
+            "valueSource": "ana_var"
+          },
+          {
+            "name": "groupvar1here",
+            "label": "grp var 1",
+            "description": "First grouping variable (treatment arm)",
+            "valueSource": "AG_var1"
+          },
+          {
+            "name": "groupvar2here",
+            "label": "grp var 2",
+            "description": "Second grouping variable (outer category, e.g. SOC)",
+            "valueSource": "AG_var2"
+          },
+          {
+            "name": "groupvar3here",
+            "label": "grp var 3",
+            "description": "Third grouping variable (inner category, e.g. PT)",
+            "valueSource": "AG_var3"
+          },
+          {
+            "name": "opid1here",
+            "label": "n id",
+            "description": "Operation ID for n",
+            "valueSource": "operation_1"
+          },
+          {
+            "name": "opid2here",
+            "label": "% id",
+            "description": "Operation ID for %",
+            "valueSource": "operation_2"
+          }
+        ]
+      }
     }
   ],
   "analyses": [
@@ -1420,7 +1520,7 @@
       "purpose": {
         "controlledTerm": "SECONDARY OUTCOME MEASURE"
       },
-      "methodId": "Mth_03",
+      "methodId": "Mth_03b",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -1449,11 +1549,11 @@
       ],
       "referencedAnalysisOperations": [
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "referencedOperationRelationshipId": "Mth_03b_pct_NUM",
           "analysisId": "An_63"
         },
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "referencedOperationRelationshipId": "Mth_03b_pct_DEN",
           "analysisId": "An_58"
         }
       ],
