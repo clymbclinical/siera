@@ -112,6 +112,15 @@
   dplyr::bind_rows(direct, children)
 }
 
+# ARS `condition.value` is multivalued, but JSON in the wild carries both a
+# scalar ("Y") and an array (["A", "B"]); jsonlite then simplifies one block of
+# where-clauses to a character column and another to a list column, which
+# dplyr::bind_rows() cannot combine (#217). Downstream code treats
+# condition_value as a list-column, so always hand it one.
+.as_value_list <- function(v) {
+  if (is.null(v) || is.list(v)) v else as.list(v)
+}
+
 #' Read ARS metadata from JSON
 #'
 #' Internal helper that ingests ARS metadata stored as JSON and converts it into
@@ -192,7 +201,7 @@
       condition_dataset = json_from[["dataSubsets"]][["condition"]][["dataset"]],
       condition_variable = json_from[["dataSubsets"]][["condition"]][["variable"]],
       condition_comparator = json_from[["dataSubsets"]][["condition"]][["comparator"]],
-      condition_value = json_from[["dataSubsets"]][["condition"]][["value"]],
+      condition_value = .as_value_list(json_from[["dataSubsets"]][["condition"]][["value"]]),
       compoundExpression_logicalOperator = json_from[["dataSubsets"]][["compoundExpression"]][["logicalOperator"]]
     )
 
@@ -211,7 +220,7 @@
           condition_dataset = whereClauses[[c]][["condition"]][["dataset"]],
           condition_variable = whereClauses[[c]][["condition"]][["variable"]],
           condition_comparator = whereClauses[[c]][["condition"]][["comparator"]],
-          condition_value = whereClauses[[c]][["condition"]][["value"]],
+          condition_value = .as_value_list(whereClauses[[c]][["condition"]][["value"]]),
           compoundExpression_logicalOperator = whereClauses[[c]]$compoundExpression$logicalOperator,
           id = tmp_DSID,
           name = tmp_DSname,
@@ -228,7 +237,7 @@
               condition_dataset = whereClausesL2[[d]][["condition"]][["dataset"]],
               condition_variable = whereClausesL2[[d]][["condition"]][["variable"]],
               condition_comparator = whereClausesL2[[d]][["condition"]][["comparator"]],
-              condition_value = whereClausesL2[[d]][["condition"]][["value"]],
+              condition_value = .as_value_list(whereClausesL2[[d]][["condition"]][["value"]]),
               id = tmp_DSID,
               name = tmp_DSname,
               label = tmp_DSlabel
