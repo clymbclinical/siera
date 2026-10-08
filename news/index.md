@@ -210,6 +210,13 @@ CRAN release: 2026-06-17
   the data subsets aborted; both forms are now read, whichever tool
   wrote the file
   ([\#217](https://github.com/clymbclinical/siera/issues/217)).
+- Fixed
+  [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+  aborting on ARS JSON that writes an empty array for an operation’s
+  `referencedOperationRelationships` or an analysis’s
+  `referencedAnalysisOperations`. Both are valid ARS, and `[]` is now
+  read as “no relationships”, exactly like an absent field
+  ([\#230](https://github.com/clymbclinical/siera/issues/230)).
 - Changed the bundled demo reporting event
   `Common_Safety_Displays_cards.json` (used by the README, the vignettes
   and `ARD_script_example("ARD_Out14-1-1.R")`) so its demographics

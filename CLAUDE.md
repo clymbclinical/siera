@@ -172,6 +172,14 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   [`.extract_lopa_ids()`](https://clymbclinical.github.io/siera/reference/dot-extract_lopa_ids.md)
   in `metadata.R` relies on this structure to traverse arbitrary-depth
   `sublist` nesting in `mainListOfContents`.
+- **Empty JSON arrays mean “none”** — jsonlite reads `[]` as an empty
+  [`list()`](https://rdrr.io/r/base/list.html), which passes an
+  `!is.null()` guard and then breaks `dplyr`/`tidyr` steps. The
+  `referencedAnalysisOperations` and `referencedOperationRelationships`
+  loops in
+  [`.read_ars_json_metadata()`](https://clymbclinical.github.io/siera/reference/dot-read_ars_json_metadata.md)
+  therefore guard with `NROW(x) > 0` (#230); use the same guard for any
+  other optional ARS array you start reading.
 - **`analysisId` must be coerced to `character`** when binding rows from
   JSON because JSON `null` parses as logical `NA`, causing type
   conflicts in
@@ -843,10 +851,7 @@ after the templates are updated, then
   `ARD_Out14-1-1.R` and the event-wide `.op_patterns` lookup block for
   this demo via `.drop_predefined_group_methods()` (`helper-xlsx.R`).
   Edit the demo by changing that script and re-running it, then
-  regenerate `inst/script/`. Gotcha: the JSON reader aborts on an
-  operation carrying an empty `referencedOperationRelationships: []`
-  (`pivot_wider` on a column-less tibble, `R/metadata.R`), so omit the
-  field rather than write `[]`.
+  regenerate `inst/script/`.
 - **eTFL Portal integration testing** — `tests/testthat/testdata/etfl/`
   holds the CDISC eTFL Portal fixtures unzipped into three subfolders
   (no `.zip` files are committed): `metadata/<table>-siera.json` (ARS
