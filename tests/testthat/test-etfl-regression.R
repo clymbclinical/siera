@@ -248,6 +248,10 @@ test_that("fda-ae-t09 AE SAE/fatal: bigN, n%, two-level n%, and risk difference 
   .expect_all_match(.cmp_n_pct(ard, ref, "An_66"))
   .expect_all_match(.cmp_n_pct_2level(ard, ref, "An_68"))
   .expect_all_match(.cmp_rd(ard, ref, "An_67"))
+  # An_70 (arm x SOC x PT, #226): same three-grouping shape as t36 An_56.
+  an70 <- .cmp_n_pct_3level(ard, ref, "An_70")
+  .expect_all_match(an70)
+  expect_equal(an70$n_total, sum(ref$analysisId == "An_70"))
 })
 
 test_that("fda-ae-t12 TEAE: bigN, n%, two-level n%, and risk difference match reference", {
@@ -260,6 +264,10 @@ test_that("fda-ae-t12 TEAE: bigN, n%, two-level n%, and risk difference match re
   .expect_all_match(.cmp_n_pct(ard, ref, "An_59"))
   .expect_all_match(.cmp_n_pct_2level(ard, ref, "An_61"))
   .expect_all_match(.cmp_rd(ard, ref, "An_60"))
+  # An_63 (arm x SOC x PT, #226): same three-grouping shape as t36 An_56.
+  an63 <- .cmp_n_pct_3level(ard, ref, "An_63")
+  .expect_all_match(an63)
+  expect_equal(an63$n_total, sum(ref$analysisId == "An_63"))
 })
 
 test_that("fda-ae-t13 AE by PT: bigN and two-level arm x PT n match spec (#158)", {
@@ -308,6 +316,19 @@ test_that("fda-ae-t36 AE by severity: bigN, n%, two-level n%, and per-(SOC x PT)
   expect_true(.cmp_bigN(ard, ref, "An_51")$match)
   .expect_all_match(.cmp_n_pct(ard, ref, "An_52"))
   .expect_all_match(.cmp_n_pct_2level(ard, ref, "An_54"))
+
+  # An_56 (arm x SOC x PT n/%, #226, method Mth_03b): every reference row has
+  # a matching siera row, the 27 reference zero counts included. siera
+  # zero-fills each observed (SOC, PT) pair across all three arms (690 cells
+  # per statistic); the reference does so only in part (381), so siera's extra
+  # zero cells have no reference partner.
+  an56 <- .cmp_n_pct_3level(ard, ref, "An_56")
+  .expect_all_match(an56)
+  expect_equal(an56$n_total, sum(ref$analysisId == "An_56"))
+  an56_ard <- dplyr::filter(ard, AnalysisId == "An_56")
+  expect_equal(nrow(an56_ard), 2L * 3L * 230L)
+  expect_false(anyNA(an56_ard$group1_groupId))
+  expect_false(anyNA(an56_ard$group3_groupValue))
 
   # An_55 / An_55_1 (per-SOC risk difference, #157): one RD + 95% CI per body
   # system, over arms 1 vs 3 (Low Dose) and 2 vs 3 (High Dose), on first-
