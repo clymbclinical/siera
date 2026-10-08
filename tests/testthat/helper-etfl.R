@@ -153,6 +153,16 @@
              siera_cat = "group2_level", ref_cat = "Group2")
 }
 
+# Three-grouping (arm x SOC x PT) n and % (#226): the category is the
+# (outer, inner) pair, keyed as one string so .cmp_n_pct() can join on it.
+.cmp_n_pct_3level <- function(siera_ard, ref_ard, ana_id,
+                              n_opid = "Mth_03_01_n", pct_opid = "Mth_03_02_%") {
+  siera_ard$pair <- paste(siera_ard$group2_level, siera_ard$group3_level, sep = " / ")
+  ref_ard$pair <- paste(ref_ard$Group2, ref_ard$Group3, sep = " / ")
+  .cmp_n_pct(siera_ard, ref_ard, ana_id, n_opid, pct_opid,
+             siera_cat = "pair", ref_cat = "pair")
+}
+
 # Independent ground truth for an arm x PT distinct-subject AE count (#158). ----
 # Computed straight from the raw ADaM XPT, NOT from the reference ARD: for
 # fda-ae-t13 An_80 the published reference ARD omits the treatment-emergent

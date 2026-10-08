@@ -254,6 +254,19 @@ test_that("fda-ae-t36 AE by severity: bigN, n%, two-level n%, and per-(SOC x PT)
   .expect_all_match(.cmp_n_pct(ard, ref, "An_52"))
   .expect_all_match(.cmp_n_pct_2level(ard, ref, "An_54"))
 
+  # An_56 (arm x SOC x PT n/%, #226, method Mth_03b): every reference row has
+  # a matching siera row, the 27 reference zero counts included. siera
+  # zero-fills each observed (SOC, PT) pair across all three arms (690 cells
+  # per statistic); the reference does so only in part (381), so siera's extra
+  # zero cells have no reference partner.
+  an56 <- .cmp_n_pct_3level(ard, ref, "An_56")
+  .expect_all_match(an56)
+  expect_equal(an56$n_total, sum(ref$analysisId == "An_56"))
+  an56_ard <- dplyr::filter(ard, AnalysisId == "An_56")
+  expect_equal(nrow(an56_ard), 2L * 3L * 230L)
+  expect_false(anyNA(an56_ard$group1_groupId))
+  expect_false(anyNA(an56_ard$group3_groupValue))
+
   # An_55 / An_55_1 (per-SOC risk difference, #157): one RD + 95% CI per body
   # system, over arms 1 vs 3 (Low Dose) and 2 vs 3 (High Dose), on first-
   # occurrence-of-SOC subjects (Dss_75 / Dss_76). The t36 reference RD matches
