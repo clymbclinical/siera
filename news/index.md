@@ -233,6 +233,12 @@ CRAN release: 2026-06-17
   previously 0.1439 over the three categories). The deprecated xlsx twin
   is unchanged
   ([\#216](https://github.com/clymbclinical/siera/issues/216)).
+- Changed the categorical n (%) template (`categorical_summary` in the
+  method library, and the demo reporting event’s adverse-event analyses)
+  so its result rows carry the ARS analysis variable in `variable`
+  (e.g. `USUBJID`, with `variable_level` NA) instead of the internal
+  counting column `dummy` / `dummyvar`. Statistic values are unchanged
+  ([\#231](https://github.com/clymbclinical/siera/issues/231)).
 - Fixed zero-event risk-difference analyses returning `NA` instead of
   `0`. Methods that compute over the full population (templates
   referencing `df_poptot`, e.g. risk differences) now bypass the

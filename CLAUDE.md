@@ -846,12 +846,14 @@ after the templates are updated, then
   `Mth01_CatVar_Summ_ByPreGrp` (library
   `categorical_summary_per_predefined_group`) for the four demographic n
   (%) analyses and gives `Mth03_CatVar_Comp_PChiSq` the
-  `chisq_per_predefined_group` template. The deprecated xlsx was
-  deliberately left as is, so the xlsx-vs-JSON parity tests drop
-  `ARD_Out14-1-1.R` and the event-wide `.op_patterns` lookup block for
-  this demo via `.drop_predefined_group_methods()` (`helper-xlsx.R`).
-  Edit the demo by changing that script and re-running it, then
-  regenerate `inst/script/`.
+  `chisq_per_predefined_group` template; \#231 gives the adverse-event
+  method `Mth01_CatVar_Summ_ByGrp` the library `categorical_summary`
+  template. The deprecated xlsx was deliberately left as is, so the
+  xlsx-vs-JSON parity tests drop `ARD_Out14-1-1.R`, `ARD_Out14-3-1-1.R`
+  and the event-wide `.op_patterns` lookup block for this demo via
+  `.drop_demo_json_methods()` (`helper-xlsx.R`). Edit the demo by
+  changing that script and re-running it, then regenerate
+  `inst/script/`.
 - **eTFL Portal integration testing** — `tests/testthat/testdata/etfl/`
   holds the CDISC eTFL Portal fixtures unzipped into three subfolders
   (no `.zip` files are committed): `metadata/<table>-siera.json` (ARS

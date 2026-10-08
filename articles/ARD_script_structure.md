@@ -168,12 +168,22 @@ if (nrow(df2_An07_03_SerTEAE_Summ_ByTrt) != 0) {
   ) |>
     # select relevant statistics as defined by the Method, and assign operation Ids
     dplyr::filter(stat_name %in% c("n", "p")) |>
-    dplyr::mutate(operationid = dplyr::case_when(
-      stat_name == "n" ~ "Mth01_CatVar_Summ_ByGrp_1_n",
-      stat_name == "p" ~ "Mth01_CatVar_Summ_ByGrp_2_pct"
-    ))
+    dplyr::mutate(
+      # the rows describe the ARS analysis variable, not the helper column
+      variable = "USUBJID",
+      variable_level = list(NULL),
+      operationid = dplyr::case_when(
+        stat_name == "n" ~ "Mth01_CatVar_Summ_ByGrp_1_n",
+        stat_name == "p" ~ "Mth01_CatVar_Summ_ByGrp_2_pct"
+      )
+    )
 }
 ```
+
+The `dummy` column is only a counting device: every subject contributes
+one row, so tabulating a constant counts the subjects in each arm. The
+result rows are then labelled with the analysis variable from the ARS
+(`USUBJID`), so the ARD says what was counted.
 
 Not every method follows this shape. Methods that must report something
 even when no subject qualifies - a zero count for every **pre-defined**

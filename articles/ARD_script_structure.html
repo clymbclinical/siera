@@ -234,11 +234,21 @@ applied, the result is an analysis-level ARD. See example below:</p>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="co"># select relevant statistics as defined by the Method, and assign operation Ids</span></span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">stat_name</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n"</span>, <span class="st">"p"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>operationid <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>      <span class="va">stat_name</span> <span class="op">==</span> <span class="st">"n"</span> <span class="op">~</span> <span class="st">"Mth01_CatVar_Summ_ByGrp_1_n"</span>,</span>
-<span>      <span class="va">stat_name</span> <span class="op">==</span> <span class="st">"p"</span> <span class="op">~</span> <span class="st">"Mth01_CatVar_Summ_ByGrp_2_pct"</span></span>
-<span>    <span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>      <span class="co"># the rows describe the ARS analysis variable, not the helper column</span></span>
+<span>      variable <span class="op">=</span> <span class="st">"USUBJID"</span>,</span>
+<span>      variable_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span>,</span>
+<span>      operationid <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>        <span class="va">stat_name</span> <span class="op">==</span> <span class="st">"n"</span> <span class="op">~</span> <span class="st">"Mth01_CatVar_Summ_ByGrp_1_n"</span>,</span>
+<span>        <span class="va">stat_name</span> <span class="op">==</span> <span class="st">"p"</span> <span class="op">~</span> <span class="st">"Mth01_CatVar_Summ_ByGrp_2_pct"</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
+<p>The <code>dummy</code> column is only a counting device: every
+subject contributes one row, so tabulating a constant counts the
+subjects in each arm. The result rows are then labelled with the
+analysis variable from the ARS (<code>USUBJID</code>), so the ARD says
+what was counted.</p>
 <p>Not every method follows this shape. Methods that must report
 something even when no subject qualifies - a zero count for every
 <strong>pre-defined</strong> group, or a risk difference of
