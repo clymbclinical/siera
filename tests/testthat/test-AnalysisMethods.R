@@ -316,3 +316,38 @@ test_that(".generate_analysis_method_section warns when no template exists", {
   expect_match(result$code, "Apply Method")
   expect_equal(result$operations, list(operation_1 = "OP200"))
 })
+
+test_that("population_frame rewrites df_poptot in population-based templates (#197)", {
+  analysis_methods <- tibble(
+    id = "MTH_RD", name = "Risk difference", description = "RD",
+    label = "rd", operation_id = "OP_RD"
+  )
+  template <- tibble(
+    method_id = "MTH_RD", context = "R", specifiedAs = "Code",
+    templateCode = "full_analysisidhere = df_poptot |> dplyr::left_join(df2_analysisidhere)\nn <- nrow(df_poptot)"
+  )
+  parameters <- tibble(
+    method_id = character(0), parameter_name = character(0),
+    parameter_valueSource = character(0)
+  )
+  run <- function(...) {
+    siera:::`.generate_analysis_method_section`(
+      analysis_methods = analysis_methods,
+      analysis_method_code_template = template,
+      analysis_method_code_parameters = parameters,
+      method_id = "MTH_RD", analysis_id = "AN1", output_id = "OUT1", ...
+    )
+  }
+
+  # default: the template keeps df_poptot (single analysis set)
+  default <- run()
+  expect_true(default$population_based)
+  expect_match(default$code, "full_AN1 = df_poptot |>", fixed = TRUE)
+
+  # an analysis on a suffixed population frame reads its own set
+  own <- run(population_frame = "df_poptot__AnalysisSet_07")
+  expect_true(own$population_based)
+  expect_match(own$code, "full_AN1 = df_poptot__AnalysisSet_07 |>", fixed = TRUE)
+  expect_match(own$code, "nrow(df_poptot__AnalysisSet_07)", fixed = TRUE)
+  expect_false(grepl("df_poptot[^_]", own$code))
+})

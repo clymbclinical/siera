@@ -157,6 +157,17 @@ readARS <- function(ARS_path,
     timenow <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
     code_header <- .generate_program_header(Output, OutputName, timenow)
 
+    # Analysis set populations ----
+    # Built once per output from metadata (#197): one frame per analysis set,
+    # and per analysis the frame its data subset starts from.
+    population <- .generate_population_code(
+      anas = Anas,
+      analyses = Analyses,
+      analysis_sets = AnalysisSets,
+      analysis_groupings = AnalysisGroupings,
+      data_subsets = DataSubsets
+    )
+
     # loop through individual analyses
     max_j <- nrow(Anas)
     for (j in 1:max_j) {
@@ -170,8 +181,6 @@ readARS <- function(ARS_path,
 
       ana_adam <- Anas_s$dataset # ADaM used for this analysis (esp. to be used in ChiSq)
       ana_name <- Anas_s$name
-      # Analysis Set
-      ana_setId <- Anas_s$analysisSetId # AS ID (to be used in AS)
       ana_var <- Anas_s$variable # AS variable (to be used in MT)
 
       # Analysis Grouping — dynamic extraction supporting any number of groupings
@@ -202,17 +211,9 @@ readARS <- function(ARS_path,
       methodid <- Anas_s$method_id #
 
       # Apply Analysis Set -----
-      analysis_set_result <- .generate_analysis_set_code(
-        j = j,
-        analysis_sets = AnalysisSets,
-        analyses = Analyses,
-        anas = Anas,
-        analysis_set_id = ana_setId,
-        analysis_id = Anas_j
-      )
-
-      code_as <- analysis_set_result$code
-      AnSetDataSubsets <- analysis_set_result$data_subset
+      # The population block is emitted once, ahead of the first analysis.
+      code_as <- if (j == 1) population$code else ""
+      AnSetDataSubsets <- population$frames[[Anas_j]]
       # Apply Grouping ----------------------------
 
       # consider denominator analysis
@@ -374,7 +375,8 @@ readARS <- function(ARS_path,
         analysis_id = Anas_j,
         output_id = Output,
         value_sources = value_sources,
-        code_style = code_style
+        code_style = code_style,
+        population_frame = population$poptot[[Anas_j]]
       )
 
       code_method <- analysis_method_result$code

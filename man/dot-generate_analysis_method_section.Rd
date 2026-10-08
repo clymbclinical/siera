@@ -12,7 +12,8 @@
   analysis_id,
   output_id,
   value_sources = list(),
-  code_style = c("expanded", "wrapped")
+  code_style = c("expanded", "wrapped"),
+  population_frame = "df_poptot"
 )
 }
 \arguments{
@@ -41,6 +42,12 @@ identifier stamp out inline; `"wrapped"` emits only the method call inside
 `df3_<id> <- NULL` followed by an `if (nrow(df2_<id>) != 0)` block, and leaves the
 identifier linking to the caller's `siera::ars_stamp()` step (see
 `.generate_stamp_code()`).}
+
+\item{population_frame}{Name of the subject-level population frame of the
+analysis' own analysis set. Method templates refer to the population as
+`df_poptot`; when an output uses more than one analysis set the frames are
+suffixed (e.g. `df_poptot__AnalysisSet_07`, #197) and the template's
+`df_poptot` is rewritten to this name.}
 }
 \value{
 Character vector with formatted numbers.

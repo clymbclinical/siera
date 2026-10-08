@@ -54,6 +54,16 @@ test_that("fda-ds-t04 disposition: bigN, n%, and risk differences match referenc
   .expect_all_match(.cmp_n_pct(ard, ref, "An_21"))
   .expect_all_match(.cmp_rd(ard, ref, "An_22"))
   .expect_all_match(.cmp_rd(ard, ref, "An_22_1"))
+
+  # Each population row uses its OWN analysis set (#197): An_13 randomized,
+  # An_15 ITT, An_17 safety, An_19 per-protocol. Before #197 they all read the
+  # first analysis' "All Subjects" population; the first three coincide with it
+  # in this data, but per-protocol differs (81/74/79 vs 84/84/86).
+  for (ana in c("An_13", "An_15", "An_17", "An_19")) {
+    .expect_all_match(.cmp_n_pct(ard, ref, ana), info = ana)
+  }
+  pp_n <- ard$stat[ard$AnalysisId == "An_19" & ard$stat_name == "n"]
+  expect_equal(sort(as.numeric(unlist(pp_n))), c(74, 79, 81))
 })
 
 test_that("fda-ex-t05 exposure: bigN, continuous summary, and risk difference match reference", {

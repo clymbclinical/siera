@@ -19,6 +19,11 @@
 #'   `df3_<id> <- NULL` followed by an `if (nrow(df2_<id>) != 0)` block, and leaves the
 #'   identifier linking to the caller's `siera::ars_stamp()` step (see
 #'   `.generate_stamp_code()`).
+#' @param population_frame Name of the subject-level population frame of the
+#'   analysis' own analysis set. Method templates refer to the population as
+#'   `df_poptot`; when an output uses more than one analysis set the frames are
+#'   suffixed (e.g. `df_poptot__AnalysisSet_07`, #197) and the template's
+#'   `df_poptot` is rewritten to this name.
 
 #' @return Character vector with formatted numbers.
 #' @keywords internal
@@ -30,7 +35,8 @@
                                               analysis_id,
                                               output_id,
                                               value_sources = list(),
-                                              code_style = c("expanded", "wrapped")) {
+                                              code_style = c("expanded", "wrapped"),
+                                              population_frame = "df_poptot") {
   code_style <- match.arg(code_style)
 
   if (is.null(method_id) || length(method_id) == 0 || is.na(method_id) || identical(method_id, "")) {
@@ -99,6 +105,11 @@
   # empty-data guard `if(nrow(df2_<id>) != 0)` must be bypassed so a zero-event
   # analysis still emits its estimate rows instead of a statistics-free stub (#156).
   population_based <- grepl("df_poptot", template_code, fixed = TRUE)
+
+  # Point the template at the analysis' own analysis-set population (#197).
+  if (population_based && !identical(population_frame, "df_poptot")) {
+    template_code <- gsub("\\bdf_poptot\\b", population_frame, template_code, perl = TRUE)
+  }
 
   # Parameter substitution is based on ARS metadata entries that can refer
   # to values calculated earlier in the script.
