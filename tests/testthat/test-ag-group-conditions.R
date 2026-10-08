@@ -235,3 +235,100 @@ test_that("the per-predefined-group method is population-based (empty subset sti
     expect_true(any(grepl("df_poptot", tmpl, fixed = TRUE)), info = dir)
   }
 })
+
+# Group names as levels (#232) ------------------------------------------------
+
+.agc_named_groupings <- function() {
+  # An IN group (two rows) whose name differs from its values, an EQ group
+  # whose name differs from its value, and a group without a name.
+  tibble::tibble(
+    id = "AG_AGE", dataDriven = "FALSE",
+    group_id = c("AG_AGE_1", "AG_AGE_2", "AG_AGE_2", "AG_AGE_3"),
+    group_name = c("< 65 years", "≥ 65 years", "≥ 65 years", NA),
+    group_order = c(1, 2, 2, 3),
+    group_condition_variable = "AGEGR1",
+    group_condition_comparator = c("EQ", "IN", "IN", "EQ"),
+    group_condition_value = c("<65", "65-80", ">80", "UNK")
+  )
+}
+
+test_that(".group_level is the group name, else the first condition value", {
+  ag <- .agc_named_groupings()
+  expect_identical(siera:::.group_level(ag[2:3, ]), "≥ 65 years")
+  expect_identical(siera:::.group_level(ag[4, ]), "UNK")
+  blank <- ag[1, ]
+  blank$group_name <- "  "
+  expect_identical(siera:::.group_level(blank), "<65")
+  expect_identical(siera:::.group_level(ag[1, setdiff(names(ag), "group_name")]), "<65")
+})
+
+test_that(".ag_group_conditions uses the group names as levels (#232)", {
+  res <- siera:::.ag_group_conditions(.agc_named_groupings(), "AG_AGE")
+  expect_identical(
+    res$levels,
+    "'< 65 years', '\\u2265 65 years', 'UNK'"
+  )
+  expect_match(res$conditions,
+               "AGEGR1 %in% c('65-80', '>80') ~ '\\u2265 65 years'", fixed = TRUE)
+})
+
+test_that(".ag_group_conditions aborts when two groups share a name", {
+  ag <- .agc_named_groupings()
+  ag$group_name[4] <- "< 65 years"
+  expect_error(siera:::.ag_group_conditions(ag, "AG_AGE"), "share the level")
+})
+
+test_that(".grouping_stamp_spec maps group names to ids when by_name = TRUE", {
+  ag <- .agc_named_groupings()
+  by_value <- siera:::.grouping_stamp_spec("AG_AGE", FALSE, ag)
+  expect_identical(by_value$values, c("<65", "65-80", ">80", "UNK"))
+  expect_identical(by_value$group_ids, c("AG_AGE_1", "AG_AGE_2", "AG_AGE_2", "AG_AGE_3"))
+
+  by_name <- siera:::.grouping_stamp_spec("AG_AGE", FALSE, ag, by_name = TRUE)
+  expect_identical(by_name$values, c("< 65 years", "≥ 65 years", "UNK"))
+  expect_identical(by_name$group_ids, c("AG_AGE_1", "AG_AGE_2", "AG_AGE_3"))
+
+  # both generators stamp by name for that grouping
+  code <- siera:::.generate_groupid_code("An_1", "AG_AGE", 1L, "FALSE", ag,
+                                         stamp_by_name = TRUE)
+  expect_match(code, "== '\\u2265 65 years' ~ 'AG_AGE_2'", fixed = TRUE)
+  stamp <- siera:::.generate_stamp_code("An_1", "Mth_1", "Out_1", "AG_AGE", 1L,
+                                        "FALSE", ag, stamp_by_name = TRUE)
+  expect_match(stamp, "'AG_AGE_2' = '\\u2265 65 years'", fixed = TRUE)
+})
+
+test_that(".stamp_by_name flags the groupings a group-conditions template levels", {
+  tmpl <- tibble::tibble(
+    method_id = c("M_GC2", "M_GC1", "M_PLAIN"), context = "R (siera)",
+    specifiedAs = "Code",
+    templateCode = c("x <- case_when(conds2here)", "x <- case_when(conds1here)",
+                     "by = c(byhere)")
+  )
+  params <- tibble::tibble(
+    method_id = c("M_GC2", "M_GC1", "M_PLAIN"),
+    parameter_name = c("conds2here", "conds1here", "byhere"),
+    parameter_valueSource = c("AG_var2_group_conditions",
+                              "AG_var1_group_levels", "by_listc")
+  )
+  expect_identical(siera:::.stamp_by_name(2L, "M_GC2", tmpl, params), c(FALSE, TRUE))
+  expect_identical(siera:::.stamp_by_name(1L, "M_GC1", tmpl, params), TRUE)
+  expect_identical(siera:::.stamp_by_name(2L, "M_PLAIN", tmpl, params), c(FALSE, FALSE))
+  expect_identical(siera:::.stamp_by_name(0L, "M_GC2", tmpl, params), logical(0))
+})
+
+test_that(".escape_single_quote writes values as portable R string literals", {
+  x <- c("plain", "it's", "a\\b", "Placebo \n(N=XX)", "tab\there\r",
+         "≥ 65 years", "\U0001F600", NA)
+  esc <- siera:::.escape_single_quote(x)
+  expect_identical(esc[1], "plain")
+  expect_identical(esc[2], "it\\'s")
+  expect_identical(esc[6], "\\u2265 65 years")
+  expect_identical(esc[7], "\\U{1F600}")
+  expect_true(is.na(esc[8]))
+  # every escaped value is ASCII and parses back to the original
+  expect_true(all(!grepl("[^ -~]", esc[1:7])))
+  for (i in 1:7) {
+    expect_identical(eval(parse(text = paste0("'", esc[i], "'"))), x[i], info = x[i])
+  }
+  expect_identical(siera:::.escape_single_quote(character(0)), character(0))
+})

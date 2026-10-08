@@ -1,7 +1,7 @@
 
 # Programme:    Generate code to produce ARD for Out14-1-1
 # Output:       Summary of Demographics
-# Date created: 2026-10-07 13:48:05
+# Date created: 2026-10-08 14:33:31
 
   # load libraries ----
     library(dplyr)
@@ -154,15 +154,15 @@ denom_An03_02_AgeGrp_Summ_ByTrt <- df2_An01_05_SAF_Summ_ByTrt |>
 # qualifies still gets a zero row; Group2's levels are the ones the ARS
 # metadata DEFINES, not the ones the data happens to contain.
 .arms_An03_02_AgeGrp_Summ_ByTrt <- as.character(denom_An03_02_AgeGrp_Summ_ByTrt$TRT01A)
-.levels_An03_02_AgeGrp_Summ_ByTrt <- c('<65', '65-80')
+.levels_An03_02_AgeGrp_Summ_ByTrt <- c('< 65 years', '\u2265 65 years')
 
 denom_An03_02_AgeGrp_Summ_ByTrt <- denom_An03_02_AgeGrp_Summ_ByTrt |>
     dplyr::mutate(TRT01A = factor(TRT01A, levels = .arms_An03_02_AgeGrp_Summ_ByTrt))
 
 in_data_An03_02_AgeGrp_Summ_ByTrt <- df2_An03_02_AgeGrp_Summ_ByTrt |>
     dplyr::mutate(ars_group = dplyr::case_when(
-      AGEGR1 == '<65' ~ '<65',
-      AGEGR1 %in% c('65-80', '>80') ~ '65-80',
+      AGEGR1 == '<65' ~ '< 65 years',
+      AGEGR1 %in% c('65-80', '>80') ~ '\u2265 65 years',
       TRUE ~ NA_character_
     )) |>
     # A data value satisfying none of the defined group conditions was never
@@ -212,9 +212,8 @@ df3_An03_02_AgeGrp_Summ_ByTrt <- siera::ars_stamp(
       'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
       'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose')),
     siera::ars_grouping('AnlsGrouping_03_AgeGp', groups = c(
-      'AnlsGrouping_03_AgeGp_1' = '<65',
-      'AnlsGrouping_03_AgeGp_2' = '65-80',
-      'AnlsGrouping_03_AgeGp_2' = '>80'))
+      'AnlsGrouping_03_AgeGp_1' = '< 65 years',
+      'AnlsGrouping_03_AgeGp_2' = '\u2265 65 years'))
   )
 )
 
@@ -239,8 +238,8 @@ if (nrow(df2_An03_02_AgeGrp_Comp_ByTrt) != 0) {
 # chi-square over an all-zero column is undefined.
 in_data_An03_02_AgeGrp_Comp_ByTrt <- df2_An03_02_AgeGrp_Comp_ByTrt |>
     dplyr::mutate(ars_group = dplyr::case_when(
-      AGEGR1 == '<65' ~ '<65',
-      AGEGR1 %in% c('65-80', '>80') ~ '65-80',
+      AGEGR1 == '<65' ~ '< 65 years',
+      AGEGR1 %in% c('65-80', '>80') ~ '\u2265 65 years',
       TRUE ~ NA_character_
     )) |>
     dplyr::filter(!is.na(ars_group))
@@ -284,15 +283,15 @@ denom_An03_03_Sex_Summ_ByTrt <- df2_An01_05_SAF_Summ_ByTrt |>
 # qualifies still gets a zero row; Group2's levels are the ones the ARS
 # metadata DEFINES, not the ones the data happens to contain.
 .arms_An03_03_Sex_Summ_ByTrt <- as.character(denom_An03_03_Sex_Summ_ByTrt$TRT01A)
-.levels_An03_03_Sex_Summ_ByTrt <- c('M', 'F')
+.levels_An03_03_Sex_Summ_ByTrt <- c('Male', 'Female')
 
 denom_An03_03_Sex_Summ_ByTrt <- denom_An03_03_Sex_Summ_ByTrt |>
     dplyr::mutate(TRT01A = factor(TRT01A, levels = .arms_An03_03_Sex_Summ_ByTrt))
 
 in_data_An03_03_Sex_Summ_ByTrt <- df2_An03_03_Sex_Summ_ByTrt |>
     dplyr::mutate(ars_group = dplyr::case_when(
-      SEX == 'M' ~ 'M',
-      SEX == 'F' ~ 'F',
+      SEX == 'M' ~ 'Male',
+      SEX == 'F' ~ 'Female',
       TRUE ~ NA_character_
     )) |>
     # A data value satisfying none of the defined group conditions was never
@@ -342,8 +341,8 @@ df3_An03_03_Sex_Summ_ByTrt <- siera::ars_stamp(
       'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
       'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose')),
     siera::ars_grouping('AnlsGrouping_02_Sex', groups = c(
-      'AnlsGrouping_02_Sex_1' = 'M',
-      'AnlsGrouping_02_Sex_2' = 'F'))
+      'AnlsGrouping_02_Sex_1' = 'Male',
+      'AnlsGrouping_02_Sex_2' = 'Female'))
   )
 )
 
@@ -368,8 +367,8 @@ if (nrow(df2_An03_03_Sex_Comp_ByTrt) != 0) {
 # chi-square over an all-zero column is undefined.
 in_data_An03_03_Sex_Comp_ByTrt <- df2_An03_03_Sex_Comp_ByTrt |>
     dplyr::mutate(ars_group = dplyr::case_when(
-      SEX == 'M' ~ 'M',
-      SEX == 'F' ~ 'F',
+      SEX == 'M' ~ 'Male',
+      SEX == 'F' ~ 'Female',
       TRUE ~ NA_character_
     )) |>
     dplyr::filter(!is.na(ars_group))
@@ -413,15 +412,15 @@ denom_An03_04_Ethnic_Summ_ByTrt <- df2_An01_05_SAF_Summ_ByTrt |>
 # qualifies still gets a zero row; Group2's levels are the ones the ARS
 # metadata DEFINES, not the ones the data happens to contain.
 .arms_An03_04_Ethnic_Summ_ByTrt <- as.character(denom_An03_04_Ethnic_Summ_ByTrt$TRT01A)
-.levels_An03_04_Ethnic_Summ_ByTrt <- c('HISPANIC OR LATINO', 'NOT HISPANIC OR LATINO')
+.levels_An03_04_Ethnic_Summ_ByTrt <- c('Hispanic or Latino', 'Not Hispanic or Latino')
 
 denom_An03_04_Ethnic_Summ_ByTrt <- denom_An03_04_Ethnic_Summ_ByTrt |>
     dplyr::mutate(TRT01A = factor(TRT01A, levels = .arms_An03_04_Ethnic_Summ_ByTrt))
 
 in_data_An03_04_Ethnic_Summ_ByTrt <- df2_An03_04_Ethnic_Summ_ByTrt |>
     dplyr::mutate(ars_group = dplyr::case_when(
-      ETHNIC == 'HISPANIC OR LATINO' ~ 'HISPANIC OR LATINO',
-      ETHNIC == 'NOT HISPANIC OR LATINO' ~ 'NOT HISPANIC OR LATINO',
+      ETHNIC == 'HISPANIC OR LATINO' ~ 'Hispanic or Latino',
+      ETHNIC == 'NOT HISPANIC OR LATINO' ~ 'Not Hispanic or Latino',
       TRUE ~ NA_character_
     )) |>
     # A data value satisfying none of the defined group conditions was never
@@ -471,8 +470,8 @@ df3_An03_04_Ethnic_Summ_ByTrt <- siera::ars_stamp(
       'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
       'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose')),
     siera::ars_grouping('AnlsGrouping_05_Ethnic', groups = c(
-      'AnlsGrouping_05_Ethnic_1' = 'HISPANIC OR LATINO',
-      'AnlsGrouping_05_Ethnic_2' = 'NOT HISPANIC OR LATINO'))
+      'AnlsGrouping_05_Ethnic_1' = 'Hispanic or Latino',
+      'AnlsGrouping_05_Ethnic_2' = 'Not Hispanic or Latino'))
   )
 )
 
@@ -497,8 +496,8 @@ if (nrow(df2_An03_04_Ethnic_Comp_ByTrt) != 0) {
 # chi-square over an all-zero column is undefined.
 in_data_An03_04_Ethnic_Comp_ByTrt <- df2_An03_04_Ethnic_Comp_ByTrt |>
     dplyr::mutate(ars_group = dplyr::case_when(
-      ETHNIC == 'HISPANIC OR LATINO' ~ 'HISPANIC OR LATINO',
-      ETHNIC == 'NOT HISPANIC OR LATINO' ~ 'NOT HISPANIC OR LATINO',
+      ETHNIC == 'HISPANIC OR LATINO' ~ 'Hispanic or Latino',
+      ETHNIC == 'NOT HISPANIC OR LATINO' ~ 'Not Hispanic or Latino',
       TRUE ~ NA_character_
     )) |>
     dplyr::filter(!is.na(ars_group))
@@ -542,22 +541,22 @@ denom_An03_05_Race_Summ_ByTrt <- df2_An01_05_SAF_Summ_ByTrt |>
 # qualifies still gets a zero row; Group2's levels are the ones the ARS
 # metadata DEFINES, not the ones the data happens to contain.
 .arms_An03_05_Race_Summ_ByTrt <- as.character(denom_An03_05_Race_Summ_ByTrt$TRT01A)
-.levels_An03_05_Race_Summ_ByTrt <- c('AMERICAN INDIAN OR ALASKA NATIVE', 'ASIAN', 'BLACK OR AFRICAN AMERICAN', 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER', 'WHITE', 'MULTIPLE', 'NOT REPORTED', 'UNKNOWN', 'OTHER')
+.levels_An03_05_Race_Summ_ByTrt <- c('American Indian or Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White', 'Multiple', 'Not Reported', 'Unknown', 'Other')
 
 denom_An03_05_Race_Summ_ByTrt <- denom_An03_05_Race_Summ_ByTrt |>
     dplyr::mutate(TRT01A = factor(TRT01A, levels = .arms_An03_05_Race_Summ_ByTrt))
 
 in_data_An03_05_Race_Summ_ByTrt <- df2_An03_05_Race_Summ_ByTrt |>
     dplyr::mutate(ars_group = dplyr::case_when(
-      RACE == 'AMERICAN INDIAN OR ALASKA NATIVE' ~ 'AMERICAN INDIAN OR ALASKA NATIVE',
-      RACE == 'ASIAN' ~ 'ASIAN',
-      RACE == 'BLACK OR AFRICAN AMERICAN' ~ 'BLACK OR AFRICAN AMERICAN',
-      RACE == 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER' ~ 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER',
-      RACE == 'WHITE' ~ 'WHITE',
-      RACE == 'MULTIPLE' ~ 'MULTIPLE',
-      RACE == 'NOT REPORTED' ~ 'NOT REPORTED',
-      RACE == 'UNKNOWN' ~ 'UNKNOWN',
-      RACE == 'OTHER' ~ 'OTHER',
+      RACE == 'AMERICAN INDIAN OR ALASKA NATIVE' ~ 'American Indian or Alaska Native',
+      RACE == 'ASIAN' ~ 'Asian',
+      RACE == 'BLACK OR AFRICAN AMERICAN' ~ 'Black or African American',
+      RACE == 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER' ~ 'Native Hawaiian or Other Pacific Islander',
+      RACE == 'WHITE' ~ 'White',
+      RACE == 'MULTIPLE' ~ 'Multiple',
+      RACE == 'NOT REPORTED' ~ 'Not Reported',
+      RACE == 'UNKNOWN' ~ 'Unknown',
+      RACE == 'OTHER' ~ 'Other',
       TRUE ~ NA_character_
     )) |>
     # A data value satisfying none of the defined group conditions was never
@@ -607,15 +606,15 @@ df3_An03_05_Race_Summ_ByTrt <- siera::ars_stamp(
       'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
       'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose')),
     siera::ars_grouping('AnlsGrouping_04_Race', groups = c(
-      'AnlsGrouping_04_Race_1' = 'AMERICAN INDIAN OR ALASKA NATIVE',
-      'AnlsGrouping_04_Race_2' = 'ASIAN',
-      'AnlsGrouping_04_Race_3' = 'BLACK OR AFRICAN AMERICAN',
-      'AnlsGrouping_04_Race_4' = 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER',
-      'AnlsGrouping_04_Race_5' = 'WHITE',
-      'AnlsGrouping_04_Race_6' = 'MULTIPLE',
-      'AnlsGrouping_04_Race_7' = 'NOT REPORTED',
-      'AnlsGrouping_04_Race_8' = 'UNKNOWN',
-      'AnlsGrouping_04_Race_9' = 'OTHER'))
+      'AnlsGrouping_04_Race_1' = 'American Indian or Alaska Native',
+      'AnlsGrouping_04_Race_2' = 'Asian',
+      'AnlsGrouping_04_Race_3' = 'Black or African American',
+      'AnlsGrouping_04_Race_4' = 'Native Hawaiian or Other Pacific Islander',
+      'AnlsGrouping_04_Race_5' = 'White',
+      'AnlsGrouping_04_Race_6' = 'Multiple',
+      'AnlsGrouping_04_Race_7' = 'Not Reported',
+      'AnlsGrouping_04_Race_8' = 'Unknown',
+      'AnlsGrouping_04_Race_9' = 'Other'))
   )
 )
 
@@ -640,15 +639,15 @@ if (nrow(df2_An03_05_Race_Comp_ByTrt) != 0) {
 # chi-square over an all-zero column is undefined.
 in_data_An03_05_Race_Comp_ByTrt <- df2_An03_05_Race_Comp_ByTrt |>
     dplyr::mutate(ars_group = dplyr::case_when(
-      RACE == 'AMERICAN INDIAN OR ALASKA NATIVE' ~ 'AMERICAN INDIAN OR ALASKA NATIVE',
-      RACE == 'ASIAN' ~ 'ASIAN',
-      RACE == 'BLACK OR AFRICAN AMERICAN' ~ 'BLACK OR AFRICAN AMERICAN',
-      RACE == 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER' ~ 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER',
-      RACE == 'WHITE' ~ 'WHITE',
-      RACE == 'MULTIPLE' ~ 'MULTIPLE',
-      RACE == 'NOT REPORTED' ~ 'NOT REPORTED',
-      RACE == 'UNKNOWN' ~ 'UNKNOWN',
-      RACE == 'OTHER' ~ 'OTHER',
+      RACE == 'AMERICAN INDIAN OR ALASKA NATIVE' ~ 'American Indian or Alaska Native',
+      RACE == 'ASIAN' ~ 'Asian',
+      RACE == 'BLACK OR AFRICAN AMERICAN' ~ 'Black or African American',
+      RACE == 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER' ~ 'Native Hawaiian or Other Pacific Islander',
+      RACE == 'WHITE' ~ 'White',
+      RACE == 'MULTIPLE' ~ 'Multiple',
+      RACE == 'NOT REPORTED' ~ 'Not Reported',
+      RACE == 'UNKNOWN' ~ 'Unknown',
+      RACE == 'OTHER' ~ 'Other',
       TRUE ~ NA_character_
     )) |>
     dplyr::filter(!is.na(ars_group))

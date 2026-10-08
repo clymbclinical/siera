@@ -435,15 +435,17 @@
 # Compare siera's per-pre-defined-group n and % against that ground truth.
 # A full join asserts EVERY arm x defined group on both sides, so siera
 # dropping a zero group, or inventing a row for an undefined data value, fails
-# the test rather than passing silently.
+# the test rather than passing silently. siera's rows are matched to the
+# defined groups by group2_groupId (cat_ids: the group ids, aligned with cats),
+# not by group2_level, which is the group's name (#232).
 .cmp_predefined_npct <- function(siera_ard, table, ana_id, subset_fun,
-                                 cat_var, arms, cats) {
+                                 cat_var, arms, cats, cat_ids) {
   truth <- .etfl_predefined_npct_truth(table, subset_fun, cat_var, arms, cats)
   s <- siera_ard |>
     dplyr::filter(AnalysisId == ana_id) |>
     dplyr::mutate(val = .etfl_safe_stat(stat),
                   arm = as.character(group1_level),
-                  cat = as.character(group2_level)) |>
+                  cat = cats[match(group2_groupId, cat_ids)]) |>
     dplyr::select(arm, cat, stat_name, val) |>
     tidyr::pivot_wider(names_from = stat_name, values_from = val)
   comp <- dplyr::full_join(s, truth, by = c("arm", "cat"), suffix = c(".s", ".t"))

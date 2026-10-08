@@ -151,12 +151,14 @@ An analysis with more than one grouping gets one `ars_grouping()` per grouping, 
   groupings   = list(
     siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(...)),
     siera::ars_grouping('AnlsGrouping_04_Race', groups = c(
-      'AnlsGrouping_04_Race_1' = 'AMERICAN INDIAN OR ALASKA NATIVE',
-      'AnlsGrouping_04_Race_2' = 'ASIAN',
+      'AnlsGrouping_04_Race_1' = 'American Indian or Alaska Native',
+      'AnlsGrouping_04_Race_2' = 'Asian',
       # ...
-      'AnlsGrouping_04_Race_9' = 'OTHER'))
+      'AnlsGrouping_04_Race_9' = 'Other'))
   )
 ```
+
+Each group is matched by the value in its `group[n]_level` column. For the treatment arms that is the data value (`Placebo`). The race rows come from a method that counts per pre-defined group condition, and it labels each row with the group's ARS name (`American Indian or Alaska Native`, not the ADaM value `AMERICAN INDIAN OR ALASKA NATIVE`), so those names are what the call matches. For the same reason, an age group defined as `AGEGR1 IN ("65-80", ">80")` appears as one row, `≥ 65 years`.
 
 A data-driven grouping, such as the system organ class of an adverse event, is written `siera::ars_grouping('<groupingId>', data_driven = TRUE)` instead.
 
