@@ -932,6 +932,340 @@
           }
         ]
       }
+    },
+    {
+      "id": "Mth_03p",
+      "name": "Categorical n% per pre-defined inner group (zero-filled)",
+      "description": "Categorical n% aggregated per PRE-DEFINED group condition of the inner grouping: every defined group is emitted (absent ones as n = 0 / % = 0.0) and data values satisfying no defined group are excluded (#187). Method-library id categorical_summary_per_predefined_group.",
+      "label": "Categorical n (%) (per pre-defined group)",
+      "operations": [
+        {
+          "id": "Mth_03p_01_n",
+          "name": "n",
+          "label": "n",
+          "order": 1,
+          "resultPattern": "XX"
+        },
+        {
+          "id": "Mth_03p_02_%",
+          "name": "%",
+          "label": "%",
+          "order": 2,
+          "resultPattern": "(XX.X)",
+          "referencedOperationRelationships": [
+            {
+              "id": "Mth_03p_pct_NUM",
+              "description": "Numerator for percentage.",
+              "referencedOperationRole": {
+                "controlledTerm": "NUMERATOR"
+              },
+              "operationId": "Mth_03p_01_n"
+            },
+            {
+              "id": "Mth_03p_pct_DEN",
+              "description": "Denominator for percentage.",
+              "referencedOperationRole": {
+                "controlledTerm": "DENOMINATOR"
+              },
+              "operationId": "Mth_00_1_01_n"
+            }
+          ]
+        }
+      ],
+      "codeTemplate": {
+        "context": "R (siera)",
+        "code": "# Denominator: the referenced analysis's population count per Group1 level.\ndenom_analysisidhere <- df2_denomanaidhere |>\n    dplyr::count(denom_anagroupvarshere) |>\n    dplyr::rename(`...ard_N...` = n) |>\n    dplyr::mutate(dplyr::across(-`...ard_N...`, as.character))\n\n# Group1's levels come from the denominator, so an arm in which no subject\n# qualifies still gets a zero row; Group2's levels are the ones the ARS\n# metadata DEFINES, not the ones the data happens to contain.\n.arms_analysisidhere <- as.character(denom_analysisidhere$groupvar1here)\n.levels_analysisidhere <- c(group2levelshere)\n\ndenom_analysisidhere <- denom_analysisidhere |>\n    dplyr::mutate(groupvar1here = factor(groupvar1here, levels = .arms_analysisidhere))\n\nin_data_analysisidhere <- df2_analysisidhere |>\n    dplyr::mutate(ars_group = dplyr::case_when(\n      group2conditionshere,\n      TRUE ~ NA_character_\n    )) |>\n    # A data value satisfying none of the defined group conditions was never\n    # asked for by the ARS, so it is excluded rather than tabulated.\n    dplyr::filter(!is.na(ars_group)) |>\n    dplyr::distinct(groupvar1here, ars_group, anavarhere) |>\n    dplyr::mutate(\n      groupvar1here = factor(as.character(groupvar1here), levels = .arms_analysisidhere),\n      ars_group     = factor(ars_group, levels = .levels_analysisidhere)\n    ) |>\n    dplyr::select(groupvar1here, ars_group)\n\ndf3_analysisidhere <- if (length(.levels_analysisidhere) > 0) {\n  cards::ard_tabulate(\n      data = in_data_analysisidhere,\n      by = 'groupvar1here',\n      variables = 'ars_group',\n      denominator = denom_analysisidhere\n    ) |>\n  dplyr::filter(stat_name %in% c('n', 'p')) |>\n  dplyr::rename(group2_level = variable_level) |>\n  # cards returns the levels as list-columns of factors, whose as.character()\n  # is the integer code - flatten to the labels before siera stamps group ids.\n  dplyr::mutate(dplyr::across(\n      dplyr::matches('_level$'),\n      ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))\n    )) |>\n  dplyr::mutate(operationid = dplyr::case_when(\n      stat_name == 'n' ~ 'opid1here',\n      stat_name == 'p' ~ 'opid2here'\n    ))\n} else {\n  tibble::tibble(group1_level = character(0), group2_level = character(0),\n                 stat_name = character(0), stat = list(),\n                 operationid = character(0))\n}\n",
+        "parameters": [
+          {
+            "name": "denomanaidhere",
+            "label": "denom ana id",
+            "description": "Analysis ID supplying the denominator",
+            "valueSource": "DEN_analysisid"
+          },
+          {
+            "name": "denom_anagroupvarshere",
+            "label": "denom grp var",
+            "description": "Grouping variable(s) of the denominator analysis",
+            "valueSource": "AG_denom_var1"
+          },
+          {
+            "name": "groupvar1here",
+            "label": "grp var 1",
+            "description": "Grouping variable from Group1 (treatment arm)",
+            "valueSource": "AG_var1"
+          },
+          {
+            "name": "group2conditionshere",
+            "label": "grp 2 conditions",
+            "description": "case_when body mapping data values onto Group2's pre-defined groups, in group order",
+            "valueSource": "AG_var2_group_conditions"
+          },
+          {
+            "name": "group2levelshere",
+            "label": "grp 2 levels",
+            "description": "Quoted, comma-separated levels of Group2's pre-defined groups, in group order, used as factor levels to zero-fill absent groups",
+            "valueSource": "AG_var2_group_levels"
+          },
+          {
+            "name": "anavarhere",
+            "label": "ana var",
+            "description": "Analysis variable (subject ID) counted distinctly",
+            "valueSource": "ana_var"
+          },
+          {
+            "name": "opid1here",
+            "label": "op id 1",
+            "description": "Operation id for the 'n' statistic (order 1)",
+            "valueSource": "operation_1"
+          },
+          {
+            "name": "opid2here",
+            "label": "op id 2",
+            "description": "Operation id for the 'p' statistic (order 2)",
+            "valueSource": "operation_2"
+          }
+        ]
+      }
+    },
+    {
+      "id": "Mth_03pt",
+      "name": "Categorical n% per pre-defined group, no treatment grouping (zero-filled)",
+      "description": "Categorical n% for an analysis whose only grouping is pre-defined (Total column): every defined group is emitted (absent ones as n = 0 / % = 0.0), % over the referenced denominator analysis's distinct subjects (#227). Method-library id categorical_summary_per_predefined_group_overall.",
+      "label": "Categorical n (%) (per pre-defined group, overall)",
+      "operations": [
+        {
+          "id": "Mth_03pt_01_n",
+          "name": "n",
+          "label": "n",
+          "order": 1,
+          "resultPattern": "XX"
+        },
+        {
+          "id": "Mth_03pt_02_%",
+          "name": "%",
+          "label": "%",
+          "order": 2,
+          "resultPattern": "(XX.X)",
+          "referencedOperationRelationships": [
+            {
+              "id": "Mth_03pt_pct_NUM",
+              "description": "Numerator for percentage.",
+              "referencedOperationRole": {
+                "controlledTerm": "NUMERATOR"
+              },
+              "operationId": "Mth_03pt_01_n"
+            },
+            {
+              "id": "Mth_03pt_pct_DEN",
+              "description": "Denominator for percentage.",
+              "referencedOperationRole": {
+                "controlledTerm": "DENOMINATOR"
+              },
+              "operationId": "Mth_00_1_01_n"
+            }
+          ]
+        }
+      ],
+      "codeTemplate": {
+        "context": "R (siera)",
+        "code": "# Population-based (see df_poptot): the zero-fill below must also run when the\n# data subset is empty, so siera drops its empty-data guard for this method -\n# an empty subset yields n = 0 / 0.0% for every defined group.\n# Denominator: the referenced analysis's distinct subjects, as ONE overall\n# count - this analysis has no treatment grouping to split it by.\ndenom_analysisidhere <- tibble::tibble(\n    `...ard_N...` = dplyr::n_distinct(df2_denomanaidhere$anavarhere)\n)\n\n# The levels are the ones the ARS metadata DEFINES, not the ones the data\n# happens to contain.\n.levels_analysisidhere <- c(group1levelshere)\n\nin_data_analysisidhere <- df2_analysisidhere |>\n    dplyr::mutate(ars_group = dplyr::case_when(\n      group1conditionshere,\n      TRUE ~ NA_character_\n    )) |>\n    # A data value satisfying none of the defined group conditions was never\n    # asked for by the ARS, so it is excluded rather than tabulated.\n    dplyr::filter(!is.na(ars_group)) |>\n    dplyr::distinct(ars_group, anavarhere) |>\n    dplyr::mutate(ars_group = factor(ars_group, levels = .levels_analysisidhere)) |>\n    dplyr::select(ars_group)\n\ndf3_analysisidhere <- if (length(.levels_analysisidhere) > 0) {\n  cards::ard_tabulate(\n      data = in_data_analysisidhere,\n      variables = 'ars_group',\n      denominator = denom_analysisidhere\n    ) |>\n  dplyr::filter(stat_name %in% c('n', 'p')) |>\n  dplyr::rename(group1_level = variable_level) |>\n  # cards returns the levels as list-columns of factors, whose as.character()\n  # is the integer code - flatten to the labels before siera stamps group ids.\n  dplyr::mutate(dplyr::across(\n      dplyr::matches('_level$'),\n      ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))\n    )) |>\n  dplyr::mutate(operationid = dplyr::case_when(\n      stat_name == 'n' ~ 'opid1here',\n      stat_name == 'p' ~ 'opid2here'\n    ))\n} else {\n  tibble::tibble(group1_level = character(0), stat_name = character(0),\n                 stat = list(), operationid = character(0))\n}",
+        "parameters": [
+          {
+            "name": "denomanaidhere",
+            "label": "denom ana id",
+            "description": "Analysis ID supplying the denominator population",
+            "valueSource": "DEN_analysisid"
+          },
+          {
+            "name": "group1conditionshere",
+            "label": "grp 1 conditions",
+            "description": "case_when body mapping data values onto Group1's pre-defined groups, in group order",
+            "valueSource": "AG_var1_group_conditions"
+          },
+          {
+            "name": "group1levelshere",
+            "label": "grp 1 levels",
+            "description": "Quoted, comma-separated levels of Group1's pre-defined groups, in group order, used as factor levels to zero-fill absent groups",
+            "valueSource": "AG_var1_group_levels"
+          },
+          {
+            "name": "anavarhere",
+            "label": "ana var",
+            "description": "Analysis variable (subject ID) counted distinctly, in this analysis and in the denominator",
+            "valueSource": "ana_var"
+          },
+          {
+            "name": "opid1here",
+            "label": "op id 1",
+            "description": "Operation id for the 'n' statistic (order 1)",
+            "valueSource": "operation_1"
+          },
+          {
+            "name": "opid2here",
+            "label": "op id 2",
+            "description": "Operation id for the 'p' statistic (order 2)",
+            "valueSource": "operation_2"
+          }
+        ]
+      }
+    },
+    {
+      "id": "Mth_03a",
+      "name": "Categorical n% (2-grouping: last grouping -> variables=)",
+      "description": "Categorical n% for 2-grouping analyses: first grouping = by=, second = variables= in ard_tabulate",
+      "label": "Categorical n% (2-grouping)",
+      "operations": [
+        {
+          "id": "Mth_03a_01_n",
+          "name": "n",
+          "label": "n",
+          "order": 1,
+          "resultPattern": "XX"
+        },
+        {
+          "id": "Mth_03a_02_%",
+          "name": "%",
+          "label": "%",
+          "order": 2,
+          "resultPattern": "XX.X",
+          "referencedOperationRelationships": [
+            {
+              "id": "Mth_03a_pct_NUM",
+              "description": "Numerator for percentage.",
+              "referencedOperationRole": {
+                "controlledTerm": "NUMERATOR"
+              },
+              "operationId": "Mth_03a_01_n"
+            },
+            {
+              "id": "Mth_03a_pct_DEN",
+              "description": "Denominator for percentage.",
+              "referencedOperationRole": {
+                "controlledTerm": "DENOMINATOR"
+              },
+              "operationId": "Mth_00_1_01_n"
+            }
+          ]
+        }
+      ],
+      "codeTemplate": {
+        "context": "R (siera)",
+        "code": "denom_dataset = df2_denomanaidhere |>\n    dplyr::count(denom_anagroupvarshere) |>\n    dplyr::rename(`...ard_N...` = n) |>\n    dplyr::mutate(dplyr::across(-`...ard_N...`, as.character))\n\ndf3_analysisidhere <- tryCatch({\nin_data = df2_analysisidhere |>\n    dplyr::select(distinctlisthere) |>\n    unique() |>\n    dplyr::mutate(dplyr::across(everything(), as.character))\n\ncards::ard_tabulate(\n    data = in_data\n   byvarshere\n   ,denominator = denom_dataset\n  ) |>\ndplyr::filter(stat_name %in% c('n', 'p')) |>\ndplyr::rename(group2_level = variable_level) |>\n dplyr::mutate(operationid = dplyr::case_when(\n    stat_name == 'n' ~ 'opid1here',\n    stat_name == 'p' ~ 'opid2here'\n  ))\n}, error = function(e) {\n  message('analysisidhere: ', conditionMessage(e))\n  tibble::tibble(group1_level = character(0), group2_level = character(0))\n})",
+        "parameters": [
+          {
+            "name": "distinctlisthere",
+            "label": "distinct list",
+            "description": "grouping+analysis vars",
+            "valueSource": "distinct_list"
+          },
+          {
+            "name": "byvarshere",
+            "label": "by+vars",
+            "description": "by= and variables= for ard_tabulate",
+            "valueSource": "by_vars"
+          },
+          {
+            "name": "denomanaidhere",
+            "label": "denom ana id",
+            "description": "Denominator analysis ID",
+            "valueSource": "DEN_analysisid"
+          },
+          {
+            "name": "denom_anagroupvarshere",
+            "label": "denom grp var",
+            "description": "Denominator grouping variable",
+            "valueSource": "AG_denom_var1"
+          },
+          {
+            "name": "opid1here",
+            "label": "n id",
+            "description": "Operation ID for n",
+            "valueSource": "operation_1"
+          },
+          {
+            "name": "opid2here",
+            "label": "% id",
+            "description": "Operation ID for %",
+            "valueSource": "operation_2"
+          }
+        ]
+      }
+    },
+    {
+      "id": "Mth_03at",
+      "name": "Categorical n% (1 data-driven grouping, no treatment grouping)",
+      "description": "Categorical n% for an analysis whose only grouping is data-driven (Total column): the grouping goes to variables= and is renamed to group1_level; % over the referenced denominator analysis's distinct subjects (#227).",
+      "label": "Categorical n% (data-driven, overall)",
+      "operations": [
+        {
+          "id": "Mth_03at_01_n",
+          "name": "n",
+          "label": "n",
+          "order": 1,
+          "resultPattern": "XX"
+        },
+        {
+          "id": "Mth_03at_02_%",
+          "name": "%",
+          "label": "%",
+          "order": 2,
+          "resultPattern": "XX.X",
+          "referencedOperationRelationships": [
+            {
+              "id": "Mth_03at_pct_NUM",
+              "description": "Numerator for percentage.",
+              "referencedOperationRole": {
+                "controlledTerm": "NUMERATOR"
+              },
+              "operationId": "Mth_03at_01_n"
+            },
+            {
+              "id": "Mth_03at_pct_DEN",
+              "description": "Denominator for percentage.",
+              "referencedOperationRole": {
+                "controlledTerm": "DENOMINATOR"
+              },
+              "operationId": "Mth_00_1_01_n"
+            }
+          ]
+        }
+      ],
+      "codeTemplate": {
+        "context": "R (siera)",
+        "code": "# One overall denominator: this analysis has no treatment grouping.\ndenom_dataset = tibble::tibble(\n    `...ard_N...` = dplyr::n_distinct(df2_denomanaidhere$anavarhere)\n)\n\nin_data = df2_analysisidhere |>\n    dplyr::distinct(groupvar1here, anavarhere) |>\n    dplyr::mutate(dplyr::across(dplyr::everything(), as.character))\n\ndf3_analysisidhere <- cards::ard_tabulate(\n    data = in_data,\n    variables = 'groupvar1here',\n    denominator = denom_dataset\n  ) |>\ndplyr::filter(stat_name %in% c('n', 'p')) |>\ndplyr::rename(group1_level = variable_level) |>\n dplyr::mutate(operationid = dplyr::case_when(\n    stat_name == 'n' ~ 'opid1here',\n    stat_name == 'p' ~ 'opid2here'\n  ))",
+        "parameters": [
+          {
+            "name": "denomanaidhere",
+            "label": "denom ana id",
+            "description": "Denominator analysis ID",
+            "valueSource": "DEN_analysisid"
+          },
+          {
+            "name": "groupvar1here",
+            "label": "grp var 1",
+            "description": "The (data-driven) grouping variable",
+            "valueSource": "AG_var1"
+          },
+          {
+            "name": "anavarhere",
+            "label": "ana var",
+            "description": "Analysis variable (subject ID)",
+            "valueSource": "ana_var"
+          },
+          {
+            "name": "opid1here",
+            "label": "n id",
+            "description": "Operation ID for n",
+            "valueSource": "operation_1"
+          },
+          {
+            "name": "opid2here",
+            "label": "% id",
+            "description": "Operation ID for %",
+            "valueSource": "operation_2"
+          }
+        ]
+      }
     }
   ],
   "analyses": [
@@ -1010,7 +1344,7 @@
       "purpose": {
         "sponsorTermId": "TermEx01_01"
       },
-      "methodId": "Mth_03",
+      "methodId": "Mth_03p",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -1033,11 +1367,11 @@
       ],
       "referencedAnalysisOperations": [
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "referencedOperationRelationshipId": "Mth_03p_pct_NUM",
           "analysisId": "An_02"
         },
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "referencedOperationRelationshipId": "Mth_03p_pct_DEN",
           "analysisId": "An_01"
         }
       ],
@@ -1413,7 +1747,7 @@
       "purpose": {
         "sponsorTermId": "TermEx01_01"
       },
-      "methodId": "Mth_03",
+      "methodId": "Mth_03pt",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -1432,11 +1766,11 @@
       ],
       "referencedAnalysisOperations": [
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "referencedOperationRelationshipId": "Mth_03pt_pct_NUM",
           "analysisId": "An_02_Total"
         },
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "referencedOperationRelationshipId": "Mth_03pt_pct_DEN",
           "analysisId": "An_01"
         }
       ],
@@ -1818,7 +2152,7 @@
       "purpose": {
         "sponsorTermId": "TermEx01_01"
       },
-      "methodId": "Mth_03",
+      "methodId": "Mth_03p",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -1841,11 +2175,11 @@
       ],
       "referencedAnalysisOperations": [
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "referencedOperationRelationshipId": "Mth_03p_pct_NUM",
           "analysisId": "An_04"
         },
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "referencedOperationRelationshipId": "Mth_03p_pct_DEN",
           "analysisId": "An_01"
         }
       ],
@@ -2131,7 +2465,7 @@
       "purpose": {
         "sponsorTermId": "TermEx01_01"
       },
-      "methodId": "Mth_03",
+      "methodId": "Mth_03pt",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -2150,11 +2484,11 @@
       ],
       "referencedAnalysisOperations": [
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "referencedOperationRelationshipId": "Mth_03pt_pct_NUM",
           "analysisId": "An_04_Total"
         },
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "referencedOperationRelationshipId": "Mth_03pt_pct_DEN",
           "analysisId": "An_01"
         }
       ],
@@ -2236,7 +2570,7 @@
       "purpose": {
         "sponsorTermId": "TermEx01_01"
       },
-      "methodId": "Mth_03",
+      "methodId": "Mth_03p",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -2259,11 +2593,11 @@
       ],
       "referencedAnalysisOperations": [
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "referencedOperationRelationshipId": "Mth_03p_pct_NUM",
           "analysisId": "An_05"
         },
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "referencedOperationRelationshipId": "Mth_03p_pct_DEN",
           "analysisId": "An_01"
         }
       ],
@@ -2909,7 +3243,7 @@
       "purpose": {
         "sponsorTermId": "TermEx01_01"
       },
-      "methodId": "Mth_03",
+      "methodId": "Mth_03pt",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -2928,11 +3262,11 @@
       ],
       "referencedAnalysisOperations": [
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "referencedOperationRelationshipId": "Mth_03pt_pct_NUM",
           "analysisId": "An_05_Total"
         },
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "referencedOperationRelationshipId": "Mth_03pt_pct_DEN",
           "analysisId": "An_01"
         }
       ],
@@ -3124,7 +3458,7 @@
       "purpose": {
         "sponsorTermId": "TermEx01_01"
       },
-      "methodId": "Mth_03",
+      "methodId": "Mth_03p",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -3147,11 +3481,11 @@
       ],
       "referencedAnalysisOperations": [
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "referencedOperationRelationshipId": "Mth_03p_pct_NUM",
           "analysisId": "An_06"
         },
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "referencedOperationRelationshipId": "Mth_03p_pct_DEN",
           "analysisId": "An_01"
         }
       ],
@@ -3527,7 +3861,7 @@
       "purpose": {
         "sponsorTermId": "TermEx01_01"
       },
-      "methodId": "Mth_03",
+      "methodId": "Mth_03pt",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -3546,11 +3880,11 @@
       ],
       "referencedAnalysisOperations": [
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "referencedOperationRelationshipId": "Mth_03pt_pct_NUM",
           "analysisId": "An_06_Total"
         },
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "referencedOperationRelationshipId": "Mth_03pt_pct_DEN",
           "analysisId": "An_01"
         }
       ],
@@ -3654,7 +3988,7 @@
       "purpose": {
         "sponsorTermId": "TermEx01_01"
       },
-      "methodId": "Mth_03",
+      "methodId": "Mth_03a",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -3677,11 +4011,11 @@
       ],
       "referencedAnalysisOperations": [
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "referencedOperationRelationshipId": "Mth_03a_pct_NUM",
           "analysisId": "An_07"
         },
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "referencedOperationRelationshipId": "Mth_03a_pct_DEN",
           "analysisId": "An_01"
         }
       ],
@@ -3781,7 +4115,7 @@
       "purpose": {
         "sponsorTermId": "TermEx01_01"
       },
-      "methodId": "Mth_03",
+      "methodId": "Mth_03at",
       "version": 1,
       "categoryIds": [
         "ANSET_01",
@@ -3800,11 +4134,11 @@
       ],
       "referencedAnalysisOperations": [
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_NUM",
+          "referencedOperationRelationshipId": "Mth_03at_pct_NUM",
           "analysisId": "An_07_Total"
         },
         {
-          "referencedOperationRelationshipId": "Mth_03_pct_DEN",
+          "referencedOperationRelationshipId": "Mth_03at_pct_DEN",
           "analysisId": "An_01"
         }
       ],

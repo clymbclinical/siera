@@ -24,6 +24,7 @@ reference.
 | `risk_difference_per_group_pair` | Risk difference + 95% CI (per group pair) | verified | Risk_Difference_%, 95%_CI_Low, 95%_CI_High | tests/testthat/testdata/etfl/metadata/fda-ae-t36-siera.json Mth_03_1b |
 | `categorical_summary_per_predefined_group` | Categorical n (%) (per pre-defined group) | verified | n, p | tests/testthat/testdata/etfl/metadata/fda-ae-t06-siera.json Mth_03p |
 | `chisq_per_predefined_group` | Chi-square p-value (per pre-defined group) | verified | p.value | Common_Safety_Displays An03_02_AgeGrp_Comp_ByTrt (AGEGR1 '< 65' vs '>= 65'): p = 0.4239, equal to stats::chisq.test() on the grouped table (the raw-value chisq method gives 0.1439) |
+| `categorical_summary_per_predefined_group_overall` | Categorical n (%) (per pre-defined group, overall) | verified | n, p | tests/testthat/testdata/etfl/metadata/fda-dm-t02-siera.json Mth_03pt (An_02_Total, An_05_Total): equal to the published fda-dm-t02 reference ARD, defined groups with no subjects included |
 
 ## Supported valueSources
 
@@ -39,6 +40,8 @@ reference.
 | `AG_var2_group_values` | simple | `group2valueshere` | Quoted, comma-separated condition values of Group2's PRE-DEFINED groups, in group order (to be wrapped in c(...)), e.g. "'SEVERE', 'MODERATE', 'MILD'". For methods that must honour a non-data-driven inner grouping's defined groups rather than loop observed data values. Only single-value EQ group conditions are supported; non-EQ groups are skipped with a warning, and a grouping with no usable groups (e.g. data-driven) resolves to an empty string. |
 | `AG_var2_group_conditions` | complex | `group2conditionshere` | A dplyr::case_when() body mapping data values onto Group2's PRE-DEFINED groups, one arm per group in group order, e.g. "AEACN == 'DRUG INTERRUPTED' ~ 'DRUG INTERRUPTED', AESEV %in% c('SEVERE', 'MODERATE') ~ 'SEVERE'". Each group's level is its FIRST condition value, so it stays a real data value that siera's group-id stamping maps back to the correct group[n]_groupId. Only EQ and IN conditions are supported (they alone define a group as a set of data values); other comparators are skipped with a warning, and a grouping with no usable groups (e.g. data-driven) resolves to an empty string. Pairs with AG_var2_group_levels, and makes siera stamp a full set of group[n] metadata columns (n_group_cols = num_grp). |
 | `AG_var2_group_levels` | complex | `group2levelshere` | The levels used by AG_var2_group_conditions, as a quoted, comma-separated list in group order (to be wrapped in c(...)), e.g. "'DRUG INTERRUPTED', 'DOSE REDUCED', 'DOSE DELAY', 'OTHER'". Supplied as factor levels, this is what makes cards emit a zero row for every defined group no data value satisfies. Same EQ/IN support and empty-string fallback as AG_var2_group_conditions; unlike AG_var2_group_values it keeps IN groups (as their first value). |
+| `AG_var1_group_conditions` | complex | `group1conditionshere` | AG_var2_group_conditions for Group1: a dplyr::case_when() body mapping data values onto Group1's PRE-DEFINED groups, for analyses whose only grouping is pre-defined (e.g. a Total column summarised by sex). Same level, EQ/IN and fallback rules; also makes siera stamp a full set of group[n] metadata columns (n_group_cols = num_grp). |
+| `AG_var1_group_levels` | complex | `group1levelshere` | AG_var2_group_levels for Group1: the levels used by AG_var1_group_conditions, as a quoted, comma-separated list in group order, used as factor levels to zero-fill defined groups no data value satisfies. |
 | `distinct_list` | complex | `distinctlisthere` | All active grouping variables plus the analysis variable, comma separated, unquoted (for dplyr::distinct) |
 | `by_listc` | complex | `byvarshere` | All grouping variables as a quoted, comma-separated list (to be wrapped in c(...)). Stamps CDISC group metadata. Preferred for grouped tabulations. |
 | `by_list` | complex | `bylisthere` | All grouping variables as an UNQUOTED, comma-separated list. Same vars as by_listc but without quotes. |
@@ -736,4 +739,82 @@ df3_analysisidhere <-
     cardx::ard_stats_chisq_test(by = groupvar1here, data = in_data_analysisidhere, variables = ars_group) |>
   dplyr::filter(stat_name == 'p.value') |>
   dplyr::mutate(operationid = 'opid1here')
+```
+
+---
+
+## `categorical_summary_per_predefined_group_overall` - Summary of a pre-defined grouping without treatment arms (n and %)
+
+n and percentage per PRE-DEFINED group (dataDriven: false) of an analysis whose ONLY grouping is that pre-defined grouping - typically a Total-column analysis such as 'Subjects by Sex' over all treated subjects. The single-grouping counterpart of categorical_summary_per_predefined_group: the AG_var1_group_conditions valueSource maps each data value onto the group whose condition it satisfies, and AG_var1_group_levels supplies the defined groups as factor levels, so (a) every defined group is reported, with n = 0 / % = 0.0 when no subject reaches it, (b) data values satisfying no defined group are excluded, and (c) a multi-value IN group is one group. The percentage is over the distinct subjects (analysis variable) of the referenced denominator analysis, taken as one overall count. siera stamps group1_groupId from the resulting levels (#227). Only EQ and IN group conditions are supported; other comparators are skipped with a warning at generation time.
+
+**Status:** verified &nbsp; **Verified against:** tests/testthat/testdata/etfl/metadata/fda-dm-t02-siera.json Mth_03pt (An_02_Total, An_05_Total): equal to the published fda-dm-t02 reference ARD, defined groups with no subjects included
+
+**Operations**
+
+| order | stat_name | label | resultPattern |
+|-------|-----------|-------|---------------|
+| 1 | `n` | Count | `xx` |
+| 2 | `p` | Percentage | `(xx.x)` |
+
+**Parameters**
+
+| token | valueSource | label | description |
+|-------|-------------|-------|-------------|
+| `denomanaidhere` | `DEN_analysisid` | denom ana id | Analysis ID supplying the denominator population |
+| `group1conditionshere` | `AG_var1_group_conditions` | grp 1 conditions | case_when body mapping data values onto Group1's pre-defined groups, in group order |
+| `group1levelshere` | `AG_var1_group_levels` | grp 1 levels | Quoted, comma-separated levels of Group1's pre-defined groups, in group order, used as factor levels to zero-fill absent groups |
+| `anavarhere` | `ana_var` | ana var | Analysis variable (subject ID) counted distinctly, in this analysis and in the denominator |
+| `opid1here` | `operation_1` | op id 1 | Operation id for the 'n' statistic (order 1) |
+| `opid2here` | `operation_2` | op id 2 | Operation id for the 'p' statistic (order 2) |
+
+**Template**
+
+```r
+# Population-based (see df_poptot): the zero-fill below must also run when the
+# data subset is empty, so siera drops its empty-data guard for this method -
+# an empty subset yields n = 0 / 0.0% for every defined group.
+# Denominator: the referenced analysis's distinct subjects, as ONE overall
+# count - this analysis has no treatment grouping to split it by.
+denom_analysisidhere <- tibble::tibble(
+    `...ard_N...` = dplyr::n_distinct(df2_denomanaidhere$anavarhere)
+)
+
+# The levels are the ones the ARS metadata DEFINES, not the ones the data
+# happens to contain.
+.levels_analysisidhere <- c(group1levelshere)
+
+in_data_analysisidhere <- df2_analysisidhere |>
+    dplyr::mutate(ars_group = dplyr::case_when(
+      group1conditionshere,
+      TRUE ~ NA_character_
+    )) |>
+    # A data value satisfying none of the defined group conditions was never
+    # asked for by the ARS, so it is excluded rather than tabulated.
+    dplyr::filter(!is.na(ars_group)) |>
+    dplyr::distinct(ars_group, anavarhere) |>
+    dplyr::mutate(ars_group = factor(ars_group, levels = .levels_analysisidhere)) |>
+    dplyr::select(ars_group)
+
+df3_analysisidhere <- if (length(.levels_analysisidhere) > 0) {
+  cards::ard_tabulate(
+      data = in_data_analysisidhere,
+      variables = 'ars_group',
+      denominator = denom_analysisidhere
+    ) |>
+  dplyr::filter(stat_name %in% c('n', 'p')) |>
+  dplyr::rename(group1_level = variable_level) |>
+  # cards returns the levels as list-columns of factors, whose as.character()
+  # is the integer code - flatten to the labels before siera stamps group ids.
+  dplyr::mutate(dplyr::across(
+      dplyr::matches('_level$'),
+      ~ vapply(.x, function(v) if (is.null(v)) NA_character_ else as.character(v), character(1L))
+    )) |>
+  dplyr::mutate(operationid = dplyr::case_when(
+      stat_name == 'n' ~ 'opid1here',
+      stat_name == 'p' ~ 'opid2here'
+    ))
+} else {
+  tibble::tibble(group1_level = character(0), stat_name = character(0),
+                 stat = list(), operationid = character(0))
+}
 ```

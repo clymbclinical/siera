@@ -25,6 +25,8 @@
     AG_var2_group_values = "'SEVERE', 'MODERATE', 'MILD'",
     AG_var2_group_conditions = "AESEV == 'SEVERE' ~ 'SEVERE', AESEV %in% c('MODERATE', 'MILD') ~ 'MODERATE'",
     AG_var2_group_levels = "'SEVERE', 'MODERATE'",
+    AG_var1_group_conditions = "ASEX == 'Male' ~ 'Male', ASEX == 'Female' ~ 'Female'",
+    AG_var1_group_levels = "'Male', 'Female'",
     DEN_analysisid    = "An_99",
     AG_denom_var1     = "TRT01A",
     AG_max_dataDriven = "FALSE",

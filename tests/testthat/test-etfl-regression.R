@@ -32,9 +32,54 @@ test_that("fda-dm-t02 demographics: bigN, sex n%, and age summary match referenc
   expect_gt(nrow(ard), 0L)
 
   expect_true(.cmp_bigN(ard, ref, "An_01")$match)                       # 84/84/86
-  .expect_all_match(.cmp_n_pct(ard, ref, "An_02",
-                               siera_cat = "variable_level", ref_cat = "Group2"))
   .expect_all_match(.cmp_continuous(ard, ref, "An_03"))
+
+  # Every reference row must have a siera partner, so a defined group siera
+  # drops (or leaves without a group id) fails the count check.
+  n_ref <- function(id) sum(ref$analysisId == id)
+
+  # Treatment x pre-defined group (Mth_03p, #227): keyed on BOTH group ids,
+  # with the defined groups no subject reaches (Intersex, Unknown, ...) as 0.
+  for (id in c("An_02", "An_04")) {
+    cmp <- .cmp_n_pct(ard, ref, id, siera_cat = "group2_groupId", ref_cat = "groupId2")
+    .expect_all_match(cmp, info = id)
+    expect_equal(cmp$n_total, n_ref(id), info = id)
+  }
+  # The reference stamps some group ids wrongly - race: Not Reported and
+  # Unknown reuse Arace_03/_04; ethnicity: Not Hispanic or Latino reuses
+  # Aethnic_01 - so match these rows on the group label instead.
+  for (id in c("An_05", "An_06")) {
+    cmp <- .cmp_n_pct(ard, ref, id, siera_cat = "group2_level", ref_cat = "Group2")
+    .expect_all_match(cmp, info = id)
+    expect_equal(cmp$n_total, n_ref(id), info = id)
+    expect_false(anyNA(dplyr::filter(ard, AnalysisId == id)$group2_groupId))
+  }
+
+  # Total column, pre-defined group only (Mth_03pt, method 13): the category
+  # is grouping 1, so group1_groupId carries its id.
+  for (id in c("An_02_Total", "An_04_Total", "An_05_Total")) {
+    cmp <- .cmp_n_pct(ard, ref, id)
+    .expect_all_match(cmp, info = id)
+    expect_equal(cmp$n_total, n_ref(id), info = id)
+  }
+  # The reference also labels the An_06_Total 'Not Hispanic or Latino' row
+  # 'Hispanic or Latino', so check that one against the ADSL itself.
+  adsl <- haven::read_xpt(file.path(.etfl_paths("fda-dm-t02")$adam_dir, "adsl.xpt")) |>
+    dplyr::filter(SAFFL == "Y")
+  eth <- dplyr::filter(ard, AnalysisId == "An_06_Total", stat_name == "n")
+  expect_equal(
+    stats::setNames(eth$res, eth$group1_groupId),
+    c(AnlsGrouping_05_Aethnic_01 = sum(adsl$AETHNIC == "Hispanic or Latino"),
+      AnlsGrouping_05_Aethnic_02 = sum(adsl$AETHNIC == "Not Hispanic or Latino"),
+      AnlsGrouping_05_Aethnic_03 = 0, AnlsGrouping_05_Aethnic_04 = 0)
+  )
+
+  # Country, data-driven (Mth_03a by treatment, Mth_03at for the Total).
+  .expect_all_match(.cmp_n_pct(ard, ref, "An_07",
+                               siera_cat = "group2_level", ref_cat = "Group2"))
+  ref_tot <- dplyr::mutate(ref, groupId1 = dplyr::na_if(groupId1, ""))
+  .expect_all_match(.cmp_n_pct(ard, ref_tot, "An_07_Total",
+                               siera_cat = "group1_level", ref_cat = "Group1"))
 })
 
 test_that("fda-ds-t04 disposition: bigN, n%, and risk differences match reference", {

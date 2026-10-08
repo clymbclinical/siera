@@ -363,6 +363,20 @@ readARS <- function(ARS_path,
               .ag_group_conditions(AnalysisGroupings, groupids[2])$levels
             }
           )
+        },
+        # The same definitions for grouping 1 (#227), for analyses whose only
+        # grouping is pre-defined, e.g. a Total column summarised by sex.
+        if (n_actual_groups >= 1) {
+          list(
+            AG_var1_group_conditions = function() {
+              .ag_group_conditions(AnalysisGroupings, groupids[1],
+                                   value_source = "AG_var1_group_conditions")$conditions
+            },
+            AG_var1_group_levels = function() {
+              .ag_group_conditions(AnalysisGroupings, groupids[1],
+                                   value_source = "AG_var1_group_levels")$levels
+            }
+          )
         }
       )
 
@@ -700,11 +714,11 @@ readARS <- function(ARS_path,
   )
   active_sources <- params$parameter_valueSource[in_template]
 
-  # A template driven by pre-defined group conditions (#187) puts the inner
+  # A template driven by pre-defined group conditions (#187, #227) puts the
   # grouping into variables= like by_vars does, but then renames the resulting
   # variable_level to group[n]_level itself, so it does produce a full set of
   # group columns.
-  if (any(active_sources == "AG_var2_group_conditions")) {
+  if (any(active_sources %in% c("AG_var1_group_conditions", "AG_var2_group_conditions"))) {
     num_grp
   } else if (any(active_sources %in% c("by_vars", "strata_vars"))) {
     max(0L, num_grp - 1L)
@@ -771,7 +785,9 @@ readARS <- function(ARS_path,
 }
 
 # Resolve the AG_var2_group_conditions / AG_var2_group_levels valueSources for a
-# pre-defined (dataDriven: false) inner grouping (#187).
+# pre-defined (dataDriven: false) inner grouping (#187), and their grouping-1
+# twins AG_var1_group_conditions / AG_var1_group_levels (#227). `value_source`
+# only names the valueSource in messages.
 #
 # Where AG_var2_group_values (#171) yields a bare list of EQ condition values,
 # these two carry the group DEFINITIONS themselves so a template can aggregate
@@ -790,7 +806,8 @@ readARS <- function(ARS_path,
 # the correct group[n]_groupId. Only EQ and IN conditions define a group as a
 # set of data values that way, so other comparators are skipped with a warning,
 # as they are for AG_var2_group_values.
-.ag_group_conditions <- function(analysis_groupings, grouping_id) {
+.ag_group_conditions <- function(analysis_groupings, grouping_id,
+                                 value_source = "AG_var2_group_conditions") {
   gid <- grouping_id
   # The empty conditions fallback is a case_when arm that matches nothing, so a
   # template embedding it still parses; the empty levels fallback resolves to
@@ -802,7 +819,7 @@ readARS <- function(ARS_path,
               "group_condition_comparator", "group_condition_value")
   if (!all(needed %in% names(analysis_groupings))) {
     cli::cli_warn(c(
-      "AG_var2_group_conditions: grouping {.val {gid}} defines no groups.",
+      "{value_source}: grouping {.val {gid}} defines no groups.",
       "i" = "Pre-defined group conditions require a non-data-driven grouping."
     ))
     return(empty)
@@ -813,7 +830,7 @@ readARS <- function(ARS_path,
 
   if (nrow(groups) == 0) {
     cli::cli_warn(c(
-      "AG_var2_group_conditions: grouping {.val {gid}} defines no groups.",
+      "{value_source}: grouping {.val {gid}} defines no groups.",
       "i" = "Pre-defined group conditions require a non-data-driven grouping."
     ))
     return(empty)
@@ -854,7 +871,7 @@ readARS <- function(ARS_path,
     # otherwise fail inside factor() at script runtime with a cryptic message.
     if (paste0("'", level, "'") %in% group_levels) {
       cli::cli_abort(c(
-        "AG_var2_group_conditions: groups of grouping {.val {gid}} share the level {.val {level}}.",
+        "{value_source}: groups of grouping {.val {gid}} share the level {.val {level}}.",
         "i" = "Groups within a grouping must be mutually exclusive; check the group conditions."
       ))
     }
@@ -864,7 +881,7 @@ readARS <- function(ARS_path,
 
   if (length(skipped) > 0) {
     cli::cli_warn(c(
-      "AG_var2_group_conditions: skipping group(s) {.val {skipped}} of grouping {.val {gid}}.",
+      "{value_source}: skipping group(s) {.val {skipped}} of grouping {.val {gid}}.",
       "i" = "Only EQ and IN group conditions define a group as a set of data values."
     ))
   }
