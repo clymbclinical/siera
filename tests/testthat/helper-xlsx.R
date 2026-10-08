@@ -27,13 +27,15 @@
   }), basename(fs))
 }
 
-# The JSON demo Common_Safety_Displays_cards carries the pre-defined-group
-# methods of #216 (data-raw/Common_Safety_Displays_cards.R); the deprecated
-# workbook does not. They change the demographics output, and the
-# operation -> resultPattern lookup that every script embeds for the whole
-# reporting event. Drop both, so the rest of each script is still compared.
-.drop_predefined_group_methods <- function(scripts) {
-  scripts[["ARD_Out14-1-1.R"]] <- NULL
+# The JSON demo Common_Safety_Displays_cards carries method templates from
+# siera's method library (data-raw/Common_Safety_Displays_cards.R): the
+# pre-defined-group methods of #216 (demographics output) and the
+# categorical_summary template of #231 (adverse-event output). The deprecated
+# workbook does not. Drop those two outputs and the operation -> resultPattern
+# lookup that every script embeds for the whole reporting event, so the rest
+# is still compared.
+.drop_demo_json_methods <- function(scripts) {
+  scripts[c("ARD_Out14-1-1.R", "ARD_Out14-3-1-1.R")] <- NULL
   lapply(scripts, function(ls) {
     s <- which(ls == ".op_patterns <- data.frame(")
     e <- which(ls == ")")

@@ -28,8 +28,8 @@ test_that("readARS() on xlsx generates the same scripts as on the committed JSON
         from_xlsx <- lapply(from_xlsx, function(x) gsub("'NA'", "''", x, fixed = TRUE))
       }
       if (base == "Common_Safety_Displays_cards") {
-        from_xlsx <- .drop_predefined_group_methods(from_xlsx)
-        from_json <- .drop_predefined_group_methods(from_json)
+        from_xlsx <- .drop_demo_json_methods(from_xlsx)
+        from_json <- .drop_demo_json_methods(from_json)
       }
       expect_identical(names(from_xlsx), names(from_json), info = base)
       for (f in names(from_json)) {

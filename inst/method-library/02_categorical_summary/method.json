@@ -2,7 +2,7 @@
   "id": "categorical_summary",
   "name": "Summary of a categorical variable (n and %)",
   "label": "Categorical n (%)",
-  "description": "n and percentage of a categorical analysis variable per group, with a referenced denominator analysis and a data-driven/pre-defined grouping branch. Verified against Common_Safety_Displays Mth01_CatVar_Summ_ByGrp; current cards API. Spurious by_vars/strata_vars params from the legacy sheet have been dropped (the template uses by_listc).",
+  "description": "n and percentage of a categorical analysis variable per group, with a referenced denominator analysis and a data-driven/pre-defined grouping branch. Verified against Common_Safety_Displays Mth01_CatVar_Summ_ByGrp; current cards API. Spurious by_vars/strata_vars params from the legacy sheet have been dropped (the template uses by_listc). Result rows carry the ARS analysis variable as `variable` (variable_level NA) rather than the internal 'dummy' column (#231).",
   "context": "R (siera)",
   "status": "verified",
   "verified_against": "Common_Safety_Displays_cards.json Mth01_CatVar_Summ_ByGrp",
@@ -50,6 +50,12 @@
       "valueSource": "by_listc",
       "label": "by vars (list)",
       "description": "Grouping variables as a quoted, comma-separated list"
+    },
+    {
+      "name": "anavarhere",
+      "valueSource": "ana_var",
+      "label": "ana var",
+      "description": "Analysis variable (e.g. USUBJID), stamped as the result rows' `variable`"
     },
     {
       "name": "opid1here",

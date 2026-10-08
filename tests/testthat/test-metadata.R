@@ -470,3 +470,48 @@ test_that("JSON data subsets mixing scalar and array values are read (#217)", {
   rel <- meta$DataSubsets[meta$DataSubsets$condition_variable %in% "AEREL", ]
   expect_identical(unlist(rel$condition_value), c("POSSIBLE", "PROBABLE"))
 })
+
+test_that("empty relationship arrays read like absent ones (#230)", {
+  src <- ARS_example("Common_Safety_Displays_cards.json")
+  ars <- jsonlite::fromJSON(src, simplifyVector = FALSE)
+  baseline <- siera:::.read_ars_json_metadata(src)
+
+  # write `[]` where the field is absent: one item, or every item
+  empty_ops <- function(a, first_only) {
+    done <- FALSE
+    a$methods <- lapply(a$methods, function(m) {
+      m$operations <- lapply(m$operations, function(o) {
+        if (is.null(o$referencedOperationRelationships) && !(first_only && done)) {
+          o$referencedOperationRelationships <- list()
+          done <<- TRUE
+        }
+        o
+      })
+      m
+    })
+    a
+  }
+  empty_refs <- function(a, first_only) {
+    done <- FALSE
+    a$analyses <- lapply(a$analyses, function(x) {
+      if (is.null(x$referencedAnalysisOperations) && !(first_only && done)) {
+        x$referencedAnalysisOperations <- list()
+        done <<- TRUE
+      }
+      x
+    })
+    a
+  }
+
+  variants <- list(
+    one_operation  = empty_ops(ars, TRUE),
+    all_operations = empty_ops(ars, FALSE),
+    one_analysis   = empty_refs(ars, TRUE),
+    all_analyses   = empty_refs(ars, FALSE)
+  )
+  for (v in names(variants)) {
+    f <- withr::local_tempfile(fileext = ".json")
+    jsonlite::write_json(variants[[v]], f, auto_unbox = TRUE, digits = NA)
+    expect_identical(siera:::.read_ars_json_metadata(f), baseline, info = v)
+  }
+})
