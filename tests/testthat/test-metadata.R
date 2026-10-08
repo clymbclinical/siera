@@ -419,10 +419,13 @@ test_that("generated script coerces _level columns to character per df3 before b
 test_that("wrapped script delegates the _level coercion to ars_stamp() per analysis", {
   ARS_path <- ARS_example("Common_Safety_Displays_cards.json")
   output_dir <- withr::local_tempdir()
-  readARS(ARS_path, output_dir, withr::local_tempdir(), spec_output = "Out14-1-1",
+  # The adverse-event output: the demographics output (Out14-1-1) uses the
+  # library template categorical_summary_per_predefined_group (#216), which
+  # flattens cards' factor levels itself, as part of the method's own code.
+  readARS(ARS_path, output_dir, withr::local_tempdir(), spec_output = "Out14-3-1-1",
           code_style = "wrapped")
 
-  lines <- readLines(file.path(output_dir, "ARD_Out14-1-1.R"))
+  lines <- readLines(file.path(output_dir, "ARD_Out14-3-1-1.R"))
   # no inline coercion block ...
   expect_false(any(grepl("matches('_level$')", lines, fixed = TRUE)))
   # ... every analysis ends with one ars_stamp() call, before the bind_rows

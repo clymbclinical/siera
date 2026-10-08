@@ -83,37 +83,40 @@ df2_An07_03_SerTEAE_Summ_ByTrt <- df_pop |>
 
 #### Step 3: Apply "Method"
 
-This step takes the subsetted dataset, and applies the required AnalysisMethod (e.g. counting subjects by treatment and a group, like RACE).  As explained in the vignette for [using `cards` and `cardx`](using-cards.html), functions from these packages are applied to handle the statistical operations for the analysis.  Typically, there would be some pre-work done on the dataset before passing it to a `cards` or `cardx` function.  When the function is applied, the result is an analysis-level ARD.  See example below:
+This step takes the subsetted dataset, and applies the required AnalysisMethod (e.g. counting the subjects with a serious TEAE in each treatment arm).  As explained in the vignette for [using `cards` and `cardx`](using-cards.html), functions from these packages are applied to handle the statistical operations for the analysis.  Typically, there would be some pre-work done on the dataset before passing it to a `cards` or `cardx` function.  When the function is applied, the result is an analysis-level ARD.  See example below:
 
 ```{r MethodExample, eval=FALSE}
 # the method only runs when there is data; otherwise df3 stays NULL and Step 4
 # turns it into a stub row that still identifies the analysis
-df3_An03_05_Race_Summ_ByTrt <- NULL
-if (nrow(df2_An03_05_Race_Summ_ByTrt) != 0) {
+df3_An07_03_SerTEAE_Summ_ByTrt <- NULL
+if (nrow(df2_An07_03_SerTEAE_Summ_ByTrt) != 0) {
   # intermediate step: Prepare Denominator Dataset for `cards` function
   denom_dataset <- df2_An01_05_SAF_Summ_ByTrt |>
     dplyr::select(TRT01A)
 
   # intermediate step: Prepare input dataset for `cards` function
-  in_data <- df2_An03_05_Race_Summ_ByTrt |>
-    dplyr::distinct(TRT01A, RACE, USUBJID) |>
+  # (one row per subject and arm, however many serious TEAEs they had)
+  in_data <- df2_An07_03_SerTEAE_Summ_ByTrt |>
+    dplyr::distinct(TRT01A, USUBJID) |>
     dplyr::mutate(dummy = "dummyvar")
 
-  # calculate subject counts and % (based on big N) grouped by treatment and race
-  df3_An03_05_Race_Summ_ByTrt <- cards::ard_tabulate(
+  # calculate subject counts and % (based on big N) grouped by treatment
+  df3_An07_03_SerTEAE_Summ_ByTrt <- cards::ard_tabulate(
     data = in_data,
-    by = c("TRT01A", "RACE"),
+    by = c("TRT01A"),
     variables = "dummy",
     denominator = denom_dataset
   ) |>
     # select relevant statistics as defined by the Method, and assign operation Ids
     dplyr::filter(stat_name %in% c("n", "p")) |>
     dplyr::mutate(operationid = dplyr::case_when(
-      stat_name == "n" ~ "Mth01_1_n",
-      stat_name == "p" ~ "Mth01_2_pct"
+      stat_name == "n" ~ "Mth01_CatVar_Summ_ByGrp_1_n",
+      stat_name == "p" ~ "Mth01_CatVar_Summ_ByGrp_2_pct"
     ))
 }
 ```
+
+Not every method follows this shape. Methods that must report something even when no subject qualifies - a zero count for every **pre-defined** group, or a risk difference of `0` - compute over the whole population and skip the empty-data guard. The demographics analyses in the same example (age group, sex, ethnicity and race) use such a method from siera's method library, `categorical_summary_per_predefined_group`, so all nine race groups that the ARS defines are reported, with zero counts for those that do not occur in the data.  See the [Concepts and conventions](concepts.html) vignette for when to choose which.
 
 This example uses the current `cards` function name `ard_tabulate()` (formerly `ard_categorical()`); see the [using `cards` and `cardx`](using-cards.html) vignette for the full list of renames.
 
@@ -123,20 +126,34 @@ The last step of every analysis is a single call to `ars_stamp()`.  It takes the
 
 ```{r StampExample, eval=FALSE}
 # Link ARS identifiers ---
-df3_An03_05_Race_Summ_ByTrt <- siera::ars_stamp(
-  df3_An03_05_Race_Summ_ByTrt,
-  analysis_id = 'An03_05_Race_Summ_ByTrt',  # analyses[].id
-  method_id   = 'Mth01',                    # analyses[].methodId
-  output_id   = 'Out14-1-1',                # mainListOfContents outputId
-  groupings   = list(                       # analyses[].orderedGroupings
+df3_An07_03_SerTEAE_Summ_ByTrt <- siera::ars_stamp(
+  df3_An07_03_SerTEAE_Summ_ByTrt,
+  analysis_id = 'An07_03_SerTEAE_Summ_ByTrt', # analyses[].id
+  method_id   = 'Mth01_CatVar_Summ_ByGrp',    # analyses[].methodId
+  output_id   = 'Out14-3-1-1',                # mainListOfContents outputId
+  groupings   = list(                         # analyses[].orderedGroupings
     siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(
       'AnlsGrouping_01_Trt_1' = 'Placebo',
       'AnlsGrouping_01_Trt_2' = 'Xanomeline Low Dose',
-      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose')),
-    siera::ars_grouping('AnlsGrouping_02_Race', data_driven = TRUE)
+      'AnlsGrouping_01_Trt_3' = 'Xanomeline High Dose'))
   )
 )
 ```
+
+An analysis with more than one grouping gets one `ars_grouping()` per grouping, in the order of `analyses[].orderedGroupings`. The race analysis, for example, adds its nine pre-defined race groups after the treatment arms (shortened here):
+
+```{r StampExample2, eval=FALSE}
+  groupings   = list(
+    siera::ars_grouping('AnlsGrouping_01_Trt', groups = c(...)),
+    siera::ars_grouping('AnlsGrouping_04_Race', groups = c(
+      'AnlsGrouping_04_Race_1' = 'AMERICAN INDIAN OR ALASKA NATIVE',
+      'AnlsGrouping_04_Race_2' = 'ASIAN',
+      # ...
+      'AnlsGrouping_04_Race_9' = 'OTHER'))
+  )
+```
+
+A data-driven grouping, such as the system organ class of an adverse event, is written `siera::ars_grouping('<groupingId>', data_driven = TRUE)` instead.
 
 Every argument is copied straight from the ARS metadata, so the call reads as a small, checkable summary of the analysis:
 
