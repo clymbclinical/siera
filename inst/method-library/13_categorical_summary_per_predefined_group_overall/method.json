@@ -1,0 +1,61 @@
+{
+  "id": "categorical_summary_per_predefined_group_overall",
+  "name": "Summary of a pre-defined grouping without treatment arms (n and %)",
+  "label": "Categorical n (%) (per pre-defined group, overall)",
+  "description": "n and percentage per PRE-DEFINED group (dataDriven: false) of an analysis whose ONLY grouping is that pre-defined grouping - typically a Total-column analysis such as 'Subjects by Sex' over all treated subjects. The single-grouping counterpart of categorical_summary_per_predefined_group: the AG_var1_group_conditions valueSource maps each data value onto the group whose condition it satisfies, and AG_var1_group_levels supplies the defined groups as factor levels, so (a) every defined group is reported, with n = 0 / % = 0.0 when no subject reaches it, (b) data values satisfying no defined group are excluded, and (c) a multi-value IN group is one group. The percentage is over the distinct subjects (analysis variable) of the referenced denominator analysis, taken as one overall count. siera stamps group1_groupId from the resulting levels (#227). Only EQ and IN group conditions are supported; other comparators are skipped with a warning at generation time.",
+  "context": "R (siera)",
+  "status": "verified",
+  "verified_against": "tests/testthat/testdata/etfl/metadata/fda-dm-t02-siera.json Mth_03pt (An_02_Total, An_05_Total): equal to the published fda-dm-t02 reference ARD, defined groups with no subjects included",
+  "operations": [
+    {
+      "order": 1,
+      "name": "n",
+      "label": "Count",
+      "resultPattern": "xx"
+    },
+    {
+      "order": 2,
+      "name": "p",
+      "label": "Percentage",
+      "resultPattern": "(xx.x)"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "denomanaidhere",
+      "valueSource": "DEN_analysisid",
+      "label": "denom ana id",
+      "description": "Analysis ID supplying the denominator population"
+    },
+    {
+      "name": "group1conditionshere",
+      "valueSource": "AG_var1_group_conditions",
+      "label": "grp 1 conditions",
+      "description": "case_when body mapping data values onto Group1's pre-defined groups, in group order"
+    },
+    {
+      "name": "group1levelshere",
+      "valueSource": "AG_var1_group_levels",
+      "label": "grp 1 levels",
+      "description": "Quoted, comma-separated levels of Group1's pre-defined groups, in group order, used as factor levels to zero-fill absent groups"
+    },
+    {
+      "name": "anavarhere",
+      "valueSource": "ana_var",
+      "label": "ana var",
+      "description": "Analysis variable (subject ID) counted distinctly, in this analysis and in the denominator"
+    },
+    {
+      "name": "opid1here",
+      "valueSource": "operation_1",
+      "label": "op id 1",
+      "description": "Operation id for the 'n' statistic (order 1)"
+    },
+    {
+      "name": "opid2here",
+      "valueSource": "operation_2",
+      "label": "op id 2",
+      "description": "Operation id for the 'p' statistic (order 2)"
+    }
+  ]
+}

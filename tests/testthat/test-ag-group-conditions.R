@@ -153,6 +153,45 @@ test_that("AG_var2_group_conditions makes siera stamp a full set of group column
   )
 })
 
+test_that("AG_var1_group_conditions makes siera stamp the single grouping (#227)", {
+  # The overall (no treatment) counterpart: one pre-defined grouping, renamed
+  # to group1_level by the template, so grouping 1 is stamped.
+  template <- tibble::tibble(
+    method_id = "MTH_GC1",
+    context = "R (siera)",
+    specifiedAs = "Code",
+    templateCode = "df3_analysisidhere <- dplyr::case_when(group1conditionshere)"
+  )
+  parameters <- tibble::tibble(
+    method_id = "MTH_GC1",
+    parameter_name = "group1conditionshere",
+    parameter_valueSource = "AG_var1_group_conditions"
+  )
+
+  expect_identical(
+    siera:::.n_group_cols_from_template(
+      num_grp = 1L,
+      method_id = "MTH_GC1",
+      analysis_method_code_template = template,
+      analysis_method_code_parameters = parameters
+    ),
+    1L
+  )
+})
+
+test_that(".ag_group_conditions names the valueSource it resolves in its messages", {
+  expect_warning(
+    siera:::.ag_group_conditions(.agc_test_groupings(), "AG_DD",
+                                 value_source = "AG_var1_group_conditions"),
+    "AG_var1_group_conditions: grouping"
+  )
+  # Default label stays the grouping-2 one.
+  expect_warning(
+    siera:::.ag_group_conditions(.agc_test_groupings(), "AG_DD"),
+    "AG_var2_group_conditions: grouping"
+  )
+})
+
 test_that(".generate_groupid_code maps every value of a multi-row IN group to its group id", {
   # The reader unnests a multi-value IN condition to one row per value with the
   # group id repeated, so each value maps back to the same group.
@@ -187,9 +226,12 @@ test_that(".ag_group_conditions aborts when two groups share a level", {
 
 test_that("the per-predefined-group method is population-based (empty subset still zero-fills)", {
   # Installed package under R CMD check; source tree under devtools::test().
-  rel <- file.path("11_categorical_summary_per_predefined_group", "template.R")
-  f <- system.file("method-library", rel, package = "siera")
-  if (!nzchar(f)) f <- testthat::test_path("..", "..", "inst", "method-library", rel)
-  tmpl <- readLines(f, warn = FALSE)
-  expect_true(any(grepl("df_poptot", tmpl, fixed = TRUE)))
+  for (dir in c("11_categorical_summary_per_predefined_group",
+                "13_categorical_summary_per_predefined_group_overall")) {
+    rel <- file.path(dir, "template.R")
+    f <- system.file("method-library", rel, package = "siera")
+    if (!nzchar(f)) f <- testthat::test_path("..", "..", "inst", "method-library", rel)
+    tmpl <- readLines(f, warn = FALSE)
+    expect_true(any(grepl("df_poptot", tmpl, fixed = TRUE)), info = dir)
+  }
 })

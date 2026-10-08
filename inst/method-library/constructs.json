@@ -72,6 +72,20 @@
       "assumed_parameter_name": "group2levelshere"
     },
     {
+      "valueSource": "AG_var1_group_conditions",
+      "type": "complex",
+      "details": "AG_var2_group_conditions for Group1: a dplyr::case_when() body mapping data values onto Group1's PRE-DEFINED groups, for analyses whose only grouping is pre-defined (e.g. a Total column summarised by sex). Same level, EQ/IN and fallback rules; also makes siera stamp a full set of group[n] metadata columns (n_group_cols = num_grp).",
+      "ars_location": "Analyses$groupingId1 -> AnalysisGroupings groups: group_condition_variable/comparator/value in group_order (EQ, IN)",
+      "assumed_parameter_name": "group1conditionshere"
+    },
+    {
+      "valueSource": "AG_var1_group_levels",
+      "type": "complex",
+      "details": "AG_var2_group_levels for Group1: the levels used by AG_var1_group_conditions, as a quoted, comma-separated list in group order, used as factor levels to zero-fill defined groups no data value satisfies.",
+      "ars_location": "Analyses$groupingId1 -> AnalysisGroupings groups: first group_condition_value per group in group_order (EQ, IN)",
+      "assumed_parameter_name": "group1levelshere"
+    },
+    {
       "valueSource": "distinct_list",
       "type": "complex",
       "details": "All active grouping variables plus the analysis variable, comma separated, unquoted (for dplyr::distinct)",

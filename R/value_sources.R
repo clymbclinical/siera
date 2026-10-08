@@ -38,7 +38,9 @@
     "AG_var3",
     "AG_var2_group_values",
     "AG_var2_group_conditions",
-    "AG_var2_group_levels"
+    "AG_var2_group_levels",
+    "AG_var1_group_conditions",
+    "AG_var1_group_levels"
   )
 }
 
