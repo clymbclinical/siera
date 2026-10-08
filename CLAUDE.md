@@ -1020,16 +1020,28 @@ after the templates are updated, then
     `cards::ard_tabulate(by = arm, variables = <cat>, denominator = <count>)`
     makes cards zero-fill **both** dimensions (verified: an entirely
     absent `by` level is zero-filled too, as long as BOTH data and
-    denominator carry the factor). A group’s level is its **first
-    condition value**, which keeps it a real data value so
-    `.generate_groupid_code()`’s case_when maps it back to the right
-    `group[n]_groupId`; only `EQ`/`IN` define a group as a value set
-    that way, so other comparators are skipped with a warning (same
-    posture as \#171). Both sources come from one resolver
-    `.ag_group_conditions()` (R/readARS.R) via two lazy wrappers; its
-    empty fallback is `conditions = "FALSE ~ NA_character_"` (a
-    case_when arm that still **parses** where the template embeds it) +
-    `levels = ""`, and the template branches on `length(levels) > 0`.
+    denominator carry the factor). A group’s level was its first
+    condition value; since **\#232 it is the ARS group NAME**
+    (`.group_level()`: name, else first condition value). Because names
+    are not data values, the group-id stamp of a grouping whose levels
+    come from `AG_var<n>_group_conditions`/`_levels` maps names to ids:
+    [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+    computes `stamp_by_name` per grouping via `.stamp_by_name()` (from
+    `.template_value_sources()`, the same active-valueSource scan
+    `.n_group_cols_from_template()` uses) and passes it to both
+    generators, which call `.grouping_stamp_spec(by_name = TRUE)`; all
+    other groupings keep stamping by condition value, so their scripts
+    are unchanged. Names are often display text (eTFL treatment groups
+    are named `"Placebo \n(N=XX)\nn (%)"`, the demo age group
+    `"≥ 65 years"`), so `.escape_single_quote()` writes generated
+    literals portably: backslash, quote, line breaks/tabs, and non-ASCII
+    as `\uXXXX`. Only `EQ`/`IN` define a group as a value set, so other
+    comparators are skipped with a warning (same posture as \#171). Both
+    sources come from one resolver `.ag_group_conditions()`
+    (R/readARS.R) via two lazy wrappers; its empty fallback is
+    `conditions = "FALSE ~ NA_character_"` (a case_when arm that still
+    **parses** where the template embeds it) + `levels = ""`, and the
+    template branches on `length(levels) > 0`.
     **`.n_group_cols_from_template()` gained a branch**:
     `AG_var2_group_conditions` → `num_grp` (the template puts the inner
     grouping in `variables=` like `by_vars` but renames `variable_level`

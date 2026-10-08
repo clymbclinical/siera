@@ -294,11 +294,20 @@ example, adds its nine pre-defined race groups after the treatment arms
 <code class="sourceCode R"><span>  <span class="va">groupings</span>   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="fu">siera</span><span class="fu">::</span><span class="fu"><a href="../reference/ars_grouping.html">ars_grouping</a></span><span class="op">(</span><span class="st">'AnlsGrouping_01_Trt'</span>, groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    <span class="fu">siera</span><span class="fu">::</span><span class="fu"><a href="../reference/ars_grouping.html">ars_grouping</a></span><span class="op">(</span><span class="st">'AnlsGrouping_04_Race'</span>, groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>      <span class="st">'AnlsGrouping_04_Race_1'</span> <span class="op">=</span> <span class="st">'AMERICAN INDIAN OR ALASKA NATIVE'</span>,</span>
-<span>      <span class="st">'AnlsGrouping_04_Race_2'</span> <span class="op">=</span> <span class="st">'ASIAN'</span>,</span>
+<span>      <span class="st">'AnlsGrouping_04_Race_1'</span> <span class="op">=</span> <span class="st">'American Indian or Alaska Native'</span>,</span>
+<span>      <span class="st">'AnlsGrouping_04_Race_2'</span> <span class="op">=</span> <span class="st">'Asian'</span>,</span>
 <span>      <span class="co"># ...</span></span>
-<span>      <span class="st">'AnlsGrouping_04_Race_9'</span> <span class="op">=</span> <span class="st">'OTHER'</span><span class="op">)</span><span class="op">)</span></span>
+<span>      <span class="st">'AnlsGrouping_04_Race_9'</span> <span class="op">=</span> <span class="st">'Other'</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
+<p>Each group is matched by the value in its <code>group[n]_level</code>
+column. For the treatment arms that is the data value
+(<code>Placebo</code>). The race rows come from a method that counts per
+pre-defined group condition, and it labels each row with the group’s ARS
+name (<code>American Indian or Alaska Native</code>, not the ADaM value
+<code>AMERICAN INDIAN OR ALASKA NATIVE</code>), so those names are what
+the call matches. For the same reason, an age group defined as
+<code>AGEGR1 IN ("65-80", "&gt;80")</code> appears as one row,
+<code>≥ 65 years</code>.</p>
 <p>A data-driven grouping, such as the system organ class of an adverse
 event, is written
 <code>siera::ars_grouping('&lt;groupingId&gt;', data_driven = TRUE)</code>

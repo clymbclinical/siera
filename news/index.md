@@ -239,6 +239,17 @@ CRAN release: 2026-06-17
   (e.g. `USUBJID`, with `variable_level` NA) instead of the internal
   counting column `dummy` / `dummyvar`. Statistic values are unchanged
   ([\#231](https://github.com/clymbclinical/siera/issues/231)).
+- Changed the level of a pre-defined group in the per-group-condition
+  templates (`categorical_summary_per_predefined_group`, its overall
+  variant and `chisq_per_predefined_group`) from the group’s first
+  condition value to its ARS group **name**. A group covering several
+  values now reads as one category: the demo’s age group
+  `AGEGR1 IN ("65-80", ">80")` is labelled `≥ 65 years` rather than
+  `65-80`, and single-value groups carry their names too (`Male` rather
+  than `M`). Group ids and statistics are unchanged. Generated scripts
+  write such names as portable string literals, with line breaks and
+  non-ASCII characters escaped
+  ([\#232](https://github.com/clymbclinical/siera/issues/232)).
 - Fixed zero-event risk-difference analyses returning `NA` instead of
   `0`. Methods that compute over the full population (templates
   referencing `df_poptot`, e.g. risk differences) now bypass the
