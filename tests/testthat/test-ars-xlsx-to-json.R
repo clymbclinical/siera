@@ -34,8 +34,8 @@ test_that("converted JSON generates the same ARD scripts as the committed JSON t
       from_conv <- lapply(from_conv, function(x) gsub("'NA'", "''", x, fixed = TRUE))
     }
     if (base == "Common_Safety_Displays_cards") {
-      from_conv <- .drop_predefined_group_methods(from_conv)
-      from_twin <- .drop_predefined_group_methods(from_twin)
+      from_conv <- .drop_demo_json_methods(from_conv)
+      from_twin <- .drop_demo_json_methods(from_twin)
     }
     expect_identical(names(from_conv), names(from_twin), info = base)
     for (f in names(from_twin)) {

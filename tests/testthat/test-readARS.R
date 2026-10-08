@@ -690,6 +690,15 @@ test_that("ARD values - Common_Safety_Displays_cards", {
         unlist()
       expect_equal(unname(test_rel), c(43, 70, 72))
 
+      # the n (%) rows describe the ARS analysis variable, not the internal
+      # 'dummy' counting column (#231)
+      ae_rows <- ARD %>%
+        filter(operationid %in% c("Mth01_CatVar_Summ_ByGrp_1_n",
+                                  "Mth01_CatVar_Summ_ByGrp_2_pct"))
+      expect_gt(nrow(ae_rows), 0)
+      expect_true(all(ae_rows$variable == "USUBJID"))
+      expect_true(all(is.na(ae_rows$variable_level)))
+
       # subject counts
       test1 <- ARD %>%
         filter(

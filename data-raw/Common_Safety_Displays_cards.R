@@ -17,6 +17,9 @@
 # * Mth03_CatVar_Comp_PChiSq (used only by the demographic tests) gets the
 #   library template chisq_per_predefined_group (#215), so the p-value tests
 #   the groups the n (%) rows report.
+# * Mth01_CatVar_Summ_ByGrp (the adverse-event analyses) gets the library
+#   template categorical_summary, whose rows carry the ARS analysis variable
+#   rather than an internal 'dummy' column (#231).
 #
 # Analyses, analysis sets, groupings, data subsets and outputs are otherwise
 # unchanged. The script edits the JSON in place and is idempotent. Run it from
@@ -104,6 +107,13 @@ for (id in demographic) {
 k <- find_index(ars$methods, "Mth03_CatVar_Comp_PChiSq")
 ars$methods[[k]]$codeTemplate <- library_template("chisq_per_predefined_group")
 
-# 4. Write ----
+# 4. Categorical summary of the adverse-event analyses ----
+# The library template categorical_summary stamps the ARS analysis variable
+# (USUBJID) as the result rows' `variable`, rather than the internal 'dummy'
+# column the tabulation counts on (#231).
+k <- find_index(ars$methods, old_id)
+ars$methods[[k]]$codeTemplate <- library_template("categorical_summary")
+
+# 5. Write ----
 jsonlite::write_json(ars, path, auto_unbox = TRUE, pretty = TRUE, digits = NA)
 message("Written: ", path)
