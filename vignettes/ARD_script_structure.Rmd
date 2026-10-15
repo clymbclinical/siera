@@ -77,6 +77,8 @@ df_poptot <- dplyr::filter(
 
 When the analyses of one output use different Analysis Sets - say, a disposition table with a row each for the randomized, ITT, safety and per-protocol populations - a population is built for each set and every analysis reads its own. The data frames are then named after the set, e.g. `df_poptot__AnalysisSet_07`. Similarly, if one Analysis Set is merged onto more than one content dataset, each merged data frame is named after its dataset, e.g. `df_pop__ADLB`.
 
+An Analysis Set may also have no condition at all - an "All Subjects" population, for instance. _siera_ then takes every subject in the dataset: the code is the same as above, just without the `dplyr::filter()` call (e.g. `df_poptot = ADSL`). The population is built from ADSL whenever one of the set's analyses uses ADSL, and otherwise from the first analysis's dataset.
+
 #### Step 2: Apply "Data Subset"
 
 Based on the resulting dataset from step 1, further data subsetting is applied which is relevant to the current analysis (e.g. filtering for serious, treatment-related Adverse Events).  If no data subsetting is required for the analysis, a simple assignment of the previous dataset is done with no 'filter' statement. This step has a convention of starting the dataframe name with "df2", followed by the AnalysisId.

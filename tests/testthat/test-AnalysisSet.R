@@ -297,3 +297,144 @@ test_that("a NULL list-column condition value and a nameless set are handled", {
   expect_match(res$code, "SAFFL == ''", fixed = TRUE)
   expect_match(res$code, "# Analysis set: AS2\n", fixed = TRUE)
 })
+
+# Filter-less analysis sets (#200) ----
+all_set <- function(id = "AS_ALL", compound = NA_character_) {
+  tibble::tibble(
+    id = id,
+    condition_dataset = NA_character_,
+    condition_variable = NA_character_,
+    condition_comparator = NA_character_,
+    condition_value = list(NULL),
+    compoundExpression_logicalOperator = compound,
+    name = "All Subjects"
+  )
+}
+
+test_that("a filter-less set is the unfiltered ADSL, silently", {
+  analyses <- tibble::tibble(
+    id = c("AN1", "AN2"),
+    dataset = "ADSL",
+    variable = c("USUBJID", "AGE"),
+    analysisSetId = "AS_ALL",
+    groupingId1 = "AG_TRT"
+  )
+
+  expect_no_warning(
+    res <- pop_code(anas_for(analyses$id), analyses, all_set(), trt_grouping, subsets)
+  )
+  # a real set, not the fallback: the leading blank line is kept
+  expect_equal(res$code, "\n# Apply Analysis Set ---\ndf_pop <- ADSL\ndf_poptot <- df_pop\n")
+  expect_equal(res$frames, c(AN1 = "df_poptot", AN2 = "df_poptot"))
+})
+
+test_that("a filter-less set prefers ADSL and merges onto content datasets", {
+  # the bigN may be listed after the content analyses
+  analyses <- tibble::tibble(
+    id = c("TEAE", "BIGN"),
+    dataset = c("ADAE", "ADSL"),
+    variable = "USUBJID",
+    analysisSetId = "AS_ALL",
+    groupingId1 = "AG_TRT",
+    dataSubsetId = c("DS_TEAE", NA)
+  )
+
+  expect_no_warning(
+    res <- pop_code(anas_for(analyses$id), analyses, all_set(), trt_grouping, subsets)
+  )
+  expect_code_lines(res$code, c(
+    "# Apply Analysis Set ---",
+    "overlap <- intersect(names(ADSL), names(ADAE))",
+    "overlapfin <- setdiff(overlap, 'USUBJID')",
+    "df_pop <- ADSL |>",
+    "            merge(ADAE |> dplyr::select(-dplyr::all_of(overlapfin)),",
+    "                  by = 'USUBJID',",
+    "                  all = FALSE)",
+    "df_poptot = ADSL"
+  ))
+  expect_no_match(res$code, "filter(", fixed = TRUE)
+  expect_equal(res$frames, c(TEAE = "df_pop", BIGN = "df_poptot"))
+})
+
+test_that("a filter-less set without an ADSL analysis uses the first dataset", {
+  analyses <- tibble::tibble(
+    id = c("AE1", "AE2"),
+    dataset = "ADAE",
+    variable = c("USUBJID", "AETERM"),
+    analysisSetId = "AS_ALL"
+  )
+
+  expect_no_warning(
+    res <- pop_code(anas_for(analyses$id), analyses, all_set())
+  )
+  expect_match(res$code, "df_pop <- ADAE\ndf_poptot <- df_pop", fixed = TRUE)
+})
+
+test_that("a filter-less set merged from a non-ADSL dataset warns", {
+  analyses <- tibble::tibble(
+    id = c("EX", "AE"),
+    dataset = c("ADEXSUM", "ADAE"),
+    variable = c("AVAL", "AETERM"),
+    analysisSetId = "AS_ALL"
+  )
+
+  expect_warning(
+    res <- pop_code(anas_for(analyses$id), analyses, all_set()),
+    "none of its analyses is on ADSL"
+  )
+  expect_match(res$code, "df_pop <- ADEXSUM |>", fixed = TRUE)
+  expect_match(res$code, "df_poptot = ADEXSUM", fixed = TRUE)
+})
+
+test_that("a set without any filter columns is filter-less", {
+  analyses <- tibble::tibble(id = "AN1", dataset = "ADSL", analysisSetId = "AS_ALL")
+  sets <- tibble::tibble(id = "AS_ALL")
+
+  expect_no_warning(res <- pop_code(anas_for("AN1"), analyses, sets))
+  expect_equal(res$code, "\n# Apply Analysis Set ---\ndf_pop <- ADSL\ndf_poptot <- df_pop\n")
+})
+
+test_that("a compound-expression set is not mistaken for a filter-less one", {
+  analyses <- tibble::tibble(id = "AN1", dataset = "ADSL", analysisSetId = "AS_ALL")
+
+  expect_warning(
+    res <- pop_code(anas_for("AN1"), analyses, all_set(compound = "AND")),
+    "missing condition dataset, condition variable, condition comparator"
+  )
+  expect_match(res$code, "df_pop <- ADSL", fixed = TRUE)
+})
+
+test_that("readARS() runs an ARS whose analysis sets have no condition (#200)", {
+  skip_on_cran()
+
+  src <- jsonlite::fromJSON(
+    ARS_example("Common_Safety_Displays_cards.json"),
+    simplifyVector = FALSE
+  )
+  src$analysisSets <- lapply(src$analysisSets, function(s) {
+    s$condition <- NULL
+    s
+  })
+  ars_file <- withr::local_tempfile(fileext = ".json")
+  jsonlite::write_json(src, ars_file, auto_unbox = TRUE, null = "null")
+  output_dir <- withr::local_tempdir()
+  adam_dir <- system.file("extdata", package = "siera")
+
+  expect_no_warning(
+    readARS(ars_file, output_dir, adam_dir, spec_output = "Out14-3-1-1")
+  )
+
+  script <- file.path(output_dir, "ARD_Out14-3-1-1.R")
+  code <- paste(readLines(script), collapse = "\n")
+  # the AE analyses get the whole of ADSL merged onto ADAE, the bigN all of ADSL
+  expect_match(code, "df_pop <- ADSL |>\n            merge(ADAE", fixed = TRUE)
+  expect_match(code, "df_poptot = ADSL\n", fixed = TRUE)
+  expect_no_match(code, "dplyr::filter(ADSL,", fixed = TRUE)
+
+  e <- new.env(parent = baseenv())
+  suppressWarnings(suppressPackageStartupMessages(source(script, local = e, chdir = TRUE)))
+  ard <- e$ARD
+  big_n <- unlist(ard$stat[ard$AnalysisId == "An01_05_SAF_Summ_ByTrt"])
+  adsl <- utils::read.csv(file.path(adam_dir, "ADSL.csv"))
+  expect_equal(sum(big_n), nrow(adsl))
+})
