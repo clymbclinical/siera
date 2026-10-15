@@ -9,7 +9,13 @@ of the first analysis using it, signalled by a \`NULL\` filter.
 ## Usage
 
 ``` r
-.resolve_analysis_set(set_id, analysis_sets, analysis_id, analysis_dataset)
+.resolve_analysis_set(
+  set_id,
+  analysis_sets,
+  analysis_id,
+  analysis_dataset,
+  set_datasets
+)
 ```
 
 ## Arguments
@@ -30,7 +36,21 @@ of the first analysis using it, signalled by a \`NULL\` filter.
 
   Dataset of that analysis (fallback population).
 
+- set_datasets:
+
+  Datasets of every analysis using the set (picks the population dataset
+  of a filter-less set).
+
 ## Value
 
-A list with \`dataset\`, \`filter\` (character or \`NULL\`) and
-\`name\`.
+A list with \`dataset\`, \`filter\` (character, \`""\` for a filter-less
+set, or \`NULL\` for the fallback) and \`name\`.
+
+## Details
+
+A set declaring neither a \`condition\` nor a \`compoundExpression\`
+(e.g. "All Subjects") is valid ARS and resolves silently to an empty
+filter (#200). Having no declared dataset, its population is the
+subject-level \`ADSL\` when one of its analyses is on \`ADSL\`, else the
+first analysis' dataset; unlike the fallback it is merged onto content
+datasets like a filtered set.

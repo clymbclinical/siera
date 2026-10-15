@@ -45,9 +45,17 @@ Run a single test file or filter by name:
 
 ``` r
 
-devtools::test_file("tests/testthat/test-readARS.R")
-devtools::test_file("tests/testthat/test-readARS.R", filter = "4 grouping factors")
+devtools::test(filter = "readARS")                       # test-readARS.R only
+devtools::test(filter = "^(AnalysisSet|metadata)$")      # several files (regex on the file stem)
 ```
+
+`devtools::test_file()` is defunct in devtools \>= 2.5; use
+`test(filter =)`.
+[`covr::file_coverage()`](http://covr.r-lib.org/reference/file_coverage.md)
+gives meaningless all-zero results here because the tests call
+`siera:::` internals, so measure with
+`covr::package_coverage(type = "none", code = "testthat::test_dir(..., filter = ..., load_package = 'installed')")` +
+[`covr::zero_coverage()`](http://covr.r-lib.org/reference/zero_coverage.md).
 
 **Before every PR**: run `document()`, `load_all()`, and
 `check(vignettes = FALSE)` — all must pass with 0 errors, 0 warnings.
@@ -279,6 +287,32 @@ GitHub REST check-runs endpoint and the Codecov PR comment.)
   rename `df2_X <- df_pop` → `df_poptot`; that is identical data, and
   the owner accepted the churn. Out of scope / still open: analysis sets
   defined by `compoundExpression` or IN/NOTIN are not parsed (Atlas B3).
+- **Filter-less analysis sets (#200)** — an `analysisSets` entry with
+  neither `condition` nor `compoundExpression` (e.g. “All Subjects”) is
+  valid ARS and means “every subject, unfiltered”. Previously jsonlite
+  dropped the `condition.*` columns entirely when **no** set had a
+  condition, and the resolver aborted with “object ‘condition_dataset’
+  not found”. Now:
+  - **Metadata:** `R/metadata.R` always pads
+    `condition_dataset/variable/comparator` (NA), `condition_value`
+    (`list(NULL)`) and `compoundExpression_logicalOperator` (NA) via a
+    `set_filter_col()` helper (base `%||%` is avoided — Depends is R \>=
+    4.1).
+  - **Resolver:**
+    [`.resolve_analysis_set()`](https://clymbclinical.github.io/siera/reference/dot-resolve_analysis_set.md)
+    returns `filter = ""` (not `NULL`) for a filter-less set. **`NULL` =
+    unfiltered fallback, never merged; `""` = filter-less but
+    merge-capable** —
+    [`.generate_population_code()`](https://clymbclinical.github.io/siera/reference/dot-generate_population_code.md)
+    emits `df_pop <- ADSL |> merge(...)` / `df_poptot = ADSL` with no
+    [`dplyr::filter()`](https://dplyr.tidyverse.org/reference/filter.html).
+    Partial conditions keep the “missing condition …” warning, and a set
+    with a `compoundExpression_logicalOperator` is **not** treated as
+    filter-less (compound sets are still unparsed, Atlas B3).
+  - **Dataset choice:** ADSL when any of the set’s analyses
+    (`set_datasets`) is on ADSL, else the first analysis’s dataset; if
+    that non-ADSL dataset must then be merged onto others, a `cli_warn`
+    (“none of its analyses is on ADSL”) flags it.
 - **Empty-data guard** — generated method code is wrapped in
   `if(nrow(df2_<analysisid>) != 0){ ... } else { df3_<analysisid> = data.frame(AnalysisId, MethodId, OutputId) }`
   (see

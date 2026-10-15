@@ -65,7 +65,13 @@ analysis using it, signalled by a `NULL` filter.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">.resolve_analysis_set</span><span class="op">(</span><span class="va">set_id</span>, <span class="va">analysis_sets</span>, <span class="va">analysis_id</span>, <span class="va">analysis_dataset</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">.resolve_analysis_set</span><span class="op">(</span></span>
+<span>  <span class="va">set_id</span>,</span>
+<span>  <span class="va">analysis_sets</span>,</span>
+<span>  <span class="va">analysis_id</span>,</span>
+<span>  <span class="va">analysis_dataset</span>,</span>
+<span>  <span class="va">set_datasets</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -87,10 +93,24 @@ analysis using it, signalled by a `NULL` filter.</p>
 <dt id="arg-analysis-dataset">analysis_dataset<a class="anchor" aria-label="anchor" href="#arg-analysis-dataset"></a></dt>
 <dd><p>Dataset of that analysis (fallback population).</p></dd>
 
+
+<dt id="arg-set-datasets">set_datasets<a class="anchor" aria-label="anchor" href="#arg-set-datasets"></a></dt>
+<dd><p>Datasets of every analysis using the set (picks the
+population dataset of a filter-less set).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list with `dataset`, `filter` (character or `NULL`) and `name`.</p>
+    <p>A list with `dataset`, `filter` (character, `""` for a filter-less
+  set, or `NULL` for the fallback) and `name`.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>A set declaring neither a `condition` nor a `compoundExpression` (e.g. "All
+Subjects") is valid ARS and resolves silently to an empty filter (#200).
+Having no declared dataset, its population is the subject-level `ADSL` when
+one of its analyses is on `ADSL`, else the first analysis' dataset; unlike
+the fallback it is merged onto content datasets like a filtered set.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

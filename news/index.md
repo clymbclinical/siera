@@ -25,6 +25,17 @@ CRAN release: 2026-06-17
   `df_poptot`, such as risk differences, use their own analysis’s
   population
   ([\#197](https://github.com/clymbclinical/siera/issues/197)).
+- Fixed
+  [`readARS()`](https://clymbclinical.github.io/siera/reference/readARS.md)
+  aborting with “object ‘condition_dataset’ not found” when an analysis
+  set has no `condition`, such as an “All Subjects” population. A set
+  without a condition is valid ARS and is now read as the whole dataset,
+  unfiltered: ADSL when any of the set’s analyses uses ADSL (otherwise
+  the first analysis’s dataset, with a warning if it must be merged onto
+  other datasets), merged onto content datasets like any other
+  population. Analysis sets defined by a `compoundExpression` are still
+  not supported and keep their existing warning
+  ([\#200](https://github.com/clymbclinical/siera/issues/200)).
 - Added CDISC Dataset-JSON (v1.1) export of generated ARDs.
   `readARS(..., output_format = "datasetjson")` appends a section to
   each generated `ARD_<OutputId>.R` script that, when the script runs,

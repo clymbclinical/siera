@@ -116,6 +116,14 @@ e.g. `df_poptot__AnalysisSet_07`. Similarly, if one Analysis Set is
 merged onto more than one content dataset, each merged data frame is
 named after its dataset, e.g. `df_pop__ADLB`.
 
+An Analysis Set may also have no condition at all - an “All Subjects”
+population, for instance. *siera* then takes every subject in the
+dataset: the code is the same as above, just without the
+[`dplyr::filter()`](https://dplyr.tidyverse.org/reference/filter.html)
+call (e.g. `df_poptot = ADSL`). The population is built from ADSL
+whenever one of the set’s analyses uses ADSL, and otherwise from the
+first analysis’s dataset.
+
 #### Step 2: Apply “Data Subset”
 
 Based on the resulting dataset from step 1, further data subsetting is
