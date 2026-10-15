@@ -515,3 +515,40 @@ test_that("empty relationship arrays read like absent ones (#230)", {
     expect_identical(siera:::.read_ars_json_metadata(f), baseline, info = v)
   }
 })
+
+test_that("JSON parser keeps the analysis set filter columns for filter-less sets (#200)", {
+  # Neither set declares a condition: jsonlite returns no `condition` frame at
+  # all, which used to drop the columns and abort readARS().
+  src <- jsonlite::fromJSON(
+    ARS_example("Common_Safety_Displays_cards.json"),
+    simplifyVector = FALSE
+  )
+  src$analysisSets <- lapply(src$analysisSets, function(s) {
+    s$condition <- NULL
+    s
+  })
+  ars_file <- withr::local_tempfile(fileext = ".json")
+  jsonlite::write_json(src, ars_file, auto_unbox = TRUE, null = "null")
+
+  sets <- siera:::.read_ars_json_metadata(ars_file)$AnalysisSets
+
+  filter_cols <- c(
+    "condition_dataset", "condition_variable", "condition_comparator",
+    "compoundExpression_logicalOperator"
+  )
+  expect_true(all(c(filter_cols, "condition_value") %in% names(sets)))
+  expect_true(all(is.na(unlist(sets[filter_cols]))))
+  expect_true(all(vapply(sets$condition_value, is.null, logical(1))))
+
+  # A compound-filtered set keeps its operator, so it is not filter-less.
+  src$analysisSets[[1]]$compoundExpression <- list(
+    logicalOperator = "AND",
+    whereClauses = list(list(level = 1, order = 1, condition = list(
+      dataset = "ADSL", variable = "ITTFL", comparator = "EQ", value = list("Y")
+    )))
+  )
+  jsonlite::write_json(src, ars_file, auto_unbox = TRUE, null = "null")
+
+  sets <- siera:::.read_ars_json_metadata(ars_file)$AnalysisSets
+  expect_equal(sets$compoundExpression_logicalOperator, c("AND", NA))
+})

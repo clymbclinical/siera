@@ -98,8 +98,9 @@
   multi_set <- length(set_keys) > 1
 
   sets <- lapply(set_keys, function(set_id) {
-    first <- info[[which(vapply(info, function(x) identical(x$set_id, set_id), logical(1)))[1]]]
-    .resolve_analysis_set(set_id, analysis_sets, first$id, first$dataset)
+    members <- Filter(function(x) identical(x$set_id, set_id), info)
+    set_datasets <- vapply(members, function(x) x$dataset, character(1))
+    .resolve_analysis_set(set_id, analysis_sets, members[[1]]$id, members[[1]]$dataset, set_datasets)
   })
 
   frames <- stats::setNames(character(length(info)), analysis_ids)
@@ -127,6 +128,15 @@
     }
     merge_ds <- unique(unlist(foreign))
     multi_ds <- length(merge_ds) > 1
+
+    # A filter-less set only knows its population is the subject-level ADSL
+    # when an analysis is on ADSL; otherwise merging is a record-level guess.
+    if (identical(set$filter, "") && length(merge_ds) > 0 && toupper(set$dataset) != "ADSL") {
+      cli::cli_warn(c(
+        "Metadata issue in AnalysisSets {set_keys[s]}: the set has no condition and none of its analyses is on ADSL; using {.val {set$dataset}} as the population dataset, merged onto {.val {merge_ds}}.",
+        "i" = "Add a bigN analysis on ADSL or a condition to the analysis set to make the population explicit."
+      ))
+    }
     pop_name_for <- function(ds) paste0("df_pop", sfx, if (multi_ds) paste0("__", ds) else "")
 
     for (k in seq_along(set_info)) {
@@ -144,15 +154,17 @@
       ""
     }
 
-    if (is.null(set$filter)) {
+    # A filter-less set (empty filter, #200) is the whole dataset: no filter()
+    # call, but it still merges onto content datasets like a filtered set.
+    pop_expr <- if (is.null(set$filter) || !nzchar(set$filter)) {
+      set$dataset
+    } else {
+      paste0("dplyr::filter(", set$dataset, ",\n", "            ", set$filter, ")")
+    }
+
+    if (length(merge_ds) == 0) {
       body <- paste0(
-        "df_pop", sfx, " <- ", set$dataset, "\n",
-        poptot_name, " <- df_pop", sfx, "\n"
-      )
-    } else if (length(merge_ds) == 0) {
-      body <- paste0(
-        "df_pop", sfx, " <- dplyr::filter(", set$dataset, ",\n",
-        "            ", set$filter, ")\n",
+        "df_pop", sfx, " <- ", pop_expr, "\n",
         poptot_name, " <- df_pop", sfx, "\n"
       )
     } else {
@@ -160,8 +172,7 @@
         paste0(
           "overlap <- intersect(names(", set$dataset, "), names(", ds, "))\n",
           "overlapfin <- setdiff(overlap, 'USUBJID')\n",
-          pop_name_for(ds), " <- dplyr::filter(", set$dataset, ",\n",
-          "            ", set$filter, ") |>\n",
+          pop_name_for(ds), " <- ", pop_expr, " |>\n",
           "            merge(", ds, " |> dplyr::select(-dplyr::all_of(overlapfin)),\n",
           "                  by = 'USUBJID',\n",
           "                  all = FALSE)\n"
@@ -169,8 +180,7 @@
       }, character(1))
       body <- paste0(
         paste(merges, collapse = ""),
-        poptot_name, " = dplyr::filter(", set$dataset, ",\n",
-        "            ", set$filter, ")\n"
+        poptot_name, " = ", pop_expr, "\n"
       )
     }
     blocks <- c(blocks, paste0(header, body))
@@ -192,14 +202,24 @@
 #' condition) it warns and falls back to the unfiltered dataset of the first
 #' analysis using it, signalled by a `NULL` filter.
 #'
+#' A set declaring neither a `condition` nor a `compoundExpression` (e.g. "All
+#' Subjects") is valid ARS and resolves silently to an empty filter (#200).
+#' Having no declared dataset, its population is the subject-level `ADSL` when
+#' one of its analyses is on `ADSL`, else the first analysis' dataset; unlike
+#' the fallback it is merged onto content datasets like a filtered set.
+#'
 #' @param set_id Analysis set identifier (or `NA`).
 #' @param analysis_sets AnalysisSets metadata for the reporting event.
 #' @param analysis_id First analysis using the set (for messages).
 #' @param analysis_dataset Dataset of that analysis (fallback population).
+#' @param set_datasets Datasets of every analysis using the set (picks the
+#'   population dataset of a filter-less set).
 #'
-#' @return A list with `dataset`, `filter` (character or `NULL`) and `name`.
+#' @return A list with `dataset`, `filter` (character, `""` for a filter-less
+#'   set, or `NULL` for the fallback) and `name`.
 #' @keywords internal
-.resolve_analysis_set <- function(set_id, analysis_sets, analysis_id, analysis_dataset) {
+.resolve_analysis_set <- function(set_id, analysis_sets, analysis_id, analysis_dataset,
+                                  set_datasets) {
   if (is.na(analysis_dataset) || analysis_dataset %in% c("", "NA")) {
     analysis_dataset <- "df_pop"
   }
@@ -229,11 +249,16 @@
     return(fallback)
   }
 
-  cond_adam <- as.character(temp_AnSet$condition_dataset[1])
-  cond_var <- as.character(temp_AnSet$condition_variable[1])
-  cond_oper <- as.character(temp_AnSet$condition_comparator[1])
+  # Metadata built outside the JSON reader may lack the filter columns.
+  set_field <- function(col) {
+    if (col %in% names(temp_AnSet)) as.character(temp_AnSet[[col]][1]) else NA_character_
+  }
+  cond_adam <- set_field("condition_dataset")
+  cond_var <- set_field("condition_variable")
+  cond_oper <- set_field("condition_comparator")
+  set_name <- set_field("name")
 
-  cond_val <- unlist(temp_AnSet$condition_value)
+  cond_val <- unlist(temp_AnSet[["condition_value"]])
   # unlist() of a list-column containing NULL returns NULL (not character(0));
   # normalise to NA early so the checks below see a length-one value.
   cond_val <- if (is.null(cond_val) || length(cond_val) == 0) NA_character_ else cond_val[1]
@@ -249,6 +274,17 @@
   }
 
   missing_components <- names(required_components)[vapply(required_components, is_missing, logical(1))]
+
+  # No condition and no compound expression: an unfiltered population.
+  if (length(missing_components) == length(required_components) &&
+      is_missing(set_field("compoundExpression_logicalOperator"))) {
+    adsl <- set_datasets[toupper(set_datasets) %in% "ADSL"]
+    return(list(
+      dataset = if (length(adsl) > 0) adsl[1] else analysis_dataset,
+      filter = "",
+      name = set_name
+    ))
+  }
 
   if (length(missing_components) > 0) {
     cli::cli_warn(
@@ -276,6 +312,6 @@
   list(
     dataset = cond_adam,
     filter = paste0(cond_var, " ", oper, " '", cond_val, "'"),
-    name = if ("name" %in% names(temp_AnSet)) as.character(temp_AnSet$name[1]) else NA_character_
+    name = set_name
   )
 }
