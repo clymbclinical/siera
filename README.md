@@ -92,6 +92,10 @@ siera picks the reader for each ADaM dataset from its file extension —
 `haven::read_xpt()` and `.json` files with
 `datasetjson::read_dataset_json()` — so no extra argument is needed.
 
+To try siera without your own data, use `ARS_example()`: it lists the
+bundled example ARS files and example ADaM datasets (CSV), which are
+based on the public CDISC Pilot 01 study.
+
 Every analysis in a generated script reads as analysis set, data subset, method, and a final call to `siera::ars_stamp()`, which links the result to the ARS metadata (`AnalysisId`, `MethodId`, `OutputId` and the grouping identifiers).  The generated scripts therefore need the siera package to be installed when run.  Use `readARS(code_style = "expanded")` if you prefer scripts that spell out that linking step in plain `dplyr` code; both styles produce an identical ARD.
 
 ARS metadata in Excel (`.xlsx`) format is deprecated: `readARS()` still

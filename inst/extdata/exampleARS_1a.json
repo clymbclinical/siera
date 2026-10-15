@@ -472,7 +472,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "1"
+                            "54"
                         ]
                     }
                 },
@@ -486,7 +486,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "2"
+                            "81"
                         ]
                     }
                 },
@@ -500,7 +500,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "3"
+                            "0"
                         ]
                     }
                 },
@@ -852,7 +852,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "1"
+                            "54"
                         ]
                     }
                 },
@@ -866,7 +866,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "2"
+                            "81"
                         ]
                     }
                 },
@@ -880,7 +880,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "3"
+                            "0"
                         ]
                     }
                 },
@@ -1425,7 +1425,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "1"
+                            "54"
                         ]
                     }
                 },
@@ -1439,7 +1439,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "2"
+                            "81"
                         ]
                     }
                 },
@@ -1453,7 +1453,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "3"
+                            "0"
                         ]
                     }
                 }

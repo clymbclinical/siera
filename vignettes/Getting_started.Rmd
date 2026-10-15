@@ -22,7 +22,7 @@ We will use the following example to get started:
 
 A modified *CDISC Common Safety Displays* ARS metadata file (JSON format, with example dynamic AnalysisMethodCodeTemplate R code handling operations, based on functions from the `cards` package)
 
-In order to facilitate the example, _siera_ includes several example files, which we use throughout the documentation.  These include several ARS metadata files (JSON), as well as csv-format ADaMs which can be run with the R scripts produced by readARS function. Use the helper ARS_example() with no arguments to list them or call it with an example filename to get the path.
+In order to facilitate the example, _siera_ includes several example files, which we use throughout the documentation.  These include several ARS metadata files (JSON), as well as csv-format ADaMs which can be run with the R scripts produced by readARS function. The example ADaMs are based on the public CDISC Pilot 01 study (the same data used across many pharmaverse packages), so the numbers you see are realistic. Use the helper ARS_example() with no arguments to list them or call it with an example filename to get the path.
 
 ### What you will produce
 

@@ -820,9 +820,9 @@ test_that("ARD values - json 1", {
         ) %>%
         select(stat) %>%
         unlist()
-      expect_equal(test1[[1]], 84)
+      expect_equal(test1[[1]], 86)
       expect_equal(test1[[2]], 84)
-      expect_equal(test1[[3]], 86)
+      expect_equal(test1[[3]], 84)
     } else if (length(grep("Out_02", f)) > 0) {
       test1 <- ARD %>%
         filter(
@@ -831,9 +831,9 @@ test_that("ARD values - json 1", {
         ) %>%
         select(stat) %>%
         unlist()
-      expect_equal(test1[[1]], 84)
+      expect_equal(test1[[1]], 86)
       expect_equal(test1[[2]], 84)
-      expect_equal(test1[[3]], 86)
+      expect_equal(test1[[3]], 84)
     } else if (length(grep("Out_03", f)) > 0) {
       test1 <- ARD %>%
         filter(
@@ -842,9 +842,9 @@ test_that("ARD values - json 1", {
         ) %>%
         select(stat) %>%
         unlist()
-      expect_equal(test1[[1]], 84)
+      expect_equal(test1[[1]], 86)
       expect_equal(test1[[2]], 84)
-      expect_equal(test1[[3]], 86)
+      expect_equal(test1[[3]], 84)
     }
   }
 })
@@ -897,9 +897,9 @@ test_that("ARD values - json 2", {
         ) %>%
         select(stat) %>%
         unlist()
-      expect_equal(test1[[1]], 84)
+      expect_equal(test1[[1]], 86)
       expect_equal(test1[[2]], 84)
-      expect_equal(test1[[3]], 86)
+      expect_equal(test1[[3]], 84)
 
       test2 <- ARD %>%
         filter(
@@ -908,9 +908,9 @@ test_that("ARD values - json 2", {
         ) %>%
         select(stat) %>%
         unlist()
-      expect_equal(test2[[1]], 3)
+      expect_equal(test2[[1]], 2)
       expect_equal(test2[[2]], 3)
-      expect_equal(test2[[3]], 2)
+      expect_equal(test2[[3]], 3)
 
       test3 <- ARD %>%
         filter(
@@ -919,9 +919,9 @@ test_that("ARD values - json 2", {
         ) %>%
         select(stat) %>%
         unlist()
-      expect_equal(round(test3[[1]], digits = 5), 16.02553)
-      expect_equal(round(test3[[2]], digits = 5), 14.12637)
-      expect_equal(round(test3[[3]], digits = 5), 15.05614)
+      expect_equal(round(test3[[1]], digits = 5), 15.05614)
+      expect_equal(round(test3[[2]], digits = 5), 16.02553)
+      expect_equal(round(test3[[3]], digits = 5), 14.12637)
     } else if (length(grep("Out_02", f)) > 0) {
       test1 <- ARD %>%
         filter(
@@ -930,16 +930,16 @@ test_that("ARD values - json 2", {
         ) %>%
         select(stat) %>%
         unlist()
-      expect_equal(test1[[1]], 84)
+      expect_equal(test1[[1]], 86)
       expect_equal(test1[[2]], 84)
-      expect_equal(test1[[3]], 86)
+      expect_equal(test1[[3]], 84)
 
       test2 <- ARD %>%
         mutate(group1_level = as.character(group1_level)) %>%
         filter(
           AnalysisId == "An_11",
           operationid == "Mth_02_02_%",
-          group1_level == 1
+          group1_level == 54
         ) %>%
         select(stat) %>%
         unlist()
@@ -954,9 +954,9 @@ test_that("ARD values - json 2", {
         ) %>%
         select(stat) %>%
         unlist()
-      expect_equal(test1[[1]], 84)
+      expect_equal(test1[[1]], 86)
       expect_equal(test1[[2]], 84)
-      expect_equal(test1[[3]], 86)
+      expect_equal(test1[[3]], 84)
 
       test2 <- ARD %>%
         filter(
@@ -965,9 +965,9 @@ test_that("ARD values - json 2", {
         ) %>%
         select(stat) %>%
         unlist()
-      expect_equal(test2[[1]], 84)
+      expect_equal(test2[[1]], 86)
       expect_equal(test2[[2]], 84)
-      expect_equal(test2[[3]], 86)
+      expect_equal(test2[[3]], 84)
 
       test3 <- ARD %>%
         filter(
