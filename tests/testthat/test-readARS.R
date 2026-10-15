@@ -53,9 +53,9 @@ test_that("ARD values - Total column with no grouping", {
   # Path to ARS file (metadata driving script generation)
   ARS_path <- ARS_example("exampleARS_4.json")
 
-  # Directly use extdata shipped with the package
-  adam_dir <- system.file("extdata", package = "siera")
-  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+  # CDISC Pilot 01 ADaM from {clinTrialData} (#205)
+  .skip_if_pilot_lacks(c("ADSL.COUNTRY"))
+  adam_dir <- .pilot_adam_dir()
 
   # Temp folder for generated scripts
   output_dir <- withr::local_tempdir()
@@ -107,11 +107,11 @@ test_that("ARD values are identical when ADaM datasets are supplied as XPT", {
   skip_if_not_installed("haven")
   skip_if_not_installed("cards")
 
-  ARS_path <- ARS_example("exampleARS_4.json")
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.json")
 
   # Build an ADaM folder holding the example datasets as SAS transport (.xpt)
-  # files instead of CSV, by round-tripping the bundled CSVs through haven.
-  csv_dir <- system.file("extdata", package = "siera")
+  # files instead of CSV, by round-tripping the pilot CSVs through haven.
+  csv_dir <- .pilot_adam_dir("adsl")
   xpt_dir <- withr::local_tempdir()
   for (csv in list.files(csv_dir, pattern = "\\.csv$", full.names = TRUE)) {
     nm <- tools::file_path_sans_ext(basename(csv))
@@ -120,9 +120,9 @@ test_that("ARD values are identical when ADaM datasets are supplied as XPT", {
   }
 
   output_dir <- withr::local_tempdir()
-  readARS(ARS_path, output_dir, xpt_dir, spec_output = "Out_01")
+  readARS(ARS_path, output_dir, xpt_dir, spec_output = "Out14-1-1")
 
-  f <- file.path(output_dir, "ARD_Out_01.R")
+  f <- file.path(output_dir, "ARD_Out14-1-1.R")
   expect_true(file.exists(f))
 
   # The generated script must read via haven, not readr.
@@ -137,11 +137,15 @@ test_that("ARD values are identical when ADaM datasets are supplied as XPT", {
 
   # Same expected values as the CSV-driven test above.
   test1 <- ARD %>%
-    filter(AnalysisId == "An_04", operationid == "Mth_02_02_%") %>%
+    filter(
+      AnalysisId == "An01_05_SAF_Summ_ByTrt",
+      operationid == "Mth01_CatVar_Count_ByGrp_1_n"
+    ) %>%
     select(stat) %>%
     unlist()
-  expect_equal(round(test1[[1]], digits = 3), 0.563)
-  expect_equal(round(test1[[2]], digits = 3), 0.437)
+  expect_equal(test1[[1]], 86)
+  expect_equal(test1[[2]], 84)
+  expect_equal(test1[[3]], 84)
 })
 
 test_that("ARD values are identical when ADaM datasets are supplied as Dataset-JSON", {
@@ -149,12 +153,12 @@ test_that("ARD values are identical when ADaM datasets are supplied as Dataset-J
   skip_if_not_installed("datasetjson")
   skip_if_not_installed("cards")
 
-  ARS_path <- ARS_example("exampleARS_4.json")
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.json")
 
   # Build an ADaM folder holding the example datasets as CDISC Dataset-JSON
-  # (.json) files instead of CSV, by round-tripping the bundled CSVs through
+  # (.json) files instead of CSV, by round-tripping the pilot CSVs through
   # the datasetjson package.
-  csv_dir <- system.file("extdata", package = "siera")
+  csv_dir <- .pilot_adam_dir("adsl")
   json_dir <- withr::local_tempdir()
   for (csv in list.files(csv_dir, pattern = "\\.csv$", full.names = TRUE)) {
     nm <- tools::file_path_sans_ext(basename(csv))
@@ -179,9 +183,9 @@ test_that("ARD values are identical when ADaM datasets are supplied as Dataset-J
   }
 
   output_dir <- withr::local_tempdir()
-  readARS(ARS_path, output_dir, json_dir, spec_output = "Out_01")
+  readARS(ARS_path, output_dir, json_dir, spec_output = "Out14-1-1")
 
-  f <- file.path(output_dir, "ARD_Out_01.R")
+  f <- file.path(output_dir, "ARD_Out14-1-1.R")
   expect_true(file.exists(f))
 
   # The generated script must read via datasetjson, not readr or haven.
@@ -197,11 +201,15 @@ test_that("ARD values are identical when ADaM datasets are supplied as Dataset-J
 
   # Same expected values as the CSV-driven test above.
   test1 <- ARD %>%
-    filter(AnalysisId == "An_04", operationid == "Mth_02_02_%") %>%
+    filter(
+      AnalysisId == "An01_05_SAF_Summ_ByTrt",
+      operationid == "Mth01_CatVar_Count_ByGrp_1_n"
+    ) %>%
     select(stat) %>%
     unlist()
-  expect_equal(round(test1[[1]], digits = 3), 0.563)
-  expect_equal(round(test1[[2]], digits = 3), 0.437)
+  expect_equal(test1[[1]], 86)
+  expect_equal(test1[[2]], 84)
+  expect_equal(test1[[3]], 84)
 })
 
 test_that("Analysis created with OrderedGroupings row 1", {
@@ -223,8 +231,7 @@ test_that("warns when JSON metadata is missing required sections", {
   skip_on_cran()
 
   ARS_path <- ARS_example("exampleARS_1a.json")
-  adam_dir <- system.file("extdata", package = "siera")
-  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+  adam_dir <- withr::local_tempdir()
 
   output_dir <- withr::local_tempdir()
 
@@ -242,9 +249,8 @@ test_that("warns when (deprecated) xlsx workbook is missing required sheets", {
   # Path to an XLSX example that is intentionally missing 'otherListsOfContents'
   ARS_path <- ARS_example("exampleARS_2a.xlsx")
 
-  # ADaM directory (as in your JSON test, if needed by downstream logic)
-  adam_dir <- system.file("extdata", package = "siera")
-  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+  # ADaM directory (generation only, so no data files are needed)
+  adam_dir <- withr::local_tempdir()
 
   # Temp folder for any outputs
   output_dir <- withr::local_tempdir()
@@ -549,9 +555,8 @@ test_that("ARD values - Common_Safety_Displays_cards", {
   # Path to ARS file (metadata driving script generation)
   ARS_path <- ARS_example("Common_Safety_Displays_cards.json")
 
-  # Directly use extdata shipped with the package
-  adam_dir <- system.file("extdata", package = "siera")
-  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+  # CDISC Pilot 01 ADaM from {clinTrialData} (#205)
+  adam_dir <- .pilot_adam_dir()
 
   # Temp folder for generated scripts
   output_dir <- withr::local_tempdir()
@@ -727,9 +732,9 @@ test_that("ARD values - exampleARS_3", {
   # Path to ARS file (metadata driving script generation)
   ARS_path <- ARS_example("exampleARS_3.json")
 
-  # Directly use extdata shipped with the package
-  adam_dir <- system.file("extdata", package = "siera")
-  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+  # CDISC Pilot 01 ADaM from {clinTrialData} (#205)
+  .skip_if_pilot_lacks(c("ADSL.COUNTRY"))
+  adam_dir <- .pilot_adam_dir()
 
   # Temp folder for generated scripts
   output_dir <- withr::local_tempdir()
@@ -772,214 +777,78 @@ test_that("ARD values - exampleARS_3", {
   }
 })
 
-test_that("ARD values - json 1", {
+# exampleARS_1's outputs each need a different pilot ADSL variable, so every
+# output is generated and sourced on its own and skips only on its own gap.
+.json1_ard <- function(output, needs, env = parent.frame()) {
   skip_on_cran()
+  # CDISC Pilot 01 ADaM from {clinTrialData} (#205)
+  .skip_if_pilot_lacks(needs)
+  adam_dir <- .pilot_adam_dir("adsl", env = env)
+  output_dir <- withr::local_tempdir(.local_envir = env)
 
-  # Path to ARS file (metadata driving script generation)
-  ARS_path <- ARS_example("exampleARS_1.json")
+  readARS(ARS_example("exampleARS_1.json"), output_dir, adam_dir, spec_output = output)
+  f <- file.path(output_dir, paste0("ARD_", output, ".R"))
 
-  # Directly use extdata shipped with the package
-  adam_dir <- system.file("extdata", package = "siera")
-  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+  e <- new.env(parent = baseenv())
+  suppressWarnings(suppressPackageStartupMessages(source(f, local = e, chdir = TRUE)))
+  get("ARD", envir = e)
+}
 
-  # Temp folder for generated scripts
-  output_dir <- withr::local_tempdir()
-
-  # Generate the R scripts — note adam_dir is passed here
-  readARS(ARS_path, output_dir, adam_dir)
-
-  # Find generated R scripts
-  r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
-  expect_true(length(r_files) > 0, info = "No R scripts generated")
-
-  # Run each script and check ARD object
-  for (f in r_files) {
-    e <- new.env(parent = baseenv())
-
-    expect_error(
-      suppressWarnings(
-        suppressPackageStartupMessages(
-          source(f, local = e, chdir = TRUE)
-        )
-      ),
-      NA,
-      info = paste("Sourcing failed for", basename(f))
-    )
-
-    # Ensure ARD dataset was created
-    expect_true(exists("ARD", envir = e), info = paste("No ARD from", basename(f)))
-    ARD <- get("ARD", envir = e)
-    expect_true("stat" %in% names(ARD), info = "'stat' column missing in ARD")
-
-    # check specific values in ARD
-    if (length(grep("Out_01", f)) > 0) {
-      test1 <- ARD %>%
-        filter(
-          AnalysisId == "An_01",
-          operationid == "Mth_01_01_n"
-        ) %>%
-        select(stat) %>%
-        unlist()
-      expect_equal(test1[[1]], 86)
-      expect_equal(test1[[2]], 84)
-      expect_equal(test1[[3]], 84)
-    } else if (length(grep("Out_02", f)) > 0) {
-      test1 <- ARD %>%
-        filter(
-          AnalysisId == "An_08",
-          operationid == "Mth_01_01_n"
-        ) %>%
-        select(stat) %>%
-        unlist()
-      expect_equal(test1[[1]], 86)
-      expect_equal(test1[[2]], 84)
-      expect_equal(test1[[3]], 84)
-    } else if (length(grep("Out_03", f)) > 0) {
-      test1 <- ARD %>%
-        filter(
-          AnalysisId == "An_19",
-          operationid == "Mth_01_01_n"
-        ) %>%
-        select(stat) %>%
-        unlist()
-      expect_equal(test1[[1]], 86)
-      expect_equal(test1[[2]], 84)
-      expect_equal(test1[[3]], 84)
-    }
-  }
+test_that("ARD values - json 1 Out_01", {
+  ARD <- .json1_ard("Out_01", "ADSL.RANDFL")
+  test1 <- ARD %>%
+    filter(
+      AnalysisId == "An_01",
+      operationid == "Mth_01_01_n"
+    ) %>%
+    select(stat) %>%
+    unlist()
+  expect_equal(test1[[1]], 86)
+  expect_equal(test1[[2]], 84)
+  expect_equal(test1[[3]], 84)
 })
 
-test_that("ARD values - json 2", {
-  skip_on_cran()
+test_that("ARD values - json 1 Out_02", {
+  ARD <- .json1_ard("Out_02", "ADSL.COUNTRY")
+  test1 <- ARD %>%
+    filter(
+      AnalysisId == "An_08",
+      operationid == "Mth_01_01_n"
+    ) %>%
+    select(stat) %>%
+    unlist()
+  expect_equal(test1[[1]], 86)
+  expect_equal(test1[[2]], 84)
+  expect_equal(test1[[3]], 84)
+})
 
-  # Path to ARS file (metadata driving script generation)
+test_that("ARD values - json 1 Out_03", {
+  ARD <- .json1_ard("Out_03", "ADSL.TRTDURM")
+  test1 <- ARD %>%
+    filter(
+      AnalysisId == "An_19",
+      operationid == "Mth_01_01_n"
+    ) %>%
+    select(stat) %>%
+    unlist()
+  expect_equal(test1[[1]], 86)
+  expect_equal(test1[[2]], 84)
+  expect_equal(test1[[3]], 84)
+})
+
+test_that("R scripts are created and parse - json 2", {
+  # exampleARS_2 is a generation-only example: it references sponsor-specific
+  # data (ADZSDER, ADSL.BMEPFFL/EVLFL) that no public example ADaM provides.
   ARS_path <- ARS_example("exampleARS_2.json")
-
-  # Directly use extdata shipped with the package
-  adam_dir <- system.file("extdata", package = "siera")
-  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
-
-  # Temp folder for generated scripts
   output_dir <- withr::local_tempdir()
+  adam_dir <- withr::local_tempdir()
 
-  # Generate the R scripts — note adam_dir is passed here
   readARS(ARS_path, output_dir, adam_dir)
 
-  # Find generated R scripts
   r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
-  expect_true(length(r_files) > 0, info = "No R scripts generated")
-
-  # Run each script and check ARD object
+  expect_setequal(basename(r_files), c("ARD_Out_01.R", "ARD_Out_02.R", "ARD_Out_03.R"))
   for (f in r_files) {
-    e <- new.env(parent = baseenv())
-
-    expect_error(
-      suppressWarnings(
-        suppressPackageStartupMessages(
-          source(f, local = e, chdir = TRUE)
-        )
-      ),
-      NA,
-      info = paste("Sourcing failed for", basename(f))
-    )
-
-    # Ensure ARD dataset was created
-    expect_true(exists("ARD", envir = e), info = paste("No ARD from", basename(f)))
-    ARD <- get("ARD", envir = e)
-    expect_true("stat" %in% names(ARD), info = "'stat' column missing in ARD")
-
-    # check specific values in ARD
-    if (length(grep("Out_01", f)) > 0) {
-      test1 <- ARD %>%
-        filter(
-          AnalysisId == "An_01",
-          operationid == "Mth_01_01_n"
-        ) %>%
-        select(stat) %>%
-        unlist()
-      expect_equal(test1[[1]], 86)
-      expect_equal(test1[[2]], 84)
-      expect_equal(test1[[3]], 84)
-
-      test2 <- ARD %>%
-        filter(
-          AnalysisId == "An_02",
-          operationid == "Mth_03_01_n"
-        ) %>%
-        select(stat) %>%
-        unlist()
-      expect_equal(test2[[1]], 2)
-      expect_equal(test2[[2]], 3)
-      expect_equal(test2[[3]], 3)
-
-      test3 <- ARD %>%
-        filter(
-          AnalysisId == "An_02",
-          operationid == "Mth_03_02_Mean"
-        ) %>%
-        select(stat) %>%
-        unlist()
-      expect_equal(round(test3[[1]], digits = 5), 15.05614)
-      expect_equal(round(test3[[2]], digits = 5), 16.02553)
-      expect_equal(round(test3[[3]], digits = 5), 14.12637)
-    } else if (length(grep("Out_02", f)) > 0) {
-      test1 <- ARD %>%
-        filter(
-          AnalysisId == "An_09",
-          operationid == "Mth_01_01_n"
-        ) %>%
-        select(stat) %>%
-        unlist()
-      expect_equal(test1[[1]], 86)
-      expect_equal(test1[[2]], 84)
-      expect_equal(test1[[3]], 84)
-
-      test2 <- ARD %>%
-        mutate(group1_level = as.character(group1_level)) %>%
-        filter(
-          AnalysisId == "An_11",
-          operationid == "Mth_02_02_%",
-          group1_level == 54
-        ) %>%
-        select(stat) %>%
-        unlist()
-      expect_equal(round(test2[[1]], digits = 7), 0.5595238)
-      expect_equal(round(test2[[2]], digits = 7), 0.0952381)
-      expect_equal(round(test2[[3]], digits = 7), 0.3452381)
-    } else if (length(grep("Out_03", f)) > 0) {
-      test1 <- ARD %>%
-        filter(
-          AnalysisId == "An_21",
-          operationid == "Mth_01_01_n"
-        ) %>%
-        select(stat) %>%
-        unlist()
-      expect_equal(test1[[1]], 86)
-      expect_equal(test1[[2]], 84)
-      expect_equal(test1[[3]], 84)
-
-      test2 <- ARD %>%
-        filter(
-          AnalysisId == "An_22",
-          operationid == "Mth_02_01_n"
-        ) %>%
-        select(stat) %>%
-        unlist()
-      expect_equal(test2[[1]], 86)
-      expect_equal(test2[[2]], 84)
-      expect_equal(test2[[3]], 84)
-
-      test3 <- ARD %>%
-        filter(
-          AnalysisId == "An_22",
-          operationid == "Mth_02_02_%"
-        ) %>%
-        select(stat) %>%
-        unlist()
-      expect_equal(test3[[1]], 1)
-      expect_equal(test3[[2]], 1)
-      expect_equal(test3[[3]], 1)
-    }
+    expect_no_error(parse(f))
   }
 })
 
@@ -990,9 +859,9 @@ test_that("Dynamic Operation Ids", {
   # Path to ARS file (metadata driving script generation)
   ARS_path <- ARS_example("exampleARS_7.json")
 
-  # Directly use extdata shipped with the package
-  adam_dir <- system.file("extdata", package = "siera")
-  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+  # CDISC Pilot 01 ADaM from {clinTrialData} (#205)
+  .skip_if_pilot_lacks(c("ADSL.COUNTRY"))
+  adam_dir <- .pilot_adam_dir()
 
   # Temp folder for generated scripts
   output_dir <- withr::local_tempdir()
@@ -1068,8 +937,9 @@ test_that("ARD values - 4 grouping factors work correctly (JSON)", {
   skip_on_cran()
 
   ARS_path <- ARS_example("exampleARS_5.json")
-  adam_dir <- system.file("extdata", package = "siera")
-  expect_true(dir.exists(adam_dir), info = "extdata ADaM folder not found")
+  # CDISC Pilot 01 ADaM from {clinTrialData} (#205)
+  .skip_if_pilot_lacks(c("ADEXSUM"))
+  adam_dir <- .pilot_adam_dir(c("adsl", "adexsum"))
 
   output_dir <- withr::local_tempdir()
 
@@ -1137,7 +1007,9 @@ test_that("ARD values - depth-3 nesting produces correct ARD (JSON)", {
   skip_on_cran()
 
   ARS_path <- ARS_example("exampleARS_6.json")
-  adam_dir  <- system.file("extdata", package = "siera")
+  # CDISC Pilot 01 ADaM from {clinTrialData} (#205)
+  .skip_if_pilot_lacks(c("ADEXSUM"))
+  adam_dir <- .pilot_adam_dir(c("adsl", "adexsum"))
   output_dir <- withr::local_tempdir()
 
   readARS(ARS_path, output_dir, adam_dir)

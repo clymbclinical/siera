@@ -143,12 +143,13 @@ test_that("generated block works at runtime on ARDs without stat/operationid", {
 test_that("sourced ARD carries res/pattern/disp and drops fmt_fun/fmt_fn", {
   skip_on_cran()
 
-  ARS_path <- ARS_example("exampleARS_6.json")
-  adam_dir <- system.file("extdata", package = "siera")
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.json")
+  # CDISC Pilot 01 ADaM from {clinTrialData} (#205)
+  adam_dir <- .pilot_adam_dir("adsl")
   output_dir <- withr::local_tempdir()
 
-  readARS(ARS_path, output_dir, adam_dir)
-  f <- file.path(output_dir, "ARD_Out_01.R")
+  readARS(ARS_path, output_dir, adam_dir, spec_output = "Out14-1-1")
+  f <- file.path(output_dir, "ARD_Out14-1-1.R")
   expect_true(file.exists(f))
 
   e <- new.env(parent = baseenv())
@@ -163,7 +164,7 @@ test_that("sourced ARD carries res/pattern/disp and drops fmt_fun/fmt_fn", {
   expect_type(ARD$res, "double")
 
   # count operation: pattern (N=) renders as (N=<int>)
-  n_rows <- ARD[!is.na(ARD$operationid) & ARD$operationid == "Mth_01_01_n", ]
+  n_rows <- ARD[!is.na(ARD$operationid) & ARD$operationid == "Mth01_CatVar_Count_ByGrp_1_n", ]
   expect_true(all(grepl("^\\(N=\\d+\\)$", n_rows$disp)))
   expect_equal(n_rows$disp, paste0("(N=", n_rows$res, ")"))
 
@@ -183,8 +184,8 @@ test_that("sourced ARD carries res/pattern/disp and drops fmt_fun/fmt_fn", {
   # continuous mean honours its pattern's decimal count (XX.X -> 1 dp);
   # rows whose raw stat is missing (empty-data analyses) stay NA
   mean_rows <- ARD[!is.na(ARD$operationid) &
-                     ARD$operationid == "Mth_03_02_Mean", ]
-  expect_identical(is.na(mean_rows$disp), is.na(mean_rows$res))
+                     ARD$operationid == "Mth02_ContVar_Summ_ByGrp_2_Mean", ]
+  expect_identical(unname(is.na(mean_rows$disp)), unname(is.na(mean_rows$res)))
   fmt <- mean_rows$disp[!is.na(mean_rows$disp)]
   expect_gt(length(fmt), 0)
   expect_true(all(grepl("^-?\\d+\\.\\d$", fmt)))

@@ -77,10 +77,11 @@ test_that("generated Dataset-JSON export round-trips and carries labels", {
   skip_if_not_installed("datasetjson")
   skip_if_not_installed("cards")
 
-  ARS_path <- ARS_example("exampleARS_4.json")
-  adam_dir <- system.file("extdata", package = "siera")
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.json")
+  # CDISC Pilot 01 ADaM from {clinTrialData} (#205)
+  adam_dir <- .pilot_adam_dir("adsl")
   out <- withr::local_tempdir()
-  readARS(ARS_path, out, adam_dir, spec_output = "Out_01",
+  readARS(ARS_path, out, adam_dir, spec_output = "Out14-1-1",
           output_format = "datasetjson")
 
   f <- list.files(out, pattern = "\\.R$", full.names = TRUE)[1]
@@ -201,10 +202,11 @@ test_that("column_labels override labels in the written Dataset-JSON", {
   skip_if_not_installed("datasetjson")
   skip_if_not_installed("cards")
 
-  ARS_path <- ARS_example("exampleARS_4.json")
-  adam_dir <- system.file("extdata", package = "siera")
+  ARS_path <- ARS_example("Common_Safety_Displays_cards.json")
+  # CDISC Pilot 01 ADaM from {clinTrialData} (#205)
+  adam_dir <- .pilot_adam_dir("adsl")
   out <- withr::local_tempdir()
-  readARS(ARS_path, out, adam_dir, spec_output = "Out_01",
+  readARS(ARS_path, out, adam_dir, spec_output = "Out14-1-1",
           output_format = "datasetjson",
           column_labels = c(AnalysisId = "Analysis ID (sponsor)",
                             NOTACOLUMN = "Typo"))

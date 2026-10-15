@@ -30,7 +30,8 @@
 # Generate both styles for one ARS file and compare every output's ARD (and the
 # per-analysis df3_* objects). Returns the number of outputs actually compared.
 .expect_style_parity <- function(ars_name) {
-  adam <- dirname(ARS_example("ADSL.csv"))
+  # CDISC Pilot 01 ADaM from {clinTrialData} (#205)
+  adam <- .pilot_adam_dir(env = parent.frame())
   ars <- ARS_example(ars_name)
 
   out_w <- withr::local_tempdir(.local_envir = parent.frame())
@@ -53,7 +54,8 @@
 
     if (!is.null(e$error)) {
       # The reference (expanded) script cannot run in this environment (e.g. an
-      # ADaM file is not bundled, or the installed cards/cardx versions
+      # ADaM dataset/variable is not in the pilot data yet, or the installed
+      # cards/cardx versions
       # mismatch), so there is nothing to compare this output against. The
       # wrapped script must not do better than the reference.
       next
@@ -132,7 +134,10 @@ test_that("an empty data subset yields the same stub row in both styles", {
 
   # An ARS file whose data subset matches nothing: the method is skipped and
   # both styles must emit the statistics-free stub row.
-  ars <- jsonlite::fromJSON(ARS_example("exampleARS_6.json"), simplifyVector = FALSE)
+  ars <- jsonlite::fromJSON(
+    ARS_example("Common_Safety_Displays_cards.json"),
+    simplifyVector = FALSE
+  )
   expect_gt(length(ars$dataSubsets), 0L)
   for (i in seq_along(ars$dataSubsets)) {
     cond <- ars$dataSubsets[[i]]$condition
@@ -144,11 +149,14 @@ test_that("an empty data subset yields the same stub row in both styles", {
   ars_file <- file.path(withr::local_tempdir(), "empty_subset.json")
   jsonlite::write_json(ars, ars_file, auto_unbox = TRUE)
 
-  adam <- dirname(ARS_example("ADSL.csv"))
+  # CDISC Pilot 01 ADaM from {clinTrialData} (#205)
+  adam <- .pilot_adam_dir()
   res <- lapply(c("wrapped", "expanded"), function(st) {
     out <- withr::local_tempdir()
-    suppressWarnings(suppressMessages(readARS(ars_file, out, adam, code_style = st)))
-    .source_script(file.path(out, "ARD_Out_01.R"))
+    suppressWarnings(suppressMessages(readARS(
+      ars_file, out, adam, code_style = st, spec_output = "Out14-3-1-1"
+    )))
+    .source_script(file.path(out, "ARD_Out14-3-1-1.R"))
   })
   skip_if(!is.null(res[[2]]$error), "expanded reference script cannot run here")
 

@@ -1,7 +1,7 @@
 
 # Programme:    Generate code to produce ARD for Out14-1-1
 # Output:       Summary of Demographics
-# Date created: 2026-10-08 15:52:59
+# Date created: 2026-10-15 15:51:02
 
   # load libraries ----
     library(dplyr)
@@ -13,9 +13,9 @@
     library(tidyr)
   
 # Load ADaM -------
-ADSL <- readr::read_csv(siera::ARS_example("ADSL.csv"),
-                                      show_col_types = FALSE,
-                                      progress = FALSE) |>
+# Example data: CDISC Pilot 01 ADaM from {clinTrialData} (needs {arrow})
+cdisc_pilot <- clinTrialData::connect_clinical_data("cdisc_pilot")
+ADSL <- as.data.frame(cdisc_pilot$adam$read_cnt("adsl.parquet")) |>
   dplyr::mutate(dplyr::across(dplyr::where(is.character), ~ tidyr::replace_na(.x, '')))
 
 

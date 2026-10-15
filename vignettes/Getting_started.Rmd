@@ -12,6 +12,12 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+# The example ADaM data comes from {clinTrialData} (read with {arrow}), and
+# the example scripts use {cards}; skip the chunks that run them otherwise.
+has_pilot <- requireNamespace("clinTrialData", quietly = TRUE) &&
+  requireNamespace("arrow", quietly = TRUE) &&
+  requireNamespace("cards", quietly = TRUE)
 ```
 
 ```{r setup, warning=FALSE}
@@ -22,13 +28,13 @@ We will use the following example to get started:
 
 A modified *CDISC Common Safety Displays* ARS metadata file (JSON format, with example dynamic AnalysisMethodCodeTemplate R code handling operations, based on functions from the `cards` package)
 
-In order to facilitate the example, _siera_ includes several example files, which we use throughout the documentation.  These include several ARS metadata files (JSON), as well as csv-format ADaMs which can be run with the R scripts produced by readARS function. The example ADaMs are based on the public CDISC Pilot 01 study (the same data used across many pharmaverse packages), so the numbers you see are realistic. Use the helper ARS_example() with no arguments to list them or call it with an example filename to get the path.
+In order to facilitate the example, _siera_ includes several example files, which we use throughout the documentation.  These include several ARS metadata files (JSON) and example ARD scripts. _siera_ ships no ADaM data of its own: the examples run against the public CDISC Pilot 01 ADaM datasets from the [clinTrialData](https://CRAN.R-project.org/package=clinTrialData) package (the same study used across many pharmaverse packages), so the numbers you see are realistic. To run the examples yourself, install `clinTrialData` and `arrow` (which reads its data files). Use the helper ARS_example() with no arguments to list the example files or call it with an example filename to get the path.
 
 ### What you will produce
 
 Before we start, it helps to see where we are headed.  The end product of _siera_ is an **Analysis Results Dataset (ARD)** - one result per row, in machine-readable form.  Below is the ARD for a Demographics output, produced by running one of the example scripts that _siera_ generates (more on running scripts further down).  This is what we are building toward:
 
-```{r target ARD, message=FALSE, warning=FALSE}
+```{r target ARD, message=FALSE, warning=FALSE, eval=has_pilot}
 # Run a ready-made example script shipped with siera; the result is the object `ARD`
 source(ARD_script_example("ARD_Out14-1-1.R"))
 head(ARD)
@@ -76,11 +82,13 @@ output_folder <- tempdir()
 # (.xpt) or CDISC Dataset-JSON (.json) format - siera detects the format from
 # each file's extension, so the folder can hold any mix (.xpt requires the
 # {haven} package, .json the {datasetjson} package). We will use the
-# temporary directory tempdir() to make the code run in this vignette, but it's
-# recommended to
-# 1. download the ADaMs required (csv ADSL and ADAE available using e.g. ARS_example("ADSL.csv"))
-# 2. store it in a folder (the directly downloaded location can be found using dirname(ARS_example("ADSL.csv")), for example.  Use this location, or manually store the ADaM somewhere else)
-# 3. use the folder path instead of tempdir() below.
+# temporary directory tempdir() to make the code run in this vignette. To run
+# the generated scripts, point it at a folder holding your ADaMs instead. To
+# try the example data, save the CDISC Pilot 01 ADaM from {clinTrialData}
+# there first, for example:
+#   pilot <- clinTrialData::connect_clinical_data("cdisc_pilot")
+#   adsl <- as.data.frame(pilot$adam$read_cnt("adsl.parquet"))
+#   write.csv(adsl, file.path(ADaM_folder, "ADSL.csv"), row.names = FALSE, na = "")
 ADaM_folder <- tempdir()
 
 # run the readARS function with these 3 parameters.  This creates R scripts
@@ -100,7 +108,9 @@ The structure of the auto-generated ARD script is discussed in the [ARD structur
 ```{r run ARD_xxx, message=FALSE, warning=FALSE, eval=FALSE}
 # Step 1: open ARD_xxx.R file
 # Step 2: Confirm the location of ADaM dataset(s) is correct in the code section "Load ADaM".
-# For the sake of simplicity, the only update made to the ARD_Out14-1-1.R script was to point to the ADaM folder to ARS_example("ADSL.csv")
+# In the example scripts shipped with siera, the only update made was to this
+# section: it reads the CDISC Pilot 01 ADaM straight from {clinTrialData}
+# (which needs {arrow}) instead of from a folder.
 # Step 3: Run the code and enjoy automated analysis results generation.
 # Note: the ARD is contained in the object "ARD" (which contains the appended) mini-ARDs from all individual Analyses ARDs.
 

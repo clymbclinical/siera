@@ -1,7 +1,7 @@
 
 # Programme:    Generate code to produce ARD for Out14-3-1-1
 # Output:       Overall Summary of Treatment-Emergent Adverse Events
-# Date created: 2026-10-08 14:26:02
+# Date created: 2026-10-15 15:51:03
 
   # load libraries ----
     library(dplyr)
@@ -13,13 +13,11 @@
     library(tidyr)
   
 # Load ADaM -------
-ADSL <- readr::read_csv(siera::ARS_example("ADSL.csv"),
-                                      show_col_types = FALSE,
-                                      progress = FALSE) |>
+# Example data: CDISC Pilot 01 ADaM from {clinTrialData} (needs {arrow})
+cdisc_pilot <- clinTrialData::connect_clinical_data("cdisc_pilot")
+ADSL <- as.data.frame(cdisc_pilot$adam$read_cnt("adsl.parquet")) |>
   dplyr::mutate(dplyr::across(dplyr::where(is.character), ~ tidyr::replace_na(.x, '')))
-ADAE <- readr::read_csv(siera::ARS_example("ADAE.csv"),
-                                      show_col_types = FALSE,
-                                      progress = FALSE) |>
+ADAE <- as.data.frame(cdisc_pilot$adam$read_cnt("adae.parquet")) |>
   dplyr::mutate(dplyr::across(dplyr::where(is.character), ~ tidyr::replace_na(.x, '')))
 
 

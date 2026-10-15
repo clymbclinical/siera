@@ -14,10 +14,13 @@ knitr::opts_chunk$set(
 )
 
 # The chunks that run a generated script and read the Dataset-JSON back need
-# the optional {cards} and {datasetjson} packages; skip them when either is
-# missing so the vignette still builds.
+# the optional {cards} and {datasetjson} packages, plus {clinTrialData} and
+# {arrow} for the example ADaM data; skip them when any is missing so the
+# vignette still builds.
 has_deps <- requireNamespace("cards", quietly = TRUE) &&
-  requireNamespace("datasetjson", quietly = TRUE)
+  requireNamespace("datasetjson", quietly = TRUE) &&
+  requireNamespace("clinTrialData", quietly = TRUE) &&
+  requireNamespace("arrow", quietly = TRUE)
 ```
 
 ```{r setup}
@@ -38,21 +41,34 @@ _siera_ writes **Dataset-JSON v1.1** files.
 
 Dataset-JSON export is controlled by one argument to `readARS()`: `output_format`. It defaults to `"none"` (generate the ARD scripts only). Set it to `"datasetjson"` and every generated `ARD_<OutputId>.R` script gets an extra section at the end that writes the ARD to a Dataset-JSON file when you run it.
 
+We will use example ADaM data: the CDISC Pilot 01 ADSL from the [clinTrialData](https://CRAN.R-project.org/package=clinTrialData) package, saved as a CSV file in a temporary folder. With your own study, `adam_path` is simply the folder that holds your ADaMs.
+
+```{r adam folder}
+adam_path <- file.path(tempdir(), "siera-adam")
+dir.create(adam_path, showWarnings = FALSE)
+```
+
+```{r adam data, eval = has_deps, message = FALSE, results = "hide"}
+pilot <- clinTrialData::connect_clinical_data("cdisc_pilot")
+adsl  <- as.data.frame(pilot$adam$read_cnt("adsl.parquet"))
+write.csv(adsl, file.path(adam_path, "ADSL.csv"), row.names = FALSE, na = "")
+```
+
 ```{r generate}
-# ARS metadata and the folder of ADaM datasets shipped with siera
-ARS_path  <- ARS_example("exampleARS_4.json")
-adam_path <- dirname(ARS_example("ADSL.csv"))
+# ARS metadata shipped with siera
+ARS_path <- ARS_example("Common_Safety_Displays_cards.json")
 
 # a fresh folder for the generated script (and, later, the Dataset-JSON file)
 output_path <- file.path(tempdir(), "siera-datasetjson")
 dir.create(output_path, showWarnings = FALSE)
 
-# generate the ARD script for output Out_01, with Dataset-JSON export switched on
+# generate the ARD script for output Out14-1-1 (demographics), with Dataset-JSON
+# export switched on
 readARS(
   ARS_path,
   output_path,
   adam_path,
-  spec_output   = "Out_01",
+  spec_output   = "Out14-1-1",
   output_format = "datasetjson"
 )
 
@@ -66,7 +82,7 @@ The value must be spelled out in full: `output_format = "dataset"` is an error r
 The export runs when **you run the generated script**, not when `readARS()` runs. That is because _siera_ only writes the code: the ARD does not exist until the script has been run against your ADaM data, and its columns depend on what the data contains. So the export section looks at the finished `ARD` object and works out the column metadata from it. Here is how it starts:
 
 ```{r peek}
-script <- readLines(file.path(output_path, "ARD_Out_01.R"))
+script <- readLines(file.path(output_path, "ARD_Out14-1-1.R"))
 start  <- grep("Export ARD as CDISC Dataset-JSON", script)
 cat(script[start:(start + 6)], sep = "\n")
 ```
@@ -86,7 +102,7 @@ If `datasetjson` is not installed, the script still produces the `ARD` object as
 Run the generated script as you normally would. The Dataset-JSON file is written to the folder you gave `readARS()` as `output_path`, beside the script, and is named after the output: `ARD_<OutputId>.json`.
 
 ```{r run, eval = has_deps, message = FALSE, warning = FALSE}
-source(file.path(output_path, "ARD_Out_01.R"))
+source(file.path(output_path, "ARD_Out14-1-1.R"))
 
 list.files(output_path)
 ```
@@ -97,7 +113,7 @@ Use `datasetjson::read_dataset_json()` to read the file back into R. You get the
 
 ```{r read back, eval = has_deps}
 ard_json <- datasetjson::read_dataset_json(
-  file.path(output_path, "ARD_Out_01.json")
+  file.path(output_path, "ARD_Out14-1-1.json")
 )
 
 dim(ard_json)
@@ -109,7 +125,7 @@ head(ard_json[, c("AnalysisId", "operationid", "group1_level", "res", "disp")])
 The column metadata travels with the data. Read the file with `jsonlite` and look at its `columns` section to see each column's name, label and data type:
 
 ```{r column metadata, eval = has_deps}
-meta <- jsonlite::fromJSON(file.path(output_path, "ARD_Out_01.json"))$columns
+meta <- jsonlite::fromJSON(file.path(output_path, "ARD_Out14-1-1.json"))$columns
 head(meta[, c("name", "label", "dataType")], 10)
 ```
 
@@ -138,7 +154,7 @@ readARS(
   ARS_path,
   output_path,
   adam_path,
-  spec_output   = "Out_01",
+  spec_output   = "Out14-1-1",
   output_format = "datasetjson",
   column_labels = c(
     group1_level = "Actual Treatment",
@@ -148,9 +164,9 @@ readARS(
 ```
 
 ```{r own labels result, eval = has_deps, message = FALSE, warning = FALSE}
-source(file.path(output_path, "ARD_Out_01.R"))
+source(file.path(output_path, "ARD_Out14-1-1.R"))
 
-meta <- jsonlite::fromJSON(file.path(output_path, "ARD_Out_01.json"))$columns
+meta <- jsonlite::fromJSON(file.path(output_path, "ARD_Out14-1-1.json"))$columns
 meta[meta$name %in% c("group1_level", "AnalysisId", "group1_groupingId"),
      c("name", "label")]
 ```
