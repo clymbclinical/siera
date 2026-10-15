@@ -258,16 +258,29 @@
     }
   }
 
+  # A filter-less analysis set ("All Subjects") is valid ARS (#200). When no
+  # set in the reporting event declares a condition, jsonlite returns no
+  # `condition` frame at all, so pad the condition columns to keep the schema
+  # stable for downstream consumers. The compound operator is kept so a
+  # compound-filtered set is not mistaken for a filter-less one.
+  n_sets <- NROW(json_from$analysisSets)
+  set_filter_col <- function(element, field, empty) {
+    x <- json_from$analysisSets[[element]][[field]]
+    if (is.null(x)) rep(empty, n_sets) else x
+  }
+
   AnalysisSets <- tibble::tibble(
     id = json_from$analysisSets$id,
     label = json_from$analysisSets$label,
     name = json_from$analysisSets$name,
     level = json_from$analysisSets$level,
     order = json_from$analysisSets$order,
-    condition_dataset = json_from$analysisSets$condition[["dataset"]],
-    condition_variable = json_from$analysisSets$condition[["variable"]],
-    condition_comparator = json_from$analysisSets$condition[["comparator"]],
-    condition_value = json_from$analysisSets$condition[["value"]]
+    condition_dataset = set_filter_col("condition", "dataset", NA_character_),
+    condition_variable = set_filter_col("condition", "variable", NA_character_),
+    condition_comparator = set_filter_col("condition", "comparator", NA_character_),
+    condition_value = set_filter_col("condition", "value", list(NULL)),
+    compoundExpression_logicalOperator =
+      set_filter_col("compoundExpression", "logicalOperator", NA_character_)
   )
 
   JSON_AnalysisGroupings <- json_from$analysisGroupings
