@@ -1,7 +1,8 @@
 # Method library: chisq_per_predefined_group (#215)
 #
 # The template is rendered the way readARS() substitutes it (placeholder ->
-# resolved valueSource) and run against the bundled ADSL; the p-value is
+# resolved valueSource) and run against the CDISC Pilot 01 ADSL from
+# {clinTrialData} (#205); the p-value is
 # checked against an independent stats::chisq.test() on the grouped table.
 
 .render_library_template <- function(key, values) {
@@ -28,7 +29,7 @@
 .p <- function(ard) unname(unlist(ard$stat))
 
 .adsl_saf <- function() {
-  adsl <- utils::read.csv(ARS_example("ADSL.csv"), stringsAsFactors = FALSE)
+  adsl <- .pilot_dataset("adsl")
   adsl[adsl$SAFFL == "Y", ]
 }
 

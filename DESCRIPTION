@@ -33,6 +33,8 @@ Suggests:
     withr,
     readr,
     haven,
+    clinTrialData,
+    arrow,
     cards,
     cardx,
     datasetjson,

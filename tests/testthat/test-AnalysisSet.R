@@ -418,7 +418,8 @@ test_that("readARS() runs an ARS whose analysis sets have no condition (#200)", 
   ars_file <- withr::local_tempfile(fileext = ".json")
   jsonlite::write_json(src, ars_file, auto_unbox = TRUE, null = "null")
   output_dir <- withr::local_tempdir()
-  adam_dir <- system.file("extdata", package = "siera")
+  # CDISC Pilot 01 ADaM from {clinTrialData} (#205)
+  adam_dir <- .pilot_adam_dir(c("adsl", "adae"))
 
   expect_no_warning(
     readARS(ars_file, output_dir, adam_dir, spec_output = "Out14-3-1-1")

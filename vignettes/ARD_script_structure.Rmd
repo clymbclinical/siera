@@ -253,6 +253,8 @@ Examples of such an ARD script has been shipped with this package.  Below are su
 - Summary of Demographics: ARD_Out14-1-1.R
 - Overall Summary of Treatment-Emergent Adverse Events: ARD_Out14-3-1-1.R
 
+Their "Load ADaM" section reads the public CDISC Pilot 01 ADaM datasets from the [clinTrialData](https://CRAN.R-project.org/package=clinTrialData) package (which needs `arrow` installed) instead of from a folder, so they run without any data files of your own.
+
 Access these with the below functions:
 
 ```{r example ARD script, message=FALSE, warning=FALSE, eval=FALSE}

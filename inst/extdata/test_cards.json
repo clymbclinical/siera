@@ -480,7 +480,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "1"
+                            "54"
                         ]
                     }
                 },
@@ -494,7 +494,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "2"
+                            "81"
                         ]
                     }
                 },
@@ -508,7 +508,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "3"
+                            "0"
                         ]
                     }
                 },
@@ -619,7 +619,7 @@
                     "label": "     Per-protocol population [3]",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "PPROTFL",
+                        "variable": "EFFFL",
                         "comparator": "EQ",
                         "value": [
                             "Y"
@@ -634,7 +634,7 @@
             "name": "Reason for Discontinuation from Study",
             "label": "Discontinued study [4]",
             "groupingDataset": "ADSL",
-            "groupingVariable": "DCSREAS",
+            "groupingVariable": "DCREASCD",
             "groups": [
                 {
                     "level": 1,
@@ -644,7 +644,7 @@
                     "label": "Adverse Event",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "DCSREAS",
+                        "variable": "DCREASCD",
                         "comparator": "EQ",
                         "value": [
                             "Adverse Event"
@@ -659,7 +659,7 @@
                     "label": "Death",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "DCSREAS",
+                        "variable": "DCREASCD",
                         "comparator": "EQ",
                         "value": [
                             "Death"
@@ -674,7 +674,7 @@
                     "label": "Lost to Follow-up",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "DCSREAS",
+                        "variable": "DCREASCD",
                         "comparator": "EQ",
                         "value": [
                             "Lost to Follow-up"
@@ -689,10 +689,10 @@
                     "label": "Withdrawal by Subject",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "DCSREAS",
+                        "variable": "DCREASCD",
                         "comparator": "EQ",
                         "value": [
-                            "Withdrawal by Subject"
+                            "Withdrew Consent"
                         ]
                     }
                 },
@@ -704,7 +704,7 @@
                     "label": "Physician Decision",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "DCSREAS",
+                        "variable": "DCREASCD",
                         "comparator": "EQ",
                         "value": [
                             "Physician Decision"
@@ -719,10 +719,10 @@
                     "label": "Protocol Deviation",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "DCSREAS",
+                        "variable": "DCREASCD",
                         "comparator": "EQ",
                         "value": [
-                            "Protocol Deviation"
+                            "Protocol Violation"
                         ]
                     }
                 },
@@ -734,7 +734,7 @@
                     "label": "Other",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "DCSREAS",
+                        "variable": "DCREASCD",
                         "comparator": "EQ",
                         "value": [
                             "Other"
@@ -749,7 +749,7 @@
             "name": "Reason for Discontinuation of Treatment",
             "label": "Discontinued study drug [4]",
             "groupingDataset": "ADSL",
-            "groupingVariable": "DCTREAS",
+            "groupingVariable": "DCDECOD",
             "groups": [
                 {
                     "level": 1,
@@ -759,10 +759,10 @@
                     "label": "Adverse Event",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "DCTREAS",
+                        "variable": "DCDECOD",
                         "comparator": "EQ",
                         "value": [
-                            "Adverse Event"
+                            "ADVERSE EVENT"
                         ]
                     }
                 },
@@ -774,10 +774,10 @@
                     "label": "Lack of Efficacy",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "DCTREAS",
+                        "variable": "DCDECOD",
                         "comparator": "EQ",
                         "value": [
-                            "Lack of Efficacy"
+                            "LACK OF EFFICACY"
                         ]
                     }
                 },
@@ -789,10 +789,10 @@
                     "label": "Protocol Deviation",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "DCTREAS",
+                        "variable": "DCDECOD",
                         "comparator": "EQ",
                         "value": [
-                            "Protocol Deviation"
+                            "PROTOCOL VIOLATION"
                         ]
                     }
                 },
@@ -804,10 +804,10 @@
                     "label": "Death",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "DCTREAS",
+                        "variable": "DCDECOD",
                         "comparator": "EQ",
                         "value": [
-                            "Death"
+                            "DEATH"
                         ]
                     }
                 },
@@ -819,10 +819,10 @@
                     "label": "Withdrawal by Subject",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "DCTREAS",
+                        "variable": "DCDECOD",
                         "comparator": "EQ",
                         "value": [
-                            "Withdrawal by Subject"
+                            "WITHDRAWAL BY SUBJECT"
                         ]
                     }
                 },
@@ -834,10 +834,10 @@
                     "label": "Other",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "DCTREAS",
+                        "variable": "DCDECOD",
                         "comparator": "EQ",
                         "value": [
-                            "Other"
+                            "OTHER"
                         ]
                     }
                 }
@@ -860,7 +860,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "1"
+                            "54"
                         ]
                     }
                 },
@@ -874,7 +874,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "2"
+                            "81"
                         ]
                     }
                 },
@@ -888,7 +888,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "3"
+                            "0"
                         ]
                     }
                 },
@@ -914,7 +914,7 @@
             "name": "Analysis Sex",
             "label": "Sex, n (%)",
             "groupingDataset": "ADSL",
-            "groupingVariable": "ASEX",
+            "groupingVariable": "SEX",
             "groups": [
                 {
                     "level": 1,
@@ -924,10 +924,10 @@
                     "label": "Male",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "ASEX",
+                        "variable": "SEX",
                         "comparator": "EQ",
                         "value": [
-                            "Male"
+                            "M"
                         ]
                     }
                 },
@@ -939,10 +939,10 @@
                     "label": "Female",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "ASEX",
+                        "variable": "SEX",
                         "comparator": "EQ",
                         "value": [
-                            "Female"
+                            "F"
                         ]
                     }
                 },
@@ -954,10 +954,10 @@
                     "label": "Intersex",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "ASEX",
+                        "variable": "SEX",
                         "comparator": "EQ",
                         "value": [
-                            "Intersex"
+                            "INTERSEX"
                         ]
                     }
                 },
@@ -969,10 +969,10 @@
                     "label": "Unknown",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "ASEX",
+                        "variable": "SEX",
                         "comparator": "EQ",
                         "value": [
-                            "Unknown"
+                            "U"
                         ]
                     }
                 }
@@ -1039,7 +1039,7 @@
             "name": "Analysis Race",
             "label": "Race, n (%)",
             "groupingDataset": "ADSL",
-            "groupingVariable": "ARACE",
+            "groupingVariable": "RACE",
             "groups": [
                 {
                     "level": 1,
@@ -1049,10 +1049,10 @@
                     "label": "American Indian or Alaska Native",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "ARACE",
+                        "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "American Indian or Alaska Native"
+                            "AMERICAN INDIAN OR ALASKA NATIVE"
                         ]
                     }
                 },
@@ -1064,10 +1064,10 @@
                     "label": "Asian",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "ARACE",
+                        "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "Asian"
+                            "ASIAN"
                         ]
                     }
                 },
@@ -1079,10 +1079,10 @@
                     "label": "Black or African American",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "ARACE",
+                        "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "Black or African American"
+                            "BLACK OR AFRICAN AMERICAN"
                         ]
                     }
                 },
@@ -1094,10 +1094,10 @@
                     "label": "Native Hawaiian or Other Pacific Islander",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "ARACE",
+                        "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "Native Hawaiian or Other Pacific Islander"
+                            "NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER"
                         ]
                     }
                 },
@@ -1109,10 +1109,10 @@
                     "label": "White",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "ARACE",
+                        "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "White"
+                            "WHITE"
                         ]
                     }
                 },
@@ -1124,10 +1124,10 @@
                     "label": "Other",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "ARACE",
+                        "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "Other"
+                            "OTHER"
                         ]
                     }
                 },
@@ -1139,10 +1139,10 @@
                     "label": "Not Reported",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "ARACE",
+                        "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "Not Reported"
+                            "NOT REPORTED"
                         ]
                     }
                 },
@@ -1154,10 +1154,10 @@
                     "label": "Unknown",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "ARACE",
+                        "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "Unknown"
+                            "UNKNOWN"
                         ]
                     }
                 }
@@ -1182,7 +1182,7 @@
                         "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "American Indian or Alaska Native"
+                            "AMERICAN INDIAN OR ALASKA NATIVE"
                         ]
                     }
                 },
@@ -1197,7 +1197,7 @@
                         "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "Asian"
+                            "ASIAN"
                         ]
                     }
                 },
@@ -1212,7 +1212,7 @@
                         "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "Black or African American"
+                            "BLACK OR AFRICAN AMERICAN"
                         ]
                     }
                 },
@@ -1227,7 +1227,7 @@
                         "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "Native Hawaiian or Other Pacific Islander"
+                            "NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER"
                         ]
                     }
                 },
@@ -1242,7 +1242,7 @@
                         "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "Not Reported"
+                            "NOT REPORTED"
                         ]
                     }
                 },
@@ -1257,7 +1257,7 @@
                         "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "Other"
+                            "OTHER"
                         ]
                     }
                 },
@@ -1272,7 +1272,7 @@
                         "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "Unknown"
+                            "UNKNOWN"
                         ]
                     }
                 },
@@ -1287,7 +1287,7 @@
                         "variable": "RACE",
                         "comparator": "EQ",
                         "value": [
-                            "White"
+                            "WHITE"
                         ]
                     }
                 }
@@ -1299,7 +1299,7 @@
             "name": "Analysis Ethnicity",
             "label": "Ethnicity, n (%)",
             "groupingDataset": "ADSL",
-            "groupingVariable": "AETHNIC",
+            "groupingVariable": "ETHNIC",
             "groups": [
                 {
                     "level": 1,
@@ -1309,10 +1309,10 @@
                     "label": "Hispanic or Latino",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "AETHNIC",
+                        "variable": "ETHNIC",
                         "comparator": "EQ",
                         "value": [
-                            "Hispanic or Latino"
+                            "HISPANIC OR LATINO"
                         ]
                     }
                 },
@@ -1324,10 +1324,10 @@
                     "label": "Not Hispanic or Latino",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "AETHNIC",
+                        "variable": "ETHNIC",
                         "comparator": "EQ",
                         "value": [
-                            "Not Hispanic or Latino"
+                            "NOT HISPANIC OR LATINO"
                         ]
                     }
                 },
@@ -1339,10 +1339,10 @@
                     "label": "Not Reported",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "AETHNIC",
+                        "variable": "ETHNIC",
                         "comparator": "EQ",
                         "value": [
-                            "Not Reported"
+                            "NOT REPORTED"
                         ]
                     }
                 },
@@ -1354,10 +1354,10 @@
                     "label": "Unknown",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "AETHNIC",
+                        "variable": "ETHNIC",
                         "comparator": "EQ",
                         "value": [
-                            "Unknown"
+                            "UNKNOWN"
                         ]
                     }
                 }
@@ -1369,7 +1369,7 @@
             "name": "Analysis Country of Participation",
             "label": "Country of participation, n (%)",
             "groupingDataset": "ADSL",
-            "groupingVariable": "ACOUNTRY",
+            "groupingVariable": "COUNTRY",
             "groups": [
                 {
                     "level": 1,
@@ -1379,10 +1379,10 @@
                     "label": "United States",
                     "condition": {
                         "dataset": "ADSL",
-                        "variable": "ACOUNTRY",
+                        "variable": "COUNTRY",
                         "comparator": "EQ",
                         "value": [
-                            "United States"
+                            "USA"
                         ]
                     }
                 }
@@ -1405,7 +1405,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "1"
+                            "54"
                         ]
                     }
                 },
@@ -1419,7 +1419,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "2"
+                            "81"
                         ]
                     }
                 },
@@ -1433,7 +1433,7 @@
                         "variable": "TRT01AN",
                         "comparator": "EQ",
                         "value": [
-                            "3"
+                            "0"
                         ]
                     }
                 }
@@ -1660,7 +1660,7 @@
             "label": "     Per-protocol population [3]",
             "condition": {
                 "dataset": "ADSL",
-                "variable": "PPROTFL",
+                "variable": "EFFFL",
                 "comparator": "EQ",
                 "value": [
                     "Y"
@@ -1682,10 +1682,10 @@
                         "order": 1,
                         "condition": {
                             "dataset": "ADSL",
-                            "variable": "DCSREAS",
+                            "variable": "DCREASCD",
                             "comparator": "NE",
                             "value": [
-                                ""
+                                "Completed"
                             ]
                         }
                     },
@@ -1719,10 +1719,10 @@
                         "order": 1,
                         "condition": {
                             "dataset": "ADSL",
-                            "variable": "DCTREAS",
+                            "variable": "DCDECOD",
                             "comparator": "NE",
                             "value": [
-                                ""
+                                "COMPLETED"
                             ]
                         }
                     },
@@ -1750,7 +1750,7 @@
             "label": "Sex, n (%)",
             "condition": {
                 "dataset": "ADSL",
-                "variable": "ASEX",
+                "variable": "SEX",
                 "comparator": "NE",
                 "value": [
                     ""
@@ -1798,7 +1798,7 @@
             "label": "Race, n (%)",
             "condition": {
                 "dataset": "ADSL",
-                "variable": "ARACE",
+                "variable": "RACE",
                 "comparator": "NE",
                 "value": [
                     ""
@@ -1830,7 +1830,7 @@
             "label": "Ethnicity, n (%)",
             "condition": {
                 "dataset": "ADSL",
-                "variable": "AETHNIC",
+                "variable": "ETHNIC",
                 "comparator": "NE",
                 "value": [
                     ""
@@ -1862,7 +1862,7 @@
             "label": "Duration of treatment, days [1]",
             "condition": {
                 "dataset": "ADSL",
-                "variable": "TRTDURD",
+                "variable": "TRTDUR",
                 "comparator": "NE",
                 "value": [
                     ""
@@ -1878,7 +1878,7 @@
             "label": "Subjects treated, by duration, n (%)",
             "condition": {
                 "dataset": "ADSL",
-                "variable": "TRTDURD",
+                "variable": "TRTDUR",
                 "comparator": "NE",
                 "value": [
                     ""
@@ -3453,7 +3453,7 @@
                 "ANSET_01_ANINT_03"
             ],
             "dataset": "ADSL",
-            "variable": "TRTDURD",
+            "variable": "TRTDUR",
             "analysisSetId": "AnalysisSet_01",
             "dataSubsetId": "Dss_14",
             "orderedGroupings": [
