@@ -414,7 +414,7 @@
       ],
       "codeTemplate": {
         "context": "R (siera)",
-        "code": "in_data = df2_analysisidhere |>\n    dplyr::select(distinctlisthere) |>\n    unique() |>\n    dplyr::mutate(dummy = 'dummyvar')\n\ndf3_analysisidhere <-\n  cards::ard_tabulate(\n    data = in_data\n   ,by = c(byvarshere)\n   ,variables = dummy\n  ) |>\ndplyr::filter(stat_name == 'n') |>\n dplyr::mutate(operationid = 'opid1here')",
+        "code": "in_data = df2_analysisidhere |>\n    dplyr::select(distinctlisthere) |>\n    unique() |>\n    dplyr::mutate(dummy = factor('dummyvar'))\n\ndf3_analysisidhere <-\n  cards::ard_tabulate(\n    data = in_data\n   ,by = c(byvarshere)\n   ,variables = dummy\n  ) |>\ndplyr::filter(stat_name == 'n') |>\n dplyr::mutate(operationid = 'opid1here')",
         "parameters": [
           {
             "name": "distinctlisthere",

@@ -492,7 +492,7 @@
       ],
       "codeTemplate": {
         "context": "R (siera)",
-        "code": "in_data = df2_analysisidhere |>\n    dplyr::select(distinctlisthere) |>\n    unique() |>\n    dplyr::mutate(dummy = 'dummyvar')\n\ndf3_analysisidhere <-\n  cards::ard_tabulate(\n    data = in_data\n   ,by = c(byvarshere)\n   ,variables = dummy\n  ) |>\ndplyr::filter(stat_name == 'n') |>\n dplyr::mutate(operationid = 'opid1here')",
+        "code": "in_data = df2_analysisidhere |>\n    dplyr::select(distinctlisthere) |>\n    unique() |>\n    dplyr::mutate(dummy = factor('dummyvar'))\n\ndf3_analysisidhere <-\n  cards::ard_tabulate(\n    data = in_data\n   ,by = c(byvarshere)\n   ,variables = dummy\n  ) |>\ndplyr::filter(stat_name == 'n') |>\n dplyr::mutate(operationid = 'opid1here')",
         "parameters": [
           {
             "name": "distinctlisthere",
@@ -556,7 +556,7 @@
       ],
       "codeTemplate": {
         "context": "R (siera)",
-        "code": "denom_dataset = df2_denomanaidhere |>\n    dplyr::count(denom_anagroupvarshere) |>\n    dplyr::rename(`...ard_N...` = n) |>\n    dplyr::mutate(dplyr::across(-`...ard_N...`, as.character))\n\ndf3_analysisidhere <- tryCatch({\nin_data = df2_analysisidhere |>\n    dplyr::select(distinctlisthere) |>\n    unique() |>\n    dplyr::mutate(dplyr::across(everything(), as.character)) |>\n    dplyr::mutate(dummy = 'dummyvar')\n\ncards::ard_tabulate(\n    data = in_data\n   ,by = c(byvarshere)\n   ,variables = dummy\n   ,denominator = denom_dataset\n  ) |>\ndplyr::filter(stat_name %in% c('n', 'p')) |>\n dplyr::mutate(operationid = dplyr::case_when(\n    stat_name == 'n' ~ 'opid1here',\n    stat_name == 'p' ~ 'opid2here'\n  ))\n}, error = function(e) {\n  message('analysisidhere: ', conditionMessage(e))\n  tibble::tibble(group1_level=character(0),group2_level=character(0),group3_level=character(0))\n})",
+        "code": "denom_dataset = df2_denomanaidhere |>\n    dplyr::count(denom_anagroupvarshere) |>\n    dplyr::rename(`...ard_N...` = n)\n\ndf3_analysisidhere <- tryCatch({\nin_data = df2_analysisidhere |>\n    dplyr::select(distinctlisthere) |>\n    unique() |>\n    dplyr::mutate(dummy = factor('dummyvar'))\n\ncards::ard_tabulate(\n    data = in_data\n   ,by = c(byvarshere)\n   ,variables = dummy\n   ,denominator = denom_dataset\n  ) |>\ndplyr::filter(stat_name %in% c('n', 'p')) |>\n dplyr::mutate(operationid = dplyr::case_when(\n    stat_name == 'n' ~ 'opid1here',\n    stat_name == 'p' ~ 'opid2here'\n  ))\n}, error = function(e) {\n  message('analysisidhere: ', conditionMessage(e))\n  tibble::tibble(group1_level=character(0),group2_level=character(0),group3_level=character(0))\n})",
         "parameters": [
           {
             "name": "distinctlisthere",
@@ -638,7 +638,7 @@
       ],
       "codeTemplate": {
         "context": "R (siera)",
-        "code": "denom_dataset = df2_denomanaidhere |>\n    dplyr::count(denom_anagroupvarshere) |>\n    dplyr::rename(`...ard_N...` = n) |>\n    dplyr::mutate(dplyr::across(-`...ard_N...`, as.character))\n\ndf3_analysisidhere <- tryCatch({\nin_data = df2_analysisidhere |>\n    dplyr::select(distinctlisthere) |>\n    unique() |>\n    dplyr::mutate(dplyr::across(everything(), as.character))\n\ncards::ard_tabulate(\n    data = in_data\n   byvarshere\n   ,denominator = denom_dataset\n  ) |>\ndplyr::filter(stat_name %in% c('n', 'p')) |>\ndplyr::rename(group2_level = variable_level) |>\n dplyr::mutate(operationid = dplyr::case_when(\n    stat_name == 'n' ~ 'opid1here',\n    stat_name == 'p' ~ 'opid2here'\n  ))\n}, error = function(e) {\n  message('analysisidhere: ', conditionMessage(e))\n  tibble::tibble(group1_level = character(0), group2_level = character(0))\n})",
+        "code": "denom_dataset = df2_denomanaidhere |>\n    dplyr::count(denom_anagroupvarshere) |>\n    dplyr::rename(`...ard_N...` = n)\n\ndf3_analysisidhere <- tryCatch({\nin_data = df2_analysisidhere |>\n    dplyr::select(distinctlisthere) |>\n    unique()\n\ncards::ard_tabulate(\n    data = in_data\n   byvarshere\n   ,denominator = denom_dataset\n  ) |>\ndplyr::filter(stat_name %in% c('n', 'p')) |>\ndplyr::rename(group2_level = variable_level) |>\n dplyr::mutate(operationid = dplyr::case_when(\n    stat_name == 'n' ~ 'opid1here',\n    stat_name == 'p' ~ 'opid2here'\n  ))\n}, error = function(e) {\n  message('analysisidhere: ', conditionMessage(e))\n  tibble::tibble(group1_level = character(0), group2_level = character(0))\n})",
         "parameters": [
           {
             "name": "distinctlisthere",

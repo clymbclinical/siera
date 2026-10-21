@@ -117,6 +117,9 @@ test_that("fda-ex-t05 exposure: bigN, continuous summary, and risk difference ma
   ard <- .run_etfl_pipeline("fda-ex-t05", tmp)
   ref <- .load_etfl_reference("fda-ex-t05")
 
+  # An_28_5's data subset is empty: its declared arms are still zero rows (#203).
+  .expect_npct_rows_match(ard, ref, "An_28_5")
+
   expect_true(.cmp_bigN(ard, ref, "An_25")$match)
   .expect_all_match(.cmp_continuous(ard, ref, "An_26"))
   .expect_all_match(.cmp_rd(ard, ref, "An_29"))
@@ -129,6 +132,11 @@ test_that("fda-ae-t06 AE summary: bigN, n%, and per-category RD match spec (#171
   tmp <- withr::local_tempdir()
   ard <- .run_etfl_pipeline("fda-ae-t06", tmp)
   ref <- .load_etfl_reference("fda-ae-t06")
+
+  # Pre-defined treatment arms are ARS-ordered factors (#203), so an arm with no
+  # qualifying subject is a zero row, exactly as in the reference - also when no
+  # subject qualifies at all (an empty data subset, e.g. t06 An_33).
+  for (an in c("An_31", "An_33", "An_35", "An_37", "An_39", "An_41", "An_43", "An_45")) .expect_npct_rows_match(ard, ref, an)
 
   expect_true(.cmp_bigN(ard, ref, "An_30")$match)
   .expect_all_match(.cmp_n_pct(ard, ref, "An_31"))
@@ -241,6 +249,11 @@ test_that("fda-ae-t07 AE by cause: bigN and one- and two-level n% match referenc
   ard <- .run_etfl_pipeline("fda-ae-t07", tmp)
   ref <- .load_etfl_reference("fda-ae-t07")
 
+  # Pre-defined treatment arms are ARS-ordered factors (#203), so an arm with no
+  # qualifying subject is a zero row, exactly as in the reference - also when no
+  # subject qualifies at all (an empty data subset, e.g. t06 An_33).
+  for (an in c("An_73", "An_74", "An_75", "An_76", "An_77")) .expect_npct_rows_match(ard, ref, an)
+
   expect_true(.cmp_bigN(ard, ref, "An_72")$match)
   .expect_all_match(.cmp_n_pct(ard, ref, "An_73"))
   .expect_all_match(.cmp_n_pct(ard, ref, "An_75"))
@@ -252,6 +265,11 @@ test_that("fda-ae-t09 AE SAE/fatal: bigN, n%, two-level n%, and risk difference 
   tmp <- withr::local_tempdir()
   ard <- .run_etfl_pipeline("fda-ae-t09", tmp)
   ref <- .load_etfl_reference("fda-ae-t09")
+
+  # Pre-defined treatment arms are ARS-ordered factors (#203), so an arm with no
+  # qualifying subject is a zero row, exactly as in the reference - also when no
+  # subject qualifies at all (an empty data subset, e.g. t06 An_33).
+  for (an in c("An_66", "An_68")) .expect_npct_rows_match(ard, ref, an)
 
   expect_true(.cmp_bigN(ard, ref, "An_65")$match)
   .expect_all_match(.cmp_n_pct(ard, ref, "An_66"))
@@ -268,6 +286,11 @@ test_that("fda-ae-t12 TEAE: bigN, n%, two-level n%, and risk difference match re
   tmp <- withr::local_tempdir()
   ard <- .run_etfl_pipeline("fda-ae-t12", tmp)
   ref <- .load_etfl_reference("fda-ae-t12")
+
+  # Pre-defined treatment arms are ARS-ordered factors (#203), so an arm with no
+  # qualifying subject is a zero row, exactly as in the reference - also when no
+  # subject qualifies at all (an empty data subset, e.g. t06 An_33).
+  for (an in c("An_59", "An_61")) .expect_npct_rows_match(ard, ref, an)
 
   expect_true(.cmp_bigN(ard, ref, "An_58")$match)
   .expect_all_match(.cmp_n_pct(ard, ref, "An_59"))

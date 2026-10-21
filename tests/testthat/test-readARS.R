@@ -61,7 +61,11 @@ test_that("ARD values - Total column with no grouping", {
   output_dir <- withr::local_tempdir()
 
   # Generate the R scripts — note adam_dir is passed here
-  readARS(ARS_path, output_dir, adam_dir, spec_output = "Out_01")
+    # exampleARS_4 declares ASEX groups 'Male'/'Female' but the bundled ADSL codes
+  # ASEX as 'F'/'M', so under the default declared-group factors (#203) no
+  # record falls in a declared group. These values are the raw-value ones.
+  readARS(ARS_path, output_dir, adam_dir, spec_output = "Out_01",
+          predefined_zero_fill = FALSE)
 
   # Find generated R scripts
   r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
@@ -120,7 +124,8 @@ test_that("ARD values are identical when ADaM datasets are supplied as XPT", {
   }
 
   output_dir <- withr::local_tempdir()
-  readARS(ARS_path, output_dir, xpt_dir, spec_output = "Out_01")
+  readARS(ARS_path, output_dir, xpt_dir, spec_output = "Out_01",
+          predefined_zero_fill = FALSE)
 
   f <- file.path(output_dir, "ARD_Out_01.R")
   expect_true(file.exists(f))
@@ -179,7 +184,8 @@ test_that("ARD values are identical when ADaM datasets are supplied as Dataset-J
   }
 
   output_dir <- withr::local_tempdir()
-  readARS(ARS_path, output_dir, json_dir, spec_output = "Out_01")
+  readARS(ARS_path, output_dir, json_dir, spec_output = "Out_01",
+          predefined_zero_fill = FALSE)
 
   f <- file.path(output_dir, "ARD_Out_01.R")
   expect_true(file.exists(f))
@@ -544,6 +550,9 @@ test_that("wrapped style flags data-driven groupings via ars_grouping(data_drive
 })
 
 test_that("ARD values - Common_Safety_Displays_cards", {
+  # Per-arm values below follow the ARS-declared treatment group order
+  # (Placebo, Xanomeline Low Dose, Xanomeline High Dose; #203), not the
+  # alphabetical order of the TRT01A data values.
   skip_on_cran()
 
   # Path to ARS file (metadata driving script generation)
@@ -605,8 +614,8 @@ test_that("ARD values - Common_Safety_Displays_cards", {
         select(stat) %>%
         unlist()
       expect_equal(test2[[1]], 76)
-      expect_equal(test2[[2]], 76)
-      expect_equal(test2[[3]], 77.5)
+      expect_equal(test2[[2]], 77.5)
+      expect_equal(test2[[3]], 76)
 
       # ANOVA
       test3 <- ARD %>%
@@ -640,7 +649,7 @@ test_that("ARD values - Common_Safety_Displays_cards", {
         ) %>%
         select(stat) %>%
         unlist()
-      expect_equal(unname(ge65), c(72, 73, 76))
+      expect_equal(unname(ge65), c(72, 76, 73))
       # ... and its rows are labelled with the group's name, not with one of
       # its two data values (#232)
       ge65_level <- ARD %>%
@@ -669,8 +678,8 @@ test_that("ARD values - Common_Safety_Displays_cards", {
         select(stat) %>%
         unlist()
       expect_equal(test1[[1]], 65)
-      expect_equal(test1[[2]], 76)
-      expect_equal(test1[[3]], 77)
+      expect_equal(test1[[2]], 77)
+      expect_equal(test1[[3]], 76)
 
       # categorical %
       test2 <- ARD %>%
@@ -681,8 +690,8 @@ test_that("ARD values - Common_Safety_Displays_cards", {
         select(stat) %>%
         unlist()
       expect_equal(round(test2[[1]], digits = 5), 0.75581)
-      expect_equal(round(test2[[2]], digits = 5), 0.90476)
-      expect_equal(round(test2[[3]], digits = 5), 0.91667)
+      expect_equal(round(test2[[2]], digits = 5), 0.91667)
+      expect_equal(round(test2[[3]], digits = 5), 0.90476)
 
       # related TEAEs: AEREL IN POSSIBLE | PROBABLE must count both values
       # (#213: a kept trailing blank once dropped every 'POSSIBLE ' record,
@@ -694,7 +703,7 @@ test_that("ARD values - Common_Safety_Displays_cards", {
         ) %>%
         select(stat) %>%
         unlist()
-      expect_equal(unname(test_rel), c(43, 70, 72))
+      expect_equal(unname(test_rel), c(43, 72, 70))
 
       # the n (%) rows describe the ARS analysis variable, not the internal
       # 'dummy' counting column (#231)
@@ -863,7 +872,10 @@ test_that("ARD values - json 2", {
   output_dir <- withr::local_tempdir()
 
   # Generate the R scripts — note adam_dir is passed here
-  readARS(ARS_path, output_dir, adam_dir)
+  # exampleARS_2 declares paediatric age bands ('1-6 years', ...) that the
+  # bundled ADSL does not carry, so the An_11 values below are the raw-value
+  # ones; the declared-group default (#203) is covered in test-derived-grouping.R.
+  readARS(ARS_path, output_dir, adam_dir, predefined_zero_fill = FALSE)
 
   # Find generated R scripts
   r_files <- list.files(output_dir, pattern = "\\.R$", full.names = TRUE)
@@ -1106,6 +1118,7 @@ test_that("ARD values - 4 grouping factors work correctly (JSON)", {
       filter(
         AnalysisId == "An_03",
         stat_name == "mean",
+        group1_level == "Placebo",
         group2_level == "PLACEBO",
         group3_level == "Duration on Therapy (days)"
       ) %>%

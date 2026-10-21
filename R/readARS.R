@@ -44,6 +44,24 @@
 #'  generated script runs, a name that matches no ARD column triggers a warning
 #'  at script runtime (likely a typo) rather than an error. Only used when
 #'  `output_format = "datasetjson"`; otherwise it is ignored with a warning.
+#' @param predefined_zero_fill Logical, `TRUE` (default) or `FALSE`. With
+#'  `TRUE`, the ARS decides which rows a pre-defined (`dataDriven: false`)
+#'  grouping produces: before the method runs, the generated script turns the
+#'  grouping variable into a factor of the groups the ARS declares, in the
+#'  declared order. Every declared group then gets a row (a zero count when no
+#'  record falls in it), and data values that match no declared group are left
+#'  out. This applies to groupings that a method template uses through the
+#'  generic grouping valueSources (`by_vars`, `strata_vars`, `by_listc`,
+#'  `by_list`, `distinct_list`, `by_stmt`) and whose groups are all `EQ` or `IN`
+#'  conditions on the grouping variable. A group defined by one `EQ` value keeps
+#'  that value as its level; an `IN` group becomes one level named after the
+#'  group. A pre-defined grouping that cannot be expressed this way (e.g. an
+#'  overlapping "Total" group, or range conditions) keeps its observed values,
+#'  with a warning. A grouping whose variable the analysis's data subset or
+#'  analysis set restricts also keeps its observed values, silently: that
+#'  slice excludes groups on purpose. `FALSE` restores the earlier behaviour, where the observed
+#'  data values determine the rows; this option is planned to be removed after
+#'  one release.
 #'
 #' @returns R programmes generating ARDs - one for each output (or analysis from an output) specified in the ARS metadata
 #' @export
@@ -68,7 +86,8 @@ readARS <- function(ARS_path,
                     spec_output = "",
                     output_format = "none",
                     code_style = "wrapped",
-                    column_labels = NULL) {
+                    column_labels = NULL,
+                    predefined_zero_fill = TRUE) {
   # Strict validation: no partial matching, omitted/NULL -> "none"
   if (is.null(output_format)) {
     output_format <- "none"
@@ -89,6 +108,13 @@ readARS <- function(ARS_path,
     cli::cli_abort(c(
       "{.arg code_style} must be one of {.val wrapped} or {.val expanded}.",
       "x" = "You supplied {.val {code_style}}."
+    ))
+  }
+  if (!is.logical(predefined_zero_fill) || length(predefined_zero_fill) != 1L ||
+      is.na(predefined_zero_fill)) {
+    cli::cli_abort(c(
+      "{.arg predefined_zero_fill} must be {.val TRUE} or {.val FALSE}.",
+      "x" = "You supplied {.val {predefined_zero_fill}}."
     ))
   }
   .check_column_labels(column_labels)
@@ -130,6 +156,10 @@ readARS <- function(ARS_path,
   }
 
   # Prework and loops ----------------------------------------------------
+
+  # Pre-defined groupings that cannot be rewritten as declared-group factors
+  # are reported once each, not once per analysis (#203).
+  warned_groupings <- character(0)
 
   for (i in 1:nrow(Lopo)) {
     Output <- Lopo[i, ]$listItem_outputId
@@ -318,6 +348,38 @@ readARS <- function(ARS_path,
 
       code_ds <- data_subset_result$code
 
+      # Pre-defined groupings as ARS-ordered factors (#203) ----
+      derived <- if (predefined_zero_fill) {
+        .derived_grouping_plan(
+          groupids = groupids,
+          num_grp = num_grp,
+          AG_vars = AG_vars,
+          AG_dataDriven = AG_dataDriven,
+          analysis_groupings = AnalysisGroupings,
+          method_id = methodid,
+          analysis_method_code_template = AnalysisMethodCodeTemplate,
+          analysis_method_code_parameters = AnalysisMethodCodeParameters,
+          # a data subset or population restricted on the grouping variable is
+          # a deliberate slice: the groups it excludes must not reappear as zeros
+          subset_variables = c(
+            .data_subset_variables(DataSubsets, subsetid),
+            # [[ ]] is NULL (not a tibble warning) when the column is absent
+            .analysis_set_variables(AnalysisSets, as.character(Anas_s[["analysisSetId"]]))
+          )
+        )
+      } else {
+        logical(n_actual_groups)
+      }
+      warned_groupings <- .warn_blocked_groupings(attr(derived, "blocked"),
+                                                  warned_groupings)
+      code_derived <- .generate_derived_grouping_code(
+        Anas_j, groupids, derived, AG_vars, AnalysisGroupings
+      )
+      if (nzchar(code_derived) && !endsWith(code_ds, "\n\n")) {
+        code_ds <- paste0(code_ds, "\n")
+      }
+      code_ds <- paste0(code_ds, code_derived)
+
       # Apply AnalysisMethod -------------------------------------------------------------
 
       # Build the explicit lookup table of all computed string values that ARS
@@ -390,11 +452,13 @@ readARS <- function(ARS_path,
         output_id = Output,
         value_sources = value_sources,
         code_style = code_style,
-        population_frame = population$poptot[[Anas_j]]
+        population_frame = population$poptot[[Anas_j]],
+        always_compute = any(derived)
       )
 
       code_method <- analysis_method_result$code
       population_based <- isTRUE(analysis_method_result$population_based)
+      always_compute <- isTRUE(analysis_method_result$always_compute)
 
       method <- analysis_method_result$method
       methodname <- method$name
@@ -440,7 +504,8 @@ readARS <- function(ARS_path,
             n_group_cols       = n_group_cols,
             AG_dataDriven      = AG_dataDriven,
             analysis_groupings = AnalysisGroupings,
-            stamp_by_name      = stamp_by_name
+            stamp_by_name      = stamp_by_name,
+            stamp_derived      = derived
           )
         )
       } else {
@@ -451,7 +516,9 @@ readARS <- function(ARS_path,
           AG_dataDriven      = AG_dataDriven,
           analysis_groupings = AnalysisGroupings,
           population_based   = population_based,
-          stamp_by_name      = stamp_by_name
+          stamp_by_name      = stamp_by_name,
+          stamp_derived      = derived,
+          always_compute     = always_compute
         )
 
         # Coerce *_level columns (variable_level, group[n]_level) to character on
@@ -474,8 +541,11 @@ readARS <- function(ARS_path,
           code_as,
           code_ds,
           code_method_frag,
-          code_groupid,
-          code_listcoerce
+          # Coerce first: the group-id lookup compares group[n]_level as
+          # character, and as.character() on cards' list-of-factor levels
+          # would yield the factor codes, not the labels (#203).
+          code_listcoerce,
+          code_groupid
         )
       }
 
@@ -529,7 +599,9 @@ readARS <- function(ARS_path,
 .generate_groupid_code <- function(analysis_id, groupids, n_group_cols,
                                    AG_dataDriven, analysis_groupings,
                                    population_based = FALSE,
-                                   stamp_by_name = logical(0)) {
+                                   stamp_by_name = logical(0),
+                                   stamp_derived = logical(0),
+                                   always_compute = FALSE) {
   if (n_group_cols < 1L) return("")
 
   mutate_parts <- character(0)
@@ -547,7 +619,8 @@ readARS <- function(ARS_path,
     gpval_col <- paste0("group", k, "_groupValue")
 
     spec <- .grouping_stamp_spec(gid, AG_dataDriven[k], analysis_groupings,
-                                 by_name = isTRUE(stamp_by_name[k]))
+                                 by_name = isTRUE(stamp_by_name[k]),
+                                 derived = isTRUE(stamp_derived[k]))
 
     if (spec$data_driven) {
       mutate_parts <- c(mutate_parts,
@@ -584,6 +657,10 @@ readARS <- function(ARS_path,
   # df2 is empty, so the group stamping must not be skipped in that case (#156).
   if (population_based) {
     mutate_block
+  } else if (always_compute) {
+    # An always-computed method still yields the stub row (no group levels to
+    # stamp) when it cannot compute on an empty subset (#203).
+    paste0("if('group1_level' %in% names(df3_", analysis_id, ")){\n", mutate_block, "}\n")
   } else {
     paste0("if(nrow(df2_", analysis_id, ") != 0){\n", mutate_block, "}\n")
   }
@@ -595,10 +672,12 @@ readARS <- function(ARS_path,
 # value, so IN conditions repeat the group id). With `by_name = TRUE`, for a
 # grouping whose levels a template takes from AG_var<n>_group_conditions /
 # _levels, they are the group levels (.group_level(): the group names, #232).
+# With `derived = TRUE`, for a grouping siera rewrote as a declared-group factor
+# (#203), they are that factor's levels (.derived_group_level()).
 # Shared by the expanded generator (.generate_groupid_code()) and the wrapped one
 # (.generate_stamp_code()), so both styles stamp the same groups by construction.
 .grouping_stamp_spec <- function(gid, data_driven, analysis_groupings,
-                                 by_name = FALSE) {
+                                 by_name = FALSE, derived = FALSE) {
   data_driven <- isTRUE(as.logical(data_driven))
   values <- character(0)
   group_ids <- character(0)
@@ -608,10 +687,11 @@ readARS <- function(ARS_path,
       analysis_groupings$id == gid &
         !is.na(analysis_groupings$group_id) &
         nchar(as.character(analysis_groupings$group_id)) > 0, ]
-    if (by_name) {
+    if (by_name || derived) {
+      level_fun <- if (by_name) .group_level else .derived_group_level
       group_ids <- unique(as.character(grp_rows$group_id))
       values <- vapply(group_ids, function(g) {
-        .group_level(grp_rows[grp_rows$group_id == g, , drop = FALSE])
+        level_fun(grp_rows[grp_rows$group_id == g, , drop = FALSE])
       }, character(1L), USE.NAMES = FALSE)
     } else {
       values <- as.character(grp_rows$group_condition_value)
@@ -650,7 +730,8 @@ readARS <- function(ARS_path,
 .generate_stamp_code <- function(analysis_id, method_id, output_id, groupids,
                                  n_group_cols, AG_dataDriven,
                                  analysis_groupings,
-                                 stamp_by_name = logical(0)) {
+                                 stamp_by_name = logical(0),
+                                 stamp_derived = logical(0)) {
   df3 <- paste0("df3_", analysis_id)
   lit <- function(x) paste0("'", .escape_single_quote(x), "'")
   has_groupings <- n_group_cols >= 1L
@@ -681,7 +762,8 @@ readARS <- function(ARS_path,
     grouping_calls <- vapply(seq_len(n_group_cols), function(k) {
       spec <- .grouping_stamp_spec(groupids[k], AG_dataDriven[k],
                                    analysis_groupings,
-                                   by_name = isTRUE(stamp_by_name[k]))
+                                   by_name = isTRUE(stamp_by_name[k]),
+                                   derived = isTRUE(stamp_derived[k]))
       if (spec$data_driven) {
         paste0("    siera::ars_grouping(", lit(spec$id), ", data_driven = TRUE)")
       } else if (length(spec$group_ids) == 0L) {
@@ -764,15 +846,7 @@ readARS <- function(ARS_path,
                                     analysis_method_code_template,
                                     analysis_method_code_parameters) {
   mid <- method_id
-
-  template_code <- analysis_method_code_template |>
-    dplyr::filter(
-      method_id == mid,
-      context %in% c("R", "R (siera)", "siera"),
-      specifiedAs == "Code"
-    ) |>
-    dplyr::pull(templateCode) |>
-    paste(collapse = "\n")
+  template_code <- .method_template_code(mid, analysis_method_code_template)
 
   params <- analysis_method_code_parameters |>
     dplyr::filter(
@@ -787,6 +861,19 @@ readARS <- function(ARS_path,
     logical(1L)
   )
   params$parameter_valueSource[in_template]
+}
+
+# A method's R code template, as one string ("" when it has none).
+.method_template_code <- function(method_id, analysis_method_code_template) {
+  mid <- method_id
+  analysis_method_code_template |>
+    dplyr::filter(
+      method_id == mid,
+      context %in% c("R", "R (siera)", "siera"),
+      specifiedAs == "Code"
+    ) |>
+    dplyr::pull(templateCode) |>
+    paste(collapse = "\n")
 }
 
 # Resolve the AG_var2_group_values valueSource: a quoted, comma-separated list
@@ -866,9 +953,12 @@ readARS <- function(ARS_path,
 # names to group ids (.grouping_stamp_spec(by_name = TRUE)), so the level still
 # resolves to the correct group[n]_groupId. Only EQ and IN conditions define a
 # group as a set of data values, so other comparators are skipped with a
-# warning, as they are for AG_var2_group_values.
+# warning, as they are for AG_var2_group_values. `level_fun` picks the level of
+# one group; siera's own declared-group factors (#203) pass
+# .derived_group_level() to keep the data value of a single-value EQ group.
 .ag_group_conditions <- function(analysis_groupings, grouping_id,
-                                 value_source = "AG_var2_group_conditions") {
+                                 value_source = "AG_var2_group_conditions",
+                                 level_fun = .group_level) {
   gid <- grouping_id
   # The empty conditions fallback is a case_when arm that matches nothing, so a
   # template embedding it still parses; the empty levels fallback resolves to
@@ -916,10 +1006,10 @@ readARS <- function(ARS_path,
       next
     }
 
-    condition <- .generate_data_subset_condition(
+    condition <- .group_value_condition(
       variable   = as.character(rows$group_condition_variable[1]),
       comparator = comparator,
-      value      = values
+      values     = values
     )
 
     if (!nzchar(condition)) {
@@ -927,7 +1017,7 @@ readARS <- function(ARS_path,
       next
     }
 
-    level_raw <- .group_level(rows)
+    level_raw <- level_fun(rows)
     level <- .escape_single_quote(level_raw)
     # Sibling groups need distinct levels; two groups sharing one would
     # otherwise fail inside factor() at script runtime with a cryptic message.
@@ -956,6 +1046,58 @@ readARS <- function(ARS_path,
     conditions = paste(conditions, collapse = ",\n      "),
     levels     = paste(group_levels, collapse = ", ")
   )
+}
+
+# The R condition that classifies a record into one pre-defined group: an EQ
+# group compares with `==`, an IN group with `%in%`. The ARS value is text and
+# siera does not see the data, so the ADaM variable may be numeric or character.
+# Unlike a data-subset condition (.generate_data_subset_condition()), a group
+# condition never discards a value or a record it could match:
+#   - a value that is the canonical text of a number (`'3'`, `'2.5'`) is written
+#     as that number: `VAR == 3` holds for numeric data and, by R's coercion,
+#     for character data too;
+#   - a numeric-looking value that is NOT canonical (`'01'`, `'1.10'`) is written
+#     both as text and as its number, `VAR %in% c('01', 1)`, so it matches a
+#     character variable holding '01' and a numeric variable holding 1;
+#   - any other value is quoted; a mixed list (`'1'`, `'A'`) keeps every member.
+# Returns "" when the variable or every value is missing.
+.group_value_condition <- function(variable, comparator, values) {
+  if (is.null(variable) || is.na(variable) || !nzchar(variable)) {
+    return("")
+  }
+  values <- as.character(unlist(values))
+  values <- values[!is.na(values)]
+  if (length(values) == 0L) {
+    return("")
+  }
+  if (!identical(comparator, "IN") && values[1] %in% c("", "NA")) {
+    # a blank EQ value is a missing-value test, as it is for data subsets; the
+    # literal string "NA" is what a blank xlsx cell converts to
+    return(paste0("(is.na(", variable, ") | ", variable, " == '')"))
+  }
+
+  numeric_values <- suppressWarnings(as.numeric(values))
+  numeric_text <- ifelse(
+    is.na(numeric_values), NA_character_,
+    vapply(numeric_values, function(n) {
+      format(n, digits = 15L, scientific = FALSE, trim = TRUE)
+    }, "")
+  )
+  quoted <- paste0("'", .escape_single_quote(values), "'")
+  literals <- unlist(lapply(seq_along(values), function(i) {
+    if (is.na(numeric_text[i])) {
+      quoted[i]
+    } else if (identical(numeric_text[i], values[i])) {
+      numeric_text[i]
+    } else {
+      c(quoted[i], numeric_text[i])
+    }
+  }))
+
+  if (identical(comparator, "IN") || length(literals) > 1L) {
+    return(paste0(variable, " %in% c(", paste(literals, collapse = ", "), ")"))
+  }
+  paste0(variable, " == ", literals)
 }
 
 # The level of one pre-defined group (the AnalysisGroupings rows of a single

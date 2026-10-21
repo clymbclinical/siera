@@ -88,15 +88,29 @@ df2_An07_03_SerTEAE_Summ_ByTrt <- df_pop |>
   dplyr::filter(TRTEMFL == "Y" & AESER == "Y")
 ```
 
+When the analysis is grouped by a **pre-defined** grouping (one whose groups the ARS lists, such as the treatment arms), a short extra step follows. It turns the grouping variable into a factor of the declared groups, in the order the ARS gives them. `cards` then reports every declared group, with zero counts where no record falls in a group, and leaves out values that match no declared group:
+
+```{r Predefined groupings, message=FALSE, eval=FALSE}
+df2_An07_03_SerTEAE_Summ_ByTrt <- df2_An07_03_SerTEAE_Summ_ByTrt |>
+  dplyr::mutate(
+    TRT01A = factor(dplyr::case_when(
+      TRT01A == 'Placebo' ~ 'Placebo',
+      TRT01A == 'Xanomeline Low Dose' ~ 'Xanomeline Low Dose',
+      TRT01A == 'Xanomeline High Dose' ~ 'Xanomeline High Dose'
+    ), levels = c('Placebo', 'Xanomeline Low Dose', 'Xanomeline High Dose'))
+  ) |>
+  dplyr::filter(!is.na(TRT01A))
+```
+
 #### Step 3: Apply "Method"
 
 This step takes the subsetted dataset, and applies the required AnalysisMethod (e.g. counting the subjects with a serious TEAE in each treatment arm).  As explained in the vignette for [using `cards` and `cardx`](using-cards.html), functions from these packages are applied to handle the statistical operations for the analysis.  Typically, there would be some pre-work done on the dataset before passing it to a `cards` or `cardx` function.  When the function is applied, the result is an analysis-level ARD.  See example below:
 
 ```{r MethodExample, eval=FALSE}
-# the method only runs when there is data; otherwise df3 stays NULL and Step 4
-# turns it into a stub row that still identifies the analysis
+# the method runs even when no subject qualifies, so every treatment arm is
+# reported (as 0 when nobody had a serious TEAE)
 df3_An07_03_SerTEAE_Summ_ByTrt <- NULL
-if (nrow(df2_An07_03_SerTEAE_Summ_ByTrt) != 0) {
+df3_An07_03_SerTEAE_Summ_ByTrt <- tryCatch({
   # intermediate step: Prepare Denominator Dataset for `cards` function
   denom_dataset <- df2_An01_05_SAF_Summ_ByTrt |>
     dplyr::select(TRT01A)
@@ -105,7 +119,8 @@ if (nrow(df2_An07_03_SerTEAE_Summ_ByTrt) != 0) {
   # (one row per subject and arm, however many serious TEAEs they had)
   in_data <- df2_An07_03_SerTEAE_Summ_ByTrt |>
     dplyr::distinct(TRT01A, USUBJID) |>
-    dplyr::mutate(dummy = "dummyvar")
+    # a factor, so cards can tabulate it even when there are no rows at all
+    dplyr::mutate(dummy = factor("dummyvar"))
 
   # calculate subject counts and % (based on big N) grouped by treatment
   df3_An07_03_SerTEAE_Summ_ByTrt <- cards::ard_tabulate(
@@ -125,8 +140,16 @@ if (nrow(df2_An07_03_SerTEAE_Summ_ByTrt) != 0) {
         stat_name == "p" ~ "Mth01_CatVar_Summ_ByGrp_2_pct"
       )
     )
-}
+  df3_An07_03_SerTEAE_Summ_ByTrt
+}, error = function(e) {
+  # a method that cannot compute on an empty subset leaves df3 NULL, and Step 4
+  # turns it into a stub row that still identifies the analysis
+  if (nrow(df2_An07_03_SerTEAE_Summ_ByTrt) != 0) stop(e)
+  NULL
+})
 ```
+
+Analyses grouped by a pre-defined grouping are wrapped like this: the method always runs, so a "subjects with a serious TEAE" row reads `0 (0.0)` for every arm even when no subject qualifies. If the method cannot compute on an empty subset, the analysis falls back to a stub row. With data, any error still stops the script. Other analyses keep a simpler guard, `if (nrow(df2_<AnalysisId>) != 0) { ... }`: with an empty subset, the method is skipped and Step 4 writes the stub row.
 
 The `dummy` column is only a counting device: every subject contributes one row, so tabulating a constant counts the subjects in each arm. The result rows are then labelled with the analysis variable from the ARS (`USUBJID`), so the ARD says what was counted.
 

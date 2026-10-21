@@ -332,3 +332,40 @@ test_that(".escape_single_quote writes values as portable R string literals", {
   }
   expect_identical(siera:::.escape_single_quote(character(0)), character(0))
 })
+
+test_that(".group_value_condition writes numbers only for canonical numeric text", {
+  f <- siera:::.group_value_condition
+  # canonical numbers hold for numeric and (by R's coercion) character data
+  expect_identical(f("TRT01AN", "EQ", "3"), "TRT01AN == 3")
+  expect_identical(f("TRT01AN", "IN", c("3", "9")), "TRT01AN %in% c(3, 9)")
+  expect_identical(f("AVAL", "EQ", "2.5"), "AVAL == 2.5")
+  expect_identical(f("ID", "EQ", "100000"), "ID == 100000")
+  # '01' / '1.10' may be a character code or a numeric value written with a
+  # leading or trailing zero: match both forms, so neither kind of data is
+  # silently classified into no group
+  expect_identical(f("TRT01A", "EQ", "01"), "TRT01A %in% c('01', 1)")
+  expect_identical(f("AVISITN", "IN", c("1.10", "2.0")),
+                   "AVISITN %in% c('1.10', 1.1, '2.0', 2)")
+  # a mixed list keeps every member
+  expect_identical(f("CODE", "IN", c("1", "A")), "CODE %in% c(1, 'A')")
+  # the generated conditions hold for numeric and for character data
+  hit <- function(cond, data) eval(parse(text = cond), list(TRT01A = data))
+  expect_true(hit(f("TRT01A", "EQ", "01"), "01"))
+  expect_true(hit(f("TRT01A", "EQ", "01"), 1))
+  expect_false(hit(f("TRT01A", "EQ", "01"), 2))
+  expect_identical(hit(f("TRT01A", "IN", c("1.10", "A")), c(1.1, 2)), c(TRUE, FALSE))
+  expect_identical(hit(f("TRT01A", "IN", c("1.10", "A")), c("1.10", "A", "1.1")),
+                   c(TRUE, TRUE, TRUE))
+  # text values are escaped like every other generated literal
+  expect_identical(f("X", "EQ", "it's"), "X == 'it\\'s'")
+  # a blank EQ value is a missing-value test; so is the literal "NA" that a
+  # blank xlsx cell converts to (as for data subsets)
+  expect_identical(f("ARM", "EQ", ""), "(is.na(ARM) | ARM == '')")
+  expect_identical(f("ARM", "EQ", "NA"), "(is.na(ARM) | ARM == '')")
+  expect_identical(f("ARM", "IN", c("NA", "A")), "ARM %in% c('NA', 'A')")
+  # nothing to compare on
+  expect_identical(f(NA_character_, "EQ", "A"), "")
+  expect_identical(f("", "EQ", "A"), "")
+  expect_identical(f("X", "EQ", NA_character_), "")
+  expect_identical(f("X", "IN", character(0)), "")
+})

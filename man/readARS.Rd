@@ -11,7 +11,8 @@ readARS(
   spec_output = "",
   output_format = "none",
   code_style = "wrapped",
-  column_labels = NULL
+  column_labels = NULL,
+  predefined_zero_fill = TRUE
 )
 }
 \arguments{
@@ -61,6 +62,25 @@ built-in labels. Because the ARD's columns are only known once the
 generated script runs, a name that matches no ARD column triggers a warning
 at script runtime (likely a typo) rather than an error. Only used when
 `output_format = "datasetjson"`; otherwise it is ignored with a warning.}
+
+\item{predefined_zero_fill}{Logical, `TRUE` (default) or `FALSE`. With
+`TRUE`, the ARS decides which rows a pre-defined (`dataDriven: false`)
+grouping produces: before the method runs, the generated script turns the
+grouping variable into a factor of the groups the ARS declares, in the
+declared order. Every declared group then gets a row (a zero count when no
+record falls in it), and data values that match no declared group are left
+out. This applies to groupings that a method template uses through the
+generic grouping valueSources (`by_vars`, `strata_vars`, `by_listc`,
+`by_list`, `distinct_list`, `by_stmt`) and whose groups are all `EQ` or `IN`
+conditions on the grouping variable. A group defined by one `EQ` value keeps
+that value as its level; an `IN` group becomes one level named after the
+group. A pre-defined grouping that cannot be expressed this way (e.g. an
+overlapping "Total" group, or range conditions) keeps its observed values,
+with a warning. A grouping whose variable the analysis's data subset or
+analysis set restricts also keeps its observed values, silently: that
+slice excludes groups on purpose. `FALSE` restores the earlier behaviour, where the observed
+data values determine the rows; this option is planned to be removed after
+one release.}
 }
 \value{
 R programmes generating ARDs - one for each output (or analysis from an output) specified in the ARS metadata

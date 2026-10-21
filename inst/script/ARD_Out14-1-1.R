@@ -1,7 +1,7 @@
 
 # Programme:    Generate code to produce ARD for Out14-1-1
 # Output:       Summary of Demographics
-# Date created: 2026-10-08 15:52:59
+# Date created: 2026-10-21 22:05:23
 
   # load libraries ----
     library(dplyr)
@@ -29,6 +29,23 @@ df_poptot <- df_pop
 #Apply Data Subset ---
 df2_An01_05_SAF_Summ_ByTrt <- df_poptot
 
+# Pre-defined groupings as ARS-ordered factors ---
+# Every declared group becomes a factor level (zero-filled by cards when no
+# record falls in it); values in no declared group are not tabulated.
+nrec_An01_05_SAF_Summ_ByTrt <- nrow(df2_An01_05_SAF_Summ_ByTrt)
+df2_An01_05_SAF_Summ_ByTrt <- df2_An01_05_SAF_Summ_ByTrt |>
+  dplyr::mutate(
+    TRT01A = factor(dplyr::case_when(
+      TRT01A == 'Placebo' ~ 'Placebo',
+      TRT01A == 'Xanomeline Low Dose' ~ 'Xanomeline Low Dose',
+      TRT01A == 'Xanomeline High Dose' ~ 'Xanomeline High Dose'
+    ), levels = c('Placebo', 'Xanomeline Low Dose', 'Xanomeline High Dose'))
+  ) |>
+  dplyr::filter(!is.na(TRT01A))
+if (nrec_An01_05_SAF_Summ_ByTrt > 0 && nrow(df2_An01_05_SAF_Summ_ByTrt) == 0) {
+  warning('Analysis An01_05_SAF_Summ_ByTrt: no record matches a declared group of AnlsGrouping_01_Trt; check the group conditions against the data', call. = FALSE)
+}
+
 #Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Count_ByGrp
@@ -36,7 +53,7 @@ df2_An01_05_SAF_Summ_ByTrt <- df_poptot
 # Method description:     Count across groups for a categorical variable, based on subject occurrence
 
 df3_An01_05_SAF_Summ_ByTrt <- NULL
-if (nrow(df2_An01_05_SAF_Summ_ByTrt) != 0) {
+df3_An01_05_SAF_Summ_ByTrt <- tryCatch({
 in_data = df2_An01_05_SAF_Summ_ByTrt |>
     dplyr::select(USUBJID, TRT01A) |>
     unique()
@@ -47,7 +64,17 @@ df3_An01_05_SAF_Summ_ByTrt <-
   ) |>
 dplyr::filter(stat_name == 'n') |>
  dplyr::mutate(operationid = 'Mth01_CatVar_Count_ByGrp_1_n')
+df3_An01_05_SAF_Summ_ByTrt
+}, error = function(e) {
+  if (nrow(df2_An01_05_SAF_Summ_ByTrt) != 0) stop(e)
+  warning('Analysis An01_05_SAF_Summ_ByTrt: method Mth01_CatVar_Count_ByGrp failed on an empty data subset (', conditionMessage(e), '); emitting the stub row',
+          call. = FALSE)
+  NULL
+})
+if (nrow(df2_An01_05_SAF_Summ_ByTrt) == 0 && NROW(df3_An01_05_SAF_Summ_ByTrt) == 0) {
+  df3_An01_05_SAF_Summ_ByTrt <- NULL
 }
+
 
 # Link ARS identifiers ---
 df3_An01_05_SAF_Summ_ByTrt <- siera::ars_stamp(
@@ -63,6 +90,23 @@ df3_An01_05_SAF_Summ_ByTrt <- siera::ars_stamp(
 #Apply Data Subset ---
 df2_An03_01_Age_Summ_ByTrt <- df_poptot
 
+# Pre-defined groupings as ARS-ordered factors ---
+# Every declared group becomes a factor level (zero-filled by cards when no
+# record falls in it); values in no declared group are not tabulated.
+nrec_An03_01_Age_Summ_ByTrt <- nrow(df2_An03_01_Age_Summ_ByTrt)
+df2_An03_01_Age_Summ_ByTrt <- df2_An03_01_Age_Summ_ByTrt |>
+  dplyr::mutate(
+    TRT01A = factor(dplyr::case_when(
+      TRT01A == 'Placebo' ~ 'Placebo',
+      TRT01A == 'Xanomeline Low Dose' ~ 'Xanomeline Low Dose',
+      TRT01A == 'Xanomeline High Dose' ~ 'Xanomeline High Dose'
+    ), levels = c('Placebo', 'Xanomeline Low Dose', 'Xanomeline High Dose'))
+  ) |>
+  dplyr::filter(!is.na(TRT01A))
+if (nrec_An03_01_Age_Summ_ByTrt > 0 && nrow(df2_An03_01_Age_Summ_ByTrt) == 0) {
+  warning('Analysis An03_01_Age_Summ_ByTrt: no record matches a declared group of AnlsGrouping_01_Trt; check the group conditions against the data', call. = FALSE)
+}
+
 #Apply Method --- 
 
 # Method ID:              Mth02_ContVar_Summ_ByGrp
@@ -70,7 +114,7 @@ df2_An03_01_Age_Summ_ByTrt <- df_poptot
 # Method description:     Descriptive summary statistics across groups for a continuous variable
 
 df3_An03_01_Age_Summ_ByTrt <- NULL
-if (nrow(df2_An03_01_Age_Summ_ByTrt) != 0) {
+df3_An03_01_Age_Summ_ByTrt <- tryCatch({
 df3_An03_01_Age_Summ_ByTrt <-
   cards::ard_summary(
     data = df2_An03_01_Age_Summ_ByTrt,
@@ -85,7 +129,17 @@ dplyr::mutate(operationid = dplyr::case_when(stat_name == 'N' ~ 'Mth02_ContVar_S
                                                                      stat_name == 'p75' ~ 'Mth02_ContVar_Summ_ByGrp_6_Q3',
                                                                      stat_name == 'min' ~ 'Mth02_ContVar_Summ_ByGrp_7_Min',
                                                                      stat_name == 'max' ~ 'Mth02_ContVar_Summ_ByGrp_8_Max'))
+df3_An03_01_Age_Summ_ByTrt
+}, error = function(e) {
+  if (nrow(df2_An03_01_Age_Summ_ByTrt) != 0) stop(e)
+  warning('Analysis An03_01_Age_Summ_ByTrt: method Mth02_ContVar_Summ_ByGrp failed on an empty data subset (', conditionMessage(e), '); emitting the stub row',
+          call. = FALSE)
+  NULL
+})
+if (nrow(df2_An03_01_Age_Summ_ByTrt) == 0 && NROW(df3_An03_01_Age_Summ_ByTrt) == 0) {
+  df3_An03_01_Age_Summ_ByTrt <- NULL
 }
+
 
 # Link ARS identifiers ---
 df3_An03_01_Age_Summ_ByTrt <- siera::ars_stamp(
@@ -672,6 +726,23 @@ df3_An03_05_Race_Comp_ByTrt <- siera::ars_stamp(
 #Apply Data Subset ---
 df2_An03_06_Height_Summ_ByTrt <- df_poptot
 
+# Pre-defined groupings as ARS-ordered factors ---
+# Every declared group becomes a factor level (zero-filled by cards when no
+# record falls in it); values in no declared group are not tabulated.
+nrec_An03_06_Height_Summ_ByTrt <- nrow(df2_An03_06_Height_Summ_ByTrt)
+df2_An03_06_Height_Summ_ByTrt <- df2_An03_06_Height_Summ_ByTrt |>
+  dplyr::mutate(
+    TRT01A = factor(dplyr::case_when(
+      TRT01A == 'Placebo' ~ 'Placebo',
+      TRT01A == 'Xanomeline Low Dose' ~ 'Xanomeline Low Dose',
+      TRT01A == 'Xanomeline High Dose' ~ 'Xanomeline High Dose'
+    ), levels = c('Placebo', 'Xanomeline Low Dose', 'Xanomeline High Dose'))
+  ) |>
+  dplyr::filter(!is.na(TRT01A))
+if (nrec_An03_06_Height_Summ_ByTrt > 0 && nrow(df2_An03_06_Height_Summ_ByTrt) == 0) {
+  warning('Analysis An03_06_Height_Summ_ByTrt: no record matches a declared group of AnlsGrouping_01_Trt; check the group conditions against the data', call. = FALSE)
+}
+
 #Apply Method --- 
 
 # Method ID:              Mth02_ContVar_Summ_ByGrp
@@ -679,7 +750,7 @@ df2_An03_06_Height_Summ_ByTrt <- df_poptot
 # Method description:     Descriptive summary statistics across groups for a continuous variable
 
 df3_An03_06_Height_Summ_ByTrt <- NULL
-if (nrow(df2_An03_06_Height_Summ_ByTrt) != 0) {
+df3_An03_06_Height_Summ_ByTrt <- tryCatch({
 df3_An03_06_Height_Summ_ByTrt <-
   cards::ard_summary(
     data = df2_An03_06_Height_Summ_ByTrt,
@@ -694,7 +765,17 @@ dplyr::mutate(operationid = dplyr::case_when(stat_name == 'N' ~ 'Mth02_ContVar_S
                                                                      stat_name == 'p75' ~ 'Mth02_ContVar_Summ_ByGrp_6_Q3',
                                                                      stat_name == 'min' ~ 'Mth02_ContVar_Summ_ByGrp_7_Min',
                                                                      stat_name == 'max' ~ 'Mth02_ContVar_Summ_ByGrp_8_Max'))
+df3_An03_06_Height_Summ_ByTrt
+}, error = function(e) {
+  if (nrow(df2_An03_06_Height_Summ_ByTrt) != 0) stop(e)
+  warning('Analysis An03_06_Height_Summ_ByTrt: method Mth02_ContVar_Summ_ByGrp failed on an empty data subset (', conditionMessage(e), '); emitting the stub row',
+          call. = FALSE)
+  NULL
+})
+if (nrow(df2_An03_06_Height_Summ_ByTrt) == 0 && NROW(df3_An03_06_Height_Summ_ByTrt) == 0) {
+  df3_An03_06_Height_Summ_ByTrt <- NULL
 }
+
 
 # Link ARS identifiers ---
 df3_An03_06_Height_Summ_ByTrt <- siera::ars_stamp(

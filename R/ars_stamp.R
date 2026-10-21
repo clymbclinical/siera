@@ -238,19 +238,33 @@ ars_stamp <- function(ard,
   group_id_col <- paste0("group", k, "_groupId")
   group_value_col <- paste0("group", k, "_groupValue")
 
+  level <- .level_labels(level)
+
   if (isTRUE(grouping$data_driven)) {
     cols[[group_id_col]] <- NA_character_
-    cols[[group_value_col]] <- as.character(level)
+    cols[[group_value_col]] <- level
   } else if (length(grouping$groups) == 0L) {
     cols[[group_id_col]] <- NA_character_
   } else {
     # match() returns the first hit, i.e. the first defined group wins,
     # and unmatched levels become NA_character_.
     cols[[group_id_col]] <- names(grouping$groups)[
-      match(as.character(level), unname(grouping$groups))
+      match(level, unname(grouping$groups))
     ]
   }
   cols
+}
+
+# A group<n>_level column as character labels. {cards} returns the levels as a
+# list-column whose elements keep the type of the data: as.character() on such a
+# list turns a factor element into its integer CODE, so a grouping held as a
+# factor (e.g. siera's declared-group factors, #203) would be matched on "1",
+# "2", ... instead of its labels. Flattening element-wise keeps the label.
+.level_labels <- function(level) {
+  if (!is.list(level)) return(as.character(level))
+  vapply(level, function(v) {
+    if (is.null(v) || length(v) == 0L) NA_character_ else as.character(v)[1]
+  }, character(1L))
 }
 
 # Abort unless `x` is a single, non-missing, non-empty string.
