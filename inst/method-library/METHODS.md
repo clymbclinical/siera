@@ -124,7 +124,9 @@ denom_dataset = df2_denomanaidhere |>
 
 in_data = df2_analysisidhere |>
     dplyr::distinct(distinctlisthere) |>
-    dplyr::mutate(dummy = 'dummyvar')
+    # a factor, so cards can also tabulate it when no subject qualifies and
+    # report every declared group as a zero row (#203)
+    dplyr::mutate(dummy = factor('dummyvar'))
 
 dataDriven = isdatadrivenhere
 if(dataDriven == TRUE){

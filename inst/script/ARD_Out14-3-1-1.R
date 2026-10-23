@@ -1,7 +1,7 @@
 
 # Programme:    Generate code to produce ARD for Out14-3-1-1
 # Output:       Overall Summary of Treatment-Emergent Adverse Events
-# Date created: 2026-10-08 14:26:02
+# Date created: 2026-10-21 22:05:23
 
   # load libraries ----
     library(dplyr)
@@ -39,6 +39,23 @@ df_poptot = dplyr::filter(ADSL,
 #Apply Data Subset ---
 df2_An01_05_SAF_Summ_ByTrt <- df_poptot
 
+# Pre-defined groupings as ARS-ordered factors ---
+# Every declared group becomes a factor level (zero-filled by cards when no
+# record falls in it); values in no declared group are not tabulated.
+nrec_An01_05_SAF_Summ_ByTrt <- nrow(df2_An01_05_SAF_Summ_ByTrt)
+df2_An01_05_SAF_Summ_ByTrt <- df2_An01_05_SAF_Summ_ByTrt |>
+  dplyr::mutate(
+    TRT01A = factor(dplyr::case_when(
+      TRT01A == 'Placebo' ~ 'Placebo',
+      TRT01A == 'Xanomeline Low Dose' ~ 'Xanomeline Low Dose',
+      TRT01A == 'Xanomeline High Dose' ~ 'Xanomeline High Dose'
+    ), levels = c('Placebo', 'Xanomeline Low Dose', 'Xanomeline High Dose'))
+  ) |>
+  dplyr::filter(!is.na(TRT01A))
+if (nrec_An01_05_SAF_Summ_ByTrt > 0 && nrow(df2_An01_05_SAF_Summ_ByTrt) == 0) {
+  warning('Analysis An01_05_SAF_Summ_ByTrt: no record matches a declared group of AnlsGrouping_01_Trt; check the group conditions against the data', call. = FALSE)
+}
+
 #Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Count_ByGrp
@@ -46,7 +63,7 @@ df2_An01_05_SAF_Summ_ByTrt <- df_poptot
 # Method description:     Count across groups for a categorical variable, based on subject occurrence
 
 df3_An01_05_SAF_Summ_ByTrt <- NULL
-if (nrow(df2_An01_05_SAF_Summ_ByTrt) != 0) {
+df3_An01_05_SAF_Summ_ByTrt <- tryCatch({
 in_data = df2_An01_05_SAF_Summ_ByTrt |>
     dplyr::select(USUBJID, TRT01A) |>
     unique()
@@ -57,7 +74,17 @@ df3_An01_05_SAF_Summ_ByTrt <-
   ) |>
 dplyr::filter(stat_name == 'n') |>
  dplyr::mutate(operationid = 'Mth01_CatVar_Count_ByGrp_1_n')
+df3_An01_05_SAF_Summ_ByTrt
+}, error = function(e) {
+  if (nrow(df2_An01_05_SAF_Summ_ByTrt) != 0) stop(e)
+  warning('Analysis An01_05_SAF_Summ_ByTrt: method Mth01_CatVar_Count_ByGrp failed on an empty data subset (', conditionMessage(e), '); emitting the stub row',
+          call. = FALSE)
+  NULL
+})
+if (nrow(df2_An01_05_SAF_Summ_ByTrt) == 0 && NROW(df3_An01_05_SAF_Summ_ByTrt) == 0) {
+  df3_An01_05_SAF_Summ_ByTrt <- NULL
 }
+
 
 # Link ARS identifiers ---
 df3_An01_05_SAF_Summ_ByTrt <- siera::ars_stamp(
@@ -73,6 +100,24 @@ df3_An01_05_SAF_Summ_ByTrt <- siera::ars_stamp(
 # Data subset: Treatment-Emergent Adverse Events
 df2_An07_01_TEAE_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y')
+
+# Pre-defined groupings as ARS-ordered factors ---
+# Every declared group becomes a factor level (zero-filled by cards when no
+# record falls in it); values in no declared group are not tabulated.
+nrec_An07_01_TEAE_Summ_ByTrt <- nrow(df2_An07_01_TEAE_Summ_ByTrt)
+df2_An07_01_TEAE_Summ_ByTrt <- df2_An07_01_TEAE_Summ_ByTrt |>
+  dplyr::mutate(
+    TRT01A = factor(dplyr::case_when(
+      TRT01A == 'Placebo' ~ 'Placebo',
+      TRT01A == 'Xanomeline Low Dose' ~ 'Xanomeline Low Dose',
+      TRT01A == 'Xanomeline High Dose' ~ 'Xanomeline High Dose'
+    ), levels = c('Placebo', 'Xanomeline Low Dose', 'Xanomeline High Dose'))
+  ) |>
+  dplyr::filter(!is.na(TRT01A))
+if (nrec_An07_01_TEAE_Summ_ByTrt > 0 && nrow(df2_An07_01_TEAE_Summ_ByTrt) == 0) {
+  warning('Analysis An07_01_TEAE_Summ_ByTrt: no record matches a declared group of AnlsGrouping_01_Trt; check the group conditions against the data', call. = FALSE)
+}
+
 #Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
@@ -80,13 +125,15 @@ df2_An07_01_TEAE_Summ_ByTrt <- df_pop |>
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
 df3_An07_01_TEAE_Summ_ByTrt <- NULL
-if (nrow(df2_An07_01_TEAE_Summ_ByTrt) != 0) {
+df3_An07_01_TEAE_Summ_ByTrt <- tryCatch({
 denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_01_TEAE_Summ_ByTrt |>
     dplyr::distinct(TRT01A, USUBJID) |>
-    dplyr::mutate(dummy = 'dummyvar')
+    # a factor, so cards can also tabulate it when no subject qualifies and
+    # report every declared group as a zero row (#203)
+    dplyr::mutate(dummy = factor('dummyvar'))
 
 dataDriven = FALSE
 if(dataDriven == TRUE){
@@ -112,7 +159,17 @@ df3_An07_01_TEAE_Summ_ByTrt <- df3_An07_01_TEAE_Summ_ByTrt|>
                 variable_level = list(NULL),
                 operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
                                                stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+df3_An07_01_TEAE_Summ_ByTrt
+}, error = function(e) {
+  if (nrow(df2_An07_01_TEAE_Summ_ByTrt) != 0) stop(e)
+  warning('Analysis An07_01_TEAE_Summ_ByTrt: method Mth01_CatVar_Summ_ByGrp failed on an empty data subset (', conditionMessage(e), '); emitting the stub row',
+          call. = FALSE)
+  NULL
+})
+if (nrow(df2_An07_01_TEAE_Summ_ByTrt) == 0 && NROW(df3_An07_01_TEAE_Summ_ByTrt) == 0) {
+  df3_An07_01_TEAE_Summ_ByTrt <- NULL
 }
+
 
 # Link ARS identifiers ---
 df3_An07_01_TEAE_Summ_ByTrt <- siera::ars_stamp(
@@ -134,6 +191,24 @@ df3_An07_01_TEAE_Summ_ByTrt <- siera::ars_stamp(
 # Data subset: Related Treatment-Emergent Adverse Events
 df2_An07_02_RelTEAE_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y' & AEREL %in% c('POSSIBLE', 'PROBABLE'))
+
+# Pre-defined groupings as ARS-ordered factors ---
+# Every declared group becomes a factor level (zero-filled by cards when no
+# record falls in it); values in no declared group are not tabulated.
+nrec_An07_02_RelTEAE_Summ_ByTrt <- nrow(df2_An07_02_RelTEAE_Summ_ByTrt)
+df2_An07_02_RelTEAE_Summ_ByTrt <- df2_An07_02_RelTEAE_Summ_ByTrt |>
+  dplyr::mutate(
+    TRT01A = factor(dplyr::case_when(
+      TRT01A == 'Placebo' ~ 'Placebo',
+      TRT01A == 'Xanomeline Low Dose' ~ 'Xanomeline Low Dose',
+      TRT01A == 'Xanomeline High Dose' ~ 'Xanomeline High Dose'
+    ), levels = c('Placebo', 'Xanomeline Low Dose', 'Xanomeline High Dose'))
+  ) |>
+  dplyr::filter(!is.na(TRT01A))
+if (nrec_An07_02_RelTEAE_Summ_ByTrt > 0 && nrow(df2_An07_02_RelTEAE_Summ_ByTrt) == 0) {
+  warning('Analysis An07_02_RelTEAE_Summ_ByTrt: no record matches a declared group of AnlsGrouping_01_Trt; check the group conditions against the data', call. = FALSE)
+}
+
 #Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
@@ -141,13 +216,15 @@ df2_An07_02_RelTEAE_Summ_ByTrt <- df_pop |>
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
 df3_An07_02_RelTEAE_Summ_ByTrt <- NULL
-if (nrow(df2_An07_02_RelTEAE_Summ_ByTrt) != 0) {
+df3_An07_02_RelTEAE_Summ_ByTrt <- tryCatch({
 denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_02_RelTEAE_Summ_ByTrt |>
     dplyr::distinct(TRT01A, USUBJID) |>
-    dplyr::mutate(dummy = 'dummyvar')
+    # a factor, so cards can also tabulate it when no subject qualifies and
+    # report every declared group as a zero row (#203)
+    dplyr::mutate(dummy = factor('dummyvar'))
 
 dataDriven = FALSE
 if(dataDriven == TRUE){
@@ -173,7 +250,17 @@ df3_An07_02_RelTEAE_Summ_ByTrt <- df3_An07_02_RelTEAE_Summ_ByTrt|>
                 variable_level = list(NULL),
                 operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
                                                stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+df3_An07_02_RelTEAE_Summ_ByTrt
+}, error = function(e) {
+  if (nrow(df2_An07_02_RelTEAE_Summ_ByTrt) != 0) stop(e)
+  warning('Analysis An07_02_RelTEAE_Summ_ByTrt: method Mth01_CatVar_Summ_ByGrp failed on an empty data subset (', conditionMessage(e), '); emitting the stub row',
+          call. = FALSE)
+  NULL
+})
+if (nrow(df2_An07_02_RelTEAE_Summ_ByTrt) == 0 && NROW(df3_An07_02_RelTEAE_Summ_ByTrt) == 0) {
+  df3_An07_02_RelTEAE_Summ_ByTrt <- NULL
 }
+
 
 # Link ARS identifiers ---
 df3_An07_02_RelTEAE_Summ_ByTrt <- siera::ars_stamp(
@@ -195,6 +282,24 @@ df3_An07_02_RelTEAE_Summ_ByTrt <- siera::ars_stamp(
 # Data subset: Serious Treatment-Emergent Adverse Events
 df2_An07_03_SerTEAE_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y' & AESER == 'Y')
+
+# Pre-defined groupings as ARS-ordered factors ---
+# Every declared group becomes a factor level (zero-filled by cards when no
+# record falls in it); values in no declared group are not tabulated.
+nrec_An07_03_SerTEAE_Summ_ByTrt <- nrow(df2_An07_03_SerTEAE_Summ_ByTrt)
+df2_An07_03_SerTEAE_Summ_ByTrt <- df2_An07_03_SerTEAE_Summ_ByTrt |>
+  dplyr::mutate(
+    TRT01A = factor(dplyr::case_when(
+      TRT01A == 'Placebo' ~ 'Placebo',
+      TRT01A == 'Xanomeline Low Dose' ~ 'Xanomeline Low Dose',
+      TRT01A == 'Xanomeline High Dose' ~ 'Xanomeline High Dose'
+    ), levels = c('Placebo', 'Xanomeline Low Dose', 'Xanomeline High Dose'))
+  ) |>
+  dplyr::filter(!is.na(TRT01A))
+if (nrec_An07_03_SerTEAE_Summ_ByTrt > 0 && nrow(df2_An07_03_SerTEAE_Summ_ByTrt) == 0) {
+  warning('Analysis An07_03_SerTEAE_Summ_ByTrt: no record matches a declared group of AnlsGrouping_01_Trt; check the group conditions against the data', call. = FALSE)
+}
+
 #Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
@@ -202,13 +307,15 @@ df2_An07_03_SerTEAE_Summ_ByTrt <- df_pop |>
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
 df3_An07_03_SerTEAE_Summ_ByTrt <- NULL
-if (nrow(df2_An07_03_SerTEAE_Summ_ByTrt) != 0) {
+df3_An07_03_SerTEAE_Summ_ByTrt <- tryCatch({
 denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_03_SerTEAE_Summ_ByTrt |>
     dplyr::distinct(TRT01A, USUBJID) |>
-    dplyr::mutate(dummy = 'dummyvar')
+    # a factor, so cards can also tabulate it when no subject qualifies and
+    # report every declared group as a zero row (#203)
+    dplyr::mutate(dummy = factor('dummyvar'))
 
 dataDriven = FALSE
 if(dataDriven == TRUE){
@@ -234,7 +341,17 @@ df3_An07_03_SerTEAE_Summ_ByTrt <- df3_An07_03_SerTEAE_Summ_ByTrt|>
                 variable_level = list(NULL),
                 operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
                                                stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+df3_An07_03_SerTEAE_Summ_ByTrt
+}, error = function(e) {
+  if (nrow(df2_An07_03_SerTEAE_Summ_ByTrt) != 0) stop(e)
+  warning('Analysis An07_03_SerTEAE_Summ_ByTrt: method Mth01_CatVar_Summ_ByGrp failed on an empty data subset (', conditionMessage(e), '); emitting the stub row',
+          call. = FALSE)
+  NULL
+})
+if (nrow(df2_An07_03_SerTEAE_Summ_ByTrt) == 0 && NROW(df3_An07_03_SerTEAE_Summ_ByTrt) == 0) {
+  df3_An07_03_SerTEAE_Summ_ByTrt <- NULL
 }
+
 
 # Link ARS identifiers ---
 df3_An07_03_SerTEAE_Summ_ByTrt <- siera::ars_stamp(
@@ -256,6 +373,24 @@ df3_An07_03_SerTEAE_Summ_ByTrt <- siera::ars_stamp(
 # Data subset: Related Serious Treatment-Emergent Adverse Events
 df2_An07_04_RelSerTEAE_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y' & AEREL %in% c('POSSIBLE', 'PROBABLE') & AESER == 'Y')
+
+# Pre-defined groupings as ARS-ordered factors ---
+# Every declared group becomes a factor level (zero-filled by cards when no
+# record falls in it); values in no declared group are not tabulated.
+nrec_An07_04_RelSerTEAE_Summ_ByTrt <- nrow(df2_An07_04_RelSerTEAE_Summ_ByTrt)
+df2_An07_04_RelSerTEAE_Summ_ByTrt <- df2_An07_04_RelSerTEAE_Summ_ByTrt |>
+  dplyr::mutate(
+    TRT01A = factor(dplyr::case_when(
+      TRT01A == 'Placebo' ~ 'Placebo',
+      TRT01A == 'Xanomeline Low Dose' ~ 'Xanomeline Low Dose',
+      TRT01A == 'Xanomeline High Dose' ~ 'Xanomeline High Dose'
+    ), levels = c('Placebo', 'Xanomeline Low Dose', 'Xanomeline High Dose'))
+  ) |>
+  dplyr::filter(!is.na(TRT01A))
+if (nrec_An07_04_RelSerTEAE_Summ_ByTrt > 0 && nrow(df2_An07_04_RelSerTEAE_Summ_ByTrt) == 0) {
+  warning('Analysis An07_04_RelSerTEAE_Summ_ByTrt: no record matches a declared group of AnlsGrouping_01_Trt; check the group conditions against the data', call. = FALSE)
+}
+
 #Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
@@ -263,13 +398,15 @@ df2_An07_04_RelSerTEAE_Summ_ByTrt <- df_pop |>
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
 df3_An07_04_RelSerTEAE_Summ_ByTrt <- NULL
-if (nrow(df2_An07_04_RelSerTEAE_Summ_ByTrt) != 0) {
+df3_An07_04_RelSerTEAE_Summ_ByTrt <- tryCatch({
 denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_04_RelSerTEAE_Summ_ByTrt |>
     dplyr::distinct(TRT01A, USUBJID) |>
-    dplyr::mutate(dummy = 'dummyvar')
+    # a factor, so cards can also tabulate it when no subject qualifies and
+    # report every declared group as a zero row (#203)
+    dplyr::mutate(dummy = factor('dummyvar'))
 
 dataDriven = FALSE
 if(dataDriven == TRUE){
@@ -295,7 +432,17 @@ df3_An07_04_RelSerTEAE_Summ_ByTrt <- df3_An07_04_RelSerTEAE_Summ_ByTrt|>
                 variable_level = list(NULL),
                 operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
                                                stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+df3_An07_04_RelSerTEAE_Summ_ByTrt
+}, error = function(e) {
+  if (nrow(df2_An07_04_RelSerTEAE_Summ_ByTrt) != 0) stop(e)
+  warning('Analysis An07_04_RelSerTEAE_Summ_ByTrt: method Mth01_CatVar_Summ_ByGrp failed on an empty data subset (', conditionMessage(e), '); emitting the stub row',
+          call. = FALSE)
+  NULL
+})
+if (nrow(df2_An07_04_RelSerTEAE_Summ_ByTrt) == 0 && NROW(df3_An07_04_RelSerTEAE_Summ_ByTrt) == 0) {
+  df3_An07_04_RelSerTEAE_Summ_ByTrt <- NULL
 }
+
 
 # Link ARS identifiers ---
 df3_An07_04_RelSerTEAE_Summ_ByTrt <- siera::ars_stamp(
@@ -317,6 +464,24 @@ df3_An07_04_RelSerTEAE_Summ_ByTrt <- siera::ars_stamp(
 # Data subset: Treatment-Emergent Adverse Events Leading to Death
 df2_An07_05_TEAELd2Dth_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y' & AESDTH == 'Y')
+
+# Pre-defined groupings as ARS-ordered factors ---
+# Every declared group becomes a factor level (zero-filled by cards when no
+# record falls in it); values in no declared group are not tabulated.
+nrec_An07_05_TEAELd2Dth_Summ_ByTrt <- nrow(df2_An07_05_TEAELd2Dth_Summ_ByTrt)
+df2_An07_05_TEAELd2Dth_Summ_ByTrt <- df2_An07_05_TEAELd2Dth_Summ_ByTrt |>
+  dplyr::mutate(
+    TRT01A = factor(dplyr::case_when(
+      TRT01A == 'Placebo' ~ 'Placebo',
+      TRT01A == 'Xanomeline Low Dose' ~ 'Xanomeline Low Dose',
+      TRT01A == 'Xanomeline High Dose' ~ 'Xanomeline High Dose'
+    ), levels = c('Placebo', 'Xanomeline Low Dose', 'Xanomeline High Dose'))
+  ) |>
+  dplyr::filter(!is.na(TRT01A))
+if (nrec_An07_05_TEAELd2Dth_Summ_ByTrt > 0 && nrow(df2_An07_05_TEAELd2Dth_Summ_ByTrt) == 0) {
+  warning('Analysis An07_05_TEAELd2Dth_Summ_ByTrt: no record matches a declared group of AnlsGrouping_01_Trt; check the group conditions against the data', call. = FALSE)
+}
+
 #Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
@@ -324,13 +489,15 @@ df2_An07_05_TEAELd2Dth_Summ_ByTrt <- df_pop |>
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
 df3_An07_05_TEAELd2Dth_Summ_ByTrt <- NULL
-if (nrow(df2_An07_05_TEAELd2Dth_Summ_ByTrt) != 0) {
+df3_An07_05_TEAELd2Dth_Summ_ByTrt <- tryCatch({
 denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_05_TEAELd2Dth_Summ_ByTrt |>
     dplyr::distinct(TRT01A, USUBJID) |>
-    dplyr::mutate(dummy = 'dummyvar')
+    # a factor, so cards can also tabulate it when no subject qualifies and
+    # report every declared group as a zero row (#203)
+    dplyr::mutate(dummy = factor('dummyvar'))
 
 dataDriven = FALSE
 if(dataDriven == TRUE){
@@ -356,7 +523,17 @@ df3_An07_05_TEAELd2Dth_Summ_ByTrt <- df3_An07_05_TEAELd2Dth_Summ_ByTrt|>
                 variable_level = list(NULL),
                 operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
                                                stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+df3_An07_05_TEAELd2Dth_Summ_ByTrt
+}, error = function(e) {
+  if (nrow(df2_An07_05_TEAELd2Dth_Summ_ByTrt) != 0) stop(e)
+  warning('Analysis An07_05_TEAELd2Dth_Summ_ByTrt: method Mth01_CatVar_Summ_ByGrp failed on an empty data subset (', conditionMessage(e), '); emitting the stub row',
+          call. = FALSE)
+  NULL
+})
+if (nrow(df2_An07_05_TEAELd2Dth_Summ_ByTrt) == 0 && NROW(df3_An07_05_TEAELd2Dth_Summ_ByTrt) == 0) {
+  df3_An07_05_TEAELd2Dth_Summ_ByTrt <- NULL
 }
+
 
 # Link ARS identifiers ---
 df3_An07_05_TEAELd2Dth_Summ_ByTrt <- siera::ars_stamp(
@@ -378,6 +555,24 @@ df3_An07_05_TEAELd2Dth_Summ_ByTrt <- siera::ars_stamp(
 # Data subset: Related Treatment-Emergent Adverse Events Leading to Death
 df2_An07_06_RelTEAELd2Dth_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y' & AESDTH == 'Y', AEREL == 'POSSIBLE' | AEREL == 'PROBABLE')
+
+# Pre-defined groupings as ARS-ordered factors ---
+# Every declared group becomes a factor level (zero-filled by cards when no
+# record falls in it); values in no declared group are not tabulated.
+nrec_An07_06_RelTEAELd2Dth_Summ_ByTrt <- nrow(df2_An07_06_RelTEAELd2Dth_Summ_ByTrt)
+df2_An07_06_RelTEAELd2Dth_Summ_ByTrt <- df2_An07_06_RelTEAELd2Dth_Summ_ByTrt |>
+  dplyr::mutate(
+    TRT01A = factor(dplyr::case_when(
+      TRT01A == 'Placebo' ~ 'Placebo',
+      TRT01A == 'Xanomeline Low Dose' ~ 'Xanomeline Low Dose',
+      TRT01A == 'Xanomeline High Dose' ~ 'Xanomeline High Dose'
+    ), levels = c('Placebo', 'Xanomeline Low Dose', 'Xanomeline High Dose'))
+  ) |>
+  dplyr::filter(!is.na(TRT01A))
+if (nrec_An07_06_RelTEAELd2Dth_Summ_ByTrt > 0 && nrow(df2_An07_06_RelTEAELd2Dth_Summ_ByTrt) == 0) {
+  warning('Analysis An07_06_RelTEAELd2Dth_Summ_ByTrt: no record matches a declared group of AnlsGrouping_01_Trt; check the group conditions against the data', call. = FALSE)
+}
+
 #Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
@@ -385,13 +580,15 @@ df2_An07_06_RelTEAELd2Dth_Summ_ByTrt <- df_pop |>
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
 df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- NULL
-if (nrow(df2_An07_06_RelTEAELd2Dth_Summ_ByTrt) != 0) {
+df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- tryCatch({
 denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_06_RelTEAELd2Dth_Summ_ByTrt |>
     dplyr::distinct(TRT01A, USUBJID) |>
-    dplyr::mutate(dummy = 'dummyvar')
+    # a factor, so cards can also tabulate it when no subject qualifies and
+    # report every declared group as a zero row (#203)
+    dplyr::mutate(dummy = factor('dummyvar'))
 
 dataDriven = FALSE
 if(dataDriven == TRUE){
@@ -417,7 +614,17 @@ df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- df3_An07_06_RelTEAELd2Dth_Summ_ByTrt|>
                 variable_level = list(NULL),
                 operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
                                                stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+df3_An07_06_RelTEAELd2Dth_Summ_ByTrt
+}, error = function(e) {
+  if (nrow(df2_An07_06_RelTEAELd2Dth_Summ_ByTrt) != 0) stop(e)
+  warning('Analysis An07_06_RelTEAELd2Dth_Summ_ByTrt: method Mth01_CatVar_Summ_ByGrp failed on an empty data subset (', conditionMessage(e), '); emitting the stub row',
+          call. = FALSE)
+  NULL
+})
+if (nrow(df2_An07_06_RelTEAELd2Dth_Summ_ByTrt) == 0 && NROW(df3_An07_06_RelTEAELd2Dth_Summ_ByTrt) == 0) {
+  df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- NULL
 }
+
 
 # Link ARS identifiers ---
 df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- siera::ars_stamp(
@@ -439,6 +646,24 @@ df3_An07_06_RelTEAELd2Dth_Summ_ByTrt <- siera::ars_stamp(
 # Data subset: Treatment-Emergent Adverse Events Leading to Dose Modification
 df2_An07_07_TEAELd2DoseMod_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y' & AEACN %in% c('DOSE REDUCED', 'DRUG INTERRUPTED'))
+
+# Pre-defined groupings as ARS-ordered factors ---
+# Every declared group becomes a factor level (zero-filled by cards when no
+# record falls in it); values in no declared group are not tabulated.
+nrec_An07_07_TEAELd2DoseMod_Summ_ByTrt <- nrow(df2_An07_07_TEAELd2DoseMod_Summ_ByTrt)
+df2_An07_07_TEAELd2DoseMod_Summ_ByTrt <- df2_An07_07_TEAELd2DoseMod_Summ_ByTrt |>
+  dplyr::mutate(
+    TRT01A = factor(dplyr::case_when(
+      TRT01A == 'Placebo' ~ 'Placebo',
+      TRT01A == 'Xanomeline Low Dose' ~ 'Xanomeline Low Dose',
+      TRT01A == 'Xanomeline High Dose' ~ 'Xanomeline High Dose'
+    ), levels = c('Placebo', 'Xanomeline Low Dose', 'Xanomeline High Dose'))
+  ) |>
+  dplyr::filter(!is.na(TRT01A))
+if (nrec_An07_07_TEAELd2DoseMod_Summ_ByTrt > 0 && nrow(df2_An07_07_TEAELd2DoseMod_Summ_ByTrt) == 0) {
+  warning('Analysis An07_07_TEAELd2DoseMod_Summ_ByTrt: no record matches a declared group of AnlsGrouping_01_Trt; check the group conditions against the data', call. = FALSE)
+}
+
 #Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
@@ -446,13 +671,15 @@ df2_An07_07_TEAELd2DoseMod_Summ_ByTrt <- df_pop |>
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
 df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <- NULL
-if (nrow(df2_An07_07_TEAELd2DoseMod_Summ_ByTrt) != 0) {
+df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <- tryCatch({
 denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_07_TEAELd2DoseMod_Summ_ByTrt |>
     dplyr::distinct(TRT01A, USUBJID) |>
-    dplyr::mutate(dummy = 'dummyvar')
+    # a factor, so cards can also tabulate it when no subject qualifies and
+    # report every declared group as a zero row (#203)
+    dplyr::mutate(dummy = factor('dummyvar'))
 
 dataDriven = FALSE
 if(dataDriven == TRUE){
@@ -478,7 +705,17 @@ df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <- df3_An07_07_TEAELd2DoseMod_Summ_ByTrt|>
                 variable_level = list(NULL),
                 operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
                                                stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+df3_An07_07_TEAELd2DoseMod_Summ_ByTrt
+}, error = function(e) {
+  if (nrow(df2_An07_07_TEAELd2DoseMod_Summ_ByTrt) != 0) stop(e)
+  warning('Analysis An07_07_TEAELd2DoseMod_Summ_ByTrt: method Mth01_CatVar_Summ_ByGrp failed on an empty data subset (', conditionMessage(e), '); emitting the stub row',
+          call. = FALSE)
+  NULL
+})
+if (nrow(df2_An07_07_TEAELd2DoseMod_Summ_ByTrt) == 0 && NROW(df3_An07_07_TEAELd2DoseMod_Summ_ByTrt) == 0) {
+  df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <- NULL
 }
+
 
 # Link ARS identifiers ---
 df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <- siera::ars_stamp(
@@ -500,6 +737,24 @@ df3_An07_07_TEAELd2DoseMod_Summ_ByTrt <- siera::ars_stamp(
 # Data subset: Treatment-Emergent Adverse Events Leading to Treatment Discontinuation
 df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- df_pop |>
         dplyr::filter(TRTEMFL == 'Y' & AEACN == 'DRUG WITHDRAWN')
+
+# Pre-defined groupings as ARS-ordered factors ---
+# Every declared group becomes a factor level (zero-filled by cards when no
+# record falls in it); values in no declared group are not tabulated.
+nrec_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- nrow(df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt)
+df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt |>
+  dplyr::mutate(
+    TRT01A = factor(dplyr::case_when(
+      TRT01A == 'Placebo' ~ 'Placebo',
+      TRT01A == 'Xanomeline Low Dose' ~ 'Xanomeline Low Dose',
+      TRT01A == 'Xanomeline High Dose' ~ 'Xanomeline High Dose'
+    ), levels = c('Placebo', 'Xanomeline Low Dose', 'Xanomeline High Dose'))
+  ) |>
+  dplyr::filter(!is.na(TRT01A))
+if (nrec_An07_08_TEAELd2TrtDsc_Summ_ByTrt > 0 && nrow(df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt) == 0) {
+  warning('Analysis An07_08_TEAELd2TrtDsc_Summ_ByTrt: no record matches a declared group of AnlsGrouping_01_Trt; check the group conditions against the data', call. = FALSE)
+}
+
 #Apply Method --- 
 
 # Method ID:              Mth01_CatVar_Summ_ByGrp
@@ -507,13 +762,15 @@ df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- df_pop |>
 # Method description:     Descriptive summary statistics across groups for a categorical variable, based on subject occurrence
 
 df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- NULL
-if (nrow(df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt) != 0) {
+df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- tryCatch({
 denom_dataset = df2_An01_05_SAF_Summ_ByTrt |>
   dplyr::select(TRT01A)
 
 in_data = df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt |>
     dplyr::distinct(TRT01A, USUBJID) |>
-    dplyr::mutate(dummy = 'dummyvar')
+    # a factor, so cards can also tabulate it when no subject qualifies and
+    # report every declared group as a zero row (#203)
+    dplyr::mutate(dummy = factor('dummyvar'))
 
 dataDriven = FALSE
 if(dataDriven == TRUE){
@@ -539,7 +796,17 @@ df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt|>
                 variable_level = list(NULL),
                 operationid = dplyr::case_when(stat_name == 'n' ~ 'Mth01_CatVar_Summ_ByGrp_1_n',
                                                stat_name == 'p' ~ 'Mth01_CatVar_Summ_ByGrp_2_pct'))
+df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt
+}, error = function(e) {
+  if (nrow(df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt) != 0) stop(e)
+  warning('Analysis An07_08_TEAELd2TrtDsc_Summ_ByTrt: method Mth01_CatVar_Summ_ByGrp failed on an empty data subset (', conditionMessage(e), '); emitting the stub row',
+          call. = FALSE)
+  NULL
+})
+if (nrow(df2_An07_08_TEAELd2TrtDsc_Summ_ByTrt) == 0 && NROW(df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt) == 0) {
+  df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- NULL
 }
+
 
 # Link ARS identifiers ---
 df3_An07_08_TEAELd2TrtDsc_Summ_ByTrt <- siera::ars_stamp(

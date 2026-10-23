@@ -13,7 +13,8 @@
   output_id,
   value_sources = list(),
   code_style = c("expanded", "wrapped"),
-  population_frame = "df_poptot"
+  population_frame = "df_poptot",
+  always_compute = FALSE
 )
 }
 \arguments{
@@ -48,6 +49,12 @@ analysis' own analysis set. Method templates refer to the population as
 `df_poptot`; when an output uses more than one analysis set the frames are
 suffixed (e.g. `df_poptot__AnalysisSet_07`, #197) and the template's
 `df_poptot` is rewritten to this name.}
+
+\item{always_compute}{`TRUE` when one of the analysis' groupings is a
+declared-group factor (#203): the method then also runs on an empty data
+subset, so the declared groups are reported as zero rows. If the method
+cannot compute on 0 rows (it errors, or returns no rows), the analysis
+falls back to the statistics-free stub row, as it would with the guard.}
 }
 \value{
 Character vector with formatted numbers.

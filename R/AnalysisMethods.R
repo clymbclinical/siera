@@ -24,6 +24,11 @@
 #'   `df_poptot`; when an output uses more than one analysis set the frames are
 #'   suffixed (e.g. `df_poptot__AnalysisSet_07`, #197) and the template's
 #'   `df_poptot` is rewritten to this name.
+#' @param always_compute `TRUE` when one of the analysis' groupings is a
+#'   declared-group factor (#203): the method then also runs on an empty data
+#'   subset, so the declared groups are reported as zero rows. If the method
+#'   cannot compute on 0 rows (it errors, or returns no rows), the analysis
+#'   falls back to the statistics-free stub row, as it would with the guard.
 
 #' @return Character vector with formatted numbers.
 #' @keywords internal
@@ -36,7 +41,8 @@
                                               output_id,
                                               value_sources = list(),
                                               code_style = c("expanded", "wrapped"),
-                                              population_frame = "df_poptot") {
+                                              population_frame = "df_poptot",
+                                              always_compute = FALSE) {
   code_style <- match.arg(code_style)
 
   if (is.null(method_id) || length(method_id) == 0 || is.na(method_id) || identical(method_id, "")) {
@@ -119,10 +125,38 @@
       parameter_valueSource != ""
     )
 
+  # With always_compute the method runs whatever the subset size, so declared
+  # groups are zero-filled even when no record qualifies (#203). Some templates
+  # cannot compute on 0 rows (e.g. {cards} refuses to tabulate an all-missing
+  # character column): with an empty subset such a failure, or an empty result,
+  # falls back to df3 = NULL, i.e. the stub row. The swallowed error is
+  # re-signalled as a warning so a defective template (a missing package, a
+  # typo, an unresolved denominator) stays visible instead of passing as a
+  # stub. With data, errors propagate.
+  always_compute <- isTRUE(always_compute) && !population_based
+  if (always_compute) {
+    template_code <- paste0(
+      "df3_analysisidhere <- NULL\n",
+      "df3_analysisidhere <- tryCatch({\n",
+      template_code,
+      "\ndf3_analysisidhere\n",
+      "}, error = function(e) {\n",
+      "  if (nrow(df2_analysisidhere) != 0) stop(e)\n",
+      "  warning('Analysis analysisidhere: method methodidhere failed on an ",
+      "empty data subset (', conditionMessage(e), '); emitting the stub row',\n",
+      "          call. = FALSE)\n",
+      "  NULL\n",
+      "})\n",
+      "if (nrow(df2_analysisidhere) == 0 && NROW(df3_analysisidhere) == 0) {\n",
+      "  df3_analysisidhere <- NULL\n",
+      "}\n"
+    )
+  }
+
   anmetcode_temp <- if (code_style == "wrapped") {
     # df3 stays NULL when the data subset is empty; ars_stamp() turns that into
     # the statistics-free stub row. Population-based methods always compute.
-    if (population_based) {
+    if (population_based || always_compute) {
       paste0(template_code, "\n")
     } else {
       paste0(
@@ -132,7 +166,7 @@
         "\n}\n"
       )
     }
-  } else if (population_based) {
+  } else if (population_based || always_compute) {
     template_code
   } else {
     paste0(
@@ -190,11 +224,20 @@
       code = paste0(code_method_tmp_1, "\n", anmetcode_final),
       operations = operations_named,
       method = method,
-      population_based = population_based
+      population_based = population_based,
+      always_compute = always_compute
     ))
   }
 
-  template <- if (population_based) {
+  template <- if (always_compute) {
+    # df3 is NULL when the method could not compute on an empty subset.
+    "\nif(!is.null(df3_analysisidhere)){\ndf3_analysisidhere <- df3_analysisidhere |>
+        dplyr::mutate(AnalysisId = 'analysisidhere',
+               MethodId = 'methodidhere',
+               OutputId = 'outputidhere')\n} else {\n    df3_analysisidhere = data.frame(AnalysisId = 'analysisidhere',
+               MethodId = 'methodidhere',
+               OutputId = 'outputidhere')\n}\n    "
+  } else if (population_based) {
     # df3 is always assigned by a population-based template, so stamp the
     # identifiers unconditionally (no empty-data stub branch).
     "\ndf3_analysisidhere <- df3_analysisidhere |>
@@ -224,6 +267,7 @@
     code = paste0("#Apply Method --- \n", code_method),
     operations = operations_named,
     method = method,
-    population_based = population_based
+    population_based = population_based,
+    always_compute = always_compute
   )
 }

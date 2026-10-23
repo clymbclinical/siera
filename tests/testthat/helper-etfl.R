@@ -146,6 +146,22 @@
   list(n_matched = sum(comp$match), n_total = nrow(comp), data = comp)
 }
 
+# Row set AND values of an n (%) analysis against the reference (#203). -------
+# .cmp_n_pct() inner-joins, so a reference row siera does not emit (e.g. the
+# zero row of an arm with no events) goes unnoticed there. This also asserts
+# that siera emits exactly as many n rows as the reference; two-level analyses
+# (a Group2 in the reference) are matched on the inner category too.
+.expect_npct_rows_match <- function(siera_ard, ref_ard, ana_id) {
+  s_n <- sum(siera_ard$AnalysisId == ana_id & siera_ard$stat_name %in% "n")
+  r <- ref_ard[ref_ard$analysisId == ana_id, ]
+  r_n <- sum(r$operation_label == "n")
+  testthat::expect_equal(s_n, r_n, info = paste(ana_id, "n rows (siera vs reference)"))
+  two_level <- any(!is.na(r$Group2) & nzchar(r$Group2))
+  cmp <- if (two_level) .cmp_n_pct_2level(siera_ard, ref_ard, ana_id) else .cmp_n_pct(siera_ard, ref_ard, ana_id)
+  testthat::expect_equal(cmp$n_total, 2L * r_n, info = paste(ana_id, "n and % rows joined"))
+  .expect_all_match(cmp, info = ana_id)
+}
+
 # Two-grouping (e.g. arm x term) n and % — thin wrapper over .cmp_n_pct(). -----
 .cmp_n_pct_2level <- function(siera_ard, ref_ard, ana_id,
                               n_opid = "Mth_03_01_n", pct_opid = "Mth_03_02_%") {

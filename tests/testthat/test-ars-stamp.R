@@ -488,7 +488,9 @@ test_that("wrapped scripts call ars_stamp() and omit the expanded boilerplate", 
 
     expect_match(wrapped, "siera::ars_stamp(", fixed = TRUE)
     expect_match(wrapped, "siera::ars_grouping(", fixed = TRUE)
-    expect_match(wrapped, "<- NULL\nif (nrow(df2_", fixed = TRUE)
+    # analyses grouped by a declared-group factor always compute, with a stub
+    # fallback for an empty subset (#203); the others keep the empty-data guard
+    expect_match(wrapped, "<- NULL\n(if \\(nrow\\(df2_|df3_\\w+ <- tryCatch\\(\\{)")
     expect_false(grepl("case_when(\n        as.character(group", wrapped, fixed = TRUE))
     expect_false(grepl("OutputId = ", wrapped, fixed = TRUE))
     expect_false(grepl("matches('_level$')", wrapped, fixed = TRUE))
@@ -501,4 +503,34 @@ test_that("wrapped scripts call ars_stamp() and omit the expanded boilerplate", 
     expect_identical(n_markers, n_analyses)
     expect_silent(parse(text = wrapped))
   }
+})
+
+test_that("ars_stamp() matches factor levels by label, not by factor code (#203)", {
+  # cards returns group[n]_level as a list-column whose elements keep the data
+  # type; as.character() on a list of factors yields their integer codes.
+  lv <- factor(c("Placebo", "High"), levels = c("Placebo", "Low", "High"))
+  ard <- tibble::tibble(
+    group1_level = list(lv[1], lv[2]),
+    stat = list(1, 2)
+  )
+  out <- ars_stamp(
+    ard, analysis_id = "An_1", method_id = "M_1", output_id = "Out_1",
+    groupings = list(
+      ars_grouping("AG_TRT", groups = c(G_PBO = "Placebo", G_HI = "High"))
+    )
+  )
+  expect_identical(out$group1_groupId, c("G_PBO", "G_HI"))
+  expect_identical(out$group1_level, c("Placebo", "High"))
+
+  dd <- ars_stamp(
+    ard, analysis_id = "An_1", method_id = "M_1", output_id = "Out_1",
+    groupings = list(ars_grouping("AG_TRT", data_driven = TRUE))
+  )
+  expect_identical(dd$group1_groupValue, c("Placebo", "High"))
+})
+
+test_that(".level_labels flattens list levels and passes atomic ones through", {
+  expect_identical(siera:::.level_labels(list(NULL, "A", character(0))),
+                   c(NA_character_, "A", NA_character_))
+  expect_identical(siera:::.level_labels(factor("B")), "B")
 })

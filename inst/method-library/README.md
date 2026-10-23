@@ -97,6 +97,24 @@ via `siera::ars_stamp()` (#206), so templates must not stamp those columns. Some
 `strata_vars`, `by_stmt`) inject a **leading comma**, so a raw template is not valid
 R until substituted — the contract test parses a substituted copy, not the raw text.
 
+**Keep grouping columns as they arrive (#203).** For a pre-defined grouping,
+siera hands the template a `df2_analysisidhere` whose grouping variable is
+already a factor of the declared groups, in ARS order. {cards} zero-fills a
+factor's unused levels, which is how an arm or category with no records still
+gets its `0 (0.0)` row. A template that converts the grouping columns to
+character (e.g. `dplyr::mutate(dplyr::across(everything(), as.character))`)
+throws those levels away: absent groups lose their zero rows and the rows fall
+back to alphabetical order. Do the same for a denominator built from another
+analysis' `df2_`: `dplyr::count()` keeps the factor, so leave it as it is.
+Compare values with `as.character(x) == value` where you need text, rather than
+converting the whole column.
+
+**Compute on zero rows.** An analysis with such a grouping runs its template even
+when its data subset is empty, so the declared groups are reported as zero rows.
+{cards} cannot tabulate an all-missing *character* column, so make a constant
+counting column a factor (`dplyr::mutate(dummy = factor('dummyvar'))`). A
+template that still fails on zero rows falls back to the statistics-free stub.
+
 ## Contract test
 
 `tests/testthat/test-method-library.R` validates every method on each run:
