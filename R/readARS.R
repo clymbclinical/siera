@@ -256,7 +256,13 @@ readARS <- function(ARS_path,
                    !is.na(DEN_analysisid) &&
                    !DEN_analysisid %in% c("", "NA")
 
-      if (has_denom) {
+      # A denominator id that names no analysis of this reporting event (TFL
+      # Designer writes "" or a placeholder such as "<'Total N' information
+      # missing>" when the Total N analysis is absent) is handled like a missing
+      # one: .denominator_fallback() substitutes the analysis-set population.
+      den_known <- has_denom && DEN_analysisid %in% Analyses$id
+
+      if (den_known) {
         AG_denom_id <- Analyses |>
           dplyr::filter(id == DEN_analysisid) |>
           dplyr::select(groupingId1) |>
@@ -379,6 +385,32 @@ readARS <- function(ARS_path,
         code_ds <- paste0(code_ds, "\n")
       }
       code_ds <- paste0(code_ds, code_derived)
+
+      # Denominator fallback ----
+      # A percentage template whose denominator analysis the ARS does not name
+      # (or names with an id no analysis carries) would otherwise be generated
+      # as `df2_` and fail at run time. Stand in the analysis-set population,
+      # grouped like the numerator, and say so.
+      denom_fallback <- .denominator_fallback(
+        analysis_id        = Anas_j,
+        method_id          = methodid,
+        den_analysisid     = DEN_analysisid,
+        den_known          = den_known,
+        poptot_frame       = population$poptot[[Anas_j]],
+        groupids           = groupids,
+        num_grp            = num_grp,
+        derived            = derived,
+        AG_vars            = AG_vars,
+        analysis_groupings = AnalysisGroupings,
+        template_sources   = .template_value_sources(
+          methodid, AnalysisMethodCodeTemplate, AnalysisMethodCodeParameters
+        )
+      )
+      if (!is.null(denom_fallback)) {
+        DEN_analysisid <- denom_fallback$den_analysisid
+        AG_denom_var1  <- denom_fallback$denom_var
+        code_ds <- paste0(code_ds, denom_fallback$code)
+      }
 
       # Apply AnalysisMethod -------------------------------------------------------------
 
